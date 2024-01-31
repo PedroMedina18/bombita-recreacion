@@ -1,0 +1,35 @@
+@import url(./normalize.css);
+
+:root {
+    --principal:36, 11, 54;
+    --secundario: 195, 20, 50;
+    --exito: 58, 182, 92;
+    --error: 191, 51, 59;
+}
+
+#root{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.cursor-pointer{
+    cursor: pointer;
+}
+
+/* modificaciondesl input number */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.btn-disabled:disabled,
+.btn-disabled[disabled] {
+    pointer-events: all;
+    cursor: no-drop
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}

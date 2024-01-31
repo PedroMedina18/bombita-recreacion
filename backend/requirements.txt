@@ -1,0 +1,13 @@
+asgiref==3.7.2
+Django==3.2.23
+django-cors-headers==4.1.0
+MarkupSafe==2.1.4
+mysqlclient @ file:///C:/Users/Pedro/Desktop/Tesis_Bombita_Recreacion/backend/mysqlclient-1.4.6-cp37-cp37m-win32.whl#sha256=72bf677de6fd33f2980325402b1d7e8be91ec191315d1a0a5b639518041b7b8e
+Pillow==9.5.0
+PyJWT==2.8.0
+python-decouple==3.8
+python-dotenv==0.21.1
+pytz==2023.3.post1
+sqlparse==0.4.4
+typing_extensions==4.7.1
+Werkzeug==2.2.3

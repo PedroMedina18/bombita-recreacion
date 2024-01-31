@@ -1,0 +1,198 @@
+/* *diseño general del login */
+main{
+  min-height:500px
+}
+.form {
+  --shadow-color: 273deg 12% 38%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 15px 20px;
+  width: 350px;
+  min-height: 400px;
+  background-color: rgb(18, 20, 48);
+  position: relative;
+  box-shadow: 0.5px 0.3px 0.9px hsl(var(--shadow-color) / 0),
+    2.7px 1.8px 4.9px hsl(var(--shadow-color) / 0.07),
+    5.6px 3.6px 10px hsl(var(--shadow-color) / 0.14),
+    11.4px 7.4px 20.4px hsl(var(--shadow-color) / 0.2);
+}
+
+.icon-user {
+  position: absolute;
+  color: rgb(255, 255, 255);
+  width: 100px;
+  top: 0;
+  background-color: rgb(35, 18, 48);
+  border-radius: 50%;
+  transform: translateY(-50%);
+}
+.bg-login {
+  background-color: #240b36;
+  opacity: 1;
+  background: linear-gradient(135deg, #c3143255 25%, transparent 25%) -37px 0/
+      74px 74px,
+    linear-gradient(225deg, #c31432 25%, transparent 25%) -37px 0/ 74px 74px,
+    linear-gradient(315deg, #c3143255 25%, transparent 25%) 0px 0/ 74px 74px,
+    linear-gradient(45deg, #c31432 25%, #240b36 25%) 0px 0/ 74px 74px;
+}
+
+/* *Input con su label */
+input {
+  --fondo: rgb(247, 247, 247);
+  outline: 0px;
+  width: 100%;
+  height: 100%;
+  background-color: none;
+  border: 0;
+  padding: 25px 5px 5px;
+  color: rgb(0, 0, 0);
+  background-color: var(--fondo);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  background-color: var(--fondo);
+  -webkit-box-shadow: 0 0 0px 1000px var(--fondo) inset;
+  -webkit-text-fill-color: rgb(0, 0, 0);
+}
+.lb-name {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  border-bottom: 2px solid rgb(0, 0, 0);
+  z-index: 1;
+}
+.lb-name::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  border-bottom: 2px solid rgb(255, 103, 166);
+  transform: translateX(-100%);
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.text-name {
+  position: absolute;
+  bottom: 0px;
+  left: 8px;
+  transition: all 0.3s ease;
+  font-weight: bold;
+  font-size: 18px;
+  color: rgb(14, 14, 14);
+}
+
+input:focus + .lb-name .text-name,
+input:valid + .lb-name .text-name {
+  transform: translateY(-130%);
+  font-size: 13px;
+  left: 5px;
+  color: rgb(255, 103, 166);
+}
+
+input:focus + .lb-name::after,
+input:valid + .lb-name::after {
+  transform: translateX(0%);
+}
+.error-login{
+  font-size:17px;
+  color:rgb(255, 1, 44);
+  align-self: flex-start;
+  margin: 0;
+}
+.error .lb-name::after {
+  border-bottom: 2px solid rgb(255, 1, 44);
+}
+.error input:focus + .lb-name .text-name,
+.error input:valid + .lb-name .text-name {
+  color: rgb(255, 1, 44)
+}
+/* *Diseño del boton */
+.button-style-login {
+  font-size: 17px;
+  padding: 1em 2.7em;
+  font-weight: 500;
+  background: #464646ea;
+  color: white;
+  border: none;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.6em;
+  cursor: pointer;
+  width: 100%;
+}
+
+.gradient {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  border-radius: 0.6em;
+  margin-top: -0.25em;
+  background-image: linear-gradient(
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0.3)
+  );
+}
+
+.name {
+  position: relative;
+  top: -1px;
+}
+
+.transition {
+  transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  transition-duration: 500ms;
+  background-color: rgb(195, 20, 50);
+  border-radius: 9999px;
+  width: 0;
+  height: 0;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.button-style-login:hover .transition {
+  width: 110%;
+  height: 14em;
+}
+
+.button-style-login:active {
+  transform: scale(0.97);
+}
+
+
+/* alerta */
+.alert-login{
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 10px;
+  width: 100%;
+  background-color: rgb(195, 20, 50);
+  border-radius: 10px;
+  border: 2px  solid rgb(228, 4, 42);
+  color: rgb(255, 255, 255);
+  font-size: 12px;
+  text-align: center;
+}
+.alert-login p{
+  margin: 0;
+}
+.alert-login svg{
+  width: 30px;
+}
