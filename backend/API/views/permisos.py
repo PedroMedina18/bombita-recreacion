@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http.response import JsonResponse
 from django.views import View
-
+from ..funtions.token import verify_token
 from ..funtions.serializador import dictfetchall
 from django.db import IntegrityError, connection
 import json
@@ -11,6 +11,15 @@ class Permisos_Views(View):
     def get(self, request):
         try:
             cursor = connection.cursor()
+            verify=verify_token(request.headers)
+            print(verify)
+            if(not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"],
+                    "data": None
+                }
+                return JsonResponse(datos)
             query = "SELECT * FROM permisos ORDER BY id ASC;"
             cursor.execute(query)
             permisos = dictfetchall(cursor)

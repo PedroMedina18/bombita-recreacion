@@ -6,10 +6,12 @@ from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..models import Cargos, PermisosCargos, Permisos
+from ..funtions.token import verify_token
 from django.db import IntegrityError, connection
 import json
 
 # CRUD COMPLETO DE LA TABLA DE CARGOS
+
 class Cargos_Views(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -18,8 +20,15 @@ class Cargos_Views(View):
     def post(self, request):
         try:
             jd = json.loads(request.body)
-            cargo = Cargos.objects.create(nombre=jd['nombre'].title(
-            ), descripcion=jd['descripcion'], administrador=jd['administrador'])
+            verify = verify_token(jd["headers"])
+            jd = jd["body"]
+            if (not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"],
+                }
+                return JsonResponse(datos)
+            cargo = Cargos.objects.create(nombre=jd["nombre"].title(), descripcion=jd['descripcion'], administrador=jd['administrador'])
             if (not jd['administrador']):
                 permisos = jd['permisos']
                 for permiso in permisos:
@@ -32,6 +41,7 @@ class Cargos_Views(View):
             }
             return JsonResponse(datos)
         except Exception as ex:
+            print(ex)
             print("Error", ex)
             datos = {
                 "status": False,
@@ -55,7 +65,7 @@ class Cargos_Views(View):
         return JsonResponse(datos)
 
     def get(self, request, id=0):
-        
+
         try:
             cursor = connection.cursor()
             if (id > 0):
@@ -85,30 +95,32 @@ class Cargos_Views(View):
                     """
                     cursor.execute(query, [int(id)])
                     permisos = dictfetchall(cursor)
-                    cargo[0]["permisos"]=permisos
+                    cargo[0]["permisos"] = permisos
                 datos = {
                     "status": True,
                     'message': "Exito",
                     "data": cargo[0]
                 }
             else:
-                if("all" in request.GET and request.GET["all"]=="true"):
+                if ("all" in request.GET and request.GET["all"] == "true"):
                     query = """
                     SELECT * FROM cargos ORDER BY id ASC;
                     """
                     cursor.execute(query)
                     cargos = dictfetchall(cursor)
-                elif("page" in request.GET ):
+                elif ("page" in request.GET):
                     query = """
                     SELECT * FROM cargos ORDER BY id ASC LIMIT %s, %s;
                     """
-                    cursor.execute(query, [indiceInicial(int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
+                    cursor.execute(query, [indiceInicial(
+                        int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
                     cargos = dictfetchall(cursor)
-                elif("page" in request.GET and "desc" in request.GET and request.GET["desc"]=="true"):
+                elif ("page" in request.GET and "desc" in request.GET and request.GET["desc"] == "true"):
                     query = """
                     SELECT * FROM cargos ORDER BY id DESC LIMIT %s, %s;
                     """
-                    cursor.execute(query, [indiceInicial(int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
+                    cursor.execute(query, [indiceInicial(
+                        int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
                     cargos = dictfetchall(cursor)
                 else:
                     query = """
@@ -116,25 +128,25 @@ class Cargos_Views(View):
                     """
                     cursor.execute(query)
                     cargos = dictfetchall(cursor)
-                
-                query="""
+
+                query = """
                     SELECT CEILING(COUNT(*) / 25) AS total FROM cargos;
                 """
                 cursor.execute(query)
                 pages = dictfetchall(cursor)
-                if len(cargos)>0:
+                if len(cargos) > 0:
                     datos = {
                         "status": True,
                         'message': "Exito",
                         "data": cargos,
-                        "pages":pages[0]["total"]
+                        "pages": pages[0]["total"]
                     }
                 else:
                     datos = {
                         "status": True,
                         'message': "Error. No se encontraron registros",
                         "data": None,
-                        "pages":pages[0]["total"]
+                        "pages": pages[0]["total"]
                     }
             return JsonResponse(datos)
         except Exception as ex:
@@ -143,7 +155,7 @@ class Cargos_Views(View):
                 "status": False,
                 'message': "Error. Error de sistema",
                 "data": None,
-                "pages":None
+                "pages": None
             }
             return JsonResponse(datos)
         finally:
@@ -161,14 +173,14 @@ class Cargos_Views(View):
                 cargo.descripcion = jd['descripcion']
                 cargo.administrador = jd['administrador']
                 cargo.save()
-                if(jd['administrador']):
+                if (jd['administrador']):
                     PermisosCargos.objects.filter(cargos=id).delete()
                     datos = {
-                    "status": True,
-                    'message': "Exito. Registro Editado"
+                        "status": True,
+                        'message': "Exito. Registro Editado"
                     }
                 else:
-                    query=""""
+                    query = """"
                     SELECT p.id FROM
                         cargos AS c
                     INNER JOIN 
@@ -184,23 +196,26 @@ class Cargos_Views(View):
                     """
                     cursor.execute(query, [int(id)])
                     permisos = dictfetchall(cursor)
-                    ids=[permiso["id"] for permiso in permisos]
-                    eliminar = [num for num in ids if num not in jd["permisos"]]
+                    ids = [permiso["id"] for permiso in permisos]
+                    eliminar = [
+                        num for num in ids if num not in jd["permisos"]]
                     for idPermisos in eliminar:
-                        PermisosCargos.objects.filter(cargos=id, permisos=idPermisos).delete()
+                        PermisosCargos.objects.filter(
+                            cargos=id, permisos=idPermisos).delete()
                     agregar = [num for num in jd["permisos"] if num not in ids]
                     for idPermisos in agregar:
-                        permiso=Permisos.get(id=idPermisos)
-                        PermisosCargos.objects.create(cargos=cargo, permisos=permiso)
+                        permiso = Permisos.get(id=idPermisos)
+                        PermisosCargos.objects.create(
+                            cargos=cargo, permisos=permiso)
                     datos = {
-                    "status": True,
-                    'message': "Exito. Registro Editado"
+                        "status": True,
+                        'message': "Exito. Registro Editado"
                     }
             else:
                 datos = {
                     "status": False,
                     'message': "Error. Registro no encontrado"
-                    }
+                }
             return JsonResponse(datos)
         except Exception as ex:
             print("Error", ex)

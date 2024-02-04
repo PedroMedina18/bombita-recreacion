@@ -1,60 +1,60 @@
 
 import './login.css'
 import { useForm } from "react-hook-form";
-import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
-import {login} from "../../js/API.js"
+import { useNavigate, Navigate } from 'react-router-dom';
+import { useState, useContext } from 'react';
+import { AuthContext } from '../../context/AuthContext';
+import { login, verify_token } from "../../js/API.js"
+import { getCookie } from "../../js/cookie.js"
 
 
 function Login() {
+  const { saveUser, isAuthenticateds } = useContext(AuthContext)
   const [alert, setAlert] = useState()
+  const navigate = useNavigate();
 
+
+  // the useform
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
 
+
+  //funcion del evento submit para comprobar el usuario
   const onSubmit = handleSubmit(
     async (data) => {
       try {
         document.getElementById("button-login").disabled = true
         const res = await login(data)
-        console.log(res)
         document.getElementById("button-login").disabled = false
-        if(res.statusText="OK"){
-          if(res.data.status){
-            console.log(res.data)
+        if (res.status = 200) {
+          if (res.data.status && res.data.token) {
+            saveUser(res.data.data, res.data.token)
+            navigate("/inicio")
             setAlert("")
-          }else{
+          } else {
             setAlert(res.data.message)
             document.getElementById("button-login").disabled = false
           }
-        }else{
+        } else {
           setAlert("Error de sistema. Por favor intentet mas tarde")
           document.getElementById("button-login").disabled = false
         }
-        // if (res.data.status) {
-        //   setLoginUser({
-        //     ...user,
-        //     state: true,
-        //     token: res.data.token,
-        //     nombre: res.data.result.nombre,
-        //     usuario: res.data.result.usuario,
-        //     cargo: res.data.result.cargo,
-        //   })
-        //   navigate("/inicio")
-        // } else {
-        //   setError(res.data.message)
-        //   document.getElementById("button-login").disabled = false
-        // }
       } catch (error) {
+        console.log(error)
         setAlert("Error de sistema. Por favor intentet mas tarde")
         document.getElementById("button-login").disabled = false
       }
     }
   )
-
+  
+  // verificacion por si ya esta logeado el usuario
+  if(isAuthenticateds && getCookie("token")){
+    <Navigate to="/inicio"/>
+  }
+  
   return (
     <main className='w-100 vh-100 d-flex justify-content-center align-items-center bg-login'>
       <form className='form'
@@ -121,18 +121,18 @@ function Login() {
           </label>
         </div>
         {errors.contraseña ? <span className='error-login'>{errors.contraseña.message}</span> : <span className='error-login invisible'>error</span>}
-        
+
         {
-          alert?
-          (
-            <div className='alert-login'>
+          alert ?
+            (
+              <div className='alert-login'>
 
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11 7h2v7h-2zm0 8h2v2h-2z"></path><path d="m21.707 7.293-5-5A.996.996 0 0 0 16 2H8a.996.996 0 0 0-.707.293l-5 5A.996.996 0 0 0 2 8v8c0 .266.105.52.293.707l5 5A.996.996 0 0 0 8 22h8c.266 0 .52-.105.707-.293l5-5A.996.996 0 0 0 22 16V8a.996.996 0 0 0-.293-.707zM20 15.586 15.586 20H8.414L4 15.586V8.414L8.414 4h7.172L20 8.414v7.172z"></path></svg>
                 <p>{alert}</p>
-            </div>
-          )
-          :
-          ""
+              </div>
+            )
+            :
+            ""
         }
 
         <button type="subtmit" className={`button-style-login mt-4 btn-disabled`} id="button-login">

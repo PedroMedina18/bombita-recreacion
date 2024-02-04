@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from jwt import encode, decode, ExpiredSignatureError, InvalidSignatureError, DecodeError
 from decouple import config
 
-def new_token(user, permisos, administrador):
+def new_token(user):
     fecha=datetime.now()
     fechaNew=datetime.now() + timedelta(hours=10)
     payload = {
@@ -10,16 +10,17 @@ def new_token(user, permisos, administrador):
             'exp': fechaNew,
             "id":user["id"],
             "nombre":user["nombre"],
-            "administrador":administrador,
-            "permisos":permisos
+            "cargo":user["cargo_id"],
+            # "administrador":administrador,
+            # "permisos":permisos
         }
     return {"token":encode(payload, config('TOKEN'), algorithm="HS256"), "fecha":fechaNew}
 
 def verify_token(headers):
-    if 'Authorization' in headers.keys():
+    if 'Authorization' in headers:
         authorization = headers['Authorization']
         encoded_token = authorization.split(" ")[1]
-        if (len(encoded_token) > 0):
+        if (len(authorization) > 0):
             try:
                 payload = decode(encoded_token, config('TOKEN'), algorithms=["HS256"])
                 if(payload):
@@ -31,7 +32,7 @@ def verify_token(headers):
                 datos = {'status':False,'message': 'Token Expirado'}
                 return datos
             except InvalidSignatureError:
-                datos = {'status':False,'message': 'Token Invalido 2'}
+                datos = {'status':False,'message': 'Firma Invalida'}
                 return datos
     datos = {'status':False,'message': 'Sin Autorizacion'}
     return datos

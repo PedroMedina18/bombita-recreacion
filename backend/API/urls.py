@@ -6,6 +6,7 @@ from .views.tipo_documento import Tipo_Documento_Views
 from .views.permisos import Permisos_Views
 from .views.personas import Persona_Views
 from .views.usuarios import Usuario_Views
+from .views.verify_token import Verify_Token_Views
 
 urlpatterns=[
     path('cargos/', Cargos_Views.as_view(), name='cargos'),
@@ -16,4 +17,5 @@ urlpatterns=[
     path('personas/', Persona_Views.as_view(), name='personas'),
     path('usuarios/', Usuario_Views.as_view(), name='usuarios'),
     path('login/', Login.as_view(), name='login'),
+    path('verify/', Verify_Token_Views.as_view(), name='verify'),
 ]

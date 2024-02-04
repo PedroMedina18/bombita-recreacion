@@ -10,6 +10,7 @@ from ..funtions.serializador import dictfetchall
 from ..models import Cargos
 from django.db import IntegrityError, connection
 import json
+from datetime import datetime 
 
 class Login(View):
     @method_decorator(csrf_exempt)
@@ -39,52 +40,52 @@ class Login(View):
                 # se comprueba de que la contraseña este correcta
                 contraseña = desencriptado_contraseña(usuario[0]["contraseña"], jd['contraseña'])
                 if(contraseña):
-                    user_administrador=Cargos.objects.filter(id=usuario[0]["cargo_id"]).values("administrador")
-                    if(user_administrador[0]["administrador"]):
-                        token=new_token(usuario[0], None, user_administrador[0]["administrador"])
-                        response={
-                            'status':True,
-                            'message': "Acceso permitido", 
-                            'token':token["token"], 
-                            "data":{
-                                "nombre":usuario[0]["nombre"], 
-                                "cargo":usuario[0]["cargo"], 
-                                "usuario":usuario[0]["usuario"],
-                                "administador":user_administrador[0]["administrador"],
-                                "permisos": None
-                            }
+                    # user_administrador=Cargos.objects.filter(id=usuario[0]["cargo_id"]).values("administrador")
+                    # if(user_administrador[0]["administrador"]):
+                    #     token=new_token(usuario[0], None, user_administrador[0]["administrador"])
+                    #     response={
+                    #         'status':True,
+                    #         'message': "Acceso permitido", 
+                    #         'token':token["token"], 
+                    #         "data":{
+                    #             "nombre":usuario[0]["nombre"], 
+                    #             "cargo":usuario[0]["cargo"], 
+                    #             "usuario":usuario[0]["usuario"],
+                    #             "administador":user_administrador[0]["administrador"],
+                    #             "permisos": None
+                    #         }
+                    #     }
+                    # else:
+                    #     query="""
+                    #     SELECT p.id 
+                    #     FROM
+                    #         cargos AS c
+                    #     INNER JOIN 
+                    #         permisos_has_cargos 
+                    #     ON 
+                    #         c.id = permisos_has_cargos.cargo_id
+                    #     INNER JOIN 
+                    #         permisos AS P
+                    #     ON 
+                    #         p.id = permisos_has_cargos.permiso_id
+                    #     WHERE 
+                    #         c.id = %s;
+                    #     """
+                    #     cursor.execute(query, [int(usuario[0]["cargo_id"])])
+                    #     permisos=dictfetchall(cursor)
+                    # token=new_token(usuario[0], [permiso["id"] for permiso in permisos], False)
+                    token=new_token(usuario[0])
+                    response={
+                        'status':True,
+                        'message': "Acceso permitido", 
+                        'token':token["token"], 
+                        "data":{
+                            "id":usuario[0]["id"],
+                            "nombre":usuario[0]["nombre"],
+                            "cargo":usuario[0]["cargo"],
+                            "inicio_sesion":datetime.now()
                         }
-                    else:
-                        query="""
-                        SELECT p.id 
-                        FROM
-                            cargos AS c
-                        INNER JOIN 
-                            permisos_has_cargos 
-                        ON 
-                            c.id = permisos_has_cargos.cargo_id
-                        INNER JOIN 
-                            permisos AS P
-                        ON 
-                            p.id = permisos_has_cargos.permiso_id
-                        WHERE 
-                            c.id = %s;
-                        """
-                        cursor.execute(query, [int(usuario[0]["cargo_id"])])
-                        permisos=dictfetchall(cursor)
-                        token=new_token(usuario[0], [permiso["id"] for permiso in permisos], False)
-                        response={
-                            'status':True,
-                            'message': "Acceso permitido", 
-                            'token':token["token"], 
-                            "data":{
-                                "nombre":usuario[0]["nombre"], 
-                                "cargo":usuario[0]["cargo"], 
-                                "usuario":usuario[0]["usuario"],
-                                "administador":user_administrador[0]["administrador"],
-                                "permisos": [permiso["id"] for permiso in permisos]
-                            }
-                        }
+                    }
                     return JsonResponse(response)
                 else:
                     response={

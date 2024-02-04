@@ -38,7 +38,7 @@
   width: 30px;
   position: absolute;
   right: 2px;
-  bottom: 1px;
+  top: 6px;
   z-index: 100;
   font-size: 16px;
   opacity: 0;
@@ -51,23 +51,33 @@
   font-weight: 500;
   display: block;
   visibility: hidden;
+  margin:0;
 }
-
+.form-check-input{
+  --bs-border-width:2px;
+  --bs-border-color:black;
+}
 /* -----Seccion de errores */
 .error .formulario-input,
 .error .formulario-textarea {
   border: 2px solid rgb(var(--error));
 }
 .error .formulario-input:focus,
-.error .formulario-textarea:focus {
+.error .formulario-textarea:focus,
+.error .form-check-input:focus {
   border: 2px solid rgb(var(--error));
   box-shadow: 0 0 0 0.25rem rgba(253, 41, 13, 0.25);
 }
-
 .error .bi-x-circle-fill {
   opacity: 1;
+}
+.error.check .formulario-label{
+  color:rgb(var(--error))
 }
 .error .formulario-message-error {
   visibility: visible;
   color: rgb(var(--error));
+}
+.error .form-check-input{
+  border: 2px solid rgb(var(--error));
 }

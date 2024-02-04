@@ -7,6 +7,7 @@ from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..models import TipoDocumento
 from django.db import IntegrityError, connection
+from ..funtions.token import verify_token
 import json
 
 # CRUD COMPLETO DE LA TABLA DE tipo_documento
@@ -18,6 +19,14 @@ class Tipo_Documento_Views(View):
     def post(self, request):
         try:
             jd = json.loads(request.body)
+            verify = verify_token(jd["headers"])
+            jd = jd["body"]
+            if (not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"],
+                }
+                return JsonResponse(datos)
             TipoDocumento.objects.create(nombre=jd['nombre'].title(), descripcion=jd['descripcion'])
             datos = {
                 "status": True,

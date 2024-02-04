@@ -1,0 +1,22 @@
+.button-initial{
+    padding: 10px 15px;
+    font-family: 16px;
+    border-radius: 5px;
+    border: 0px solid;
+    background-color: rgb(var(--secundario));
+    color: white;
+    font-weight: 800;
+    transition: all ease .3s;
+}
+.button-initial:hover{
+    transform: scale(1.05);
+}
+.button-initial:active{
+    background-color: rgb(var(--secundario), 0.75);
+}
+.button-initial.w-100{
+    width: 100%;
+}
+.button-initial.w-50{
+    width: 50%;
+}

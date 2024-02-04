@@ -18,6 +18,17 @@
 .name-page{
     font-size: 20px;
     font-weight: bold;
+    padding-bottom: 3px;
+}
+.descripcion-page{
+    font-size: 14px;
+    font-weight: lighter;
+    margin: 0;
+    color: rgb(0, 0, 0);
+}
+.span-fecha{
+    font-size: 13px;
+    font-weight: bold;
 }
 .main .body{
     background-color: rgb(226, 221, 221);
