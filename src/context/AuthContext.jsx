@@ -4,7 +4,7 @@ export const AuthContext = createContext();
 import { getCookie } from "../js/cookie.js"
 
 export function AuthContextProvider({ children }) {
-  const [user, setUser] = useState()
+  const [user, setUser] = useState({})
   const [isAuthenticateds, setIsAuthenticated] = useState(false)
   const [isloading, setIsLoading] = useState(true);
   
@@ -31,12 +31,12 @@ export function AuthContextProvider({ children }) {
   const getUser = () => {
     return user
   }
-
+  // funcion para chekear si el token es valido
   const checkAuth = async () => {
     try {
       const token = getCookie("token")
       if (token) {
-        const res = await verify_token()
+        const res = await verify_token.get()
         if (res.statusText = "OK" && res.data.status && res.data.token) {
           saveUser(res.data.data, res.data.token)
         } else {
@@ -54,6 +54,11 @@ export function AuthContextProvider({ children }) {
       setIsLoading(false)
     }
   }
+  const closeSession=()=>{
+    setUser({})
+    setIsAuthenticated(false)
+    document.cookie = `token=; path=/; max-age=0`
+  }
 
   return (
     <AuthContext.Provider value={
@@ -61,6 +66,7 @@ export function AuthContextProvider({ children }) {
         saveUser,
         getUser,
         isAuthenticateds,
+        closeSession,
       }
     }>
       {isloading ? <div>Loading...</div> : children}

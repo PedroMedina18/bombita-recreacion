@@ -4,13 +4,13 @@ import { Toaster } from "sonner";
 import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
-import { permisos_get, post_cargos } from "../../js/API.js";
+import { permisos, cargos } from "../../js/API.js";
 import { LoaderCircle } from "../../components/loader/Loader";
 import { ButtonSimple } from "../../components/button/Button"
-import { alertConfim, toastError, alertLoading, alertAceptar } from "../../js/alerts.js"
+import { alertConfim, toastError, alertLoading } from "../../js/alerts.js"
 import { InputText, InputTextTarea, InputCheck, MultiSelect } from "../../components/input/Input"
 import ErrorSystem from "../../components/ErrorSystem";
-import {hasLeadingOrTrailingSpace} from "../../js/funtions.js"
+import {hasLeadingOrTrailingSpace, verificacion_options} from "../../js/funtions.js"
 
 function Cargos() {
     const navigate = useNavigate();
@@ -19,36 +19,23 @@ function Cargos() {
     const [options, setOptions] = useState([])
     const [selectOptions, setSelectOptions] = useState([])
     useEffect(() => {
-        getPermisos()
+        get_Permisos()
     }, [])
 
     // funcion para buscar los permisos en la vase de datos
-    const getPermisos = async () => {
+    const get_Permisos = async () => {
         try {
-            const res = await permisos_get()
-            if (res.status === 200) {
-                if (res.data.status === true) {
-                    const permisos = res.data.data.map((elements) => {
-                        return {
-                            value: elements.id,
-                            label: elements.nombre
-                        }
-                    })
-                    setOptions(permisos)
-                    setLoading(false)
-                    setErrorServer(``)
-                } else {
-                    setLoading(false)
-                    setErrorServer(`${res.data.message}`)
-                }
-            } else {
-                setLoading(false)
-                setErrorServer(`Error. ${res.status} ${res.statusText}`)
-            }
+            const res = await permisos.get()
+            verificacion_options({
+                respuesta:res,
+                setError:setErrorServer,
+                setOptions
+            })
         } catch (error) {
             console.log(error)
-            setLoading(false)
             setErrorServer("Error de Sistema")
+        } finally{
+            setLoading(false)
         }
     }
     // the useform
@@ -73,7 +60,7 @@ function Cargos() {
                         permisos: permisos
                     }
                     alertLoading("Cargando")
-                    const res = await post_cargos(body)
+                    const res = await cargos.post(body)
                     if (res.status = 200) {
                         if (res.data.status) {
                             Swal.close()
@@ -92,7 +79,6 @@ function Cargos() {
                         )
                     }
                 }
-
             } catch (error) {
                 console.log(error)
                 Swal.close()

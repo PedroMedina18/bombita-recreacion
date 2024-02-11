@@ -1,8 +1,7 @@
 import axios from 'axios'
-import { getCookie } from "../js/cookie.js"
+import Petisions from './class/Peticions.js'
 
-
-const API = axios.create({
+export const API = axios.create({
     baseURL: "http://127.0.0.1:8000/API/v1/",
 })
 
@@ -10,43 +9,20 @@ export const login = async (data) => {
     return API.post("login/", data)
 }
 
-export const post_cargos = async (data) => {
-    const token = getCookie("token")
-    return API.post("cargos/", {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-        },
-        body: data,
-    })
-}
-export const post_tipoDocumento = async (data) => {
-    const token = getCookie("token")
-    return API.post("tipo_documento/", {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-        },
-        body: data,
-    })
-}
+export const usuarios=new Petisions("usuarios")
 
-export const verify_token = async () => {
-    const token = getCookie("token")
-    return API.get("verify/", {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-        }
-    })
-}
+export const recreadores=new Petisions("recreadores")
 
-export const permisos_get = async () => {
-    const token = getCookie("token")
-    return API.get("permisos/", {
-        headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-        }
-    })
-}
+export const actividades=new Petisions("actividades")
+
+export const verify_token=new Petisions("verify")
+
+export const permisos=new Petisions("permisos")
+
+export const personas=new Petisions("personas")
+
+export const cargos=new Petisions("cargos")
+
+export const niveles=new Petisions("niveles")
+
+export const tipo_documentos=new Petisions("tipo_documento")

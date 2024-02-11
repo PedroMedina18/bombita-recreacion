@@ -5,7 +5,7 @@
 } */
 
 .main {
-    height: 100vh;
+    min-height: 100vh;
     width: 100%;
     overflow: hidden;
     transition: all 0.35s ease-in-out;
@@ -40,7 +40,7 @@
 .sidebar {
     width: 70px;
     min-width: 70px;
-    min-height: 100vh;
+    height: 100vh;
     z-index: 1000;
     transition: all .25s ease-in-out;
     background-color: rgb(36, 11, 54);
@@ -48,6 +48,21 @@
     position:fixed;
     flex-direction: column;
 }
+.sidebar::before{
+    content: "";
+    background-color: rgb(0, 0, 0, 0.5);
+    height: 100vh;
+    width: 100vw;
+    top: 0;
+    right: 0;
+    transform: translateX(-100%);
+    position: absolute;
+    background-clip: padding-box;
+    z-index: -5;
+    transition: all 0.3s ease;
+
+}
+
 .perfile{
     background-color:  rgb(36, 11, 54);
     width: 100%;
@@ -95,7 +110,8 @@
 }
 
 .sidebar:not(.expand) .sidebar-logo,
-.sidebar:not(.expand) a.sidebar-link span {
+.sidebar:not(.expand) a.sidebar-link span,
+.sidebar:not(.expand) p.sidebar-link span {
     visibility: hidden;
 }
 
@@ -104,8 +120,20 @@
     flex: 1 1 auto;
     margin: 0;
 }
+.sidebar.expand .sidebar-nav{
+    overflow-y: auto;
+}
+.sidebar.expand .sidebar-nav::-webkit-scrollbar{
+    width: 10px;
+    background-color: transparent;
+}
+.sidebar.expand .sidebar-nav::-webkit-scrollbar-thumb{
+    background-color: rgb(var(--secundario));
+    border-radius: 10px;
+}
 
-a.sidebar-link {
+
+a.sidebar-link, p.sidebar-link {
     padding: .625rem 1rem;
     color: #FFF;
     display: block;
@@ -113,7 +141,7 @@ a.sidebar-link {
     white-space: nowrap;
     border-left: 3px solid transparent;
     text-decoration: none;
-    
+    cursor: pointer;
 }
 
 .sidebar-link svg {
@@ -121,7 +149,7 @@ a.sidebar-link {
     margin-right: .75rem;
 }
 
-a.sidebar-link:hover {
+a.sidebar-link:hover, p.sidebar-link:hover {
     background-color: rgba(255, 255, 255, .075);
     border-left: 3px solid rgb(195, 20, 50);
 }
@@ -163,4 +191,10 @@ a.sidebar-link:hover {
 .sidebar.expand .sidebar-link[data-bs-toggle="collapse"].collapsed::after {
     transform: rotate(45deg);
     transition: all .2s ease-out;
+}
+@media (max-width: 576px) {
+    
+    .expand.sidebar::before{
+        transform: translateX(100%);
+    }
 }

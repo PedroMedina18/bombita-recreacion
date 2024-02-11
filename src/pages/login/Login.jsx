@@ -2,9 +2,9 @@
 import './login.css'
 import { useForm } from "react-hook-form";
 import { useNavigate, Navigate } from 'react-router-dom';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect, useRef } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { login, verify_token } from "../../js/API.js"
+import { login } from "../../js/API.js"
 import { getCookie } from "../../js/cookie.js"
 
 
@@ -12,7 +12,6 @@ function Login() {
   const { saveUser, isAuthenticateds } = useContext(AuthContext)
   const [alert, setAlert] = useState()
   const navigate = useNavigate();
-
 
   // the useform
   const {
@@ -49,24 +48,25 @@ function Login() {
       }
     }
   )
-  
+
   // verificacion por si ya esta logeado el usuario
-  if(isAuthenticateds && getCookie("token")){
-    <Navigate to="/inicio"/>
+  if (isAuthenticateds && getCookie("token")) {
+    <Navigate to="/inicio" />
   }
-  
+
   return (
     <main className='w-100 vh-100 d-flex justify-content-center align-items-center bg-login'>
       <form className='form'
+      autoComplete={"off"}
         onSubmit={onSubmit}
       >
         <div className="icon-user" >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.579 2 2 6.579 2 12s4.579 10 10 10 10-4.579 10-10S17.421 2 12 2zm0 5c1.727 0 3 1.272 3 3s-1.273 3-3 3c-1.726 0-3-1.272-3-3s1.274-3 3-3zm-5.106 9.772c.897-1.32 2.393-2.2 4.106-2.2h2c1.714 0 3.209.88 4.106 2.2C15.828 18.14 14.015 19 12 19s-3.828-.86-5.106-2.228z"></path></svg>
         </div>
 
-        <h1 className='h1 fw-bold mb-4 mt-4 text-white'>Inicio de Sesión</h1>
+        <h1 className='h1 fw-bold mb-4 mt-5 text-white'>Inicio de Sesión</h1>
 
-        <div className={`w-100 position-relative overflow-hidden my-2 ${errors.usuario ? "error" : ""}`}>
+        <div className={`w-100 position-relative overflow-hidden my-2  ${errors.usuario ? "error" : ""}`} id="container-input-usuario">
           <input
             type="text"
             id="user"
@@ -87,6 +87,15 @@ function Login() {
               }
             })
             }
+            onKeyUp={
+              (e)=>{
+                if(e.target.value){
+                  document.getElementById("container-input-usuario").classList.add("valid")
+                }else{
+                  document.getElementById("container-input-usuario").classList.remove("valid")
+                }
+              }
+            }
           />
           <label htmlFor="user" className='lb-name  cursor-pointer'>
             <span className='text-name'>Usuario</span>
@@ -94,7 +103,7 @@ function Login() {
         </div>
         {errors.usuario ? <span className='error-login'>{errors.usuario.message}</span> : <span className='error-login invisible'>error</span>}
 
-        <div className={`w-100 position-relative overflow-hidden my-2 ${errors.contraseña ? "error" : ""}`}>
+        <div className={`w-100 position-relative overflow-hidden my-2 ${errors.contraseña ? "error" : ""}`} id="container-input-password">
           <input
             id="password"
             type="password"
@@ -115,6 +124,16 @@ function Login() {
               }
             })
             }
+            onKeyUp={
+              (e)=>{
+                if(e.target.value){
+                  document.getElementById("container-input-password").classList.add("valid")
+                }else{
+                  document.getElementById("container-input-password").classList.remove("valid")
+                }
+              }
+            }
+            autoComplete="current-password"
           />
           <label htmlFor="password" className='lb-name  cursor-pointer'>
             <span className='text-name'>Contraseña</span>

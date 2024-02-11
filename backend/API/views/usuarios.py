@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from ..funtions.encriptado_contraseña import encriptado_constraseña, desencriptado_contraseña
 from ..funtions.indice import indiceFinal, indiceInicial
-from ..funtions.token import new_token, verify_token
+from ..funtions.token import verify_token
 from ..funtions.serializador import dictfetchall
 from ..models import Cargos, Permisos, TipoDocumento, Usuarios, Personas
 from django.db import IntegrityError, connection
@@ -20,6 +20,16 @@ class Usuario_Views(View):
     def post(self, request):
         try:
             jd = json.loads(request.body)
+            verify = verify_token(jd["headers"])
+            jd = jd["body"]
+            if (not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"],
+                }
+                return JsonResponse(datos)
+
+            # Comprobar si se esta registrando un nuevo recreador con los datos de una persona existente
             if("id_persona" in jd):
                 persona = list(Personas.objects.filter(id=jd["id_persona"]).values())
                 if(len(persona)>0):
@@ -30,6 +40,7 @@ class Usuario_Views(View):
                         'message': "Error. Compruebe id de la persona"
                     }
                     return JsonResponse(datos)
+                    
             else:
                 tipo_documento = list(TipoDocumento.objects.filter(id=jd["tipo_documento"]).values())
                 if(len(tipo_documento)>0):

@@ -12,7 +12,6 @@ class Permisos_Views(View):
         try:
             cursor = connection.cursor()
             verify=verify_token(request.headers)
-            print(verify)
             if(not verify["status"]):
                 datos = {
                     "status": False,

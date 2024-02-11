@@ -3,28 +3,44 @@ from django.http.response import JsonResponse
 from django.views import View
 from ..funtions.serializador import dictfetchall
 from django.db import IntegrityError, connection
+from ..funtions.token import verify_token
 
 class Persona_Views(View):
-    def get(self, request, documento=0, tipo_documento=0):
+    def get(self, request, tipo_documento=0, documento=0):
         try:
             cursor = connection.cursor()
-            if(documento>0 and tipo_documento>0):
+            verify=verify_token(request.headers)
+            if(not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"],
+                    "data": None
+                }
+                return JsonResponse(datos)
+            if(tipo_documento>0 and documento>0):
                 query = """
                     SELECT 
-                        p.id
+                        p.id,
                         p.nombres, 
                         p.apellidos, 
                         p.numero_documento,
-                        p.telefono_principal,
-                        p.telefono_secundario,
+                        CONCAT('0', p.telefono_principal) AS telefono_principal,
+                        CONCAT('0', p.telefono_secundario) AS telefono_secundario,
                         p.correo,
-                        tp.id,
-                        tp.nombre
+                        tp.id AS id_documento,
+                        tp.nombre AS nombre_documento
                     FROM personas AS p
-                        LEFT JOIN tipo_documento AS tp
+                        LEFT JOIN tipo_documentos AS tp
                     ON p.tipo_documento_id= tp.id
                     WHERE p.numero_documento=%s AND tp.id=%s;
                 """
+            else:
+                datos = {
+                    "status": False,
+                    'message': "Error. Persona no encontrada",
+                    "data": None
+                }
+                return JsonResponse(datos)
             cursor.execute(query, [int(documento), int(tipo_documento)])
             persona = dictfetchall(cursor)
             if len(persona) > 0:
@@ -36,7 +52,7 @@ class Persona_Views(View):
             else:
                 datos = {
                     "status": False,
-                    'message': "Error. Permisos no encontrados",
+                    'message': "Error. Persona no encontrada",
                     "data": None
                 }
             return JsonResponse(datos)

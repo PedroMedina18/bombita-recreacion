@@ -94,7 +94,7 @@ input:-webkit-autofill:focus {
 }
 
 input:focus + .lb-name .text-name,
-input:valid + .lb-name .text-name {
+.valid .lb-name .text-name {
   transform: translateY(-130%);
   font-size: 13px;
   left: 5px;
@@ -102,7 +102,7 @@ input:valid + .lb-name .text-name {
 }
 
 input:focus + .lb-name::after,
-input:valid + .lb-name::after {
+.valid .lb-name::after {
   transform: translateX(0%);
 }
 .error-login{
@@ -115,7 +115,7 @@ input:valid + .lb-name::after {
   border-bottom: 2px solid rgb(255, 1, 44);
 }
 .error input:focus + .lb-name .text-name,
-.error input:valid + .lb-name .text-name {
+.valid.error .lb-name .text-name {
   color: rgb(255, 1, 44)
 }
 /* *Diseño del boton */

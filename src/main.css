@@ -5,9 +5,9 @@
   --secundario: 195, 20, 50;
   --exito: 43, 241, 96;
   --error: 226, 32, 42;
-  --info:17, 182, 233;
+  --info: 17, 182, 233;
 }
-.white{
+.white {
   color: white;
 }
 #root {
@@ -57,10 +57,10 @@ input[type="number"] {
 }
 
 /* toast*/
-.toast-alert{
+.toast-alert {
   --shadow-color: 286deg 36% 56%;
   --background-color: white;
-  --iconColor:white;
+  --iconColor: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -71,61 +71,69 @@ input[type="number"] {
   border-radius: 10px;
   border: 2px solid white;
   box-shadow: 0.3px 0.5px 0.7px hsl(var(--shadow-color) / 0.36),
-  0.8px 1.6px 2px -0.8px hsl(var(--shadow-color) / 0.36),
-  2.1px 4.1px 5.2px -1.7px hsl(var(--shadow-color) / 0.36),
-  5px 10px 12.6px -2.5px hsl(var(--shadow-color) / 0.36);
-
+    0.8px 1.6px 2px -0.8px hsl(var(--shadow-color) / 0.36),
+    2.1px 4.1px 5.2px -1.7px hsl(var(--shadow-color) / 0.36),
+    5px 10px 12.6px -2.5px hsl(var(--shadow-color) / 0.36);
 }
-.toast-alert svg{
-  color: var(--iconColor) ;
+.toast-alert svg {
+  color: var(--iconColor);
   width: 35px;
   line-height: 35px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.toast-alert svg pat
-.title-toast{
+.toast-alert svg pat .title-toast {
   font-weight: bold;
   font-size: 18px;
 }
-.toast-error{
-  --background-color:rgb(var(--error))
+.toast-error {
+  --background-color: rgb(var(--error));
   /* --color-toast:white */
 }
 
-.button-toast{
+.button-toast {
   background-color: white !important;
   padding: 15px 10px !important;
   font-size: 20px !important;
   margin-left: 10px !important;
 }
 /* loader */
-.loader{
+.loader {
   width: 8rem;
   height: 8rem;
   border-width: 15px;
-  border-color: rgb(var(--principal)) rgba(0, 0, 0,0) rgb(var(--principal)) rgba(0, 0, 0,0);
+  border-color: rgb(var(--principal)) rgba(0, 0, 0, 0) rgb(var(--principal))
+    rgba(0, 0, 0, 0);
 }
-.container-loader{
+.container-loader {
   min-height: 350px;
-  background-color:rgba(255, 255, 255, 0.884);
+  background-color: rgba(255, 255, 255, 0.884);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
-.title-loader{
+.title-loader {
   width: max-content;
-  height:max-content;
+  height: max-content;
   padding: 0;
   margin: 0 auto;
   font-weight: bold;
-  color:black;
+  color: black;
   font-size: 50px;
+}
 
+@media (min-width: 768px) {
+  .w-md-25 {
+    width: 25% !important;
+  }
+  .w-md-75 {
+    width: 75% !important;
+  }
+  .w-md-50 {
+    width: 50% !important;
+  }
 }
-@media screen and (max-width: 768px) {
-}
-@media screen and (max-width: 992px) {
+@media (max-width: 992px) {
 }

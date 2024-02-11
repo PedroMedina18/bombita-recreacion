@@ -68,39 +68,54 @@ class Cargos_Views(View):
 
         try:
             cursor = connection.cursor()
+            verify=verify_token(request.headers)
+            if(not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"],
+                    "data": None
+                }
+                return JsonResponse(datos)
             if (id > 0):
                 query = """
                 SELECT * FROM cargos WHERE cargos.id=%s;
                 """
                 cursor.execute(query, [int(id)])
                 cargo = dictfetchall(cursor)
-                if (not cargo[0]["administrador"]):
-                    query = """
-                    SELECT 
-                        p.id,
-                        p.nombre,
-                        P.descripcion
-                    FROM 
-                        cargos AS c
-                    INNER JOIN 
-                        permisos_has_cargos 
-                    ON 
-                        c.id = permisos_has_cargos.cargo_id
-                    INNER JOIN 
-                        permisos AS P
-                    ON 
-                        p.id = permisos_has_cargos.permiso_id
-                    WHERE 
-                        c.id = %s;
-                    """
-                    cursor.execute(query, [int(id)])
-                    permisos = dictfetchall(cursor)
-                    cargo[0]["permisos"] = permisos
-                datos = {
-                    "status": True,
-                    'message': "Exito",
-                    "data": cargo[0]
-                }
+                if(len(cargo)>0):
+                    if (not cargo[0]["administrador"]):
+                        query = """
+                        SELECT 
+                            p.id,
+                            p.nombre,
+                            P.descripcion
+                        FROM 
+                            cargos AS c
+                        INNER JOIN 
+                            permisos_has_cargos 
+                        ON 
+                            c.id = permisos_has_cargos.cargo_id
+                        INNER JOIN 
+                            permisos AS P
+                        ON 
+                            p.id = permisos_has_cargos.permiso_id
+                        WHERE 
+                            c.id = %s;
+                        """
+                        cursor.execute(query, [int(id)])
+                        permisos = dictfetchall(cursor)
+                        cargo[0]["permisos"] = permisos
+                    datos = {
+                        "status": True,
+                        'message': "Exito",
+                        "data": cargo[0]
+                    }
+                else:
+                    datos = {
+                        "status": False,
+                        'message': "Error. Cargo no Encontrado",
+                        "data": None,
+                    }
             else:
                 if ("all" in request.GET and request.GET["all"] == "true"):
                     query = """
@@ -143,10 +158,10 @@ class Cargos_Views(View):
                     }
                 else:
                     datos = {
-                        "status": True,
+                        "status": False,
                         'message': "Error. No se encontraron registros",
                         "data": None,
-                        "pages": pages[0]["total"]
+                        "pages": None
                     }
             return JsonResponse(datos)
         except Exception as ex:

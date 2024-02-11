@@ -3,7 +3,7 @@ import { InputText, InputTextTarea } from "../../components/input/Input"
 import { ButtonSimple } from "../../components/button/Button"
 import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom'
-import { post_tipoDocumento } from "../../js/API.js";
+import { tipo_documentos } from "../../js/API.js";
 import { alertConfim, toastError, alertLoading, alertAceptar } from "../../js/alerts.js"
 import Swal from 'sweetalert2';
 import { Toaster } from "sonner";
@@ -31,7 +31,7 @@ function Tipo_Documento() {
                         descripcion: data.descripcion,
                     }
                     alertLoading("Cargando")
-                    const res = await post_tipoDocumento(body)
+                    const res = await tipo_documentos.post(body)
                     if (res.status = 200) {
                         if (res.data.status) {
                             Swal.close()
