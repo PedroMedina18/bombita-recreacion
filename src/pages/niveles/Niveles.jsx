@@ -7,7 +7,7 @@ import { niveles } from "../../js/API.js";
 import { alertConfim, toastError, alertLoading, alertAceptar } from "../../js/alerts.js"
 import Swal from 'sweetalert2';
 import { Toaster } from "sonner";
-import { hasLeadingOrTrailingSpace } from "../../js/funtions.js"
+import { hasLeadingOrTrailingSpace } from "../../js/functions.js"
 
 function Niveles() {
   const navigate = useNavigate();

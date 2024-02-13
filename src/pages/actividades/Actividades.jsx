@@ -10,7 +10,7 @@
 // import { hasLeadingOrTrailingSpace } from "../../js/funtions.js"
 
 function Actividades() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // the useform
   const {

@@ -6,7 +6,7 @@ from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..models import TipoDocumento
-from django.db import IntegrityError, connection
+from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
 import json
 
@@ -43,19 +43,35 @@ class Tipo_Documento_Views(View):
             return JsonResponse(datos)
 
     def delete(self, request, id):
-        tipo_documento = list(TipoDocumento.objects.filter(id=id).values())
-        if len(tipo_documento) > 0:
-            TipoDocumento.objects.filter(id=id).delete()
-            datos = {
-                "status": True,
-                'message': "Registro Eliminado"
-            }
-        else:
+        try:
+            verify=verify_token(request.headers)
+            if(not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"]
+                }
+                return JsonResponse(datos)
+            tipo_documento = list(TipoDocumento.objects.filter(id=id).values())
+            if len(tipo_documento) > 0:
+                TipoDocumento.objects.filter(id=id).delete()
+                datos = {
+                    "status": True,
+                    'message': "Registro Eliminado"
+                }
+            else:
+                datos = {
+                    "status": False,
+                    'message': "Registro No Encontrado"
+                }
+            return JsonResponse(datos)
+        except models.ProtectedError as e:
+            print("Erorr de proteccion")
+            print(str(e))
             datos = {
                 "status": False,
-                'message': "Registro No Encontrado"
+                'message': "Error. Item protejido no se puede eliminar"
             }
-        return JsonResponse(datos)
+            return JsonResponse(datos)
 
     def put(self, request, id):
         try:
@@ -140,23 +156,25 @@ class Tipo_Documento_Views(View):
                     tipo_documentos = dictfetchall(cursor)
 
                 query="""
-                    SELECT CEILING(COUNT(*) / 25) AS total FROM tipo_documentos;
+                    SELECT CEILING(COUNT(*) / 25) AS pages, COUNT(id) AS total FROM tipo_documentos;
                 """
                 cursor.execute(query)
-                pages = dictfetchall(cursor)
+                result = dictfetchall(cursor)
                 if len(tipo_documentos)>0:
                     datos = {
                         "status": True,
                         'message': "Exito",
                         "data": tipo_documentos,
-                        "pages":pages[0]["total"]
+                        "pages": int(result[0]["pages"]),
+                        "total":result[0]["total"],
                     }
                 else:
                     datos = {
                         "status": False,
                         'message': "Error. No se encontraron registros",
                         "data": None,
-                        "pages":None
+                        "pages": None,
+                        "total":0
                     }
             return JsonResponse(datos)
         except Exception as ex:
@@ -165,6 +183,7 @@ class Tipo_Documento_Views(View):
                 "status": False,
                 'message': "Error. Error de sistema",
                 "data": None,
+                "total":0
             }
             return JsonResponse(datos)
         finally:

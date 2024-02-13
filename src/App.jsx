@@ -3,7 +3,9 @@ import Login from './pages/login/Login';
 import Error404 from './pages/Error404';
 import Inicio from './pages/Inicio';
 import Cargos from "./pages/cargos/Cargos";
+import Form_Cargos from "./pages/cargos/Form_Cargos"
 import Tipo_Documento from "./pages/tipoDocumento/Tipo_Documento";
+import Form_Tipo_Documento from "./pages/tipoDocumento/Form_Tipo_Documento";
 import ProtectedRouter from "./components/protected/ProtectedRouter";
 import Usuarios from "./pages/usuarios/Usuarios";
 import Actividades from "./pages/actividades/Actividades";
@@ -17,11 +19,13 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route element={<ProtectedRouter />}>
+            <Route path="/register/cargos" element={<Form_Cargos />} />
             <Route path="/cargos" element={<Cargos />} />
             <Route path="/usuarios" element={<Usuarios />} />
             <Route path="/actividades" element={<Actividades />} />
             <Route path="/niveles" element={<Niveles />} />
             <Route path="/tipo_documento" element={<Tipo_Documento />} />
+            <Route path="register/tipo_documento" element={<Form_Tipo_Documento />} />
             <Route path="/recreadores" element={<Recreadores />} />
             <Route path="/inicio" element={<Inicio />} />
           </Route>

@@ -2,7 +2,7 @@
 import './login.css'
 import { useForm } from "react-hook-form";
 import { useNavigate, Navigate } from 'react-router-dom';
-import { useState, useContext, useEffect, useRef } from 'react';
+import { useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { login } from "../../js/API.js"
 import { getCookie } from "../../js/cookie.js"

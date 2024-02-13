@@ -7,7 +7,8 @@ from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..models import Cargos, PermisosCargos, Permisos
 from ..funtions.token import verify_token
-from django.db import IntegrityError, connection
+from django.db import IntegrityError, connection, models
+
 import json
 
 # CRUD COMPLETO DE LA TABLA DE CARGOS
@@ -50,19 +51,36 @@ class Cargos_Views(View):
             return JsonResponse(datos)
 
     def delete(self, request, id):
-        cargos = list(Cargos.objects.filter(id=id).values())
-        if len(cargos) > 0:
-            Cargos.objects.filter(id=id).delete()
+        try:
+            verify=verify_token(request.headers)
+            if(not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"]
+                }
+                return JsonResponse(datos)
+            cargos = list(Cargos.objects.filter(id=id).values())
+            if len(cargos) > 0:
+                Cargos.objects.filter(id=id).delete()
+                datos = {
+                    "status": True,
+                    'message': "Registro Eliminado"
+                }
+            else:
+                datos = datos = {
+                    "status": False,
+                    'message': "Registro No Encontrado"
+                }
+            return JsonResponse(datos)
+        except models.ProtectedError as e:
+            print("Erorr de proteccion")
+            print(str(e))
             datos = {
-                "status": True,
-                'message': "Registro Eliminado"
-            }
-        else:
-            datos = datos = {
                 "status": False,
-                'message': "Registro No Encontrado"
+                'message': "Error. Item protejido no se puede eliminar"
             }
-        return JsonResponse(datos)
+            return JsonResponse(datos)
+       
 
     def get(self, request, id=0):
 
@@ -145,23 +163,26 @@ class Cargos_Views(View):
                     cargos = dictfetchall(cursor)
 
                 query = """
-                    SELECT CEILING(COUNT(*) / 25) AS total FROM cargos;
+                    SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM cargos;
                 """
                 cursor.execute(query)
-                pages = dictfetchall(cursor)
+                result = dictfetchall(cursor)
+                
                 if len(cargos) > 0:
                     datos = {
                         "status": True,
                         'message': "Exito",
                         "data": cargos,
-                        "pages": pages[0]["total"]
+                        "pages": int(result[0]["pages"]),
+                        "total":result[0]["total"],
                     }
                 else:
                     datos = {
                         "status": False,
                         'message': "Error. No se encontraron registros",
                         "data": None,
-                        "pages": None
+                        "pages": None,
+                        "total":0
                     }
             return JsonResponse(datos)
         except Exception as ex:
@@ -170,7 +191,8 @@ class Cargos_Views(View):
                 "status": False,
                 'message': "Error. Error de sistema",
                 "data": None,
-                "pages": None
+                "pages": None,
+                "total":0
             }
             return JsonResponse(datos)
         finally:

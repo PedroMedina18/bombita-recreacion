@@ -1,0 +1,110 @@
+button[disabled] {
+  pointer-events: all;
+  cursor: no-drop;
+  background-color: rgba(var(--secundario), 0.5);
+}
+button[disabled]:hover {
+  transform: scale(1);
+}
+.input-table {
+  max-width: 100%;
+  min-width: 50px;
+  background: #fff;
+  border: 2px solid rgb(22, 21, 21);
+  border-radius: 5px;
+  height: 35px;
+  line-height: 40px;
+  padding: 10px 15px;
+  transition: 0.3s ease all;
+}
+.input-table:focus {
+  border: 2px solid #619bdd;
+  outline: none;
+  box-shadow: 0 0 0 0.25rem rgb(13 110 253 / 25%);
+}
+.input-table.page {
+  padding: 10px 0px;
+  text-align: center;
+}
+.container-table {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 5px;
+}
+.container-table::-webkit-scrollbar {
+  background-color: transparent;
+  height: 10px;
+  margin-top: 5px;
+}
+.container-table::-webkit-scrollbar-thumb {
+  background-color: rgb(var(--secundario));
+  border-radius: 10px;
+}
+
+table.table-data, .table-loading {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+.table-loading{
+  border: 1px solid rgb(0, 0, 0);
+}
+table.table-data th, table.table-data td {
+  text-align: center;
+  padding: 5px 0px;
+  border: 2px solid rgb(92, 92, 92);
+}
+.table-loading th, .table-loading td{
+  padding: 5px 8px;
+}
+table.table-data td.d-flex {
+  align-items: center;
+  border: 0px solid rgb(92, 92, 92);
+  border-bottom: 2px solid rgb(92, 92, 92);
+  border-right: 2px solid rgb(92, 92, 92);
+  margin: -1px;
+  padding: 7px 0px;
+}
+thead tr th {
+  font-size: 16px;
+  font-weight: bold;
+}
+tbody tr td {
+  font-size: 14px;
+  font-weight: normal;
+}
+
+table td:first-child {
+  font-weight: bold;
+}
+table tbody tr:nth-child(odd) {
+  background-color: #e6e6e6;
+}
+table svg {
+  width: 30px;
+}
+table .svg-check svg {
+  color: rgb(0, 167, 0);
+}
+table .svg-x svg {
+  color: rgb(204, 19, 19);
+}
+table svg.edit,
+table svg.eliminate {
+  color: rgb(var(--secundario));
+  transition: transform 0.2s ease-out;
+}
+table svg.edit:hover,
+table svg.eliminate:hover {
+  transform: scale(1.1);
+  filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.5));
+}
+
+@media (max-width: 768px) {
+  table.table-data {
+    min-width: max-content;
+  }
+  table.table-data td, table.table-data th {
+    padding: 5px 6px;
+  }
+}

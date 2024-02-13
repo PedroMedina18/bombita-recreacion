@@ -9,8 +9,9 @@ import { niveles, tipo_documentos, recreadores } from "../../js/API.js";
 import { alertConfim, toastError, alertLoading, alertAceptar } from "../../js/alerts.js";
 import Swal from 'sweetalert2';
 import { Toaster } from "sonner";
-import { hasLeadingOrTrailingSpace, habilitarEdicion, get_persona, verificacion_options, calcular_edad } from "../../js/funtions.js";
-import { useState, useEffect } from "react";
+import { hasLeadingOrTrailingSpace, habilitarEdicion, calcular_edad } from "../../js/functions.js";
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from '../../context/AuthContext';
 
 function Recreadores() {
     const [data_tipo_documentos, setTipoDocumentos] = useState([])
@@ -20,6 +21,7 @@ function Recreadores() {
     const [dataNewUser, setdataNewUser] = useState({ tipo_documento: null, numero_documento: null })
     const [dataPersona, setPersona] = useState({})
     const [disabledInputs, setDisabledInputs] = useState(false)
+    const { verificacion_options, get_persona, controlResultPost } = useContext(AuthContext)
     const [fechaActual] = useState(new Date())
     const navigate = useNavigate();
     useEffect(() => {
@@ -85,24 +87,10 @@ function Recreadores() {
                     }
                     alertLoading("Cargando")
                     const res = await recreadores.post(body)
-                    if (res.status = 200) {
-                        if (res.data.status) {
-                            Swal.close()
-                            const aceptar = await alertAceptar("Exito!", "Recreador Registrado")
-                            if (aceptar.isConfirmed) { navigate("/inicio") }
-                        } else {
-                            Swal.close()
-                            toastError(`${res.data.message}`,
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.953 2C6.465 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.493 2 11.953 2zM13 17h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>
-                            )
-                        }
-                    } else {
-                        Swal.close()
-                        console.log(res)
-                        toastError(`Error.${res.status} ${res.statusText}`,
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.953 2C6.465 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.493 2 11.953 2zM13 17h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>
-                        )
-                    }
+                    controlResultPost({
+                        respuesta:res,
+                        messageExito:"Recreador Registrado",
+                    })
                 }
 
             } catch (error) {

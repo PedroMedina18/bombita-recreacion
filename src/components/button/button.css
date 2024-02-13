@@ -8,6 +8,9 @@
     font-weight: 800;
     transition: all ease .3s;
 }
+.button-initial svg{
+    width: 25px;
+}
 .button-initial:hover{
     transform: scale(1.05);
 }

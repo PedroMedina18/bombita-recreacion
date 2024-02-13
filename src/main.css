@@ -14,7 +14,6 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #bf333b;
   /* color: rgb(67, 191, 51); */
 }
 
@@ -83,9 +82,13 @@ input[type="number"] {
   justify-content: center;
   align-items: center;
 }
-.toast-alert svg pat .title-toast {
+.toast-alert  .title-toast {
   font-weight: bold;
-  font-size: 18px;
+  font-size: 14px;
+  width: 95%;
+  height: max-content;
+  text-align: center;
+  margin-left: auto;
 }
 .toast-error {
   --background-color: rgb(var(--error));
@@ -123,7 +126,17 @@ input[type="number"] {
   color: black;
   font-size: 50px;
 }
-
+@media (max-width: 992px) {
+  .w-lg-25 {
+    width: 25% !important;
+  }
+  .w-lg-75 {
+    width: 75% !important;
+  }
+  .w-lg-50 {
+    width: 50% !important;
+  }
+}
 @media (min-width: 768px) {
   .w-md-25 {
     width: 25% !important;
@@ -135,5 +148,16 @@ input[type="number"] {
     width: 50% !important;
   }
 }
-@media (max-width: 992px) {
+@media (min-width: 576px) {
+  .w-sm-25 {
+    width: 25% !important;
+  }
+  .w-sm-75 {
+    width: 75% !important;
+  }
+  .w-sm-50 {
+    width: 50% !important;
+  }
 }
+
+

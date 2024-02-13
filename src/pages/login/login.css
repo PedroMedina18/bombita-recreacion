@@ -175,7 +175,6 @@ input:focus + .lb-name::after,
   transform: scale(0.97);
 }
 
-
 /* alerta */
 .alert-login{
   display:flex;
