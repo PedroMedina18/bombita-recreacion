@@ -5,11 +5,11 @@ import { getCookie } from "../js/cookie.js"
 import { toastError, alertConfim, alertLoading, alertAceptar } from '../js/alerts.js'
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+
 export function AuthContextProvider({ children }) {
   const [user, setUser] = useState({})
   const [isAuthenticateds, setIsAuthenticated] = useState(false)
   const [isloading, setIsLoading] = useState(true);
-  const navigate=useNavigate()
 
   useEffect(() => {
     checkAuth();
@@ -39,7 +39,7 @@ export function AuthContextProvider({ children }) {
     try {
       const token = getCookie("token")
       if (token) {
-        const res = await verify_token.get()
+        const respuesta = await verify_token.get()
         if (respuesta.statusText = "OK" && respuesta.data.status && respuesta.data.token) {
           saveUser(respuesta.data.data, respuesta.data.token)
         } else {
@@ -57,6 +57,7 @@ export function AuthContextProvider({ children }) {
       setIsLoading(false)
     }
   }
+
   const closeSession = () => {
     setUser({})
     setIsAuthenticated(false)
@@ -82,6 +83,7 @@ export function AuthContextProvider({ children }) {
       setError(`Error. ${respuesta.status} ${respuesta.statusText}`)
     }
   }
+
   const get_persona = async ({ dataNewUser, setPersona, setValue, setDisabledInputs }) => {
     try {
 
@@ -111,7 +113,7 @@ export function AuthContextProvider({ children }) {
       const confirmacion = await alertConfim("Confirmar", "Confirmar la Solicitud de Eliminación")
       if (confirmacion.isConfirmed) {
         alertLoading("Cargando")
-        const res = await objet.delete(row.id)
+        const respuesta = await objet.delete(row.id)
         if (respuesta.status = 200) {
           if (respuesta.data.status) {
             Swal.close()
@@ -138,6 +140,7 @@ export function AuthContextProvider({ children }) {
       )
     }
   }
+
   const searchCode = async ({ value, object, setList }) => {
     try {
       const result = await object.get(value)
@@ -166,7 +169,7 @@ export function AuthContextProvider({ children }) {
     }
   }
 
-  const getData = async ({ object, setList, setData }) => {
+  const getData = async ({ object, setList, setData, setLoading }) => {
     try {
       const result = await object.get()
       if (result.status === 200) {
@@ -185,9 +188,12 @@ export function AuthContextProvider({ children }) {
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.953 2C6.465 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.493 2 11.953 2zM13 17h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>
       )
     }
+    finally{
+      setLoading(false)
+    }
   }
 
-  const controlResultPost = ({respuesta, messageExito, navigate=null}) => {
+  const controlResultPost = async({respuesta, messageExito, navigate=null}) => {
     if (respuesta.status = 200) {
       if (respuesta.data.status) {
         Swal.close()

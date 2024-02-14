@@ -156,7 +156,7 @@ class Tipo_Documento_Views(View):
                     tipo_documentos = dictfetchall(cursor)
 
                 query="""
-                    SELECT CEILING(COUNT(*) / 25) AS pages, COUNT(id) AS total FROM tipo_documentos;
+                    SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM tipo_documentos;
                 """
                 cursor.execute(query)
                 result = dictfetchall(cursor)

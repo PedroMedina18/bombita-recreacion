@@ -101,7 +101,7 @@ function Navbar({ children, name, descripcion }) {
                                 <Link to="/cargos" className="sidebar-link">Cargos</Link>
                             </li>
                             <li className="sidebar-item">
-                                <Link to="/tipo_documento" className="sidebar-link">Tipo Documento</Link>
+                                <Link to="/tipo_documentos" className="sidebar-link">Tipo Documento</Link>
                             </li>
                         </ul>
                     </li>

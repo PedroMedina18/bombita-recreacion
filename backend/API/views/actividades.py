@@ -6,7 +6,7 @@ from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..models import Actividades
-from django.db import IntegrityError, connection
+from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
 import json
 
@@ -43,19 +43,35 @@ class Actividades_Views(View):
             return JsonResponse(datos)
 
     def delete(self, request, id):
-        actividades = list(Actividades.objects.filter(id=id).values())
-        if len(actividades) > 0:
-            Actividades.objects.filter(id=id).delete()
+        try:
+            verify=verify_token(request.headers)
+            if(not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"]
+                }
+                return JsonResponse(datos)
+            actividades = list(Actividades.objects.filter(id=id).values())
+            if len(actividades) > 0:
+                Actividades.objects.filter(id=id).delete()
+                datos = {
+                    "status": True,
+                    'message': "Registro Eliminado"
+                }
+            else:
+                datos  = {
+                    "status": False,
+                    'message': "Registro No Encontrado"
+                }
+            return JsonResponse(datos)
+        except models.ProtectedError as e:
+            print("Erorr de proteccion")
+            print(str(e))
             datos = {
-                "status": True,
-                'message': "Registro Eliminado"
-            }
-        else:
-            datos  = {
                 "status": False,
-                'message': "Registro No Encontrado"
+                'message': "Error. Item protejido no se puede eliminar"
             }
-        return JsonResponse(datos)
+            return JsonResponse(datos)
 
     def put(self, request, id):
         try:
@@ -97,7 +113,7 @@ class Actividades_Views(View):
                 return JsonResponse(datos)
             if (id > 0):
                 query = """
-                SELECT * FROM actividades WHERE niveles.id=%s;
+                SELECT * FROM actividades WHERE actividades.id=%s;
                 """
                 cursor.execute(query, [int(id)])
                 actividad = dictfetchall(cursor)
@@ -140,23 +156,25 @@ class Actividades_Views(View):
                     activiades = dictfetchall(cursor)
 
                 query="""
-                    SELECT CEILING(COUNT(*) / 25) AS total FROM actividades;
+                    SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM actividades;
                 """
                 cursor.execute(query)
-                pages = dictfetchall(cursor)
+                result = dictfetchall(cursor)
                 if len(activiades)>0:
                     datos = {
                         "status": True,
                         'message': "Exito",
                         "data": activiades,
-                        "pages":pages[0]["total"]
+                        "pages": int(result[0]["pages"]),
+                        "total":result[0]["total"],
                     }
                 else:
                     datos = {
                         "status": False,
                         'message': "Error. No se encontraron registros",
                         "data": None,
-                        "pages":None
+                        "pages": None,
+                        "total":0
                     }
             return JsonResponse(datos)
         except Exception as ex:
@@ -164,7 +182,8 @@ class Actividades_Views(View):
             datos = {
                 "status": False,
                 'message': "Error. Error de sistema",
-                "data": None,
+                "pages": None,
+                "total":0
             }
             return JsonResponse(datos)
         finally:

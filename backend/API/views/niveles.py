@@ -6,7 +6,7 @@ from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..models import Nivel
-from django.db import IntegrityError, connection
+from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
 import json
 
@@ -44,19 +44,35 @@ class Nivel_Views(View):
             return JsonResponse(datos)
 
     def delete(self, request, id):
-        niveles = list(Nivel.objects.filter(id=id).values())
-        if len(niveles) > 0:
-            Nivel.objects.filter(id=id).delete()
+        try:
+            verify=verify_token(request.headers)
+            if(not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"]
+                }
+                return JsonResponse(datos)
+            niveles = list(Nivel.objects.filter(id=id).values())
+            if len(niveles) > 0:
+                Nivel.objects.filter(id=id).delete()
+                datos = {
+                    "status": True,
+                    'message': "Registro Eliminado"
+                }
+            else:
+                datos  = {
+                    "status": False,
+                    'message': "Registro No Encontrado"
+                }
+            return JsonResponse(datos)
+        except models.ProtectedError as e:
+            print("Eror de proteccion")
+            print(str(e))
             datos = {
-                "status": True,
-                'message': "Registro Eliminado"
-            }
-        else:
-            datos  = {
                 "status": False,
-                'message': "Registro No Encontrado"
+                'message': "Error. Item protejido no se puede eliminar"
             }
-        return JsonResponse(datos)
+            return JsonResponse(datos)
 
     def put(self, request, id):
         try:
@@ -141,23 +157,25 @@ class Nivel_Views(View):
                     niveles = dictfetchall(cursor)
 
                 query="""
-                    SELECT CEILING(COUNT(*) / 25) AS total FROM niveles;
+                    SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM niveles;
                 """
                 cursor.execute(query)
-                pages = dictfetchall(cursor)
+                result = dictfetchall(cursor)
                 if len(niveles)>0:
                     datos = {
                         "status": True,
                         'message': "Exito",
                         "data": niveles,
-                        "pages":pages[0]["total"]
+                        "pages": int(result[0]["pages"]),
+                        "total":result[0]["total"],
                     }
                 else:
                     datos = {
                         "status": False,
                         'message': "Error. No se encontraron registros",
                         "data": None,
-                        "pages":None
+                        "pages": None,
+                        "total":0
                     }
             return JsonResponse(datos)
         except Exception as ex:

@@ -85,7 +85,7 @@ class Materiales_Views(View):
             }
             return JsonResponse(datos)
 
-    # def get(self, request, id=0):
+    def get(self, request, id=0):
         try:
             cursor = connection.cursor()
             verify=verify_token(request.headers)

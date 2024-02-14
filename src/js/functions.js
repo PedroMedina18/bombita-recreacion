@@ -18,8 +18,9 @@ export const habilitarEdicion = ({ setValue, setdataNewUser, dataPersona }) => {
 }
 
 // Para calcular la edad al dar la fecha de nacimiento y la fecha actual
-export const calcular_edad = (fecha_nacimiento, fecha) => {
+export const calcular_edad = (fecha_nacimiento) => {
   const fechaNacimiento = new Date(fecha_nacimiento)
+  const fecha=new Date()
   const añoActual = Number(fecha.getFullYear())
   const mesActual = Number(fecha.getMonth() + 1)
   const diaActual = Number(fecha.getDate())

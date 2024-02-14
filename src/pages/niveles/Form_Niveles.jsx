@@ -5,13 +5,13 @@ import { InputText, InputTextTarea } from "../../components/input/Input"
 import { ButtonSimple } from "../../components/button/Button"
 import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom'
-import { tipo_documentos } from "../../js/API.js";
-import { alertConfim, toastError, alertLoading, alertAceptar } from "../../js/alerts.js"
+import { niveles } from "../../js/API.js";
+import { alertConfim, toastError, alertLoading } from "../../js/alerts.js"
 import Swal from 'sweetalert2';
 import { Toaster } from "sonner";
 import { hasLeadingOrTrailingSpace } from "../../js/functions.js"
 
-function Form_Tipo_Documento() {
+function Form_Niveles() {
     const { controlResultPost } = useContext(AuthContext)
     const navigate = useNavigate();
 
@@ -21,7 +21,7 @@ function Form_Tipo_Documento() {
         handleSubmit,
         formState: { errors },
         watch
-    } = useForm();
+    } = useForm()
 
     // Funcion para registrar
     const onSubmit = handleSubmit(
@@ -34,27 +34,25 @@ function Form_Tipo_Documento() {
                         descripcion: data.descripcion,
                     }
                     alertLoading("Cargando")
-                    const res = await tipo_documentos.post(body)
+                    const res = await niveles.post(body)
                     controlResultPost({
-                        respuesta:res, 
-                        messageExito:"Tipo de Documento Registrado", 
-                        navigate:"/tipo_documentos"
+                        respuesta: res,
+                        messageExito: "Nivel Registrado",
+                        navigate: "/niveles"
                     })
                 }
-
             } catch (error) {
                 console.log(error)
                 Swal.close()
                 toastError("Error de Conexión",
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.953 2C6.465 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.493 2 11.953 2zM13 17h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.953 2C6.465 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.493 2 11.953 2zM13 17h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>
                 )
             }
         }
     )
-
     return (
-        <Navbar name="Registrar un Tipo de Documento" descripcion="Intruduzca los datos para agregar un nuevo tipo de documento">
-            <ButtonSimple type="button" className="mb-2" onClick={()=>{navigate("/tipo_documentos")}}> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.939 4.939 6.879 12l7.06 7.061 2.122-2.122L11.121 12l4.94-4.939z"></path></svg> Regresar</ButtonSimple>
+        <Navbar name="Registrar un nuevo Nivel" descripcion="Intruduzca los datos para agregar un nuevo nivel">
+            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/niveles") }}> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.939 4.939 6.879 12l7.06 7.061 2.122-2.122L11.121 12l4.94-4.939z"></path></svg> Regresar</ButtonSimple>
 
             <div className="w-100 bg-white p-3 round">
                 <form className="w-100 d-flex flex-column"
@@ -107,4 +105,4 @@ function Form_Tipo_Documento() {
     )
 }
 
-export default Form_Tipo_Documento
+export default Form_Niveles

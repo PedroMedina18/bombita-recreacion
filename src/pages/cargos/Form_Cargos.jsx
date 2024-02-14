@@ -1,8 +1,9 @@
+import { useState, useEffect, useContext } from "react";
+import { AuthContext } from '../../context/AuthContext';
 import Navbar from "../../components/navbar/Navbar"
 import Swal from 'sweetalert2';
 import { Toaster } from "sonner";
 import { useForm } from "react-hook-form";
-import { useState, useEffect } from "react";
 import { useNavigate } from 'react-router-dom';
 import { permisos, cargos } from "../../js/API.js";
 import { LoaderCircle } from "../../components/loader/Loader";
@@ -10,14 +11,16 @@ import { ButtonSimple } from "../../components/button/Button"
 import { alertConfim, toastError, alertLoading } from "../../js/alerts.js"
 import { InputText, InputTextTarea, InputCheck, MultiSelect } from "../../components/input/Input"
 import ErrorSystem from "../../components/ErrorSystem";
-import {hasLeadingOrTrailingSpace, verificacion_options} from "../../js/functions.js"
+import {hasLeadingOrTrailingSpace} from "../../js/functions.js"
 
 function Cargos() {
-    const navigate = useNavigate();
     const [loading, setLoading] = useState(true)
     const [errorServer, setErrorServer] = useState("")
     const [options, setOptions] = useState([])
     const [selectOptions, setSelectOptions] = useState([])
+    const { verificacion_options, controlResultPost } = useContext(AuthContext)
+    const navigate = useNavigate();
+
     useEffect(() => {
         get_Permisos()
     }, [])
@@ -61,23 +64,11 @@ function Cargos() {
                     }
                     alertLoading("Cargando")
                     const res = await cargos.post(body)
-                    if (res.status = 200) {
-                        if (res.data.status) {
-                            Swal.close()
-                            const aceptar=await alertAceptar("Exito!", "Cargo Registrado")
-                            if(aceptar.isConfirmed){navigate("/inicio")}
-                        } else {
-                            Swal.close()
-                            toastError(`${res.data.message}`,
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.953 2C6.465 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.493 2 11.953 2zM13 17h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>
-                            )
-                        }
-                    } else {
-                        Swal.close()
-                        toastError(`Error.${res.status} ${res.statusText}`,
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.953 2C6.465 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.493 2 11.953 2zM13 17h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>
-                        )
-                    }
+                    controlResultPost({
+                        respuesta:res, 
+                        messageExito:"Cargo Registrado", 
+                        navigate:"/cargos"
+                    })
                 }
             } catch (error) {
                 console.log(error)

@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react"
+import { useEffect, useState, useContext, useRef } from "react"
 import { AuthContext } from '../../context/AuthContext';
 import Navbar from "../../components/navbar/Navbar"
 import Table from "../../components/table/Table"
@@ -10,16 +10,24 @@ function Cargos() {
     const [listCargos, setCargos] = useState([])
     const [dataCargos, setDataCargos] = useState({ pages: 0, total: 0 })
     const { deleteItem, searchCode, getData } = useContext(AuthContext)
+    const [tableLoading, setTableLoaing] = useState(true)
+    const renderizado = useRef(0)
     const navigate = useNavigate()
+
     useEffect(() => {
-        getCargos()
+        if (renderizado.current === 0) {
+            renderizado.current = renderizado.current + 1
+            getCargos()
+            return
+        }
     }, [])
 
     const getCargos = () => {
         getData({
-            object:cargos,
+            object: cargos,
             setList: setCargos,
-            setData: setDataCargos
+            setData: setDataCargos,
+            setLoading: setTableLoaing
         })
     }
     const columns = [
@@ -64,7 +72,7 @@ function Cargos() {
         register: {
             name: "Agregar un nuevo cargo",
             function: () => {
-                navigate("/register/cargos")
+                navigate("/register/cargo")
             }
         }
     }
@@ -77,6 +85,7 @@ function Cargos() {
                 totalElements={dataCargos.total}
                 totalPages={dataCargos.pages}
                 options={options}
+                loading={tableLoading}
             />
             <Toaster />
         </Navbar>

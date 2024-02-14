@@ -1,4 +1,4 @@
-import { useEffect, useState, useContext } from "react"
+import { useEffect, useState, useContext, useRef } from "react"
 import Navbar from "../../components/navbar/Navbar"
 import { AuthContext } from '../../context/AuthContext';
 import Table from "../../components/table/Table"
@@ -10,19 +10,27 @@ function Tipo_Documento() {
     const [listTipo_Documentos, setTipo_Documentos] = useState([])
     const [dataTipo_Documentos, setDataTipo_Documentos] = useState({ pages: 0, total: 0 })
     const { deleteItem, searchCode, getData } = useContext(AuthContext)
+    const [tableLoading, setTableLoaing] = useState(true)
+    const renderizado = useRef(0)
+
     const navigate = useNavigate()
     useEffect(() => {
-        getTipo_Documentos()
+        if (renderizado.current === 0) {
+            renderizado.current = renderizado.current + 1
+            getTipo_Documentos()
+            return
+        }
     }, [])
 
     const getTipo_Documentos = () => {
         getData({
-            object:tipo_documentos,
+            object: tipo_documentos,
             setList: setTipo_Documentos,
-            setData: setDataTipo_Documentos
+            setData: setDataTipo_Documentos,
+            setLoading: setTableLoaing
         })
     }
-    
+
     const columns = [
         {
             name: "Item",
@@ -71,6 +79,7 @@ function Tipo_Documento() {
                 totalElements={dataTipo_Documentos.total}
                 totalPages={dataTipo_Documentos.pages}
                 options={options}
+                loading={tableLoading}
             />
             <Toaster />
         </Navbar>
