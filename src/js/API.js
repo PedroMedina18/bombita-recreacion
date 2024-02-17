@@ -25,4 +25,8 @@ export const cargos=new Petisions("cargos")
 
 export const niveles=new Petisions("niveles")
 
-export const tipo_documentos=new Petisions("tipo_documento")
+export const materiales=new Petisions("materiales")
+
+export const tipo_documentos=new Petisions("tipo_documentos")
+
+export const servicios=new Petisions("servicios")

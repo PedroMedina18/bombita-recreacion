@@ -89,6 +89,7 @@ function Form_Recreadores() {
                     controlResultPost({
                         respuesta:res,
                         messageExito:"Recreador Registrado",
+                        useNavigate:{navigate:navigate, direction:"/recreadores"}
                     })
                 }
 

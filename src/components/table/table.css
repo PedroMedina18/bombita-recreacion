@@ -54,20 +54,22 @@ table.table-data, .table-loading {
 }
 table.table-data th, table.table-data td {
   text-align: center;
-  padding: 5px 0px;
+  padding: 5px 5px;
   border: 2px solid rgb(92, 92, 92);
+  min-width: 50px;
+  max-width: 150px;
+  word-wrap: break-word;
 }
 .table-loading th, .table-loading td{
   padding: 5px 8px;
 }
 table.table-data td.d-flex {
   align-items: center;
-  border: 0px solid rgb(92, 92, 92);
-  border-bottom: 2px solid rgb(92, 92, 92);
-  border-right: 2px solid rgb(92, 92, 92);
   margin: -1px;
-  padding: 7px 0px;
+  padding: 20px 0px;
+  align-self: stretch;
 }
+
 thead tr th {
   font-size: 16px;
   font-weight: bold;

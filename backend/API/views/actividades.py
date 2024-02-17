@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
-from ..models import Actividades
+from ..models import Actividades, MaterialesActividad, Materiales
 from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
 import json
@@ -27,11 +27,16 @@ class Actividades_Views(View):
                     'message': verify["message"],
                 }
                 return JsonResponse(datos)
-            Actividades.objects.create(nombre=jd['nombre'].title(), descripcion=jd['descripcion'])
-            datos = {
-                "status": True,
-                'message': "Registro Completado"
-            }
+            actividad = Actividades.objects.create(nombre=jd['nombre'].title(), descripcion=jd['descripcion'])
+            if(jd['materiales']):
+                materiales = jd['materiales']
+                for material in materiales:
+                        new_material = Materiales.objects.get(id=int(material))
+                        MaterialesActividad.objects.create(material=new_material, actividad=actividad)
+                datos = {
+                    "status": True,
+                    'message': "Registro Completado"
+                }
             return JsonResponse(datos)
 
         except Exception as ex:

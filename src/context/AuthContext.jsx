@@ -4,7 +4,6 @@ export const AuthContext = createContext();
 import { getCookie } from "../js/cookie.js"
 import { toastError, alertConfim, alertLoading, alertAceptar } from '../js/alerts.js'
 import Swal from 'sweetalert2';
-import { useNavigate } from 'react-router-dom';
 
 export function AuthContextProvider({ children }) {
   const [user, setUser] = useState({})
@@ -135,7 +134,7 @@ export function AuthContextProvider({ children }) {
     } catch (error) {
       Swal.close()
       console.log(error)
-      toastError(`Error de Sistema. Intente mas tarde`,
+      toastError(`Error de Sistema al eliminar. Intente mas tarde`,
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.953 2C6.465 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.493 2 11.953 2zM13 17h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>
       )
     }
@@ -184,7 +183,7 @@ export function AuthContextProvider({ children }) {
       }
     } catch (error) {
       console.log(error)
-      toastError(`Error de Sistema. Intente mas tarde`,
+      toastError(`Error de Sistema. Intente mas tarde al buscar`,
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.953 2C6.465 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.493 2 11.953 2zM13 17h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>
       )
     }
@@ -193,12 +192,12 @@ export function AuthContextProvider({ children }) {
     }
   }
 
-  const controlResultPost = async({respuesta, messageExito, navigate=null}) => {
+  const controlResultPost = async({respuesta, messageExito, useNavigate=null}) => {
     if (respuesta.status = 200) {
       if (respuesta.data.status) {
         Swal.close()
         const aceptar = await alertAceptar("Exito!", `${messageExito}`)
-        if (aceptar.isConfirmed && navigate) { navigate(navigate) }
+        if (aceptar.isConfirmed && useNavigate) { useNavigate.navigate(useNavigate.direction) }
       } else {
         Swal.close()
         toastError(`${respuesta.data.message}`,

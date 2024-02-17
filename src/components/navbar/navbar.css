@@ -10,7 +10,8 @@
     overflow: hidden;
     transition: all 0.35s ease-in-out;
     background-color: rgb(230, 230, 230);
-    padding: 81px 16px 16px 86px;
+    padding: 86px 16px 16px 86px;
+    transition: all .25s ease-in-out;
 }
 .expand-main{
     padding: 81px 16px 16px 216px;
@@ -62,18 +63,22 @@
     transition: all 0.3s ease;
 
 }
-
-.perfile{
+.barra-superior{
     background-color:  rgb(36, 11, 54);
     width: 100%;
     display: flex;
-    justify-content: end;
+    justify-content: space-between;
+    align-items: center;
     color: #FFF;
-    padding: 15px 15px;
+    padding: 15px 15px 15px 86px;
     position: fixed;
     z-index: 999;
+    transition: all .25s ease-in-out;
 }
-.perfile .user{
+.expand-barra{
+    padding: 15px 15px 15px 216px;
+}
+.barra-superior .user{
     display: flex;
     align-items: center;
     justify-content: center;
@@ -92,21 +97,25 @@
     padding: 1rem;
 }
 
-.toggle-btn svg, .perfile .user svg {
+.toggle-btn svg, .barra-superior .user svg {
     width: 35px;
     color: #FFF;
 }
 
 .sidebar-logo {
+    display: flex;
+    align-items: center;
     margin: auto 0;
     text-align: center;
-}
-
-.sidebar-logo a {
     color: #FFF;
     font-size: 1.1rem;
     font-weight: 800;
     text-decoration: none;
+}
+
+.sidebar-logo img{
+    width: 50px;
+    object-fit: cover;
 }
 
 .sidebar:not(.expand) .sidebar-logo,

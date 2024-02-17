@@ -1,14 +1,14 @@
 import { useEffect, useState, useContext, useRef } from "react"
-import { AuthContext } from '../../context/AuthContext';
 import Navbar from "../../components/navbar/Navbar"
+import { AuthContext } from '../../context/AuthContext';
 import Table from "../../components/table/Table"
-import { cargos } from "../../js/API"
+import { materiales } from "../../js/API"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 
-function Cargos() {
-    const [listCargos, setCargos] = useState([])
-    const [dataCargos, setDataCargos] = useState({ pages: 0, total: 0 })
+function Materiales() {
+    const [listMateriales, setMateriales] = useState([])
+    const [dataMateriales, setDataMateriales] = useState({ pages: 0, total: 0 })
     const { deleteItem, searchCode, getData } = useContext(AuthContext)
     const [tableLoading, setTableLoaing] = useState(true)
     const renderizado = useRef(0)
@@ -17,19 +17,21 @@ function Cargos() {
     useEffect(() => {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
-            getCargos()
+            getMateriales()
             return
         }
     }, [])
 
-    const getCargos = () => {
+    const getMateriales = () => {
         getData({
-            object: cargos,
-            setList: setCargos,
-            setData: setDataCargos,
-            setLoading: setTableLoaing
+            object: materiales,
+            setList: setMateriales,
+            setData: setDataMateriales,
+            setLoading: setTableLoaing,
+            
         })
     }
+
     const columns = [
         {
             name: "Item",
@@ -43,20 +45,13 @@ function Cargos() {
             name: "Descripcion",
             row: (row) => { return row.descripcion }
         },
-        {
-            name: "Administrador",
-            row: (row) => {
-                const value = row.administrador ? true : false
-                return value
-            }
-        },
     ]
     const options = {
         delete: (row) => {
             deleteItem({
                 row: row,
-                objet: cargos,
-                functionGet: getCargos
+                objet: materiales,
+                functionGet: getMateriales
             })
         },
         search: {
@@ -64,26 +59,26 @@ function Cargos() {
             function: (value) => {
                 searchCode({
                     value: value,
-                    object: cargos,
-                    setList: setCargos
+                    object: materiales,
+                    setList: setMateriales
                 })
             }
         },
         register: {
-            name: "Agregar un nuevo cargo",
+            name: "Agregar un Nuevo Materiales",
             function: () => {
-                navigate("/register/cargo")
+                navigate("/register/material")
             }
         }
     }
     return (
-        <Navbar name="Lista de Cargos" descripcion="Verifique los cargos agregados">
+        <Navbar name="Lista de Materiales" descripcion="Verifique los Materiales agregados">
 
             <Table
                 columns={columns}
-                rows={listCargos}
-                totalElements={dataCargos.total}
-                totalPages={dataCargos.pages}
+                rows={listMateriales}
+                totalElements={dataMateriales.total}
+                totalPages={dataMateriales.pages}
                 options={options}
                 loading={tableLoading}
             />
@@ -92,4 +87,4 @@ function Cargos() {
     )
 }
 
-export default Cargos
+export default Materiales

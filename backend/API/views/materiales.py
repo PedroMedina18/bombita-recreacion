@@ -6,7 +6,7 @@ from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..models import Materiales
-from django.db import IntegrityError, connection
+from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
 import json
 
@@ -43,19 +43,35 @@ class Materiales_Views(View):
             return JsonResponse(datos)
 
     def delete(self, request, id):
-        materiales = list(Materiales.objects.filter(id=id).values())
-        if len(materiales) > 0:
-            Materiales.objects.filter(id=id).delete()
+        try:
+            verify=verify_token(request.headers)
+            if(not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"]
+                }
+                return JsonResponse(datos)
+            materiales = list(Materiales.objects.filter(id=id).values())
+            if len(materiales) > 0:
+                Materiales.objects.filter(id=id).delete()
+                datos = {
+                    "status": True,
+                    'message': "Registro Eliminado"
+                }
+            else:
+                datos  = {
+                    "status": False,
+                    'message': "Registro No Encontrado"
+                }
+            return JsonResponse(datos)
+        except models.ProtectedError as e:
+            print("Erorr de proteccion")
+            print(str(e))
             datos = {
-                "status": True,
-                'message': "Registro Eliminado"
-            }
-        else:
-            datos  = {
                 "status": False,
-                'message': "Registro No Encontrado"
+                'message': "Error. Item protejido no se puede eliminar"
             }
-        return JsonResponse(datos)
+            return JsonResponse(datos)
 
     def put(self, request, id):
         try:
@@ -96,17 +112,18 @@ class Materiales_Views(View):
                     "data": None
                 }
                 return JsonResponse(datos)
+
             if (id > 0):
                 query = """
-                SELECT * FROM mat WHERE niveles.id=%s;
+                SELECT * FROM mat WHERE materiales.id=%s;
                 """
                 cursor.execute(query, [int(id)])
-                actividad = dictfetchall(cursor)
-                if(len(actividad)>0):
+                material = dictfetchall(cursor)
+                if(len(material)>0):
                     datos = {
                         "status": True,
                         'message': "Exito",
-                        "data": actividad[0]
+                        "data": material[0]
                     }
                 else:
                     datos = {
@@ -117,47 +134,49 @@ class Materiales_Views(View):
             else:
                 if("all" in request.GET and request.GET["all"]=="true"):
                     query = """
-                    SELECT * FROM actividades ORDER BY id ASC;
+                    SELECT * FROM materiales ORDER BY id ASC;
                     """
                     cursor.execute(query)
-                    activiades = dictfetchall(cursor)
+                    materiales = dictfetchall(cursor)
                 elif("page" in request.GET ):
                     query = """
-                    SELECT * FROM actividades ORDER BY id ASC id LIMIT %s, %s;
+                    SELECT * FROM materiales ORDER BY id ASC id LIMIT %s, %s;
                     """
                     cursor.execute(query, [indiceInicial(int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
-                    activiades = dictfetchall(cursor)
+                    materiales = dictfetchall(cursor)
                 elif("page" in request.GET and "desc" in request.GET and request.GET["desc"]=="true"):
                     query = """
-                    SELECT * FROM actividades ORDER BY id DESC LIMIT %s, %s;
+                    SELECT * FROM materiales ORDER BY id DESC LIMIT %s, %s;
                     """
                     cursor.execute(query, [indiceInicial(int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
-                    activiades = dictfetchall(cursor)
+                    materiales = dictfetchall(cursor)
                 else:
                     query = """
-                    SELECT * FROM actividades ORDER BY id LIMIT 25;
+                    SELECT * FROM materiales ORDER BY id LIMIT 25;
                     """
                     cursor.execute(query)
-                    activiades = dictfetchall(cursor)
+                    materiales = dictfetchall(cursor)
 
                 query="""
-                    SELECT CEILING(COUNT(*) / 25) AS total FROM actividades;
+                    SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM materiales;
                 """
                 cursor.execute(query)
-                pages = dictfetchall(cursor)
-                if len(activiades)>0:
+                result = dictfetchall(cursor)
+                if len(materiales)>0:
                     datos = {
                         "status": True,
                         'message': "Exito",
-                        "data": activiades,
-                        "pages":pages[0]["total"]
+                        "data": materiales,
+                        "pages": int(result[0]["pages"]),
+                        "total":result[0]["total"],
                     }
                 else:
                     datos = {
                         "status": False,
                         'message': "Error. No se encontraron registros",
                         "data": None,
-                        "pages":None
+                        "pages": None,
+                        "total":0
                     }
             return JsonResponse(datos)
         except Exception as ex:
@@ -165,7 +184,8 @@ class Materiales_Views(View):
             datos = {
                 "status": False,
                 'message': "Error. Error de sistema",
-                "data": None,
+                "pages": None,
+                "total":0
             }
             return JsonResponse(datos)
         finally:

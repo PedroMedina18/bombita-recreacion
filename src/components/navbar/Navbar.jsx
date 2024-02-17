@@ -2,6 +2,7 @@ import "./navbar.css"
 import { useContext, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { Link, useNavigate } from "react-router-dom"
+import bombita from "../../assets/bomb.png"
 
 function Navbar({ children, name, descripcion }) {
     const { getUser, closeSession } = useContext(AuthContext)
@@ -17,12 +18,11 @@ function Navbar({ children, name, descripcion }) {
                         onClick={() => {
                             document.querySelector("#sidebar").classList.toggle("expand");
                             document.querySelector("#main-top").classList.toggle("expand-main");
+                            document.querySelector("#barra-superior").classList.toggle("expand-barra");
                         }}>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10 3H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM9 9H5V5h4v4zm5 2h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1zm1-6h4v4h-4V5zM3 20a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v6zm2-5h4v4H5v-4zm8 5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v6zm2-5h4v4h-4v-4z"></path></svg>
                     </button>
-                    <div className="sidebar-logo">
-                        <a href="#">Bombitas Recreación</a>
-                    </div>
+
                 </div>
                 <ul className="sidebar-nav">
                     <li className="sidebar-item">
@@ -31,7 +31,7 @@ function Navbar({ children, name, descripcion }) {
                             <span>Inicio</span>
                         </Link>
                     </li>
-                    
+
                     <li className="sidebar-item">
                         <Link to="/usuarios" className="sidebar-link">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16.604 11.048a5.67 5.67 0 0 0 .751-3.44c-.179-1.784-1.175-3.361-2.803-4.44l-1.105 1.666c1.119.742 1.8 1.799 1.918 2.974a3.693 3.693 0 0 1-1.072 2.986l-1.192 1.192 1.618.475C18.951 13.701 19 17.957 19 18h2c0-1.789-.956-5.285-4.396-6.952z"></path><path d="M9.5 12c2.206 0 4-1.794 4-4s-1.794-4-4-4-4 1.794-4 4 1.794 4 4 4zm0-6c1.103 0 2 .897 2 2s-.897 2-2 2-2-.897-2-2 .897-2 2-2zm1.5 7H8c-3.309 0-6 2.691-6 6v1h2v-1c0-2.206 1.794-4 4-4h3c2.206 0 4 1.794 4 4v1h2v-1c0-3.309-2.691-6-6-6z"></path></svg>
@@ -44,7 +44,7 @@ function Navbar({ children, name, descripcion }) {
                             <span>Eventos</span>
                         </a>
                     </li>
-                    
+
                     <li className="sidebar-item">
                         <a href="#" className="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
                             data-bs-target="#servicios" aria-expanded="false" aria-controls="servicios">
@@ -55,13 +55,22 @@ function Navbar({ children, name, descripcion }) {
                             <li className="sidebar-item">
                                 <Link to="/actividades" className="sidebar-link">Actividades</Link>
                             </li>
+                            <li className="sidebar-item">
+                                <Link to="/register/servicio" className="sidebar-link">Servicios</Link>
+                            </li>
                         </ul>
                     </li>
                     <li className="sidebar-item">
-                        <a href="#" className="sidebar-link">
+                        <a href="#" className="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
+                            data-bs-target="#inventario" aria-expanded="false" aria-controls="inventario">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="m21.706 5.291-2.999-2.998A.996.996 0 0 0 18 2H6a.996.996 0 0 0-.707.293L2.294 5.291A.994.994 0 0 0 2 5.999V19c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V5.999a.994.994 0 0 0-.294-.708zM6.414 4h11.172l.999.999H5.415L6.414 4zM4 19V6.999h16L20.002 19H4z"></path><path d="M15 12H9v-2H7v4h10v-4h-2z"></path></svg>
                             <span>Inventario</span>
                         </a>
+                        <ul id="inventario" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            <li className="sidebar-item">
+                                <Link to="/materiales" className="sidebar-link">Materiales</Link>
+                            </li>
+                        </ul>
                     </li>
                     <li className="sidebar-item">
                         <a href="#" className="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
@@ -164,9 +173,16 @@ function Navbar({ children, name, descripcion }) {
                 </div> */}
             </aside>
             <main className="d-flex flex-column w-100" id="main">
-                <div className="perfile">
-                    <div className="user">
-                        <p className="m-0 me-3">{dataUser.nombre}</p>
+
+                <div className="barra-superior" id="barra-superior">
+                    <Link to="/inicio" className="sidebar-logo">
+                        <img src={bombita} alt="bombita" />
+                        <div>
+                            <span>Bombitas <br />Recreación</span>
+                        </div>
+                    </Link>
+                    <div className="user ms-2">
+                        <p className="m-0 me-1 text-center inline-block">{dataUser.nombre}</p>
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2A10.13 10.13 0 0 0 2 12a10 10 0 0 0 4 7.92V20h.1a9.7 9.7 0 0 0 11.8 0h.1v-.08A10 10 0 0 0 22 12 10.13 10.13 0 0 0 12 2zM8.07 18.93A3 3 0 0 1 11 16.57h2a3 3 0 0 1 2.93 2.36 7.75 7.75 0 0 1-7.86 0zm9.54-1.29A5 5 0 0 0 13 14.57h-2a5 5 0 0 0-4.61 3.07A8 8 0 0 1 4 12a8.1 8.1 0 0 1 8-8 8.1 8.1 0 0 1 8 8 8 8 0 0 1-2.39 5.64z"></path><path d="M12 6a3.91 3.91 0 0 0-4 4 3.91 3.91 0 0 0 4 4 3.91 3.91 0 0 0 4-4 3.91 3.91 0 0 0-4-4zm0 6a1.91 1.91 0 0 1-2-2 1.91 1.91 0 0 1 2-2 1.91 1.91 0 0 1 2 2 1.91 1.91 0 0 1-2 2z"></path></svg>
                     </div>
                 </div>
@@ -176,7 +192,7 @@ function Navbar({ children, name, descripcion }) {
                             <h1 className="name-page m-0">{name}</h1>
                             <p className="descripcion-page">{descripcion}</p>
                         </div>
-                        <span className="span-fecha mb-2 mb-md-0">Inicio de sesión {startDate.getDate() < 10 ? `0${startDate.getDate()}` : startDate.getDate()}-{(startDate.getMonth() + 1) < 10 ? `0${startDate.getMonth() + 1}` : startDate.getMonth() + 1}-{startDate.getFullYear()} a las {startDate.getHours()}:{startDate.getMinutes()}:{startDate.getSeconds()}</span>
+                        <span className="span-fecha mb-2 mb-md-0">Inicio de sesión {startDate.getDate() < 10 ? `0${startDate.getDate()}` : startDate.getDate()}-{(startDate.getMonth() + 1) < 10 ? `0${startDate.getMonth() + 1}` : startDate.getMonth() + 1}-{startDate.getFullYear()} a las {startDate.getHours() < 10 ? `0${startDate.getHours()}` : startDate.getHours()}:{startDate.getMinutes() < 10 ? `0${startDate.getMinutes()}` : startDate.getMinutes()}:{startDate.getSeconds() < 10 ? `0${startDate.getSeconds()}` : startDate.getSeconds()}</span>
                     </div>
 
                     <hr />

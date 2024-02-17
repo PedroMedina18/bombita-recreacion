@@ -12,8 +12,6 @@ class Permisos(models.Model):
         db_table = "permisos"
 
 # Tabla con los cargos del sistema principal funcion determinar que puede hacer cada usuario
-
-
 class Cargos(models.Model):
     nombre = models.CharField(max_length=50, unique=True)
     descripcion = models.CharField(max_length=500, null=True, blank=True)
@@ -25,8 +23,6 @@ class Cargos(models.Model):
         db_table = "cargos"
 
 # Tabla intermedia entre los cargos y los permisos
-
-
 class PermisosCargos(models.Model):
     permisos = models.ForeignKey(
         Permisos, on_delete=models.CASCADE, related_name="cargos", db_column="permiso_id")
@@ -37,8 +33,6 @@ class PermisosCargos(models.Model):
         db_table = "permisos_has_cargos"
 
 # Tabla los tipos de documentos
-
-
 class TipoDocumento(models.Model):
     nombre = models.CharField(max_length=50, unique=True)
     descripcion = models.CharField(max_length=200, null=True, blank=True)
@@ -49,8 +43,6 @@ class TipoDocumento(models.Model):
         db_table = "tipo_documentos"
 
 # Tabla base de las personas o entidades
-
-
 class Personas(models.Model):
     nombres = models.CharField(max_length=200)
     apellidos = models.CharField(max_length=200)
@@ -68,8 +60,6 @@ class Personas(models.Model):
         db_table = "personas"
 
 # Tabla de los usuarios del sistema
-
-
 class Usuarios(models.Model):
     persona = models.OneToOneField(
         Personas, on_delete=models.PROTECT, related_name="usuario", db_column="persona_id")
@@ -83,8 +73,6 @@ class Usuarios(models.Model):
         db_table = "usuarios"
 
 # Tabla los niveles de los recreadores
-
-
 class Nivel(models.Model):
     nombre = models.CharField(max_length=50, unique=True)
     descripcion = models.CharField(max_length=200, null=True, blank=True)
@@ -93,8 +81,6 @@ class Nivel(models.Model):
         db_table = "niveles"
 
 # Tabla los niveles de los recreadores
-
-
 class Recreadores(models.Model):
     persona = models.OneToOneField(
         Personas, on_delete=models.PROTECT, related_name="recreador", db_column="persona_id")
@@ -108,14 +94,12 @@ class Recreadores(models.Model):
     class Meta:
         db_table = "recreadores"
 
-
 class Actividades(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     descripcion = models.CharField(max_length=300, null=True, blank=True)
 
     class Meta:
         db_table = "actividades"
-
 
 class Materiales(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
@@ -124,3 +108,50 @@ class Materiales(models.Model):
 
     class Meta:
         db_table = "materiales"
+
+class Servicios(models.Model):
+    nombre = models.CharField(max_length=100, unique=True)
+    precio = models.FloatField(default=0)
+    duracion = models.DurationField()
+    numero_recreadores = models.ImageField(default=1)
+    descripcion = models.CharField(max_length=300, null=True, blank=True)
+
+    class Meta:
+        db_table = "servicios"
+
+class MaterialesActividad(models.Model):
+    material = models.ForeignKey(
+        Materiales, on_delete=models.CASCADE, related_name="actividades", db_column="material_id")
+    actividad = models.ForeignKey(
+        Actividades, on_delete=models.CASCADE, related_name="materiales", db_column="actividad_id")
+
+    class Meta:
+        db_table = "materiales_has_actvidades"
+
+class ServiciosRecreadores(models.Model):
+    servicio = models.ForeignKey(
+        Servicios, on_delete=models.CASCADE, related_name="recreador", db_column="servicio_id")
+    recreador = models.ForeignKey(
+        Recreadores, on_delete=models.CASCADE, related_name="servicio", db_column="recreador_id")
+
+    class Meta:
+        db_table = "servicios_has_recreadores"
+
+class ServiciosActividades(models.Model):
+    servicio = models.ForeignKey(
+        Servicios, on_delete=models.CASCADE, related_name="actividades", db_column="servicio_id")
+    actividad = models.ForeignKey(
+        Actividades, on_delete=models.CASCADE, related_name="servicios", db_column="actividad_id")
+
+    class Meta:
+        db_table = "servicios_has_actvidades"
+
+class Serviciosmateriales(models.Model):
+    servicio = models.ForeignKey(
+        Servicios, on_delete=models.CASCADE, related_name="materiales", db_column="servicio_id")
+    material = models.ForeignKey(
+        Materiales, on_delete=models.CASCADE, related_name="servicios", db_column="material_id")
+    cantidad = models.ImageField(default=1)
+
+    class Meta:
+        db_table = "servicios_has_materiales"

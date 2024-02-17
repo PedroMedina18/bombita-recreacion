@@ -30,12 +30,14 @@ class Cargos_Views(View):
                 }
                 return JsonResponse(datos)
             cargo = Cargos.objects.create(nombre=jd["nombre"].title(), descripcion=jd['descripcion'], administrador=jd['administrador'])
+            
             if (not jd['administrador']):
                 permisos = jd['permisos']
                 for permiso in permisos:
                     new_permiso = Permisos.objects.get(id=int(permiso))
                     PermisosCargos.objects.create(
                         permisos=new_permiso, cargos=cargo)
+            
             datos = {
                 "status": True,
                 'message': "Registro Completado"
@@ -80,7 +82,6 @@ class Cargos_Views(View):
                 'message': "Error. Item protejido no se puede eliminar"
             }
             return JsonResponse(datos)
-       
 
     def get(self, request, id=0):
 

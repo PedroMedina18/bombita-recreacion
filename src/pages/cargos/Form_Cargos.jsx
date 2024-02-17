@@ -25,7 +25,7 @@ function Cargos() {
         get_Permisos()
     }, [])
 
-    // funcion para buscar los permisos en la vase de datos
+    // funcion para buscar los permisos en la base de datos
     const get_Permisos = async () => {
         try {
             const res = await permisos.get()
@@ -67,7 +67,7 @@ function Cargos() {
                     controlResultPost({
                         respuesta:res, 
                         messageExito:"Cargo Registrado", 
-                        navigate:"/cargos"
+                        useNavigate:{navigate:navigate, direction:"/cargos"}
                     })
                 }
             } catch (error) {
@@ -154,7 +154,7 @@ function Cargos() {
                                     />
                                     {
                                         !watch("administrador") ?
-                                            (<MultiSelect name="Permisos" id="permisos" options={options} save={setSelectOptions} placeholder={"Permisos"} />)
+                                            (<MultiSelect name="permisos" label="Permisos" id="permisos" options={options} save={setSelectOptions} placeholder={"Permisos"} />)
                                             :
                                             ""
                                     }

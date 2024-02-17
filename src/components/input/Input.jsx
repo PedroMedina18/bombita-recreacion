@@ -53,13 +53,13 @@ export function InputNumber({ label, id, name, form, params = {}, isError = true
     )
 }
 
-export function InputTextTarea({ label, id, name, form, params = {}, ...props }) {
+export function InputTextTarea({ label, id, name, form, params = {}, rows=null, ...props }) {
     const { errors, register } = form
     return (
         <div className={`w-100 mb-1 ${errors[name] ? "error" : " "}`}>
             <label className="formulario-label" htmlFor={id}>{label}</label>
             <div className="formulario-grupo-input textarea m-0">
-                <textarea className="formulario-textarea" rows={3}
+                <textarea className="formulario-textarea" rows={rows? rows : 4}
                     id={id}
                     {
                     ...register(name,
@@ -156,7 +156,7 @@ export function InputTel({ label, id, name, form, params = {}, isError = true, .
         <div className={`w-100 ${errors[name] && isError ? "error" : " "}`}>
             <label className="formulario-label" htmlFor={id}>{label}</label>
             <div className="formulario-grupo-input">
-                <input className="formulario-input" type="number"
+                <input className="formulario-input" type="number"  
                     id={id}
                     {
                     ...register(name,
@@ -241,10 +241,10 @@ export function UnitSelect({ label, id, name, form, params = {}, options, placeh
 }
 
 const animatedComponent = MakeAnimated()
-export function MultiSelect({ name, id, options, save, placeholder, }) {
+export function MultiSelect({ name, id, label, options, save, placeholder, }) {
     return (
         <div className="w-100">
-            <label className="formulario-label" htmlFor={id}>{name}</label>
+            <label className="formulario-label" htmlFor={id}>{label}</label>
             <Select
                 id={id}
                 isMulti

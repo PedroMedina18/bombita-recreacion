@@ -14,6 +14,10 @@ import Recreadores from "./pages/recreadores/Recreadores"
 import Niveles from "./pages/niveles/Niveles";
 import Form_Niveles from "./pages/niveles/Form_Niveles";
 import Form_Recreadores from "./pages/recreadores/Form_Recreadores";
+import Materiales from "./pages/materiales/Materiales";
+import Form_Materiales from "./pages/materiales/Form_Materiales";
+import Servicios from "./pages/servicios/Servicios";
+import Form_Servicios from "./pages/servicios/Form_Servicios";
 
 function App() {
   return (
@@ -29,11 +33,15 @@ function App() {
             <Route path="/register/actividad" element={<Form_Actividades />} />
             <Route path="/niveles" element={<Niveles />} />
             <Route path="/register/nivel" element={<Form_Niveles />} />
+            <Route path="/materiales" element={<Materiales />} />
+            <Route path="/register/material" element={<Form_Materiales />} />
             <Route path="/tipo_documentos" element={<Tipo_Documento />} />
             <Route path="/register/tipo_documento" element={<Form_Tipo_Documento />} />
             <Route path="/recreadores" element={<Recreadores />} />
             <Route path="/register/recreadores" element={<Form_Recreadores />} />
             <Route path="/inicio" element={<Inicio />} />
+            <Route path="/servicios" element={<Servicios />} />
+            <Route path="/register/servicio" element={<Form_Servicios />} />
           </Route>
           <Route path="*" element={<Error404 />} />
         </Routes>

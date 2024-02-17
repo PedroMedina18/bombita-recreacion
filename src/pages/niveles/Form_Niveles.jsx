@@ -38,7 +38,7 @@ function Form_Niveles() {
                     controlResultPost({
                         respuesta: res,
                         messageExito: "Nivel Registrado",
-                        navigate: "/niveles"
+                        useNavigate:{navigate:navigate, direction:"/niveles"}
                     })
                 }
             } catch (error) {
@@ -66,10 +66,6 @@ function Form_Niveles() {
                             maxLength: {
                                 value: 50,
                                 message: "Máximo 50 caracteres",
-                            },
-                            pattern: {
-                                value: /^[a-zA-ZÁ-ÿ\s]+$/,
-                                message: "Nombre invalido",
                             },
                             validate: (value) => {
                                 if (hasLeadingOrTrailingSpace(value)) {

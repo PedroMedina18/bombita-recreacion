@@ -10,7 +10,7 @@
 }
 .formulario-input,
 .formulario-textarea,
-.formulario-input-date{
+.formulario-input-date {
   width: 100%;
   background: #fff;
   border: 2px solid rgb(22, 21, 21);
@@ -20,14 +20,16 @@
   padding: 0 40px 0 10px;
   transition: 0.3s ease all;
 }
-.formulario-input-date{
+.formulario-input-date {
   padding: 0 10px 0 10px;
 }
-.formulario-input.select{
+.formulario-input.select {
   padding: 0 50px 0 10px;
 }
 .formulario-textarea {
   height: max-content;
+  line-height: 25px;
+  padding: 5px 40px 5px 10px;
 }
 .formulario-input:focus,
 .formulario-textarea:focus,
@@ -52,7 +54,7 @@
   visibility: hidden;
   pointer-events: none;
 }
-.formulario-grupo-input.select svg{
+.formulario-grupo-input.select svg {
   right: 10px;
 }
 .formulario-grupo-input.textarea svg {
@@ -66,11 +68,11 @@
   font-weight: 500;
   display: block;
   visibility: hidden;
-  margin:0;
+  margin: 0;
 }
-.form-check-input{
-  --bs-border-width:2px;
-  --bs-border-color:black;
+.form-check-input {
+  --bs-border-width: 2px;
+  --bs-border-color: black;
 }
 /* -----Seccion de errores */
 .error .formulario-input,
@@ -86,15 +88,15 @@
   box-shadow: 0 0 0 0.25rem rgba(253, 41, 13, 0.25);
 }
 .error .bi-x-circle-fill {
-  visibility:visible;
+  visibility: visible;
 }
-.error.check .formulario-label{
-  color:rgb(var(--error))
+.error.check .formulario-label {
+  color: rgb(var(--error));
 }
 .error .formulario-message-error {
   visibility: visible;
   color: rgb(var(--error));
 }
-.error .form-check-input{
+.error .form-check-input {
   border: 2px solid rgb(var(--error));
 }

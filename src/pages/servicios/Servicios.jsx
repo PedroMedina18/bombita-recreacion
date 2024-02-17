@@ -1,14 +1,14 @@
 import { useEffect, useState, useContext, useRef } from "react"
-import Navbar from "../../components/navbar/Navbar"
 import { AuthContext } from '../../context/AuthContext';
+import Navbar from "../../components/navbar/Navbar"
 import Table from "../../components/table/Table"
-import { niveles } from "../../js/API"
+import { servicios } from "../../js/API"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 
-function Niveles() {
-  const [listNiveles, setNiveles] = useState([])
-  const [dataNiveles, setDataNiveles] = useState({ pages: 0, total: 0 })
+function Servicios() {
+  const [listServicios, setServicios] = useState([])
+  const [dataServicios, setDataServicios] = useState({ pages: 0, total: 0 })
   const { deleteItem, searchCode, getData } = useContext(AuthContext)
   const [tableLoading, setTableLoaing] = useState(true)
   const renderizado = useRef(0)
@@ -17,20 +17,19 @@ function Niveles() {
   useEffect(() => {
     if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1
-      getNiveles()
+      getServicios()
       return
     }
   }, [])
 
-  const getNiveles = () => {
+  const getServicios = () => {
     getData({
-      object: niveles,
-      setList: setNiveles,
-      setData: setDataNiveles,
+      object: servicios,
+      setList: setServicios,
+      setData: setDataServicios,
       setLoading: setTableLoaing
     })
   }
-
   const columns = [
     {
       name: "Item",
@@ -49,8 +48,8 @@ function Niveles() {
     delete: (row) => {
       deleteItem({
         row: row,
-        objet: Niveles,
-        functionGet: getNiveles
+        objet: servicios,
+        functionGet: getServicios
       })
     },
     search: {
@@ -58,26 +57,25 @@ function Niveles() {
       function: (value) => {
         searchCode({
           value: value,
-          object: niveles,
-          setList: setNiveles
+          object: servicios,
+          setList: setServicios
         })
       }
     },
     register: {
-      name: "Agregar un Nuevo Nivel",
+      name: "Agregar un nuevo cargo",
       function: () => {
-        navigate("/register/nivel")
+        navigate("/register/servicio")
       }
     }
   }
   return (
-    <Navbar name="Lista de Niveles" descripcion="Verifique los Niveles de recreador agregados">
-
+    <Navbar name="Lista de Servicios" descripcion="Verifique los servicios agregados">
       <Table
         columns={columns}
-        rows={listNiveles}
-        totalElements={dataNiveles.total}
-        totalPages={dataNiveles.pages}
+        rows={listServicios}
+        totalElements={dataServicios.total}
+        totalPages={dataServicios.pages}
         options={options}
         loading={tableLoading}
       />
@@ -86,4 +84,4 @@ function Niveles() {
   )
 }
 
-export default Niveles
+export default Servicios
