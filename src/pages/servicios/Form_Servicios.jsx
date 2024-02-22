@@ -9,9 +9,10 @@ import { recreadores, servicios, materiales, actividades } from "../../js/API.js
 import { LoaderCircle } from "../../components/loader/Loader";
 import { ButtonSimple } from "../../components/button/Button"
 import { alertConfim, toastError, alertLoading } from "../../js/alerts.js"
-import { InputText, InputTextTarea, InputCheck, MultiSelect } from "../../components/input/Input"
+import { InputText, InputTextTarea, InputDuration, MultiSelect, InputNumber } from "../../components/input/Input"
 import ErrorSystem from "../../components/ErrorSystem";
 import { hasLeadingOrTrailingSpace } from "../../js/functions.js"
+import texts from "../../context/text_es.js"
 
 function Form_Servicios() {
   const [loading, setLoading] = useState(true)
@@ -19,7 +20,11 @@ function Form_Servicios() {
   const [dataRecreadores, setDataRecreadores] = useState([])
   const [dataMateriales, setDataMateriales] = useState([])
   const [dataActividades, setDataActividades] = useState([])
-  const [selectOptions, setSelectOptions] = useState([])
+  const [saveRecreadores, setSaveRecreadores] = useState([])
+  const [saveMateriales, setSaveMateriales] = useState([])
+  const [saveActividades, setSaveActividades] = useState([])
+  const [submit, setSubmit] = useState(false)
+
   const { verificacion_options, controlResultPost } = useContext(AuthContext)
   const navigate = useNavigate();
 
@@ -36,17 +41,17 @@ function Form_Servicios() {
       verificacion_options({
         respuesta: getRecreadores,
         setError: setErrorServer,
-        setDataRecreadores
+        setOptions: setDataRecreadores
       })
       verificacion_options({
         respuesta: getMateriales,
         setError: setErrorServer,
-        setDataMateriales
+        setOptions: setDataMateriales
       })
       verificacion_options({
         respuesta: getActividades,
         setError: setErrorServer,
-        setDataActividades
+        setOptions: setDataActividades
       })
     } catch (error) {
       console.log(error)
@@ -64,9 +69,15 @@ function Form_Servicios() {
     watch
   } = useForm();
 
+  const onSubmit = handleSubmit(
+    async (data) => {
+      console.log("esta bien")
+    }
+  )
+
   return (
-    <Navbar name="Registrar un Cargo" descripcion="Intruduzca los datos para agregar un nuevo cargo">
-      <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/cargos") }}> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.939 4.939 6.879 12l7.06 7.061 2.122-2.122L11.121 12l4.94-4.939z"></path></svg> Regresar</ButtonSimple>
+    <Navbar name={texts.page.registerServicio.name} descripcion={texts.page.registerServicio.description}>
+      <ButtonSimple type="button" className="mb-3" onClick={() => { navigate("/servicios") }}> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.939 4.939 6.879 12l7.06 7.061 2.122-2.122L11.121 12l4.94-4.939z"></path></svg> Regresar</ButtonSimple>
       {
         loading ?
           (
@@ -84,10 +95,74 @@ function Form_Servicios() {
             :
             (
               <div className="w-100 bg-white p-3 round">
-
                 <form className="w-100 d-flex flex-column"
                   onSubmit={onSubmit}>
-                  
+                  <InputText id="nombre" label={texts.label.nombre} name="nombre" form={{ register, errors }} />
+                  <div className="w-100 d-flex justify-content-between align-item-center">
+                    <div className="w-md-15">
+                      <InputDuration id="duracion" label={texts.label.duracion} name="duracion" form={{ register, errors }} />
+                    </div>
+                    <div className="w-md-20">
+                      <InputNumber label={texts.label.recreadores} name="recreadores" id="recreadores" form={{ errors, register }}
+                        params={{
+                          required: {
+                            value: true,
+                            message: texts.message.requireRecreadores,
+                          },
+                        }}
+                      />
+                    </div>
+                    <div className="w-md-15">
+                      <InputNumber label={texts.label.precio} name="precio" id="precio" form={{ errors, register }}
+                        params={{
+                          required: {
+                            value: true,
+                            message: texts.message.requirePrecio,
+                          },
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="mb-1">
+                    <MultiSelect name="recreadores-servicio" label="Recreadores Permitidos" id="recreadores-servicio" options={dataRecreadores} save={setSaveRecreadores} placeholder={"Recreadores"} />
+                    {Boolean(!saveRecreadores.length && submit) ? <span className="message-error visible">Seleccione los permisos del Cargo</span> : <span className="message-error invisible">Sin errores</span>}
+                  </div>
+                  <div className="mb-1">
+                    <MultiSelect name="actividades" label="Actividades" id="actividades" options={dataActividades} save={setSaveActividades} placeholder={"Activiades que se realizan"} />
+                    {Boolean(!saveActividades.length && submit) ? <span className="message-error visible">Seleccione los permisos del Cargo</span> : <span className="message-error invisible">Sin errores</span>}
+                  </div>
+                  <div className="mb-1">
+                    <MultiSelect name="materiales" label="Materiales" id="materiales" options={dataMateriales} save={setSaveMateriales} placeholder={"Materiales que se necesitan"} />
+                    {Boolean(!saveMateriales.length && submit) ? <span className="message-error visible">Seleccione los permisos del Cargo</span> : <span className="message-error invisible">Sin errores</span>}
+                  </div>
+                  {
+                    saveMateriales.length ?
+                      saveMateriales.map((element, index) =>
+                      (
+                        <div key={`${element.label}-${index}`} className="d-flex aling-item-center justify-content-between">
+                          <label for={`${element.value}-material`}>{element.label}</label>
+                          <input id={`${element.value}-material`} type="number" />
+                        </div>
+                      ))
+                      :
+                      ""
+                  }
+
+                  <InputTextTarea label={texts.label.descripcion} name="descripcion" id="descripcion" form={{ errors, register }}
+                    params={{
+                      maxLength: {
+                        value: 500,
+                        message: texts.message.max500,
+                      },
+                      validate: (value) => {
+                        if (hasLeadingOrTrailingSpace(value)) {
+                          return texts.message.noneSpace
+                        } else {
+                          return true
+                        }
+                      }
+                    }}
+                  />
                   <ButtonSimple type="submit" className="mx-auto w-50 mt-5">
                     Registrar
                   </ButtonSimple>

@@ -10,11 +10,11 @@
     overflow: hidden;
     transition: all 0.35s ease-in-out;
     background-color: rgb(230, 230, 230);
-    padding: 86px 16px 16px 86px;
+    padding: 96px 46px 26px 116px;
     transition: all .25s ease-in-out;
 }
 .expand-main{
-    padding: 81px 16px 16px 216px;
+    padding: 96px 46px 26px 236px;
 }
 .name-page{
     font-size: 20px;
@@ -201,9 +201,25 @@ a.sidebar-link:hover, p.sidebar-link:hover {
     transform: rotate(45deg);
     transition: all .2s ease-out;
 }
+@media (max-width: 768px) {
+    
+    .expand.sidebar::before{
+        transform: translateX(100%);
+    }
+    .main {
+        padding: 96px 36px 26px 106px;
+    }
+    .expand-main{
+        padding: 96px 36px 26px 216px;
+    }
+}
+
 @media (max-width: 576px) {
     
     .expand.sidebar::before{
         transform: translateX(100%);
+    }
+    .main {
+        padding: 96px 26px 26px 96px;
     }
 }
