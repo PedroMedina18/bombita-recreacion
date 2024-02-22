@@ -114,7 +114,7 @@ function Cargos() {
                                                 message: "Máximo 50 caracteres",
                                             },
                                             pattern: {
-                                                value: /^[a-zA-ZÁ-ÿ\s]+$/,
+                                                value: /^[a-zA-ZÁ-ÿ0-9\s]+$/,
                                                 message: "Nombre invalido",
                                             },
                                             validate:(value)=>{

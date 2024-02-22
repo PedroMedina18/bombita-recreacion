@@ -70,7 +70,7 @@ export function AuthContextProvider({ children }) {
         const options = respuesta.data.data.map((elements) => {
           return {
             value: elements.id,
-            label: elements.nombre
+            label: elements.nombre || `${elements.nombres} ${elements.apellidos}`
           }
         })
         setOptions(options)
