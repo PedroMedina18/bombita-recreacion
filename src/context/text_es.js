@@ -2,10 +2,16 @@ const texts={
     message:{
         noneSpace:"Sin espacios al inicio o al final",
         max500:"Máximo 500 caracteres",
+        max50:"Máximo 50 caracteres",
+        max100:"Máximo 100 caracteres",
+        minRecreador:"Minimo un recreador",                    
         requireName:"Se requiere un nombre",
         requireRecreadores:"Se requiere el numero de recreadores",
         requirePrecio:"Se requiere el precio",
-        
+        selectRecreadores:"Seleccione los recreadores",
+        selectActividades:"Seleccione las actividades a realizar",
+        selectMateriales:"Seleccione los materiales a utilizar",
+
     },
     label:{
         descripcion:"Descripción",
