@@ -113,7 +113,7 @@ class Servicios(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     precio = models.FloatField(default=0)
     duracion = models.DurationField()
-    numero_recreadores = models.ImageField(default=1)
+    numero_recreadores = models.IntegerField(default=1)
     descripcion = models.CharField(max_length=300, null=True, blank=True)
 
     class Meta:

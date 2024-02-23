@@ -80,9 +80,41 @@ function Form_Servicios() {
     watch,
   } = useForm();
 
-  const onSubmit = handleSubmit(async (data) => {
-    console.log("esta bien");
-  });
+  const onSubmit = handleSubmit(
+    async (data) => {
+      try {
+
+        if (!saveRecreadores.length || !saveMateriales.length || !saveActividades.length) {
+          return
+        }
+        const confirmacion = await alertConfim("Confirmar", "Por favor confirmar la solicitud de Registro")
+        if (!confirmacion) { return }
+        const recreadores = saveRecreadores.map((elements) => { return elements.value })
+        const actividades = saveActividades.map((elements) => { return elements.value })
+        const materiales = saveMateriales.map((elements) => { 
+          return {
+            material:elements.value,
+            cantidad:data[`${elements.label}`]
+          } 
+        })
+        const body = {
+          nombre: data.nombre,
+          precio: parseFloat(data.precio),
+          numero_recreadores: Number(data.numero_recreadores),
+          descripcion: data.descripcion,
+          duracion:{
+            horas:Number(data["duracion-hours"]),
+            minutos:Number(data["duracion-minutes"])
+          },
+          recreadores: recreadores,
+          actividades: actividades,
+          materiales: materiales
+        }
+        console.log(body)
+      } catch {
+
+      }
+    });
 
   return (
     <Navbar
@@ -140,20 +172,29 @@ function Form_Servicios() {
                 },
               }}
             />
-            <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
-              <div className="w-md-25">
+            <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-items-center">
+              <div className="w-md-30 w-100">
                 <InputDuration
                   id="duracion"
                   label={texts.label.duracion}
                   name="duracion"
                   form={{ register, errors }}
+                  params={{
+                    validate: (value) => {
+                      if ((value === "")) {
+                        return "Seleccione un valor"
+                      } else {
+                        return true
+                      }
+                    }
+                  }}
                 />
               </div>
-              <div className="w-md-25">
+              <div className="w-md-30 w-100">
                 <InputNumber
                   label={texts.label.recreadores}
-                  name="recreadores"
-                  id="recreadores"
+                  name="numero_recreadores"
+                  id="numero_recreadores"
                   form={{ errors, register }}
                   params={{
                     required: {
@@ -168,7 +209,7 @@ function Form_Servicios() {
                   defaultValue={0}
                 />
               </div>
-              <div className="w-md-25">
+              <div className="w-md-25 w-100">
                 <InputNumber
                   label={texts.label.precio}
                   name="precio"
@@ -179,6 +220,13 @@ function Form_Servicios() {
                       value: true,
                       message: texts.message.requirePrecio,
                     },
+                    validate: (e) => {
+                      if (e <= 0) {
+                        return texts.message.minPrecio
+                      } else {
+                        return true
+                      }
+                    }
                   }}
                   defaultValue={0}
                 />
@@ -235,19 +283,36 @@ function Form_Servicios() {
                 <span className="message-error invisible">Sin errores</span>
               )}
             </div>
-            {saveMateriales.length
-              ? saveMateriales.map((element, index) => (
-                  <InputNumber
-                    key={`${element.label}-${index}`}
-                    name={element.label}
-                    label={element.label}
-                    id={`${element.value}-material`}
-                    form={{ errors, register }}
-                    flexRow={true}
-                  />
-                ))
-              : ""}
-
+            {
+              saveMateriales.length ?
+                <div>
+                  <h4 className="fw-bold h5 mb-2">Escoja la cantidad de materiales</h4>
+                  {
+                    saveMateriales.map((element, index) => (
+                      <InputNumber
+                        key={`${element.label}-${index}`}
+                        name={element.label}
+                        label={element.label}
+                        id={`${element.value}-material`}
+                        form={{ errors, register }}
+                        flexRow={true}
+                        params={{
+                          required: {
+                            value: true,
+                            message: texts.message.requireCantidadMaterial,
+                          },
+                          min: {
+                            value: 0,
+                            message: texts.message.minNegative,
+                          }
+                        }}
+                      />
+                    ))
+                  }
+                </div>
+                :
+                ""
+            }
             <InputTextTarea
               label={texts.label.descripcion}
               name="descripcion"
@@ -267,7 +332,7 @@ function Form_Servicios() {
                 },
               }}
             />
-            <ButtonSimple type="submit" className="mx-auto w-50 mt-5">
+            <ButtonSimple onClick={(e) => { setSubmit(true); }} type="submit" className="mx-auto w-50 mt-5">
               Registrar
             </ButtonSimple>
           </form>

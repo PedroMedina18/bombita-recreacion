@@ -25,14 +25,7 @@ export function InputText({
           {...register(name, params)}
           {...props}
         />
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="bi bi-check-circle-fill"
-        >
-          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-        </svg>
+
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -62,8 +55,8 @@ export function InputNumber({
   const { errors, register } = form;
   if (flexRow) {
     return (
-      <div className={`w-100 ${errors[name] && isError ? "error" : " "}`}>
-        <div className="d-flex justify-content-between align-item-center"> 
+      <div className={`w-100 d-flex flex-column ${errors[name] && isError ? "error" : " "}`}>
+        <div className="d-flex justify-content-between align-items-center">
           <label className="formulario-label w-50" htmlFor={id}>
             {label}
           </label>
@@ -93,7 +86,7 @@ export function InputNumber({
             </svg>
           </div>
         </div>
-        <p className="formulario-message-error">
+        <p className="formulario-message-error mb-2 ms-auto d-inline-block">
           {errors[name] ? errors[name].message : "error"}
         </p>
       </div>
@@ -105,21 +98,14 @@ export function InputNumber({
         {label}
       </label>
       <div className="formulario-grupo-input">
-        <input 
+        <input
           className="formulario-input"
           type="number"
           id={id}
           {...register(name, params)}
           {...props}
         />
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="bi bi-check-circle-fill"
-        >
-          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-        </svg>
+
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -159,14 +145,7 @@ export function InputTextTarea({
           {...register(name, params)}
           {...props}
         />
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="bi bi-check-circle-fill"
-        >
-          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-        </svg>
+
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -196,9 +175,8 @@ export function InputCheck({
   const { errors, register } = form;
   return (
     <div
-      className={`w-100 d-flex check ${
-        errors[name] && isError ? "error" : " "
-      } ${className}`}
+      className={`w-100 d-flex check ${errors[name] && isError ? "error" : " "
+        } ${className}`}
     >
       <input
         className="form-check-input"
@@ -238,14 +216,7 @@ export function InputEmail({
           {...register(name, params)}
           {...props}
         />
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="bi bi-check-circle-fill"
-        >
-          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-        </svg>
+
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -284,14 +255,7 @@ export function InputPassword({
           {...register(name, params)}
           {...props}
         />
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="bi bi-check-circle-fill"
-        >
-          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-        </svg>
+
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -331,14 +295,7 @@ export function InputTel({
           {...register(name, params)}
           {...props}
         />
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="bi bi-check-circle-fill"
-        >
-          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-        </svg>
+
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -377,14 +334,7 @@ export function InputDate({
           {...register(name, params)}
           {...props}
         />
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="bi bi-check-circle-fill"
-        >
-          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-        </svg>
+
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
@@ -408,6 +358,7 @@ export function InputDuration({
   form,
   params = {},
   isError = true,
+  ...props
 }) {
   const { errors, register } = form;
   const hours = [
@@ -502,35 +453,70 @@ export function InputDuration({
   ];
 
   return (
-    <div className={`w-100  ${errors[name] && isError ? "error" : " "} `}>
+    <div className={`w-100  ${(errors[`${name}-hours`] || errors[`${name}-minutes`]) && isError ? "error" : " "} `}>
       <label className="formulario-label" htmlFor={`${id}-hour`}>
         {label}
       </label>
       <div className="d-flex align-items-center justify-content-center">
-        <select
-          name={`${name}-hour`}
-          id={`${id}-hour`}
-          className="w-50 me-2 formulario-input"
-        >
-          <option value="">{"..."}</option>
-          {hours.map((element) => (
-            <option key={element.value} value={element.value}>
-              {element.label}
-            </option>
-          ))}
-        </select>
-        <select
-          name={`${name}-minute`}
-          id={`${id}-minute`}
-          className="w-50 ms-2 formulario-input"
-        >
-          <option value="">{"..."}</option>
-          {minutes.map((element) => (
-            <option key={element.value} value={element.value}>
-              {element.label}
-            </option>
-          ))}
-        </select>
+        <div className="w-50 ">
+          <div className="formulario-grupo-input select">
+            <select
+              name={`${name}-hours`}
+              id={`${id}-hours`}
+              className="w-100 me-2 formulario-input"
+              {...register(`${name}-hours`, params)}
+              {...props}
+            >
+              <option value="">{"..."}</option>
+              {hours.map((element) => (
+                <option key={element.value} value={element.value}>
+                  {element.label}
+                </option>
+              ))}
+            </select>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="bi bi-x-circle-fill"
+            >
+              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z" />
+            </svg>
+          </div>
+          <p className="formulario-message-error">
+            {errors[`${name}-hours`] ? errors[`${name}-hours`].message : "error"}
+          </p>
+        </div>
+        <div className="w-50 ">
+          <div className="formulario-grupo-input select">
+            <select
+              name={`${name}-minutes`}
+              id={`${id}-minutes`}
+              className="w-100 ms-2 formulario-input"
+              {...register(`${name}-minutes`, params)}
+              {...props}
+            >
+              <option value="">{"..."}</option>
+              {minutes.map((element) => (
+                <option key={element.value} value={element.value}>
+                  {element.label}
+                </option>
+              ))}
+            </select>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="bi bi-x-circle-fill"
+            >
+              <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z" />
+            </svg>
+          </div>
+
+          <p className="formulario-message-error">
+            {errors[`${name}-minutes`] ? errors[`${name}-minutes`].message : "error"}
+          </p>
+        </div>
       </div>
     </div>
   );
@@ -564,20 +550,12 @@ export function UnitSelect({
           <option value="">{placeholder}</option>
           {options.length
             ? options.map((element) => (
-                <option key={element.value} value={element.value}>
-                  {element.label}
-                </option>
-              ))
+              <option key={element.value} value={element.value}>
+                {element.label}
+              </option>
+            ))
             : ""}
         </select>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="bi bi-check-circle-fill"
-        >
-          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-        </svg>
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 24 24"
