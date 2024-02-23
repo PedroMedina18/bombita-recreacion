@@ -80,41 +80,69 @@ function Form_Servicios() {
     watch,
   } = useForm();
 
-  const onSubmit = handleSubmit(
-    async (data) => {
-      try {
-
-        if (!saveRecreadores.length || !saveMateriales.length || !saveActividades.length) {
-          return
-        }
-        const confirmacion = await alertConfim("Confirmar", "Por favor confirmar la solicitud de Registro")
-        if (!confirmacion) { return }
-        const recreadores = saveRecreadores.map((elements) => { return elements.value })
-        const actividades = saveActividades.map((elements) => { return elements.value })
-        const materiales = saveMateriales.map((elements) => { 
-          return {
-            material:elements.value,
-            cantidad:data[`${elements.label}`]
-          } 
-        })
-        const body = {
-          nombre: data.nombre,
-          precio: parseFloat(data.precio),
-          numero_recreadores: Number(data.numero_recreadores),
-          descripcion: data.descripcion,
-          duracion:{
-            horas:Number(data["duracion-hours"]),
-            minutos:Number(data["duracion-minutes"])
-          },
-          recreadores: recreadores,
-          actividades: actividades,
-          materiales: materiales
-        }
-        console.log(body)
-      } catch {
-
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      if (
+        !saveRecreadores.length ||
+        !saveMateriales.length ||
+        !saveActividades.length
+      ) {
+        return;
       }
-    });
+      const confirmacion = await alertConfim(
+        "Confirmar",
+        "Por favor confirmar la solicitud de Registro"
+      );
+      if (!confirmacion) {
+        return;
+      }
+      const recreadores = saveRecreadores.map((elements) => {
+        return elements.value;
+      });
+      const actividades = saveActividades.map((elements) => {
+        return elements.value;
+      });
+      const materiales = saveMateriales.map((elements) => {
+        return {
+          material: elements.value,
+          cantidad: data[`${elements.label}`],
+        };
+      });
+      const body = {
+        nombre: data.nombre,
+        precio: parseFloat(data.precio),
+        numero_recreadores: Number(data.numero_recreadores),
+        descripcion: data.descripcion,
+        duracion: {
+          horas: Number(data["duracion-hours"]),
+          minutos: Number(data["duracion-minutes"]),
+        },
+        recreadores: recreadores,
+        actividades: actividades,
+        materiales: materiales,
+      };
+      servicios.post(body);
+      const res = await servicios.post(body);
+      controlResultPost({
+        respuesta: res,
+        messageExito: "Servicio Registrado",
+        useNavigate: { navigate: navigate, direction: "/servicios" },
+      });
+    } catch {
+      console.log(error);
+      Swal.close();
+      toastError(
+        "Error de Conexión",
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path d="M11.953 2C6.465 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.493 2 11.953 2zM13 17h-2v-2h2v2zm0-4h-2V7h2v6z"></path>
+        </svg>
+      );
+    }
+  });
 
   return (
     <Navbar
@@ -181,12 +209,12 @@ function Form_Servicios() {
                   form={{ register, errors }}
                   params={{
                     validate: (value) => {
-                      if ((value === "")) {
-                        return "Seleccione un valor"
+                      if (value === "") {
+                        return "Seleccione un valor";
                       } else {
-                        return true
+                        return true;
                       }
-                    }
+                    },
                   }}
                 />
               </div>
@@ -222,11 +250,11 @@ function Form_Servicios() {
                     },
                     validate: (e) => {
                       if (e <= 0) {
-                        return texts.message.minPrecio
+                        return texts.message.minPrecio;
                       } else {
-                        return true
+                        return true;
                       }
-                    }
+                    },
                   }}
                   defaultValue={0}
                 />
@@ -283,36 +311,35 @@ function Form_Servicios() {
                 <span className="message-error invisible">Sin errores</span>
               )}
             </div>
-            {
-              saveMateriales.length ?
-                <div>
-                  <h4 className="fw-bold h5 mb-2">Escoja la cantidad de materiales</h4>
-                  {
-                    saveMateriales.map((element, index) => (
-                      <InputNumber
-                        key={`${element.label}-${index}`}
-                        name={element.label}
-                        label={element.label}
-                        id={`${element.value}-material`}
-                        form={{ errors, register }}
-                        flexRow={true}
-                        params={{
-                          required: {
-                            value: true,
-                            message: texts.message.requireCantidadMaterial,
-                          },
-                          min: {
-                            value: 0,
-                            message: texts.message.minNegative,
-                          }
-                        }}
-                      />
-                    ))
-                  }
-                </div>
-                :
-                ""
-            }
+            {saveMateriales.length ? (
+              <div>
+                <h4 className="fw-bold h5 mb-2">
+                  Escoja la cantidad de materiales
+                </h4>
+                {saveMateriales.map((element, index) => (
+                  <InputNumber
+                    key={`${element.label}-${index}`}
+                    name={element.label}
+                    label={element.label}
+                    id={`${element.value}-material`}
+                    form={{ errors, register }}
+                    flexRow={true}
+                    params={{
+                      required: {
+                        value: true,
+                        message: texts.message.requireCantidadMaterial,
+                      },
+                      min: {
+                        value: 0,
+                        message: texts.message.minNegative,
+                      },
+                    }}
+                  />
+                ))}
+              </div>
+            ) : (
+              ""
+            )}
             <InputTextTarea
               label={texts.label.descripcion}
               name="descripcion"
@@ -332,7 +359,13 @@ function Form_Servicios() {
                 },
               }}
             />
-            <ButtonSimple onClick={(e) => { setSubmit(true); }} type="submit" className="mx-auto w-50 mt-5">
+            <ButtonSimple
+              onClick={(e) => {
+                setSubmit(true);
+              }}
+              type="submit"
+              className="mx-auto w-50 mt-5"
+            >
               Registrar
             </ButtonSimple>
           </form>

@@ -55,7 +55,7 @@ function Navbar({ children, name, descripcion }) {
                                 <Link to="/actividades" className="sidebar-link">Actividades</Link>
                             </li>
                             <li className="sidebar-item">
-                                <Link to="/register/servicio" className="sidebar-link">Servicios</Link>
+                                <Link to="/servicios" className="sidebar-link">Servicios</Link>
                             </li>
                         </ul>
                     </li>
