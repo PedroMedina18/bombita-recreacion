@@ -1,15 +1,15 @@
-import { useEffect, useState, useContext, useRef } from "react"
-import Navbar from "../../components/navbar/Navbar"
-import { AuthContext } from '../../context/AuthContext';
-import Table from "../../components/table/Table"
-import { tipo_documentos } from "../../js/API"
+import { useEffect, useState, useRef } from "react"
 import { Toaster } from "sonner";
+import { tipo_documentos } from "../../utils/API.jsx";
 import { useNavigate } from 'react-router-dom';
+import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx"
+import Navbar from "../../components/navbar/Navbar"
+import Table from "../../components/table/Table"
+import texts from "../../context/text_es.js";
 
 function Tipo_Documento() {
     const [listTipo_Documentos, setTipo_Documentos] = useState([])
     const [dataTipo_Documentos, setDataTipo_Documentos] = useState({ pages: 0, total: 0 })
-    const { deleteItem, searchCode, getData } = useContext(AuthContext)
     const [tableLoading, setTableLoaing] = useState(true)
     const renderizado = useRef(0)
 
@@ -23,7 +23,7 @@ function Tipo_Documento() {
     }, [])
 
     const getTipo_Documentos = () => {
-        getData({
+        getListItems({
             object: tipo_documentos,
             setList: setTipo_Documentos,
             setData: setDataTipo_Documentos,
@@ -45,6 +45,7 @@ function Tipo_Documento() {
             row: (row) => { return row.descripcion }
         },
     ]
+
     const options = {
         delete: (row) => {
             deleteItem({
@@ -54,7 +55,7 @@ function Tipo_Documento() {
             })
         },
         search: {
-            placeholder: "Buscar por su Item",
+            placeholder: texts.messageRegister.searchItem,
             function: (value) => {
                 searchCode({
                     value: value,
@@ -64,14 +65,15 @@ function Tipo_Documento() {
             }
         },
         register: {
-            name: "Agregar un Nuevo Tipo de Documento",
+            name: texts.messageRegister.buttonRegisterTipoDocumento,
             function: () => {
                 navigate("/register/tipo_documento")
             }
         }
     }
+
     return (
-        <Navbar name="Lista de Tipos de Documentos" descripcion="Verifique los Tipos de Documentos agregados">
+        <Navbar name={`${texts.pages.getTipoDocumentos.name}`} descripcion={`${texts.pages.getTipoDocumentos.description}`}>
 
             <Table
                 columns={columns}

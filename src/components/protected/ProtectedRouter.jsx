@@ -1,7 +1,9 @@
 import { Outlet, Navigate } from 'react-router-dom'
 import { useContext, } from "react";
 import { AuthContext } from "../../context/AuthContext.jsx";
-import { getCookie } from "../../js/cookie.js"
+import { getCookie } from "../../utils/cookie.jsx"
+
+
 
 function ProtectedRouter({children}) {
   const { isAuthenticateds } = useContext(AuthContext)

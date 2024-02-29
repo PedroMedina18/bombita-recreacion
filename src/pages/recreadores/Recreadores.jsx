@@ -1,15 +1,16 @@
-import { useEffect, useState, useContext, useRef } from "react"
-import { AuthContext } from '../../context/AuthContext';
-import Navbar from "../../components/navbar/Navbar"
-import Table from "../../components/table/Table"
-import { recreadores } from "../../js/API"
+import { useEffect, useState, useRef } from "react"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
-import { calcular_edad } from "../../js/functions.js"
+import { recreadores } from "../../utils/API.jsx"
+import { calcularEdad } from "../../utils/process.jsx"
+import { searchCode, getListItems} from "../../utils/actions.jsx"
+import Navbar from "../../components/navbar/Navbar"
+import Table from "../../components/table/Table"
+import texts from "../../context/text_es.js";
+
 function Recreadores() {
     const [listRecreadores, setRecreadores] = useState([])
     const [dataRecreadores, setDataRecreadores] = useState({ pages: 0, total: 0 })
-    const { searchCode, getData } = useContext(AuthContext)
     const [tableLoading, setTableLoaing] = useState(true)
     const renderizado = useRef(0)
     const navigate = useNavigate()
@@ -23,13 +24,14 @@ function Recreadores() {
     }, [])
 
     const getRecreadores = () => {
-        getData({
+        getListItems({
             object: recreadores,
             setList: setRecreadores,
             setData: setDataRecreadores,
             setLoading: setTableLoaing
         })
     }
+
     const columns = [
         {
             name: "Item",
@@ -46,7 +48,7 @@ function Recreadores() {
         {
             name: "Edad",
             row: (row) => {
-                const edad = calcular_edad(row.fecha_nacimiento)
+                const edad = calcularEdad(row.fecha_nacimiento)
                 return `${edad} Años`
             }
         },
@@ -66,9 +68,10 @@ function Recreadores() {
             }
         },
     ]
+
     const options = {
         search: {
-            placeholder: "Buscar por número de Documento o Nombre",
+            placeholder: texts.registerMessage.searchNameDocument,
             function: (value) => {
                 searchCode({
                     value: value,
@@ -78,14 +81,15 @@ function Recreadores() {
             }
         },
         register: {
-            name: "Agregar un nuevo recreador",
+            name: texts.registerMessage.buttonRegisterRecreador,
             function: () => {
                 navigate("/register/recreadores")
             }
         }
     }
+
     return (
-        <Navbar name="Lista de Recreadores" descripcion="Verifique los Recreadores agregados">
+        <Navbar name={`${texts.pages.getRecreadores.name}`} descripcion={`${texts.pages.getRecreadores.description}`}>
             <Table
                 columns={columns}
                 rows={listRecreadores}

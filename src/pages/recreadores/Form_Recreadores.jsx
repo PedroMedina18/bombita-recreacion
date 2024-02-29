@@ -1,16 +1,19 @@
-import Navbar from "../../components/navbar/Navbar"
-import { InputText, UnitSelect, InputNumber, InputEmail, InputDate, InputTel, InputCheck } from "../../components/input/Input"
+import { useState, useEffect } from "react";
+import { InputsGeneral, UnitSelect, InputCheck } from "../../components/input/Input"
 import { ButtonSimple } from "../../components/button/Button"
 import { useForm } from "react-hook-form";
 import { LoaderCircle } from "../../components/loader/Loader";
-import ErrorSystem from "../../components/ErrorSystem";
 import { useNavigate } from 'react-router-dom'
-import { niveles, tipo_documentos, recreadores } from "../../js/API.js";
-import { alertConfim, toastError, alertLoading } from "../../js/alerts.js";
 import { Toaster } from "sonner";
-import { hasLeadingOrTrailingSpace, habilitarEdicion, calcular_edad } from "../../js/functions.js";
-import { useState, useEffect, useContext } from "react";
-import { AuthContext } from '../../context/AuthContext';
+import { niveles, tipo_documentos, recreadores } from "../../utils/API.jsx";
+import { alertConfim, toastError, alertLoading } from "../../utils/alerts.jsx";
+import { hasLeadingOrTrailingSpace, calcularEdad } from "../../utils/process.jsx";
+import { habilitarEdicion, verifyOptionsSelect, getPersona, controlResultPost } from "../../utils/actions.jsx"
+import ErrorSystem from "../../components/errores/ErrorSystem";
+import texts from "../../context/text_es.js";
+import Navbar from "../../components/navbar/Navbar"
+import pattern from "../../context/pattern.js"
+import {IconRowLeft} from "../../components/Icon"
 
 function Form_Recreadores() {
     const [data_tipo_documentos, setTipoDocumentos] = useState([])
@@ -20,9 +23,9 @@ function Form_Recreadores() {
     const [dataNewUser, setdataNewUser] = useState({ tipo_documento: null, numero_documento: null })
     const [dataPersona, setPersona] = useState({})
     const [disabledInputs, setDisabledInputs] = useState(false)
-    const { verificacion_options, get_persona, controlResultPost } = useContext(AuthContext)
     const [fechaActual] = useState(new Date())
     const navigate = useNavigate();
+
     useEffect(() => {
         get_data()
     }, [])
@@ -31,19 +34,19 @@ function Form_Recreadores() {
         try {
             const get_niveles = await niveles.get()
             const get_tipo_documentos = await tipo_documentos.get()
-            verificacion_options({
+            verifyOptionsSelect({
                 respuesta: get_niveles,
                 setError: setErrorServer,
                 setOptions: setNiveles
             })
-            verificacion_options({
+            verifyOptionsSelect({
                 respuesta: get_tipo_documentos,
                 setError: setErrorServer,
                 setOptions: setTipoDocumentos
             })
         } catch (error) {
             console.log(error)
-            setErrorServer("Error de Sistema")
+            setErrorServer(texts.errorMessage.errorSystem)
         } finally {
             setLoading(false)
         }
@@ -61,50 +64,47 @@ function Form_Recreadores() {
     const onSubmit = handleSubmit(
         async (data) => {
             try {
-                const confirmacion = await alertConfim("Confirmar", "Por favor confirmar la solicitud de Registro")
+                const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirRegister)
                 console.log(data)
                 if (confirmacion.isConfirmed) {
                     let body
                     if (data.id_persona) {
                         body = {
                             id_persona: data.id_persona,
-                            fecha_nacimiento:data.fecha_nacimiento,
+                            fecha_nacimiento: data.fecha_nacimiento,
                             nivel: Number(data.nivel)
                         }
                     } else {
                         body = {
                             nombres: data.nombres,
                             apellidos: data.apellidos,
-                            numero_documento:data.numero_documento,
+                            numero_documento: data.numero_documento,
                             tipo_documento: Number(data.tipo_documento),
                             telefono_principal: Number(data.telefono_principal),
                             telefono_secundario: Number(data.telefono_secundario),
                             correo: data.correo,
-                            fecha_nacimiento:data.fecha_nacimiento,
+                            fecha_nacimiento: data.fecha_nacimiento,
                             nivel: Number(data.nivel)
                         }
                     }
                     alertLoading("Cargando")
                     const res = await recreadores.post(body)
                     controlResultPost({
-                        respuesta:res,
-                        messageExito:"Recreador Registrado",
-                        useNavigate:{navigate:navigate, direction:"/recreadores"}
+                        respuesta: res,
+                        messageExito: texts.successMessage.recreador,
+                        useNavigate: { navigate: navigate, direction: "/recreadores" }
                     })
                 }
 
             } catch (error) {
-
-                toastError("Error de Conexión",
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.953 2C6.465 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.493 2 11.953 2zM13 17h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>
-                )
+                toastError(texts.errorMessage.errorConexion)
             }
         }
     )
 
     return (
-        <Navbar name="Registrar un Nuevo Recreador" descripcion="Intruduzca los datos para agregar un nuevo recreador al sistema">
-            <ButtonSimple type="button" className="mb-2" onClick={()=>{navigate("/recreadores")}}> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.939 4.939 6.879 12l7.06 7.061 2.122-2.122L11.121 12l4.94-4.939z"></path></svg> Regresar</ButtonSimple>
+        <Navbar name={`${texts.pages.registerRecreadores.name}`} descripcion={`${texts.pages.registerRecreadores.description}`}>
+            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/recreadores") }}> <IconRowLeft/> Regresar</ButtonSimple>
 
             {
                 loading ?
@@ -130,7 +130,7 @@ function Form_Recreadores() {
                                         ...register("id_persona")
                                         }
                                     />
-                                    <InputCheck label="Datos de persona ya registrados en el sistema" name="persona" id="persona" form={{ errors, register }} className={`${!disabledInputs ? "d-none" : ""}`} checked={disabledInputs}
+                                    <InputCheck label={`${texts.label.dataPersonaCheck}`} name="persona" id="persona" form={{ errors, register }} className={`${!disabledInputs ? "d-none" : ""}`} checked={disabledInputs}
                                         onClick={
                                             (e) => {
                                                 setDisabledInputs(!disabledInputs)
@@ -143,17 +143,17 @@ function Form_Recreadores() {
                                         } />
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-25 pe-0 pe-md-3 d-flex align-items-center">
-                                            <UnitSelect label="Tipo de Documento" name="tipo_documento" id="tipo_documento" form={{ errors, register }}
+                                            <UnitSelect label={texts.label.tipoDocuemnto} name="tipo_documento" id="tipo_documento" form={{ errors, register }}
                                                 options={data_tipo_documentos}
                                                 params={{
                                                     validate: (value) => {
                                                         if ((value === "")) {
-                                                            return "Seleccione un tipo de documento"
+                                                            return texts.inputsMessage.selectTipoDocumento
                                                         } else {
                                                             return true
                                                         }
                                                     },
-                                                    
+
                                                 }}
                                                 isError={!watch("tipo_documento")}
                                                 onChange={
@@ -162,7 +162,7 @@ function Form_Recreadores() {
                                                             ...dataNewUser,
                                                             tipo_documento: e.target.value
                                                         })
-                                                        get_persona({
+                                                        getPersona({
                                                             dataNewUser,
                                                             setPersona,
                                                             setValue,
@@ -175,19 +175,19 @@ function Form_Recreadores() {
                                             />
                                         </div>
                                         <div className="w-100 w-md-75 ps-0 ps-md-3 d-flex align-items-center">
-                                            <InputNumber label="Número de Documento" name="numero_documento" id="numero_documento" form={{ errors, register }}
+                                            <InputsGeneral type={"number"} label={`${texts.label.documento}`} name="numero_documento" id="numero_documento" form={{ errors, register }}
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: "Se requiere el número de documento",
+                                                        message: texts.inputsMessage.requireDocumento,
                                                     },
                                                     maxLength: {
                                                         value: 10,
-                                                        message: "Máximo 10 caracteres",
+                                                        message: texts.inputsMessage.max10,
                                                     },
                                                     minLength: {
                                                         value: 7,
-                                                        message: "Minimo 7 caracteres",
+                                                        message: texts.inputsMessage.min7,
                                                     },
                                                 }}
                                                 onKeyUp={
@@ -199,7 +199,7 @@ function Form_Recreadores() {
                                                     }
                                                 }
                                                 onBlur={(e) => {
-                                                    get_persona({
+                                                    getPersona({
                                                         dataNewUser,
                                                         setPersona,
                                                         setValue,
@@ -213,27 +213,27 @@ function Form_Recreadores() {
 
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-50 pe-0 pe-md-3">
-                                            <InputText label="Nombres del Recreador" name="nombres" id="nombres" form={{ errors, register }}
+                                            <InputsGeneral type={"text"} label={`${texts.label.namesRecreador}`} name="nombres" id="nombres" form={{ errors, register }}
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: "Se requiere los nombres",
+                                                        message: texts.inputsMessage.requireNames,
                                                     },
                                                     maxLength: {
                                                         value: 200,
-                                                        message: "Máximo 200 caracteres",
+                                                        message: texts.inputsMessage.max200,
                                                     },
                                                     minLength: {
                                                         value: 5,
-                                                        message: "Minimo 5 caracteres",
+                                                        message: texts.inputsMessage.min5,
                                                     },
                                                     pattern: {
-                                                        value: /^[a-zA-ZÁ-ÿ\s]+$/,
-                                                        message: "Nombres invalidos",
+                                                        value: pattern.textNoneNumber,
+                                                        message: texts.inputsMessage.invalidNombres,
                                                     },
                                                     validate: (value) => {
                                                         if (hasLeadingOrTrailingSpace(value)) {
-                                                            return "Sin espacios al inicio o al final"
+                                                            return texts.inputsMessage.noneSpace
                                                         } else {
                                                             return true
                                                         }
@@ -244,27 +244,27 @@ function Form_Recreadores() {
                                             />
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
-                                            <InputText label="Apellidos del Recreador" name="apellidos" id="apellidos" form={{ errors, register }}
+                                            <InputsGeneral type={"text"} label={`${texts.label.lastNamesRecreador}`} name="apellidos" id="apellidos" form={{ errors, register }}
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: "Se requiere los apellidos",
+                                                        message: texts.inputsMessage.requireLastName,
                                                     },
                                                     maxLength: {
                                                         value: 200,
-                                                        message: "Máximo 200 caracteres",
+                                                        message: texts.inputsMessage.max200,
                                                     },
                                                     minLength: {
                                                         value: 5,
-                                                        message: "Minimo 5 caracteres",
+                                                        message: texts.inputsMessage.min5,
                                                     },
                                                     pattern: {
-                                                        value: /^[a-zA-ZÁ-ÿ\s]+$/,
-                                                        message: "Apellidos invalidos",
+                                                        value: pattern.textNoneNumber,
+                                                        message: texts.inputsMessage.invalidLastNames,
                                                     },
                                                     validate: (value) => {
                                                         if (hasLeadingOrTrailingSpace(value)) {
-                                                            return "Sin espacios al inicio o al final"
+                                                            return texts.inputsMessage.noneSpace
                                                         } else {
                                                             return true
                                                         }
@@ -277,15 +277,15 @@ function Form_Recreadores() {
                                     </div>
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-50 pe-0 pe-md-3">
-                                            <InputDate label="Fecha de Nacimiento" name="fecha_nacimiento" id="fecha_nacimiento" form={{ errors, register }}
+                                            <InputsGeneral type={"date"} label={`${texts.label.birthDate}`} name="fecha_nacimiento" id="fecha_nacimiento" form={{ errors, register }}
                                                 max={`${fechaActual.getFullYear()}-${(fechaActual.getMonth() + 1) < 10 ? `0${fechaActual.getMonth() + 1}` : `${fechaActual.getMonth() + 1}`}-${fechaActual.getDate() < 10 ? `0${fechaActual.getDate()}` : fechaActual.getDate()}`}
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: "Se requiere la fecha de nacimeinto",
+                                                        message: texts.inputsMessage.requireDate,
                                                     },
                                                     validate: (e) => {
-                                                        const edad = calcular_edad(e, fechaActual)
+                                                        const edad = calcularEdad(e, fechaActual)
                                                         if (edad < 15 || edad > 60) {
                                                             return `Edad ${edad} años, recreador Invalido`
                                                         } else {
@@ -296,19 +296,19 @@ function Form_Recreadores() {
                                             />
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
-                                            <InputTel label="Teléfono Principal" name="telefono_principal" id="telefono_principal" form={{ errors, register }}
+                                            <InputsGeneral type={"tel"} label={`${texts.label.telPrincipal}`} name="telefono_principal" id="telefono_principal" form={{ errors, register }}
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: "Se requiere un número de teléfono",
+                                                        message: texts.inputsMessage.requireTel,
                                                     },
                                                     maxLength: {
                                                         value: 11,
-                                                        message: "Solo se admiten 11 caracteres",
+                                                        message: texts.inputsMessage.onlyCharacter11,
                                                     },
                                                     minLength: {
                                                         value: 11,
-                                                        message: "Solo se admiten 11 caracteres",
+                                                        message: texts.inputsMessage.onlyCharacter11,
                                                     }
                                                 }}
                                                 disabled={disabledInputs}
@@ -318,15 +318,15 @@ function Form_Recreadores() {
                                     </div>
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-50 pe-0 pe-md-3">
-                                            <InputTel label="Teléfono Secundario" name="telefono_secundario" id="telefono_secundario" form={{ errors, register }}
+                                            <InputsGeneral type={"tel"} label={`${texts.label.telSecundario}`} name="telefono_secundario" id="telefono_secundario" form={{ errors, register }}
                                                 params={{
                                                     maxLength: {
                                                         value: 11,
-                                                        message: "Solo se admiten 11 caracteres",
+                                                        message: texts.inputsMessage.onlyCharacter11,
                                                     },
                                                     minLength: {
                                                         value: 5,
-                                                        message: "Solo se admiten 11 caracteres",
+                                                        message: texts.inputsMessage.onlyCharacter11,
                                                     }
                                                 }}
                                                 disabled={disabledInputs}
@@ -334,23 +334,23 @@ function Form_Recreadores() {
                                             />
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
-                                            <InputEmail label="Correo Electrónico" name="correo" id="correo" form={{ errors, register }}
+                                            <InputsGeneral type={"email"} label={`${texts.label.email}`} name="correo" id="correo" form={{ errors, register }}
                                                 params={{
                                                     minLength: {
-                                                        value: 6,
-                                                        message: "Minimo 6 caracteres"
+                                                        value: 5,
+                                                        message: texts.inputsMessage.min5
                                                     },
                                                     maxLength: {
                                                         value: 100,
-                                                        message: "Minimo 100 caracteres"
+                                                        message: texts.inputsMessage.max100
                                                     },
                                                     pattern: {
-                                                        value: /^\w+([.-_+/$%&?¡¿]?\w+)@\w+([.-]?\w+)(.\w)+$/,
-                                                        message: "Correo  no valido"
+                                                        value: pattern.email,
+                                                        message: texts.inputsMessage.invalidEmail
                                                     },
                                                     validate: (value) => {
                                                         if (hasLeadingOrTrailingSpace(value)) {
-                                                            return "Sin espacios al inicio o al final"
+                                                            return texts.inputsMessage.noneSpace
                                                         } else {
                                                             return true
                                                         }
@@ -363,12 +363,12 @@ function Form_Recreadores() {
                                     </div>
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-50 pe-0 pe-md-3">
-                                            <UnitSelect label="Nivel" name="nivel" id="nivel" form={{ errors, register }}
+                                            <UnitSelect label={`${texts.label.nivel}`} name="nivel" id="nivel" form={{ errors, register }}
                                                 options={data_niveles}
                                                 params={{
                                                     validate: (value) => {
                                                         if ((value === "")) {
-                                                            return "Seleccione un nivel"
+                                                            return texts.inputsMessage.selectNivel
                                                         } else {
                                                             return true
                                                         }
@@ -377,7 +377,6 @@ function Form_Recreadores() {
                                             />
                                         </div>
                                     </div>
-
 
                                     <ButtonSimple type="submit" className="mx-auto w-50 mt-5">
                                         Registrar

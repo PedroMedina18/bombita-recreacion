@@ -1,15 +1,16 @@
-import { useEffect, useState, useContext, useRef } from "react"
-import { AuthContext } from '../../context/AuthContext';
-import Navbar from "../../components/navbar/Navbar"
-import Table from "../../components/table/Table"
-import { servicios } from "../../js/API"
+import { useEffect, useState, useRef } from "react"
+import { servicios } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
+import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx"
+import Table from "../../components/table/Table"
+import Navbar from "../../components/navbar/Navbar"
+import texts from "../../context/text_es.js";
+
 
 function Servicios() {
   const [listServicios, setServicios] = useState([])
   const [dataServicios, setDataServicios] = useState({ pages: 0, total: 0 })
-  const { deleteItem, searchCode, getData } = useContext(AuthContext)
   const [tableLoading, setTableLoaing] = useState(true)
   const renderizado = useRef(0)
   const navigate = useNavigate()
@@ -23,13 +24,14 @@ function Servicios() {
   }, [])
 
   const getServicios = () => {
-    getData({
+    getListItems({
       object: servicios,
       setList: setServicios,
       setData: setDataServicios,
       setLoading: setTableLoaing
     })
   }
+
   const columns = [
     {
       name: "Item",
@@ -44,6 +46,7 @@ function Servicios() {
       row: (row) => { return row.descripcion }
     },
   ]
+
   const options = {
     delete: (row) => {
       deleteItem({
@@ -53,7 +56,7 @@ function Servicios() {
       })
     },
     search: {
-      placeholder: "Buscar por su Item",
+      placeholder: texts.registerMessage.searchItem,
       function: (value) => {
         searchCode({
           value: value,
@@ -63,14 +66,15 @@ function Servicios() {
       }
     },
     register: {
-      name: "Agregar un nuevo cargo",
+      name: texts.registerMessage.buttonRegisterServicio,
       function: () => {
         navigate("/register/servicio")
       }
     }
   }
+
   return (
-    <Navbar name="Lista de Servicios" descripcion="Verifique los servicios agregados">
+    <Navbar name={`${texts.pages.getServicios.name}`} descripcion={`${texts.pages.getServicios.description}`}>
       <Table
         columns={columns}
         rows={listServicios}

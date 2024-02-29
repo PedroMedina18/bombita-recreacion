@@ -1,47 +1,50 @@
-import { useState, useEffect, useContext } from "react";
-import { AuthContext } from '../../context/AuthContext';
-import Navbar from "../../components/navbar/Navbar"
-import Swal from 'sweetalert2';
+import { useState, useEffect } from "react";
 import { Toaster } from "sonner";
 import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
-import { permisos, cargos } from "../../js/API.js";
+import { permisos, cargos } from "../../utils/API.jsx";
 import { LoaderCircle } from "../../components/loader/Loader";
 import { ButtonSimple } from "../../components/button/Button"
-import { alertConfim, toastError, alertLoading } from "../../js/alerts.js"
-import { InputText, InputTextTarea, InputCheck, MultiSelect } from "../../components/input/Input"
-import ErrorSystem from "../../components/ErrorSystem";
-import {hasLeadingOrTrailingSpace} from "../../js/functions.js"
+import { alertConfim, toastError, alertLoading } from "../../utils/alerts.jsx"
+import { InputsGeneral, InputTextTarea, InputCheck, MultiSelect } from "../../components/input/Input"
+import {verifyOptionsSelect, controlResultPost} from "../../utils/actions.jsx"
+import {hasLeadingOrTrailingSpace} from "../../utils/process.jsx"
+import ErrorSystem from "../../components/errores/ErrorSystem";
+import Navbar from "../../components/navbar/Navbar"
+import Swal from 'sweetalert2';
+import texts from "../../context/text_es.js";
+import pattern from "../../context/pattern.js";
+import {IconRowLeft} from "../../components/Icon"
 
 function Cargos() {
     const [loading, setLoading] = useState(true)
     const [errorServer, setErrorServer] = useState("")
     const [options, setOptions] = useState([])
     const [selectOptions, setSelectOptions] = useState([])
-    const { verificacion_options, controlResultPost } = useContext(AuthContext)
     const navigate = useNavigate();
 
     useEffect(() => {
         get_Permisos()
     }, [])
 
-    // funcion para buscar los permisos en la base de datos
+    // *funcion para buscar los permisos en la base de datos
     const get_Permisos = async () => {
         try {
             const res = await permisos.get()
-            verificacion_options({
+            verifyOptionsSelect({
                 respuesta:res,
                 setError:setErrorServer,
                 setOptions
             })
         } catch (error) {
             console.log(error)
-            setErrorServer("Error de Sistema")
+            setErrorServer(texts.errorMessage.errorSystem)
         } finally{
             setLoading(false)
         }
     }
-    // the useform
+
+    // *the useform
     const {
         register,
         handleSubmit,
@@ -49,12 +52,12 @@ function Cargos() {
         watch
     } = useForm();
 
-    // Funcion para registrar
+    // * Funcion para registrar
     const onSubmit = handleSubmit(
         async (data) => {
             try {
                 const permisos = selectOptions.map((elements) => { return elements.value })
-                const confirmacion = await alertConfim("Confirmar", "Por favor confirmar la solicitud de Registro")
+                const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirRegister)
                 if (confirmacion.isConfirmed) {
                     const body = {
                         nombre: data.nombre,
@@ -66,23 +69,21 @@ function Cargos() {
                     const res = await cargos.post(body)
                     controlResultPost({
                         respuesta:res, 
-                        messageExito:"Cargo Registrado", 
+                        messageExito:texts.successMessage.cargo,
                         useNavigate:{navigate:navigate, direction:"/cargos"}
                     })
                 }
             } catch (error) {
                 console.log(error)
                 Swal.close()
-                toastError("Error de Conexión",
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.953 2C6.465 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.493 2 11.953 2zM13 17h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>
-                )
+                toastError(texts.errorMessage.errorConexion)
             }
         }
     )
 
     return (
-        <Navbar  name="Registrar un Cargo" descripcion="Intruduzca los datos para agregar un nuevo cargo">
-            <ButtonSimple type="button" className="mb-2" onClick={()=>{navigate("/cargos")}}> <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.939 4.939 6.879 12l7.06 7.061 2.122-2.122L11.121 12l4.94-4.939z"></path></svg> Regresar</ButtonSimple>
+        <Navbar  name={texts.pages.registerCargos.name} descripcion={texts.pages.registerCargos.description}>
+            <ButtonSimple type="button" className="mb-2" onClick={()=>{navigate("/cargos")}}> <IconRowLeft/> Regresar</ButtonSimple>
             {
                 loading ?
                     (
@@ -103,49 +104,53 @@ function Cargos() {
                                 
                                 <form className="w-100 d-flex flex-column"
                                     onSubmit={onSubmit}>
-                                    <InputText label="Nombre" name="nombre" id="nombre" form={{ errors, register }}
+                                    <InputsGeneral type={"text"} label={`${texts.label.nombre}`} name="nombre" id="nombre" form={{ errors, register }}
                                         params={{
                                             required: {
                                                 value: true,
-                                                message: "Se requiere un nombre",
+                                                message: texts.inputsMessage.requireName,
                                             },
                                             maxLength: {
                                                 value: 50,
-                                                message: "Máximo 50 caracteres",
+                                                message:texts.inputsMessage.max50,
+                                            },
+                                            minLength: {
+                                                value: 5,
+                                                message: texts.inputsMessage.min5
                                             },
                                             pattern: {
-                                                value: /^[a-zA-ZÁ-ÿ0-9\s]+$/,
-                                                message: "Nombre invalido",
+                                                value: pattern.textWithNumber,
+                                                message: texts.inputsMessage.invalidName,
                                             },
                                             validate:(value)=>{
                                                 if(hasLeadingOrTrailingSpace(value)){
-                                                    return "Sin espacios al inicio o al final"
+                                                    return texts.inputsMessage.noneSpace
                                                 }else {
                                                     return true
                                                 }
                                             }
                                         }}
                                     />
-                                    <InputTextTarea label="Descripcion" name="descripcion" id="descripcion" form={{ errors, register }}
+                                    <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
                                         params={{
                                             maxLength: {
                                                 value: 500,
-                                                message: "Máximo 500 caracteres",
+                                                message: texts.inputsMessage.max500
                                             },
                                             validate:(value)=>{
                                                 if(hasLeadingOrTrailingSpace(value)){
-                                                    return "Sin espacios al inicio o al final"
+                                                    return texts.inputsMessage.noneSpace
                                                 }else {
                                                     return true
                                                 }
                                             }
                                         }}
                                     />
-                                    <InputCheck label="Administrador" name="administrador" id="administrador" form={{ errors, register }} isError={Boolean(!selectOptions.length)}
+                                    <InputCheck label={`${texts.label.admin}`} name="administrador" id="administrador" form={{ errors, register }} isError={Boolean(!selectOptions.length)}
                                         params={{
                                             validate: (value) => {
                                                 if (!selectOptions.length && !value) {
-                                                    return "Seleccione los permisos"
+                                                    return texts.inputsMessage.noneSpace
                                                 } else {
                                                     return true
                                                 }
@@ -154,11 +159,11 @@ function Cargos() {
                                     />
                                     {
                                         !watch("administrador") ?
-                                            (<MultiSelect name="permisos" label="Permisos" id="permisos" options={options} save={setSelectOptions} placeholder={"Permisos"} />)
+                                            (<MultiSelect name="permisos" label={`${texts.label.permisos}`} id="permisos" options={options} save={setSelectOptions} placeholder={"Permisos"} />)
                                             :
                                             ""
                                     }
-                                    {Boolean(!selectOptions.length && errors["administrador"]) ? <span className="message-error visible">Seleccione los permisos del Cargo</span> : <span className="message-error invisible">Sin errores</span>}
+                                    {Boolean(!selectOptions.length && errors["administrador"]) ? <span className="message-error visible">{texts.inputsMessage.selecPermisos}</span> : <span className="message-error invisible">Sin errores</span>}
                                     <ButtonSimple type="submit" className="mx-auto w-50 mt-5">
                                         Registrar
                                     </ButtonSimple>

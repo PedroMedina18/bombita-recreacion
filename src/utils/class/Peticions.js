@@ -1,5 +1,5 @@
-import { getCookie } from "../cookie.js"
-import {API} from "../API.js"
+import { getCookie } from "../cookie.jsx"
+import {API} from "../API.jsx"
 
 
 

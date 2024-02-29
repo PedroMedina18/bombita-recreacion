@@ -1,0 +1,5 @@
+.img-error {
+  max-width: 60vw;
+  height: 80%;
+  object-fit: contain;
+}

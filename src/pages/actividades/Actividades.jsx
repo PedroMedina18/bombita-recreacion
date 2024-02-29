@@ -1,15 +1,15 @@
-import { useEffect, useState, useContext, useRef } from "react"
-import { AuthContext } from '../../context/AuthContext';
-import Navbar from "../../components/navbar/Navbar"
-import Table from "../../components/table/Table"
-import { actividades } from "../../js/API.js"
+import { useEffect, useState, useRef } from "react"
+import { actividades } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
+import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx"
+import Navbar from "../../components/navbar/Navbar"
+import Table from "../../components/table/Table"
+import texts from "../../context/text_es.js";
 
 function Actividades() {
   const [listActividades, setActividades] = useState([])
   const [dataActividades, setDataActividades] = useState({ pages: 0, total: 0 })
-  const { deleteItem, searchCode, getData } = useContext(AuthContext)
   const [tableLoading, setTableLoaing] = useState(true)
   const renderizado = useRef(0)
   const navigate = useNavigate()
@@ -22,13 +22,13 @@ function Actividades() {
     }
   }, [])
   const getActividades = () => {
-    getData({
-        object:actividades,
-        setList: setActividades,
-        setData: setDataActividades,
-        setLoading:setTableLoaing
+    getListItems({
+      object: actividades,
+      setList: setActividades,
+      setData: setDataActividades,
+      setLoading: setTableLoaing
     })
-}
+  }
   const columns = [
     {
       name: "Item",
@@ -43,16 +43,17 @@ function Actividades() {
       row: (row) => { return row.descripcion }
     },
   ]
+
   const options = {
     delete: (row) => {
       deleteItem({
         row: row,
         objet: actividades,
-        functionGet: "dffd"
+        functionGet: getActividades
       })
     },
     search: {
-      placeholder: "Buscar por su Item",
+      placeholder: texts.registerMessage.s,
       function: (value) => {
         searchCode({
           value: value,
@@ -62,14 +63,15 @@ function Actividades() {
       }
     },
     register: {
-      name: "Agregar una nueva actividad",
+      name: texts.registerMessage.buttonRegisterActividad,
       function: () => {
         navigate("/register/actividad")
       }
     }
   }
+
   return (
-    <Navbar name="Lista de Actividades" descripcion="Verifique los Actividades agregados">
+    <Navbar name={texts.pages.getActividades.name} descripcion={texts.pages.getActividades.description}>
 
       <Table
         columns={columns}

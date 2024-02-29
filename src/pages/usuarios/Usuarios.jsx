@@ -1,17 +1,20 @@
-import Navbar from "../../components/navbar/Navbar"
-import { InputText, UnitSelect, InputNumber, InputEmail, InputPassword, InputTel, InputCheck } from "../../components/input/Input"
+import { useState, useEffect } from "react";
+import { InputsGeneral, UnitSelect, InputCheck } from "../../components/input/Input"
 import { ButtonSimple } from "../../components/button/Button"
-import { useForm } from "react-hook-form";
 import { LoaderCircle } from "../../components/loader/Loader";
-import ErrorSystem from "../../components/ErrorSystem";
 import { useNavigate } from 'react-router-dom'
-import { cargos, tipo_documentos, usuarios } from "../../js/API.js";
-import { alertConfim, toastError, alertLoading, alertAceptar } from "../../js/alerts.js"
-import Swal from 'sweetalert2';
+import { useForm } from "react-hook-form";
 import { Toaster } from "sonner";
-import { hasLeadingOrTrailingSpace, habilitarEdicion } from "../../js/functions.js"
-import { useState, useEffect, useContext } from "react";
-import { AuthContext } from '../../context/AuthContext';
+import { cargos, tipo_documentos, usuarios } from "../../utils/API.jsx";
+import { alertConfim, toastError, alertLoading } from "../../utils/alerts.jsx"
+import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx"
+import {getPersona, verifyOptionsSelect, controlResultPost, habilitarEdicion} from "../../utils/actions.jsx"
+import Navbar from "../../components/navbar/Navbar"
+import Swal from 'sweetalert2';
+import ErrorSystem from "../../components/errores/ErrorSystem";
+import texts from "../../context/text_es.js";
+import pattern from "../../context/pattern.js";
+
 
 function Usuarios() {
     const [data_tipo_documentos, setTipoDocumentos] = useState([])
@@ -21,36 +24,35 @@ function Usuarios() {
     const [dataNewUser, setdataNewUser] = useState({ tipo_documento: null, numero_documento: null })
     const [dataPersona, setPersona] = useState({})
     const [disabledInputs, setDisabledInputs] = useState(false)
-    const { verificacion_options, get_persona, controlResultPost } = useContext(AuthContext)
     const navigate = useNavigate();
     useEffect(() => {
-        get_data()
+        getData()
     }, [])
 
-    const get_data = async () => {
+    // *funcion para buscar los tipos de documentos y los cargos
+    const getData = async () => {
         try {
             const get_cargos = await cargos.get()
             const get_tipo_documentos = await tipo_documentos.get()
-            verificacion_options({
+            verifyOptionsSelect({
                 respuesta:get_cargos,
                 setError:setErrorServer,
                 setOptions:setCargos
             })
-            verificacion_options({
+            verifyOptionsSelect({
                 respuesta:get_tipo_documentos,
                 setError:setErrorServer,
                 setOptions:setTipoDocumentos
             })
         } catch (error) {
             console.log(error)
-            setErrorServer("Error de Sistema")
+            setErrorServer(texts.inputsMessage.errorSystem)
         } finally {
             setLoading(false)
         }
     }
-    
 
-    // the useform
+    // *the useform
     const {
         register,
         handleSubmit,
@@ -59,11 +61,11 @@ function Usuarios() {
         setValue
     } = useForm();
 
-    // Funcion para registrar
+    // *Funcion para registrar
     const onSubmit = handleSubmit(
         async (data) => {
             try {
-                const confirmacion = await alertConfim("Confirmar", "Por favor confirmar la solicitud de Registro")
+                const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirRegister)
                 if (confirmacion.isConfirmed) {
                     let body
                     if (data.id_persona) {
@@ -91,20 +93,23 @@ function Usuarios() {
                     const res = await usuarios.post(body)
                     controlResultPost({
                         respuesta:res,
-                        messageExito:"Usuario Registrado",
+                        useNavigate:{
+                            navigate,
+                            direction:"/inicio"
+                        },
+                        messageExito:texts.successMessage.usuario,
                     })
                 }
 
             } catch (error) {
                 Swal.close()
-                toastError("Error de Conexión",
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M11.953 2C6.465 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.493 2 11.953 2zM13 17h-2v-2h2v2zm0-4h-2V7h2v6z"></path></svg>
-                )
+                toastError(texts.errorMessage.errorConexion)
             }
         }
     )
+
     return (
-        <Navbar name="Registrar un Nuevo Usuario" descripcion="Intruduzca los datos para agregar un nuevo usuario al sistema">
+        <Navbar name={`${texts.pages.registerUsuairo.name}`} descripcion={`${texts.pages.registerUsuairo.description}`}>
             {
                 loading ?
                     (
@@ -131,7 +136,7 @@ function Usuarios() {
                                         ...register("id_persona")
                                         }
                                     />
-                                    <InputCheck label="Datos de persona ya registrados en el sistema" name="persona" id="persona" form={{ errors, register }} className={`${!disabledInputs ? "d-none" : ""}`} checked={disabledInputs}
+                                    <InputCheck label={`${texts.label.dataPersonaCheck}`} name="persona" id="persona" form={{ errors, register }} className={`${!disabledInputs ? "d-none" : ""}`} checked={disabledInputs}
                                         onClick={
                                             (e) => {
                                                 setDisabledInputs(!disabledInputs)
@@ -144,12 +149,12 @@ function Usuarios() {
                                         } />
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-md-25  w-100 pe-0 pe-md-3">
-                                            <UnitSelect label="Tipo de Documento" name="tipo_documento" id="tipo_documento" form={{ errors, register }}
+                                            <UnitSelect label={texts.label.tipoDocuemnto} name="tipo_documento" id="tipo_documento" form={{ errors, register }}
                                                 options={data_tipo_documentos}
                                                 params={{
                                                     validate: (value) => {
                                                         if (!value) {
-                                                            return "Seleccione un tipo de documento"
+                                                            return texts.inputsMessage.selectTipoDocumento
                                                         } else {
                                                             return true
                                                         }
@@ -161,7 +166,7 @@ function Usuarios() {
                                                             ...dataNewUser,
                                                             tipo_documento: e.target.value
                                                         })
-                                                        get_persona({
+                                                        getPersona({
                                                             dataNewUser, 
                                                             setPersona, 
                                                             setValue, 
@@ -173,20 +178,21 @@ function Usuarios() {
 
                                             />
                                         </div>
+
                                         <div className="w-100 w-md-75 ps-0 ps-md-3 ">
-                                            <InputNumber label="Número de Documento" name="numero_documento" id="numero_documento" form={{ errors, register }}
+                                            <InputsGeneral label={texts.label.documento} type="number" name="numero_documento" id="numero_documento" form={{ errors, register }}
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: "Se requiere el número de documento",
+                                                        message: texts.inputsMessage.requireDocumento,
                                                     },
                                                     maxLength: {
                                                         value: 10,
-                                                        message: "Máximo 10 caracteres",
+                                                        message:  texts.inputsMessage.max10,
                                                     },
                                                     minLength: {
                                                         value: 7,
-                                                        message: "Minimo 7 caracteres",
+                                                        message: texts.inputsMessage.min7,
                                                     },
                                                 }}
                                                 onKeyUp={
@@ -198,7 +204,7 @@ function Usuarios() {
                                                     }
                                                 }
                                                 onBlur={(e) => {
-                                                    get_persona({
+                                                    getPersona({
                                                         dataNewUser, 
                                                         setPersona, 
                                                         setValue, 
@@ -212,27 +218,27 @@ function Usuarios() {
 
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-50 pe-0 pe-md-3">
-                                            <InputText label="Nombres del Usuario" name="nombres" id="nombres" form={{ errors, register }}
+                                            <InputsGeneral type="text" label={texts.label.namesUser} name="nombres" id="nombres" form={{ errors, register }}
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: "Se requiere los nombres",
+                                                        message: texts.inputsMessage.requireNames,
                                                     },
                                                     maxLength: {
                                                         value: 200,
-                                                        message: "Máximo 200 caracteres",
+                                                        message: texts.inputsMessage.max200,
                                                     },
                                                     minLength: {
                                                         value: 5,
-                                                        message: "Minimo 5 caracteres",
+                                                        message: texts.inputsMessage.min7,
                                                     },
                                                     pattern: {
-                                                        value: /^[a-zA-ZÁ-ÿ\s]+$/,
-                                                        message: "Nombres invalidos",
+                                                        value: pattern.textNoneNumber,
+                                                        message: texts.inputsMessage.invalidNombres,
                                                     },
                                                     validate: (value) => {
                                                         if (hasLeadingOrTrailingSpace(value)) {
-                                                            return "Sin espacios al inicio o al final"
+                                                            return texts.inputsMessage.noneSpace
                                                         } else {
                                                             return true
                                                         }
@@ -243,27 +249,27 @@ function Usuarios() {
                                             />
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
-                                            <InputText label="Apellidos del Usuario" name="apellidos" id="apellidos" form={{ errors, register }}
+                                            <InputsGeneral type={"text"} label={`${texts.label.lastNamesUser}`} name="apellidos" id="apellidos" form={{ errors, register }}
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: "Se requiere los apellidos",
+                                                        message: texts.inputsMessage.requireLastName,
                                                     },
                                                     maxLength: {
                                                         value: 200,
-                                                        message: "Máximo 200 caracteres",
+                                                        message: texts.inputsMessage.max200,
                                                     },
                                                     minLength: {
                                                         value: 5,
-                                                        message: "Minimo 5 caracteres",
+                                                        message: texts.inputsMessage.min5,
                                                     },
                                                     pattern: {
-                                                        value: /^[a-zA-ZÁ-ÿ\s]+$/,
-                                                        message: "Apellidos invalidos",
+                                                        value: pattern.textNoneNumber,
+                                                        message: texts.inputsMessage.invalidLastNames,
                                                     },
                                                     validate: (value) => {
                                                         if (hasLeadingOrTrailingSpace(value)) {
-                                                            return "Sin espacios al inicio o al final"
+                                                            return texts.inputsMessage.noneSpace
                                                         } else {
                                                             return true
                                                         }
@@ -274,37 +280,39 @@ function Usuarios() {
                                             />
                                         </div>
                                     </div>
+
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-50 pe-0 pe-md-3">
-                                            <InputTel label="Teléfono Principal" name="telefono_principal" id="telefono_principal" form={{ errors, register }}
+                                            <InputsGeneral type={"tel"} label={`${texts.label.telPrincipal}`} name="telefono_principal" id="telefono_principal" form={{ errors, register }}
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: "Se requiere un número de teléfono",
+                                                        message: texts.inputsMessage.requireTel,
                                                     },
                                                     maxLength: {
                                                         value: 11,
-                                                        message: "Solo se admiten 11 caracteres",
+                                                        message: texts.inputsMessage.onlyCharacter11,
                                                     },
                                                     minLength: {
                                                         value: 11,
-                                                        message: "Solo se admiten 11 caracteres",
+                                                        message: texts.inputsMessage.onlyCharacter11,
                                                     }
                                                 }}
                                                 disabled={disabledInputs}
                                                 isError={!disabledInputs}
                                             />
                                         </div>
+
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
-                                            <InputTel label="Teléfono Secundario" name="telefono_secundario" id="telefono_secundario" form={{ errors, register }}
+                                            <InputsGeneral type={"tel"} label={`${texts.label.telSecundario}`} name="telefono_secundario" id="telefono_secundario" form={{ errors, register }}
                                                 params={{
                                                     maxLength: {
                                                         value: 11,
-                                                        message: "Solo se admiten 11 caracteres",
+                                                        message: texts.inputsMessage.onlyCharacter11,
                                                     },
                                                     minLength: {
-                                                        value: 5,
-                                                        message: "Solo se admiten 11 caracteres",
+                                                        value:11,
+                                                        message: texts.inputsMessage.onlyCharacter11,
                                                     }
                                                 }}
                                                 disabled={disabledInputs}
@@ -314,23 +322,23 @@ function Usuarios() {
                                     </div>
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-50 pe-0 pe-md-3">
-                                            <InputEmail label="Correo Electrónico" name="correo" id="correo" form={{ errors, register }}
+                                            <InputsGeneral type={"email"} label={`${texts.label.email}`} name="correo" id="correo" form={{ errors, register }}
                                                 params={{
                                                     minLength: {
-                                                        value: 6,
-                                                        message: "Minimo 6 caracteres"
+                                                        value: 5,
+                                                        message: texts.inputsMessage.min5
                                                     },
                                                     maxLength: {
                                                         value: 100,
-                                                        message: "Minimo 100 caracteres"
+                                                        message: texts.inputsMessage.max100
                                                     },
                                                     pattern: {
-                                                        value: /^\w+([.-_+/$%&?¡¿]?\w+)@\w+([.-]?\w+)(.\w)+$/,
-                                                        message: "Correo  no valido"
+                                                        value: pattern.email,
+                                                        message: texts.inputsMessage.invalidEmail
                                                     },
                                                     validate: (value) => {
                                                         if (hasLeadingOrTrailingSpace(value)) {
-                                                            return "Sin espacios al inicio o al final"
+                                                            return texts.inputsMessage.noneSpace
                                                         } else {
                                                             return true
                                                         }
@@ -341,12 +349,12 @@ function Usuarios() {
                                             />
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
-                                            <UnitSelect label="Cargo" name="cargo" id="cargo" form={{ errors, register }} 
+                                            <UnitSelect label={`${texts.label.cargo}`} name="cargo" id="cargo" form={{ errors, register }} 
                                             options={data_cargos}
                                                 params={{
                                                     validate: (value) => {
                                                         if ((value === "")) {
-                                                            return "Seleccione un cargo"
+                                                            return texts.inputsMessage.selectCargo
                                                         } else {
                                                             return true
                                                         }
@@ -357,27 +365,27 @@ function Usuarios() {
                                     </div>
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-50 pe-0 pe-md-3">
-                                            <InputText label="Usuario" name="usuario" id="usuario" form={{ errors, register }}
+                                            <InputsGeneral type={"text"} label={`${texts.label.user}`} name="usuario" id="usuario" form={{ errors, register }}
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: "Se requiere el usuario",
+                                                        message: texts.inputsMessage.requireUser
                                                     },
                                                     minLength: {
                                                         value: 8,
-                                                        message: "Minimo 8 caracteres"
+                                                        message: texts.inputsMessage.min8
                                                     },
                                                     maxLength: {
                                                         value: 20,
-                                                        message: "Minimo 20 caracteres"
+                                                        message: texts.inputsMessage.max20
                                                     },
                                                     pattern: {
-                                                        value: /^[a-zA-Z0-9_!@#$%^&*(),.?":{}|<>]*$/,
-                                                        message: "Usuario  no valido"
+                                                        value: pattern.user,
+                                                        message: texts.inputsMessage.invalidUser
                                                     },
                                                     validate: (value) => {
                                                         if (hasLeadingOrTrailingSpace(value)) {
-                                                            return "Sin espacios al inicio o al final"
+                                                            return texts.inputsMessage.noneSpace
                                                         } else {
                                                             return true
                                                         }
@@ -386,27 +394,27 @@ function Usuarios() {
                                             />
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
-                                            <InputPassword label="Contraseña" name="contraseña" id="contraseña" form={{ errors, register }}
+                                            <InputsGeneral type={"password"} label={`${texts.label.password}`} name="contraseña" id="contraseña" form={{ errors, register }}
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: "Se requiere la contraseña",
+                                                        message: texts.inputsMessage.requirePassword
                                                     },
                                                     minLength: {
-                                                        value: 6,
-                                                        message: "Minimo 6 caracteres"
+                                                        value: 5,
+                                                        message: texts.inputsMessage.min5
                                                     },
                                                     maxLength: {
                                                         value: 20,
-                                                        message: "Minimo 18 caracteres"
+                                                        message: texts.inputsMessage.max20
                                                     },
                                                     pattern: {
-                                                        value: /^[a-zA-Z0-9_!@#$%^&*(),.?":{}|<>]*$/,
-                                                        message: "Contraseña  no valido"
+                                                        value: pattern.password,
+                                                        message: texts.inputsMessage.invalidPassword,
                                                     },
                                                     validate: (value) => {
                                                         if (hasLeadingOrTrailingSpace(value)) {
-                                                            return "Sin espacios al inicio o al final"
+                                                            return texts.inputsMessage.noneSpace
                                                         } else {
                                                             return true
                                                         }
@@ -416,15 +424,15 @@ function Usuarios() {
                                         </div>
                                     </div>
                                     <div className="w-100 w-md-50 d-flex justify-content-between align-item-cente pe-0 pe-md-3">
-                                        <InputPassword label="Repita la contraseña" name="contraseñaTwo" id="contraseñaTwo" form={{ errors, register }}
+                                        <InputsGeneral type={"password"} label={texts.label.password2} name="contraseñaTwo" id="contraseñaTwo" form={{ errors, register }}
                                             params={{
                                                 required: {
                                                     value: true,
-                                                    message: "Se requiere confirmar la contraseña",
+                                                    message: texts.inputsMessage.confirmPassword
                                                 },
                                                 validate: (value) => {
                                                     if (!(value === watch("contraseña"))) {
-                                                        return "las contraseñas no Coinciden"
+                                                        return texts.inputsMessage.errorPassword
                                                     } else {
                                                         return true
                                                     }

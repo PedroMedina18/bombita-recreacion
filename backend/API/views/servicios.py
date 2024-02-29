@@ -5,9 +5,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
-from ..models import Servicios, ServiciosActividades, Serviciosmateriales, ServiciosRecreadores
+from ..models import Servicios, ServiciosActividades, Materiales, Serviciosmateriales, ServiciosRecreadores, Recreadores, Actividades
 from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
+import datetime
 import json
 
 
@@ -110,14 +111,43 @@ class Servicios_Views(View):
             connection.close()
 
     def post(self, request,):
-        jd = json.loads(request.body)
-        verify = verify_token(jd["headers"])
-        jd = jd["body"]
-        if (not verify["status"]):
+        try:
+            jd = json.loads(request.body)
+            verify = verify_token(jd["headers"])
+            jd = jd["body"]
+            if (not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"],
+                }
+                return JsonResponse(datos)
+            duracion = datetime.timedelta(hours=jd["duracion"]["horas"], minutes=jd["duracion"]["minutos"])
+            servicio = Servicios.objects.create(nombre=jd["nombre"], precio=jd["precio"], numero_recreadores=jd["numero_recreadores"], descripcion=jd["descripcion"], duracion=duracion)
+                
+            recreadores = jd['recreadores']
+            for recreador in recreadores:
+                newRecreador = Recreadores.objects.get(id=int(recreador))
+                ServiciosRecreadores.objects.create(recreador=newRecreador, servicio=servicio)
+            
+            actividades = jd['actividades']
+            for actividad in actividades:
+                newAtividades = Actividades.objects.get(id=int(actividad))
+                ServiciosActividades.objects.create(actividad=newAtividades, servicio=servicio)
+
+            materiales = jd['materiales']
+            for material in materiales:
+                newMteriales = Materiales.objects.get(id=int(material["material"]))
+                Serviciosmateriales.objects.create(material=newMteriales, servicio=servicio, cantidad=material["cantidad"])
+            
             datos = {
-                "status": False,
-                'message': verify["message"],
+                "status": True,
+                'message': "Registro Completado"
             }
             return JsonResponse(datos)
-        
-    
+        except Exception as ex:
+            print("Error", ex)
+            datos = {
+                "status": False,
+                'message': "Error. Compruebe Datos"
+            }
+            return JsonResponse(datos)

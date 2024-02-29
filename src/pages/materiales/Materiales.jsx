@@ -1,15 +1,15 @@
-import { useEffect, useState, useContext, useRef } from "react"
-import Navbar from "../../components/navbar/Navbar"
-import { AuthContext } from '../../context/AuthContext';
-import Table from "../../components/table/Table"
-import { materiales } from "../../js/API"
+import { useEffect, useState, useRef } from "react"
+import { materiales } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
+import {deleteItem, searchCode, getListItems} from "../../utils/actions.jsx"
+import Navbar from "../../components/navbar/Navbar"
+import Table from "../../components/table/Table"
+import texts from "../../context/text_es.js";
 
 function Materiales() {
     const [listMateriales, setMateriales] = useState([])
     const [dataMateriales, setDataMateriales] = useState({ pages: 0, total: 0 })
-    const { deleteItem, searchCode, getData } = useContext(AuthContext)
     const [tableLoading, setTableLoaing] = useState(true)
     const renderizado = useRef(0)
     const navigate = useNavigate()
@@ -23,7 +23,7 @@ function Materiales() {
     }, [])
 
     const getMateriales = () => {
-        getData({
+        getListItems({
             object: materiales,
             setList: setMateriales,
             setData: setDataMateriales,
@@ -46,6 +46,7 @@ function Materiales() {
             row: (row) => { return row.descripcion }
         },
     ]
+
     const options = {
         delete: (row) => {
             deleteItem({
@@ -55,7 +56,7 @@ function Materiales() {
             })
         },
         search: {
-            placeholder: "Buscar por su Item",
+            placeholder: texts.registerMessage.searchItem,
             function: (value) => {
                 searchCode({
                     value: value,
@@ -65,14 +66,15 @@ function Materiales() {
             }
         },
         register: {
-            name: "Agregar un Nuevo Materiales",
+            name: texts.registerMessage.buttonRegisterMaterial,
             function: () => {
                 navigate("/register/material")
             }
         }
     }
+    
     return (
-        <Navbar name="Lista de Materiales" descripcion="Verifique los Materiales agregados">
+        <Navbar name={texts.pages.getMateriales.name} descripcion={texts.pages.getMateriales.description}>
 
             <Table
                 columns={columns}
