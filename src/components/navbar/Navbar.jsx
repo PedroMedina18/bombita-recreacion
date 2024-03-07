@@ -61,10 +61,16 @@ function Navbar({ children, name, descripcion }) {
                     </li>
 
                     <li className="sidebar-item">
-                        <a href="#" className="sidebar-link">
+                        <a href="#" className="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
+                            data-bs-target="#eventos" aria-expanded="false" aria-controls="eventos">
                             <IconEvent />
                             <span>Eventos</span>
                         </a>
+                        <ul id="eventos" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                            <li className="sidebar-item">
+                                <Link to="/register/eventos" className="sidebar-link">Agregar un Evento</Link>
+                            </li>
+                        </ul>
                     </li>
 
                     <li className="sidebar-item">

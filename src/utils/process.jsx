@@ -1,5 +1,6 @@
 import Swal from 'sweetalert2';
 import { personas } from "./API.jsx"
+import texts from '../context/text_es.js';
 
 // *Para verificar que no queden espacios en los inputs ni al inicio ni al final
 export function hasLeadingOrTrailingSpace(name) {
@@ -28,4 +29,15 @@ export const calcularEdad = (fecha_nacimiento) => {
     }
   }
   return edad
+}
+
+
+export const errorAxios = async (error) => {
+  if (error.code = "ERR_NETWORK") {
+    return (texts.errorMessage.errorConexion)
+  } else if (error.request) {
+    return (texts.errorMessage.errorRequest)
+  } else {
+    return ('Error', error.message)
+  }
 }

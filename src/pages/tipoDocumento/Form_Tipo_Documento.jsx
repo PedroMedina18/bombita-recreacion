@@ -55,7 +55,7 @@ function Form_Tipo_Documento() {
         <Navbar name={texts.pages.registerTipoDocumento.name} descripcion={texts.pages.registerTipoDocumento.description}>
             <ButtonSimple type="button" className="mb-2" onClick={()=>{navigate("/tipo_documentos")}}> <IconRowLeft/> Regresar</ButtonSimple>
 
-            <div className="w-100 bg-white p-3 round">
+            <div className="w-100 bg-white p-4 border rounded d-flex flex-column justify-content-center align-items-center">
                 <form className="w-100 d-flex flex-column"
                     onSubmit={onSubmit}>
                     <InputsGeneral type={"text"} label={`${texts.label.nombre}`} name="nombre" id="nombre" form={{ errors, register }}

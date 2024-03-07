@@ -8,6 +8,7 @@ from ..funtions.serializador import dictfetchall
 from ..models import Servicios, ServiciosActividades, Materiales, Serviciosmateriales, ServiciosRecreadores, Recreadores, Actividades
 from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
+from ..funtions.time import duration
 import datetime
 import json
 
@@ -34,12 +35,12 @@ class Servicios_Views(View):
                 SELECT * FROM mat WHERE servicios.id=%s;
                 """
                 cursor.execute(query, [int(id)])
-                material = dictfetchall(cursor)
-                if (len(material) > 0):
+                servicio = dictfetchall(cursor)
+                if (len(servicio) > 0):
                     datos = {
                         "status": True,
                         'message': "Exito",
-                        "data": material[0]
+                        "data": servicio[0]
                     }
                 else:
                     datos = {
@@ -78,6 +79,8 @@ class Servicios_Views(View):
                 query = """
                     SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM servicios;
                 """
+                for servicio in servicios:
+                    servicio["duracion"]=duration(servicio["duracion"])
                 cursor.execute(query)
                 result = dictfetchall(cursor)
                 if len(servicios) > 0:

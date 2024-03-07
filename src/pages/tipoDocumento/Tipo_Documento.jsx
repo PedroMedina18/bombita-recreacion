@@ -55,7 +55,7 @@ function Tipo_Documento() {
             })
         },
         search: {
-            placeholder: texts.messageRegister.searchItem,
+            placeholder: texts.registerMessage.searchItem,
             function: (value) => {
                 searchCode({
                     value: value,
@@ -65,7 +65,7 @@ function Tipo_Documento() {
             }
         },
         register: {
-            name: texts.messageRegister.buttonRegisterTipoDocumento,
+            name: texts.registerMessage.buttonRegisterTipoDocumento,
             function: () => {
                 navigate("/register/tipo_documento")
             }

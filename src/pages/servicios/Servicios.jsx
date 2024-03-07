@@ -42,6 +42,23 @@ function Servicios() {
       row: (row) => { return row.nombre }
     },
     {
+      name: "Precio",
+      row: (row) => { return `${row.precio} $` }
+    },
+    {
+      name: "Duracion",
+      row: (row) => {
+          const horas=row.duracion.horas
+          const minutos=row.duracion.minutos
+          return `${horas<10? `0${horas}` : horas}:${minutos<10?  `0${minutos}` : minutos}`
+
+       }
+    },
+    {
+      name: "Número de Recreadores",
+      row: (row) => { return `${row.numero_recreadores}` }
+    },
+    {
       name: "Descripcion",
       row: (row) => { return row.descripcion }
     },

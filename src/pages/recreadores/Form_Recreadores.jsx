@@ -109,20 +109,20 @@ function Form_Recreadores() {
             {
                 loading ?
                     (
-                        <div className="w-100 d-flex justify-content-center align-items-center bg-white p-5 round heigh-85">
+                        <div className="w-100 d-flex justify-content-center align-items-center bg-white p-5 border rounded heigh-85">
                             <LoaderCircle />
                         </div>
                     )
                     :
                     errorServer ?
                         (
-                            <div className="w-100 d-flex flex-column justify-content-center align-items-center bg-white p-5 round heigh-85">
+                            <div className="w-100 d-flex flex-column justify-content-center align-items-center bg-white p-5 border rounded heigh-85">
                                 <ErrorSystem error={errorServer} />
                             </div>
                         )
                         :
                         (
-                            <div className="w-100 bg-white p-3 round">
+                            <div className="w-100 bg-white p-4 border rounded d-flex flex-column justify-content-center align-items-center">
                                 <form className="w-100 d-flex flex-column"
                                     onSubmit={onSubmit}>
                                     <input type="number" className="d-none"

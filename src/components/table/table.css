@@ -1,4 +1,4 @@
-.min-height{
+.min-height {
   min-height: 50vh;
 }
 button[disabled] {
@@ -44,15 +44,17 @@ button[disabled]:hover {
   border-radius: 10px;
 }
 
-table.table-data, .table-loading {
+table.table-data,
+.table-loading {
   width: 100%;
   border-collapse: collapse;
   table-layout: auto;
 }
-.table-loading{
-  border: 1px solid rgb(0, 0, 0);
+.table-loading {
+  border: 2px solid rgb(92, 92, 92);
 }
-table.table-data th, table.table-data td {
+table.table-data th,
+table.table-data td {
   text-align: center;
   padding: 5px 5px;
   border: 2px solid rgb(92, 92, 92);
@@ -60,7 +62,8 @@ table.table-data th, table.table-data td {
   max-width: 150px;
   word-wrap: break-word;
 }
-.table-loading th, .table-loading td{
+.table-loading th,
+.table-loading td {
   padding: 5px 8px;
 }
 table.table-data td.d-flex {
@@ -109,7 +112,8 @@ table svg.eliminate:hover {
   table.table-data {
     min-width: max-content;
   }
-  table.table-data td, table.table-data th {
+  table.table-data td,
+  table.table-data th {
     padding: 5px 6px;
   }
 }

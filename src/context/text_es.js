@@ -37,6 +37,7 @@ const texts={
         selectNivel:"Seleccione un Nivel",
         selecPermisos:"Seleccione los permisos del Cargo",
         selectValor:"Seleccione un valor",
+        selectCliente:"Seleccione un cliente o cree uno nuevo",
         selectTipoDocumento:"Seleccione un tipo de documento",
         invalidUser:"Usuario invalido",
         invalidName:"Nombre invalido",
@@ -68,7 +69,8 @@ const texts={
         errorDelete:`Error de Sistema al eliminar. Intente mas tarde`,
         errorSystem:`Error de Sistema. Por favor intente mas tarde`,
         errorConexion:"Error de conexion. Por favor intente mas tarde",
-        
+        errorRequest:"No se ha obtenido una respuesta. Por favor vuelva a intentar",
+        errorResponse:"Error de consulta"
     },
 
     label:{
@@ -84,12 +86,14 @@ const texts={
         user:"Usuario",
         email:"Correo Electrónico",
         password:"Contraseña",
+        cliente:"Cliente",
         admin:"Administrador",
         birthDate:"Fecha de Nacimiento",
         password2:"Repita la Contraseña",
         tipoDocuemnto:"Tipo de Documento",
         cantidadTotal:"Cantidad Total",
         dataPersonaCheck:"Datos de la persona ya registrados en el sistema",
+        clienteCheck:"Nuevo Cliente",
         documento:"Número de Documento",
         namesUser:"Nombres del Usuario",
         recreadores:"Número de Recreadores",
@@ -129,6 +133,10 @@ const texts={
         registerActividades:{
             name:"Registrar una Actividad",
             description:"Intruduzca los datos para agregar una nueva Actividad"
+        },
+        registerEventos:{
+            name:"Registrar un Evento",
+            description:"Intruduzca los datos para agregar un nuevo Evento"
         },
         registerRecreadores:{
             name:"Registrar un Nuevo Recreador",

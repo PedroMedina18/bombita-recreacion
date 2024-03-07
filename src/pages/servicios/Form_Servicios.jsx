@@ -123,7 +123,7 @@ function Form_Servicios() {
 
   return (
     <Navbar
-      name={texts.page.registerServicio.name}
+      name={texts.pages.registerServicio.name}
       descripcion={texts.pages.registerServicio.description}
     >
       <ButtonSimple type="button"  className="mb-3"
@@ -137,19 +137,19 @@ function Form_Servicios() {
 
       {loading ?
         (
-          <div className="w-100 d-flex justify-content-center align-items-center bg-white p-5 round heigh-85">
+          <div className="w-100 d-flex justify-content-center align-items-center bg-white p-5 border rounded heigh-85">
             <LoaderCircle />
           </div>
         )
         : errorServer ?
           (
-            <div className="w-100 d-flex flex-column justify-content-center align-items-center bg-white p-5 round heigh-85">
+            <div className="w-100 d-flex flex-column justify-content-center align-items-center bg-white p-5 border rounded heigh-85">
               <ErrorSystem error={errorServer} />
             </div>
           )
           :
           (
-            <div className="w-100 bg-white p-4 round">
+            <div className="w-100 bg-white p-4 border rounded d-flex flex-column justify-content-center align-items-center">
               <form className="w-100 d-flex flex-column" onSubmit={onSubmit}>
                 <InputsGeneral
                   type={"text"}
@@ -160,15 +160,15 @@ function Form_Servicios() {
                   params={{
                     required: {
                       value: true,
-                      message: texts.message.requireName,
+                      message: texts.inputsMessage.requireName,
                     },
                     maxLength: {
                       value: 100,
-                      message: texts.message.max50,
+                      message: texts.inputsMessage.max50,
                     },
                     validate: (value) => {
                       if (hasLeadingOrTrailingSpace(value)) {
-                        return texts.message.noneSpace;
+                        return texts.inputsMessage.noneSpace;
                       } else {
                         return true;
                       }
@@ -203,11 +203,11 @@ function Form_Servicios() {
                       params={{
                         required: {
                           value: true,
-                          message: texts.message.requireRecreadores,
+                          message: texts.inputsMessage.requireRecreadores,
                         },
                         min: {
                           value: 1,
-                          message: texts.message.minRecreador,
+                          message: texts.inputsMessage.minRecreador,
                         },
                       }}
                       defaultValue={0}
@@ -223,11 +223,11 @@ function Form_Servicios() {
                       params={{
                         required: {
                           value: true,
-                          message: texts.message.requirePrecio,
+                          message: texts.inputsMessage.requirePrecio,
                         },
                         validate: (e) => {
                           if (e <= 0) {
-                            return texts.message.minPrecio;
+                            return texts.inputsMessage.minPrecio;
                           } else {
                             return true;
                           }
@@ -248,7 +248,7 @@ function Form_Servicios() {
                   />
                   {Boolean(!saveRecreadores.length && submit) ? (
                     <span className="message-error visible">
-                      {texts.message.selectRecreadores}
+                      {texts.inputsMessage.selectRecreadores}
                     </span>
                   ) : (
                     <span className="message-error invisible">Sin errores</span>
@@ -265,7 +265,7 @@ function Form_Servicios() {
                   />
                   {Boolean(!saveActividades.length && submit) ? (
                     <span className="message-error visible">
-                      {texts.message.selectActividades}
+                      {texts.inputsMessage.selectActividades}
                     </span>
                   ) : (
                     <span className="message-error invisible">Sin errores</span>
@@ -282,7 +282,7 @@ function Form_Servicios() {
                   />
                   {Boolean(!saveMateriales.length && submit) ? (
                     <span className="message-error visible">
-                      {texts.message.selectMateriales}
+                      {texts.inputsMessage.selectMateriales}
                     </span>
                   ) : (
                     <span className="message-error invisible">Sin errores</span>
@@ -305,11 +305,11 @@ function Form_Servicios() {
                         params={{
                           required: {
                             value: true,
-                            message: texts.message.requireCantidadMaterial,
+                            message: texts.inputsMessage.requireCantidadMaterial,
                           },
                           min: {
                             value: 0,
-                            message: texts.message.minNegative,
+                            message: texts.inputsMessage.minNegative,
                           },
                         }}
                       />
@@ -326,11 +326,11 @@ function Form_Servicios() {
                   params={{
                     maxLength: {
                       value: 500,
-                      message: texts.message.max500,
+                      message: texts.inputsMessage.max500,
                     },
                     validate: (value) => {
                       if (hasLeadingOrTrailingSpace(value)) {
-                        return texts.message.noneSpace;
+                        return texts.inputsMessage.noneSpace;
                       } else {
                         return true;
                       }

@@ -14,6 +14,14 @@
   /* color: rgb(67, 191, 51); */
 }
 
+/* background */
+
+.haikus{
+  background: #fd746c;  /* fallback for old browsers */
+  background: -webkit-linear-gradient(to right, #ff9068, #fd746c);  /* Chrome 10-25, Safari 5.1-6 */
+  background: linear-gradient(to right, #ff9068, #fd746c); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+}
+
 /* modificaciondesl input number */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
@@ -122,6 +130,10 @@ input[type="number"] {
 /* heigh y width */
 .heigh-85 {
   height: 85%;
+}
+
+.heigh-100 {
+  height: 100vh;
 }
 
 @media (max-width: 992px) {

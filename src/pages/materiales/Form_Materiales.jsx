@@ -54,7 +54,7 @@ function Form_Materiales() {
         <Navbar name={texts.pages.registerMaterial.name} descripcion={texts.pages.registerMaterial.description}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/materiales") }}> <IconRowLeft/> Regresar</ButtonSimple>
 
-            <div className="w-100 bg-white p-3 round">
+            <div className="w-100 bg-white p-4 border rounded d-flex flex-column justify-content-center align-items-center">
                 <form className="w-100 d-flex flex-column"
                     onSubmit={onSubmit}>
                     <InputsGeneral type={"text"} label={texts.label.nombre} name="nombre" id="nombre" form={{ errors, register }}

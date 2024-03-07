@@ -1,5 +1,5 @@
 .loader {
-    --dim: 7rem;
+    --dim: 10rem;
     width: var(--dim);
     height: var(--dim);
     position: relative;
@@ -7,7 +7,7 @@
   }
   
   .loader .circle {
-    --dim: 2.5rem;
+    --dim: 2.8rem;
     width: var(--dim);
     height: var(--dim);
     background-color: rgb(var(--secundario));

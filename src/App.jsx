@@ -18,6 +18,7 @@ import Materiales from "./pages/materiales/Materiales";
 import Form_Materiales from "./pages/materiales/Form_Materiales";
 import Servicios from "./pages/servicios/Servicios";
 import Form_Servicios from "./pages/servicios/Form_Servicios";
+import Form_Eventos from "./pages/eventos/Form_Eventos";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             <Route path="/register/cargo" element={<Form_Cargos />} />
             <Route path="/cargos" element={<Cargos />} />
             <Route path="/usuarios" element={<Usuarios />} />
+            <Route path="/register/eventos" element={<Form_Eventos />} />
             <Route path="/actividades" element={<Actividades />} />
             <Route path="/register/actividad" element={<Form_Actividades />} />
             <Route path="/niveles" element={<Niveles />} />

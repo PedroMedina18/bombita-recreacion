@@ -30,7 +30,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
 
 
     return (
-        <div className='w-100 bg-white p-3 round min-height d-flex flex-column justify-content-evenly'>
+        <div className='w-100 bg-white p-4 border rounded min-height d-flex flex-column justify-content-evenly'>
 
             {/* Primera Seccion con el buscardor y el Boton de direccionamiento */}
             <div className='w-100 d-flex flex-column flex-md-row justify-content-between'>
@@ -68,7 +68,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
 
             {/* Segunda Seccion de la Tabla */}
             {
-                loading ?
+                rows.length===0 ?
                     (
                         skeletonTable()
                     ) :
@@ -228,8 +228,8 @@ function totalItems(pages, items) {
 function skeletonTable() {
     return (
         <SkeletonTheme baseColor="#dda6ad" highlightColor="#b81414">
-            <div className='container-table mt-4'>
-                <table className='table-loading'>
+            <div className='container-table  mt-4'>
+                <table className='table-loading border-table'>
                     <thead>
                         <tr>
                             <th><Skeleton duration={1.5} /></th>

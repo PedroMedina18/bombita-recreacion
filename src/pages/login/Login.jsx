@@ -6,7 +6,8 @@ import { useState, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import { login } from "../../utils/API.jsx"
 import { getCookie } from "../../utils/cookie.jsx"
-import { IconUserLogin,IconWarnig } from "../../components/Icon"
+import { errorAxios } from "../../utils/process.jsx"
+import { IconUserLogin, IconWarnig } from "../../components/Icon"
 import texts from '../../context/text_es.js';
 import pattern from '../../context/pattern.js';
 
@@ -29,20 +30,20 @@ function Login() {
       try {
         document.getElementById("button-login").disabled = true
         const res = await login(data)
-        if (res.status = 200) {
-          if (res.data.status && res.data.token) {
-            saveUser(res.data.data, res.data.token)
-            navigate("/inicio")
-            setAlert("")
-          } else {
-            setAlert(res.data.message)
-          }
+        if (!res.status === 200) {
+          setAlert(`texts.errorMessage.errorResponse. Codigo ${res.status}`)
+          return
+        }
+        if (res.data.status && res.data.token) {
+          saveUser(res.data.data, res.data.token)
+          navigate("/inicio")
+          setAlert("")
         } else {
-          setAlert(texts.inputsMessage.errorConexion)
+          setAlert(res.data.message)
         }
       } catch (error) {
-        console.log(error)
-        setAlert(texts.inputsMessage.errorSystem)
+        const message = await errorAxios(error)
+        setAlert(message)
       }
       finally {
         document.getElementById("button-login").disabled = false
@@ -87,7 +88,7 @@ function Login() {
                 message: texts.inputsMessage.min8,
               },
               pattern: {
-                value: pattern.user ,
+                value: pattern.user,
                 message: texts.inputsMessage.invalidUser
               }
             })
@@ -150,7 +151,7 @@ function Login() {
           alert ?
             (
               <div className='alert-login'>
-                <IconWarnig/>
+                <IconWarnig />
                 <p>{alert}</p>
               </div>
             )
