@@ -14,6 +14,12 @@ dist-ssr
 help
 *.env
 backend/*.env
+*/__pycache__/*
+backend/*/__pycache__/*
+./backend/API/__pycache__
+./backend/API/migrations/__pycache__/
+backend/API/__pycache__/models.cpython-37.pyc
+backend/my_api/__pycache__/wsgi.cpython-39.pyc
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
