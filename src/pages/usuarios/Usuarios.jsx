@@ -126,6 +126,7 @@ function Usuarios() {
                         )
                         :
                         (
+                            //* Sección principal
                             <div className="w-100 bg-white p-4 border rounded d-flex flex-column justify-content-center align-items-center">
                                 <form className="w-100 d-flex flex-column"
                                     onSubmit={onSubmit}
@@ -230,7 +231,7 @@ function Usuarios() {
                                                     },
                                                     minLength: {
                                                         value: 5,
-                                                        message: texts.inputsMessage.min7,
+                                                        message: texts.inputsMessage.min5,
                                                     },
                                                     pattern: {
                                                         value: pattern.textNoneNumber,

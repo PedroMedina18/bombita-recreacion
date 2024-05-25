@@ -85,7 +85,6 @@ function Form_Materiales() {
                         }}
                     />
                     <InputsGeneral type={"number"} label={`${texts.label.cantidadTotal}`} name="total" id="total" form={{ errors, register }}
-
                         defaultValue={0}
                         params={{
                             min: {

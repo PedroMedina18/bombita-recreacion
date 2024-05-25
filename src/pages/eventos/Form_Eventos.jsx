@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { InputsGeneral, UnitSelect, InputCheck } from "../../components/input/Input"
+import { InputsGeneral, UnitSelect, InputCheck, InputTextTarea } from "../../components/input/Input"
 import { ButtonSimple } from "../../components/button/Button"
 import { LoaderCircle } from "../../components/loader/Loader";
 import { useNavigate } from 'react-router-dom'
@@ -30,7 +30,12 @@ function Form_Eventos() {
     // *funcion para buscar los tipos de documentos y los cargos
     const getData = async () => {
         try {
-            console.log("funciona")
+            const get_tipo_documentos = await tipo_documentos.get()
+            verifyOptionsSelect({
+                respuesta: get_tipo_documentos,
+                setError: setErrorServer,
+                setOptions: setTipoDocumentos
+            })
         } catch (error) {
             console.log(error)
             setErrorServer(texts.inputsMessage.errorSystem)
@@ -58,16 +63,17 @@ function Form_Eventos() {
             }
         }
     )
-    
-    const collapseElements=(check)=>{
-        const collapseClient = new Collapse("#Cliente", {toggle:false})
-        const collapseDataClient = new Collapse("#DataCliente", {toggle:false})
+
+    // *funcion para colapsar la sesion de cliente
+    const collapseElements = (check) => {
+        const collapseClient = new Collapse("#Cliente", { toggle: false })
+        const collapseDataClient = new Collapse("#DataCliente", { toggle: false })
         console.log("hola")
 
-        if(check.target.checked){
+        if (check.target.checked) {
             collapseClient.hide()
             collapseDataClient.show()
-        }else{
+        } else {
             collapseClient.show()
             collapseDataClient.hide()
         }
@@ -78,7 +84,7 @@ function Form_Eventos() {
             {
                 loading ?
                     (
-                        <div className="w-100 d-flex justify-content-center align-items-center bg-white p-5 border rounded heigh-85">
+                        <div className="w-100 d-flex justify-content-center align-items-center bg-white p-5 border rounded heigh-85" >
                             <LoaderCircle />
                         </div>
                     )
@@ -91,6 +97,8 @@ function Form_Eventos() {
                         )
                         :
                         (
+                            //* Sección Principal
+
                             <div className="w-100 bg-white p-4 border rounded d-flex flex-column justify-content-center align-items-center">
                                 <form className="w-100 d-flex flex-column"
                                     onSubmit={onSubmit}
@@ -102,12 +110,13 @@ function Form_Eventos() {
                                         }
                                     />
                                     <div className="w-100 d-flex flex-column justify-content-between align-item-center">
-                                        <InputCheck label={`${texts.label.clienteCheck}`} name="newClient" id="newClient" form={{ errors, register }} 
-                                        
-                                        onClick={(element)=>{
-                                            collapseElements(element)
-                                        }}
+                                        <InputCheck label={`${texts.label.clienteCheck}`} name="newClient" id="newClient" form={{ errors, register }}
+
+                                            onClick={(element) => {
+                                                collapseElements(element)
+                                            }}
                                         />
+
                                         <div className="collapse show" id="Cliente">
                                             <UnitSelect label={`${texts.label.cliente}`} name="cliente" id="cliente" form={{ errors, register }}
                                                 options={[]}
@@ -123,8 +132,10 @@ function Form_Eventos() {
                                             />
                                         </div>
                                     </div>
+
                                     <div class="collapse " id="DataCliente">
-                                        <InputCheck label={`${texts.label.dataPersonaCheck}`} name="persona" id="persona" form={{ errors, register }} className={`${!disabledInputs ? "d-none" : ""}`} checked={disabledInputs}
+
+                                        {/* <InputCheck label={`${texts.label.dataPersonaCheck}`} name="persona" id="persona" form={{ errors, register }} className={`${!disabledInputs ? "d-none" : ""}`} checked={disabledInputs}
                                             onClick={
                                                 (e) => {
                                                     setDisabledInputs(!disabledInputs)
@@ -135,8 +146,7 @@ function Form_Eventos() {
                                                     })
                                                 }
                                             }
-
-                                        />
+                                        /> */}
 
                                         <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                             <div className="w-md-25  w-100 pe-0 pe-md-3">
@@ -169,6 +179,8 @@ function Form_Eventos() {
 
                                                 />
                                             </div>
+
+                                            {/* Sección de cliente */}
 
                                             <div className="w-100 w-md-75 ps-0 ps-md-3 ">
                                                 <InputsGeneral label={texts.label.documento} type="number" name="numero_documento" id="numero_documento" form={{ errors, register }}
@@ -209,7 +221,7 @@ function Form_Eventos() {
 
                                         <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                             <div className="w-100 w-md-50 pe-0 pe-md-3">
-                                                <InputsGeneral type="text" label={texts.label.namesUser} name="nombres" id="nombres" form={{ errors, register }}
+                                                <InputsGeneral type="text" label={texts.label.namesCliente} name="nombres" id="nombres" form={{ errors, register }}
                                                     params={{
                                                         required: {
                                                             value: true,
@@ -221,7 +233,7 @@ function Form_Eventos() {
                                                         },
                                                         minLength: {
                                                             value: 5,
-                                                            message: texts.inputsMessage.min7,
+                                                            message: texts.inputsMessage.min5,
                                                         },
                                                         pattern: {
                                                             value: pattern.textNoneNumber,
@@ -240,7 +252,7 @@ function Form_Eventos() {
                                                 />
                                             </div>
                                             <div className="w-100 w-md-50 ps-0 ps-md-3">
-                                                <InputsGeneral type={"text"} label={`${texts.label.lastNamesUser}`} name="apellidos" id="apellidos" form={{ errors, register }}
+                                                <InputsGeneral type={"text"} label={`${texts.label.lastNamesCliente}`} name="apellidos" id="apellidos" form={{ errors, register }}
                                                     params={{
                                                         required: {
                                                             value: true,
@@ -343,6 +355,56 @@ function Form_Eventos() {
                                         </div>
                                     </div>
 
+                                    <div className="w-100 d-flex flex-column justify-content-between align-item-center">
+                                        <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
+                                            <InputTextTarea label={`${texts.label.direccion}`} name="direccion" id="direccion" form={{ errors, register }}
+                                                params={{
+                                                    maxLength: {
+                                                        value: 500,
+                                                        message: texts.inputsMessage.max500
+                                                    },
+                                                    validate: (value) => {
+                                                        if (hasLeadingOrTrailingSpace(value)) {
+                                                            return texts.inputsMessage.noneSpace
+                                                        } else {
+                                                            return true
+                                                        }
+                                                    }
+                                                }}
+                                            />
+                                        </div>
+
+                                        <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
+                                            <div className="w-100 w-md-50 pe-0 pe-md-3">
+                                                <InputsGeneral type={"datetime-local"} label={`${texts.label.fechaEvento}`} name="fecha_evento" id="fecha_evento" form={{ errors, register }}
+                                                    params={{
+                                                        required: {
+                                                            value: true,
+                                                            message: texts.inputsMessage.requireFechaEvent,
+                                                        },
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="w-100 w-md-50 ps-0 ps-md-3">
+                                                <InputsGeneral type={"number"} label={`${texts.label.numeroPersonas}`} name="numero_personas" id="numero_personas" form={{ errors, register }}
+                                                    defaultValue={1}
+                                                    params={{
+                                                        required: {
+                                                            value: true,
+                                                            message: texts.inputsMessage.requirePersonas,
+                                                        },
+                                                        min: {
+                                                            value: 1,
+                                                            message: texts.inputsMessage.min1
+                                                        },
+                                                    }}
+                                                />
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
                                     <ButtonSimple type="submit" className="mx-auto w-50 mt-5">
                                         Registrar
                                     </ButtonSimple>
@@ -351,7 +413,7 @@ function Form_Eventos() {
                         )
             }
             <Toaster />
-        </Navbar>
+        </Navbar >
     )
 }
 

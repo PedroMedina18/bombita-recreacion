@@ -30,6 +30,7 @@ function Form_Recreadores() {
         get_data()
     }, [])
 
+    // *Funcion para buscar los niveles y tipos de documentos
     const get_data = async () => {
         try {
             const get_niveles = await niveles.get()
@@ -52,7 +53,7 @@ function Form_Recreadores() {
         }
     }
 
-    // the useform
+    // *the useform
     const {
         register,
         handleSubmit,
@@ -61,6 +62,7 @@ function Form_Recreadores() {
         setValue
     } = useForm();
 
+    // *Funcion para registrar 
     const onSubmit = handleSubmit(
         async (data) => {
             try {
@@ -122,6 +124,7 @@ function Form_Recreadores() {
                         )
                         :
                         (
+                            //* Sección principal
                             <div className="w-100 bg-white p-4 border rounded d-flex flex-column justify-content-center align-items-center">
                                 <form className="w-100 d-flex flex-column"
                                     onSubmit={onSubmit}>

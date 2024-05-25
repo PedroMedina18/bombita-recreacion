@@ -68,6 +68,8 @@ class Usuarios(models.Model):
     inhabilitado = models.BooleanField(default=False)
     cargo = models.ForeignKey(
         Cargos, on_delete=models.PROTECT, related_name="usuarios", db_column="cargo_id")
+    fecha_registro = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "usuarios"
@@ -76,6 +78,8 @@ class Usuarios(models.Model):
 class Nivel(models.Model):
     nombre = models.CharField(max_length=50, unique=True)
     descripcion = models.CharField(max_length=200, null=True, blank=True)
+    fecha_registro = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "niveles"
@@ -97,6 +101,8 @@ class Recreadores(models.Model):
 class Actividades(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     descripcion = models.CharField(max_length=300, null=True, blank=True)
+    fecha_registro = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "actividades"
@@ -105,6 +111,8 @@ class Materiales(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     descripcion = models.CharField(max_length=300, null=True, blank=True)
     total = models.IntegerField(default=0)
+    fecha_registro = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "materiales"
@@ -115,7 +123,9 @@ class Servicios(models.Model):
     duracion = models.DurationField()
     numero_recreadores = models.IntegerField(default=1)
     descripcion = models.CharField(max_length=300, null=True, blank=True)
-
+    fecha_registro = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    
     class Meta:
         db_table = "servicios"
 
@@ -155,3 +165,34 @@ class Serviciosmateriales(models.Model):
 
     class Meta:
         db_table = "servicios_has_materiales"
+
+class Clientes(models.Model):
+    persona = models.ForeignKey(Personas, on_delete=models.PROTECT, related_name="clientes", db_column="persona_id")
+    fecha_registro = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "clientes"
+
+class PrecioDolar(models.Model):
+    precio=models.FloatField()
+    fecha_registro = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "precio_dolar"
+
+class Eventos(models.Model):
+    fecha_evento = models.DateTimeField()
+    direccion = models.CharField(max_length=500)
+    numero_personas=models.IntegerField()
+    cliente = models.ForeignKey(Clientes, on_delete=models.PROTECT, related_name="eventos", db_column="cliente_id")
+    completado = models.BooleanField()
+    fecha_registro = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    PrecioDolar = models.ForeignKey(PrecioDolar, on_delete=models.PROTECT, related_name="eventos", db_column="precio_dolar_id")
+
+    class Meta:
+        db_table = "eventos"
+
+
+
