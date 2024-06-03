@@ -54,7 +54,7 @@ function Form_Niveles() {
         <Navbar name={`${texts.pages.registerServicio.name}`} descripcion={`${texts.pages.registerServicio.description}`}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/niveles") }}><IconRowLeft/> Regresar</ButtonSimple>
 
-            <div className="w-100 bg-white p-4 border rounded d-flex flex-column justify-content-center align-items-center">
+            <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
                 <form className="w-100 d-flex flex-column"
                     onSubmit={onSubmit}>
                     <InputsGeneral type={"text"} label={`${texts.label.nombre}`} name="nombre" id="nombre" form={{ errors, register }}
@@ -83,6 +83,7 @@ function Form_Niveles() {
                                 }
                             }
                         }}
+                        placeholder={"Nombre de la Actividad"}
                     />
                     <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
                         params={{
@@ -98,8 +99,9 @@ function Form_Niveles() {
                                 }
                             }
                         }}
+                        placeholder={texts.placeholder.descripcion}
                     />
-                    <ButtonSimple type="submit" className="mx-auto w-50 mt-5">
+                    <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
                         Registrar
                     </ButtonSimple>
                 </form>

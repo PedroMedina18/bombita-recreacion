@@ -84,14 +84,14 @@ function Form_Eventos() {
             {
                 loading ?
                     (
-                        <div className="w-100 d-flex justify-content-center align-items-center bg-white p-5 border rounded heigh-85" >
+                        <div className="div-main justify-content-center p-4" >
                             <LoaderCircle />
                         </div>
                     )
                     :
                     errorServer ?
                         (
-                            <div className="w-100 d-flex flex-column justify-content-center align-items-center bg-white p-5 border rounded heigh-85">
+                            <div className="div-main justify-content-center p-4">
                                 <ErrorSystem error={errorServer} />
                             </div>
                         )
@@ -99,7 +99,7 @@ function Form_Eventos() {
                         (
                             //* Sección Principal
 
-                            <div className="w-100 bg-white p-4 border rounded d-flex flex-column justify-content-center align-items-center">
+                            <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
                                 <form className="w-100 d-flex flex-column"
                                     onSubmit={onSubmit}
                                     autoComplete={"off"}
@@ -133,9 +133,9 @@ function Form_Eventos() {
                                         </div>
                                     </div>
 
-                                    <div class="collapse " id="DataCliente">
+                                    <div className="collapse " id="DataCliente">
 
-                                        {/* <InputCheck label={`${texts.label.dataPersonaCheck}`} name="persona" id="persona" form={{ errors, register }} className={`${!disabledInputs ? "d-none" : ""}`} checked={disabledInputs}
+                                        <InputCheck label={`${texts.label.dataPersonaCheck}`} name="persona" id="persona" form={{ errors, register }} className={`${!disabledInputs ? "d-none" : ""}`} checked={disabledInputs}
                                             onClick={
                                                 (e) => {
                                                     setDisabledInputs(!disabledInputs)
@@ -146,7 +146,7 @@ function Form_Eventos() {
                                                     })
                                                 }
                                             }
-                                        /> */}
+                                        />
 
                                         <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                             <div className="w-md-25  w-100 pe-0 pe-md-3">
@@ -215,6 +215,7 @@ function Form_Eventos() {
                                                         })
                                                     }}
                                                     disabled={disabledInputs}
+                                                    placeholder={texts.placeholder.numeroDocumento}
                                                 />
                                             </div>
                                         </div>
@@ -249,6 +250,7 @@ function Form_Eventos() {
                                                     }}
                                                     disabled={disabledInputs}
                                                     isError={!disabledInputs}
+                                                    placeholder={texts.placeholder.nombre}
                                                 />
                                             </div>
                                             <div className="w-100 w-md-50 ps-0 ps-md-3">
@@ -280,6 +282,7 @@ function Form_Eventos() {
                                                     }}
                                                     disabled={disabledInputs}
                                                     isError={!disabledInputs}
+                                                    placeholder={texts.placeholder.apellidos}
                                                 />
                                             </div>
                                         </div>
@@ -303,6 +306,7 @@ function Form_Eventos() {
                                                     }}
                                                     disabled={disabledInputs}
                                                     isError={!disabledInputs}
+                                                    placeholder={texts.placeholder.telefono}
                                                 />
                                             </div>
 
@@ -320,6 +324,7 @@ function Form_Eventos() {
                                                     }}
                                                     disabled={disabledInputs}
                                                     isError={!disabledInputs}
+                                                    placeholder={texts.placeholder.telefono}
                                                 />
                                             </div>
                                         </div>
@@ -350,7 +355,8 @@ function Form_Eventos() {
                                                     }}
                                                     disabled={disabledInputs}
                                                     isError={!disabledInputs}
-                                                />
+                                                    placeholder={texts.placeholder.correo}
+                                                />  
                                             </div>
                                         </div>
                                     </div>
@@ -371,6 +377,7 @@ function Form_Eventos() {
                                                         }
                                                     }
                                                 }}
+                                                placeholder={texts.placeholder.direccion}
                                             />
                                         </div>
 
@@ -398,6 +405,7 @@ function Form_Eventos() {
                                                             message: texts.inputsMessage.min1
                                                         },
                                                     }}
+                                                    placeholder={texts.placeholder.numeroPersonas}
                                                 />
                                             </div>
 
@@ -405,7 +413,7 @@ function Form_Eventos() {
 
                                     </div>
 
-                                    <ButtonSimple type="submit" className="mx-auto w-50 mt-5">
+                                    <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
                                         Registrar
                                     </ButtonSimple>
                                 </form>

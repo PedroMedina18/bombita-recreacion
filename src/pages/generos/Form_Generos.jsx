@@ -1,19 +1,19 @@
+import { useForm } from "react-hook-form";
+import { useNavigate } from 'react-router-dom'
 import { InputsGeneral, InputTextTarea } from "../../components/input/Input"
 import { ButtonSimple } from "../../components/button/Button"
-import { useNavigate } from 'react-router-dom'
-import { materiales } from "../../utils/API.jsx";
+import { tipo_documentos } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../utils/alerts.jsx"
-import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx"
-import { controlResultPost } from "../../utils/actions.jsx"
-import { useForm } from "react-hook-form";
 import { Toaster } from "sonner";
+import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx"
+import { controlResultPost} from "../../utils/actions.jsx"
 import Navbar from "../../components/navbar/Navbar"
 import Swal from 'sweetalert2';
 import texts from "../../context/text_es.js";
 import pattern from "../../context/pattern.js";
 import {IconRowLeft} from "../../components/Icon"
 
-function Form_Materiales() {
+function Form_Tipo_Generos() {
     const navigate = useNavigate();
 
     // *the useform
@@ -22,7 +22,7 @@ function Form_Materiales() {
         handleSubmit,
         formState: { errors },
         watch
-    } = useForm()
+    } = useForm();
 
     // *Funcion para registrar
     const onSubmit = handleSubmit(
@@ -32,44 +32,41 @@ function Form_Materiales() {
                 if (confirmacion.isConfirmed) {
                     const body = {
                         nombre: data.nombre,
-                        total: Number(data.total),
                         descripcion: data.descripcion,
                     }
                     alertLoading("Cargando")
-                    const res = await materiales.post(body)
+                    const res = await tipo_documentos.post(body)
                     controlResultPost({
-                        respuesta: res,
-                        messageExito: texts.successMessage.material,
-                        useNavigate: { navigate: navigate, direction: "/materiales" }
+                        respuesta:res, 
+                        messageExito:texts.successMessage.tipoDocumento, 
+                        useNavigate:{navigate:navigate, direction:"/tipo_documentos"}
                     })
                 }
+
             } catch (error) {
                 console.log(error)
                 Swal.close()
-                toastError(texts.errorMessage.errorConexion,)
+                toastError(texts.errorMessage.errorConexion)
             }
         }
     )
+
     return (
-        <Navbar name={texts.pages.registerMaterial.name} descripcion={texts.pages.registerMaterial.description}>
-            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/materiales") }}> <IconRowLeft/> Regresar</ButtonSimple>
+        <Navbar name={texts.pages.registerGenero.name} descripcion={texts.pages.registerGenero.description}>
+            <ButtonSimple type="button" className="mb-2" onClick={()=>{navigate("/tipo_documentos")}}> <IconRowLeft/> Regresar</ButtonSimple>
 
             <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
                 <form className="w-100 d-flex flex-column"
                     onSubmit={onSubmit}>
-                    <InputsGeneral type={"text"} label={texts.label.nombre} name="nombre" id="nombre" form={{ errors, register }}
+                    <InputsGeneral type={"text"} label={`${texts.label.nombre}`} name="nombre" id="nombre" form={{ errors, register }}
                         params={{
                             required: {
                                 value: true,
-                                message: texts.inputsMessage.requireName
+                                message: texts.inputsMessage.requireName,
                             },
                             maxLength: {
                                 value: 50,
-                                message: texts.inputsMessage.max50
-                            },
-                            minLength: {
-                                value: 5,
-                                message: texts.inputsMessage.min5
+                                message: texts.inputsMessage.max50,
                             },
                             pattern: {
                                 value: pattern.textWithNumber,
@@ -83,21 +80,7 @@ function Form_Materiales() {
                                 }
                             }
                         }}
-                        placeholder={"Nombre del Material"}
-                    />
-                    <InputsGeneral type={"number"} label={`${texts.label.cantidadTotal}`} name="total" id="total" form={{ errors, register }}
-                        defaultValue={0}
-                        params={{
-                            min: {
-                                value: 0,
-                                message: texts.inputsMessage.min0
-                            },
-                            step: {
-                                value: 1,
-                                message: texts.inputsMessage.step1
-                            }
-                        }}
-                        placeholder="0"
+                        placeholder={"Nombre del genero"}
                     />
                     <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
                         params={{
@@ -113,7 +96,7 @@ function Form_Materiales() {
                                 }
                             }
                         }}
-                        placeholder={texts.placeholder.descrpcion}
+                        placeholder={texts.placeholder.descripcion}
                     />
                     <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
                         Registrar
@@ -125,4 +108,4 @@ function Form_Materiales() {
     )
 }
 
-export default Form_Materiales
+export default Form_Tipo_Generos

@@ -83,7 +83,7 @@ function Recreadores() {
         register: {
             name: texts.registerMessage.buttonRegisterRecreador,
             function: () => {
-                navigate("/register/recreadores")
+                navigate("/register/recreador")
             }
         }
     }

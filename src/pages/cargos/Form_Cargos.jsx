@@ -6,7 +6,7 @@ import { permisos, cargos } from "../../utils/API.jsx";
 import { LoaderCircle } from "../../components/loader/Loader";
 import { ButtonSimple } from "../../components/button/Button"
 import { alertConfim, toastError, alertLoading } from "../../utils/alerts.jsx"
-import { InputsGeneral, InputTextTarea, InputCheck, MultiSelect } from "../../components/input/Input"
+import { InputsGeneral, InputTextTarea, InputCheck, MultiSelect, InputImgPerfil } from "../../components/input/Input"
 import {verifyOptionsSelect, controlResultPost} from "../../utils/actions.jsx"
 import {hasLeadingOrTrailingSpace} from "../../utils/process.jsx"
 import ErrorSystem from "../../components/errores/ErrorSystem";
@@ -87,20 +87,20 @@ function Cargos() {
             {
                 loading ?
                     (
-                        <div className="w-100 d-flex justify-content-center align-items-center bg-white p-5 border rounded heigh-85">
+                        <div className="div-main justify-content-center">
                             <LoaderCircle />
                         </div>
                     )
                     :
                     errorServer ?
                         (
-                            <div className="w-100 d-flex flex-column justify-content-center align-items-center bg-white p-5 border rounded heigh-85">
+                            <div className="div-main justify-content-center p-4">
                                 <ErrorSystem error={errorServer} />
                             </div>
                         )
                         :
                         (
-                            <div className="w-100 bg-white p-4 border rounded d-flex flex-column justify-content-center align-items-center">
+                            <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
                                 
                                 <form className="w-100 d-flex flex-column"
                                     onSubmit={onSubmit}>
@@ -130,6 +130,7 @@ function Cargos() {
                                                 }
                                             }
                                         }}
+                                        placeholder={"Nombre del Cargo"}
                                     />
                                     <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
                                         params={{
@@ -145,6 +146,7 @@ function Cargos() {
                                                 }
                                             }
                                         }}
+                                        placeholder={texts.placeholder.descripcion}
                                     />
                                     <InputCheck label={`${texts.label.admin}`} name="administrador" id="administrador" form={{ errors, register }} isError={Boolean(!selectOptions.length)}
                                         params={{
@@ -163,8 +165,12 @@ function Cargos() {
                                             :
                                             ""
                                     }
+                                    <div className="w-100 mt-2">
+                                        <InputImgPerfil name="icono" id="icono" label={`Icono`} form={{ errors, register }} tamaño="sm"/>
+                                    </div>
+
                                     {Boolean(!selectOptions.length && errors["administrador"]) ? <span className="message-error visible">{texts.inputsMessage.selecPermisos}</span> : <span className="message-error invisible">Sin errores</span>}
-                                    <ButtonSimple type="submit" className="mx-auto w-50 mt-5">
+                                    <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
                                         Registrar
                                     </ButtonSimple>
                                 </form>

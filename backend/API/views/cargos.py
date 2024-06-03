@@ -20,36 +20,110 @@ class Cargos_Views(View):
 
     def post(self, request):
         try:
-            jd = json.loads(request.body)
-            verify = verify_token(jd["headers"])
-            jd = jd["body"]
+            req = request.POST
+            img=request.FILES
+            verify = verify_token(request.headers)
             if (not verify["status"]):
                 datos = {
                     "status": False,
                     'message': verify["message"],
                 }
                 return JsonResponse(datos)
-            cargo = Cargos.objects.create(nombre=jd["nombre"].title(), descripcion=jd['descripcion'], administrador=jd['administrador'])
-            if (not jd['administrador']):
-                permisos = jd['permisos']
+            cargo = Cargos.objects.create(nombre=req["nombre"].title(), descripcion=req['descripcion'], administrador=req['administrador'], img_logo=img["img_logo"])
+            
+            if (not req['administrador']):
+                permisos = req['permisos']
                 for permiso in permisos:
-                    new_permiso = Permisos.objects.get(id=int(permiso))
+                    getPermiso = Permisos.objects.get(id=int(permiso))
                     PermisosCargos.objects.create(
-                        permisos=new_permiso, cargos=cargo)
+                        permisos=getPermiso, cargos=cargo)
             datos = {
                 "status": True,
-                'message': "Registro Completado"
+                'message': "Registro de Cargo completado"
             }
             return JsonResponse(datos)
-        except Exception as ex:
-            print(ex)
-            print("Error", ex)
+        except Exception as error:
+            print(f"Error consulta post - {error}", )
             datos = {
                 "status": False,
-                'message': "Error. Compruebe Datos"
+                'message': f"Error al registrar: {error}"
             }
             return JsonResponse(datos)
 
+    def put(self, request, id):
+        try:
+            verify = verify_token(request.headers)
+            req = request.POST
+            img = request.FILES
+            if (not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"],
+                }
+                return JsonResponse(datos)
+
+            cargos = list(Cargos.objects.filter(id=id).values())
+            cursor = connection.cursor()
+            if len(cargos) > 0:
+                cargo = Cargos.objects.get(id=id)
+                cargo.nombre = req['nombre']
+                cargo.descripcion = req['descripcion']
+                cargo.administrador = req['administrador']
+                if "img_logo" in img:
+                    cargo.img_logo=img["img_logo"]
+                cargo.save()
+                if (req['administrador']):
+                    PermisosCargos.objects.filter(cargos=id).delete()
+                    datos = {
+                        "status": True,
+                        'message': "Exito. Registro editado"
+                    }
+                else:
+                    query = """"
+                    SELECT p.id FROM
+                        cargos AS c
+                    INNER JOIN 
+                        permisos_has_cargos 
+                    ON 
+                        c.id = permisos_has_cargos.cargo_id
+                    INNER JOIN 
+                        permisos AS P
+                    ON 
+                        p.id = permisos_has_cargos.permiso_id
+                    WHERE 
+                        c.id = %s;
+                    """
+                    cursor.execute(query, [int(id)])
+                    permisos = dictfetchall(cursor)
+                    ids_permisos = [permiso["id"] for permiso in permisos]
+                    eliminar = [num for num in ids_permisos if num not in req["permisos"]]
+                    for permiso in eliminar:
+                        PermisosCargos.objects.filter(cargos=id, permisos=permiso).delete()
+                    agregar = [num for num in req["permisos"] if num not in ids_permisos]
+                    for permiso in agregar:
+                        permiso = Permisos.get(id=permiso)
+                        PermisosCargos.objects.create(cargos=cargo, permisos=permiso)
+                    datos = {
+                        "status": True,
+                        'message': "Exito. Registro Editado"
+                    }
+            else:
+                datos = {
+                    "status": False,
+                    'message': "Error. Registro no encontrado"
+                }
+            return JsonResponse(datos)
+        except Exception as error:
+            print(f"Error de consulta put - {error}")
+            datos = {
+                "status": False,
+                'message': f"Error al editar: {error}",
+            }
+            return JsonResponse(datos)
+        finally:
+            cursor.close()
+            connection.close()
+    
     def delete(self, request, id):
         try:
             verify=verify_token(request.headers)
@@ -59,25 +133,31 @@ class Cargos_Views(View):
                     'message': verify["message"]
                 }
                 return JsonResponse(datos)
-            cargos = list(Cargos.objects.filter(id=id).values())
-            if len(cargos) > 0:
+            cargo = list(Cargos.objects.filter(id=id).values())
+            if len(cargo) > 0:
                 Cargos.objects.filter(id=id).delete()
                 datos = {
                     "status": True,
-                    'message': "Registro Eliminado"
+                    'message': "Registro eliminado"
                 }
             else:
                 datos = datos = {
                     "status": False,
-                    'message': "Registro No Encontrado"
+                    'message': "Registro no encontrado"
                 }
             return JsonResponse(datos)
-        except models.ProtectedError as e:
-            print("Erorr de proteccion")
-            print(str(e))
+        except models.ProtectedError as error:
+            print(f"Error de proteccion  - {str(error)}")
             datos = {
                 "status": False,
                 'message': "Error. Item protejido no se puede eliminar"
+            }
+            return JsonResponse(datos)
+        except Exception as error:
+            print(f"Error consulta delete - {error}", )
+            datos = {
+                "status": False,
+                'message': f"Error al eliminar: {error}"
             }
             return JsonResponse(datos)
 
@@ -183,81 +263,16 @@ class Cargos_Views(View):
                         "pages": None,
                         "total":0
                     }
+            
             return JsonResponse(datos)
-        except Exception as ex:
-            print("Error", ex)
+        except Exception as error:
+            print(f"Error consulta get - {error}")
             datos = {
                 "status": False,
-                'message': "Error. Error de sistema",
+                'message': f"Error de consulta: {error}",
                 "data": None,
                 "pages": None,
                 "total":0
-            }
-            return JsonResponse(datos)
-        finally:
-            cursor.close()
-            connection.close()
-
-    def put(self, request, id):
-        try:
-            jd = json.loads(request.body)
-            cargos = list(Cargos.objects.filter(id=id).values())
-            cursor = connection.cursor()
-            if len(cargos) > 0:
-                cargo = Cargos.objects.get(id=id)
-                cargo.nombre = jd['nombre']
-                cargo.descripcion = jd['descripcion']
-                cargo.administrador = jd['administrador']
-                cargo.save()
-                if (jd['administrador']):
-                    PermisosCargos.objects.filter(cargos=id).delete()
-                    datos = {
-                        "status": True,
-                        'message': "Exito. Registro Editado"
-                    }
-                else:
-                    query = """"
-                    SELECT p.id FROM
-                        cargos AS c
-                    INNER JOIN 
-                        permisos_has_cargos 
-                    ON 
-                        c.id = permisos_has_cargos.cargo_id
-                    INNER JOIN 
-                        permisos AS P
-                    ON 
-                        p.id = permisos_has_cargos.permiso_id
-                    WHERE 
-                        c.id = %s;
-                    """
-                    cursor.execute(query, [int(id)])
-                    permisos = dictfetchall(cursor)
-                    ids = [permiso["id"] for permiso in permisos]
-                    eliminar = [
-                        num for num in ids if num not in jd["permisos"]]
-                    for idPermisos in eliminar:
-                        PermisosCargos.objects.filter(
-                            cargos=id, permisos=idPermisos).delete()
-                    agregar = [num for num in jd["permisos"] if num not in ids]
-                    for idPermisos in agregar:
-                        permiso = Permisos.get(id=idPermisos)
-                        PermisosCargos.objects.create(
-                            cargos=cargo, permisos=permiso)
-                    datos = {
-                        "status": True,
-                        'message': "Exito. Registro Editado"
-                    }
-            else:
-                datos = {
-                    "status": False,
-                    'message': "Error. Registro no encontrado"
-                }
-            return JsonResponse(datos)
-        except Exception as ex:
-            print("Error", ex)
-            datos = {
-                "status": False,
-                'message': "Error. Error de sistema",
             }
             return JsonResponse(datos)
         finally:

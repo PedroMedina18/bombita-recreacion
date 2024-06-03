@@ -42,6 +42,7 @@ const texts={
         selectValor:"Seleccione un valor",
         selectCliente:"Seleccione un cliente o cree uno nuevo",
         selectTipoDocumento:"Seleccione un tipo de documento",
+        selectTipoDocumento:"Seleccione el genero",
         invalidUser:"Usuario invalido",
         invalidName:"Nombre invalido",
         invalidEmail:"Correo Electronico invalido",
@@ -66,6 +67,7 @@ const texts={
     confirmMessage:{
         confirmDelete:"Confirmar la Solicitud de Eliminación",
         confirRegister:"Por favor confirmar la solicitud de Registro",
+        confirCloset:"Desea cerrar sesión",
     },
 
     errorMessage:{
@@ -81,6 +83,7 @@ const texts={
         direccion:"Direccion del Evento",
         nombre:"Nombre",
         materiales:"Materiales",
+        fotoRecreador:"Foto del Recreador",
         duracion:"Duracion",
         precio:"Precio",
         cargo:"Cargo",
@@ -96,6 +99,7 @@ const texts={
         birthDate:"Fecha de Nacimiento",
         password2:"Repita la Contraseña",
         tipoDocuemnto:"Tipo de Documento",
+        genero:"Genero",
         cantidadTotal:"Cantidad Total",
         dataPersonaCheck:"Datos de la persona ya registrados en el sistema",
         clienteCheck:"Nuevo Cliente",
@@ -114,6 +118,18 @@ const texts={
         numeroPersonas:"Número de Personas",
     },
 
+    placeholder:{
+        telefono:"0000-000-0000",
+        nombre:"Ambos Nombres",
+        apellidos:"Ambos Apellidos",
+        descripcion:"Describa de manera concreta el elemento",
+        correo:"ejemplo@dominio.com",
+        numeroDocumento:"00.000.000",
+        nombreElement:"Nombre del Elemento",
+        direccion:"Dirección exacta del evento",
+        numeroPersonas:"Numero aproximado de asistentes al evento"
+    },
+
     pages:{
         registerServicio:{
             name:"Registrar un Servicio",
@@ -127,9 +143,13 @@ const texts={
             name:"Registrar un Tipo de Documento",
             description:"Intruduzca los datos para agregar un nuevo tipo de documento"
         },
+        registerTipoGenero:{
+            name:"Registrar un Genero",
+            description:"Intruduzca los datos para agregar un nuevo genero"
+        },
         registerServicio:{
             name:"Registrar un nuevo Nivel",
-            description:"ntruduzca los datos para agregar un nuevo nivel"
+            description:"Intruduzca los datos para agregar un nuevo nivel"
         },
         registerMaterial:{
             name:"Registrar un nuevo Material",
@@ -154,6 +174,10 @@ const texts={
         getTipoDocumentos:{
             name:"Lista de Tipos de Documentos",
             description:"Verifique los Tipos de Documentos agregados"
+        },
+        getTipoDocumentos:{
+            name:"Lista de Generos",
+            description:"Verifique los Generos agregados"
         },
         getNiveles:{
             name:"Lista de Niveles",

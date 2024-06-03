@@ -18,28 +18,62 @@ class Nivel_Views(View):
     
     def post(self, request):
         try:
-            jd = json.loads(request.body)
-            verify = verify_token(jd["headers"])
+            requ = json.loads(request.body)
+            verify = verify_token(requ["headers"])
             print(verify)
-            jd = jd["body"]
+            requ = requ["body"]
             if (not verify["status"]):
                 datos = {
                     "status": False,
                     'message': verify["message"],
                 }
                 return JsonResponse(datos)
-            Nivel.objects.create(nombre=jd['nombre'].title(), descripcion=jd['descripcion'])
+            Nivel.objects.create(nombre=requ['nombre'].title(), descripcion=requ['descripcion'])
             datos = {
                 "status": True,
                 'message': "Registro Completado"
             }
             return JsonResponse(datos)
 
-        except Exception as ex:
-            print("Error", ex)
+        except Exception as error:
+            print(f"Error consulta post - {error}", )
             datos = {
                 "status": False,
-                'message': "Error. Compruebe Datos"
+                'message': f"Error al registrar: {error}"
+            }
+            return JsonResponse(datos)
+
+    def put(self, request, id):
+        try:
+            requ = json.loads(request.body)
+            verify=verify_token(requ["headers"])
+            if(not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"],
+                }
+                return JsonResponse(datos)
+            nivel = list(Nivel.objects.filter(id=id).values())
+            if len(nivel) > 0:
+                nivel = Nivel.objects.get(id=id)
+                nivel.nombre = requ['nombre']
+                nivel.descripcion = requ['descripcion']
+                nivel.save()
+                datos = {
+                    "status": True,
+                    'message': "Exito. Registro editado"
+                }
+            else:
+                datos = {
+                    "status": False,
+                    'message': "Error. Registro no encontrado"
+                }
+            return JsonResponse(datos)
+        except Exception as error:
+            print(f"Error de consulta put - {error}")
+            datos = {
+                "status": False,
+                'message': f"Error al editar: {error}",
             }
             return JsonResponse(datos)
 
@@ -52,8 +86,8 @@ class Nivel_Views(View):
                     'message': verify["message"]
                 }
                 return JsonResponse(datos)
-            niveles = list(Nivel.objects.filter(id=id).values())
-            if len(niveles) > 0:
+            nivel = list(Nivel.objects.filter(id=id).values())
+            if len(nivel) > 0:
                 Nivel.objects.filter(id=id).delete()
                 datos = {
                     "status": True,
@@ -62,42 +96,21 @@ class Nivel_Views(View):
             else:
                 datos  = {
                     "status": False,
-                    'message': "Registro No Encontrado"
+                    'message': "Registro no encontrado"
                 }
             return JsonResponse(datos)
-        except models.ProtectedError as e:
-            print("Eror de proteccion")
-            print(str(e))
+        except models.ProtectedError as error:
+            print(f"Error de proteccion  - {str(error)}")
             datos = {
                 "status": False,
                 'message': "Error. Item protejido no se puede eliminar"
             }
             return JsonResponse(datos)
-
-    def put(self, request, id):
-        try:
-            jd = json.loads(request.body)
-            niveles = list(Nivel.objects.filter(id=id).values())
-            if len(niveles) > 0:
-                nivel = Nivel.objects.get(id=id)
-                nivel.nombre = jd['nombre']
-                nivel.descripcion = jd['descripcion']
-                nivel.save()
-                datos = {
-                    "status": True,
-                    'message': "Exito. Registro editado"
-                }
-            else:
-                datos = {
-                    "status": False,
-                    'message': "Error. Registro no encontrado"
-                }
-            return JsonResponse(datos)
-        except Exception as ex:
-            print("Error", ex)
+        except Exception as error:
+            print(f"Error consulta delete - {error}", )
             datos = {
                 "status": False,
-                'message': "Error. Error de sistema",
+                'message': f"Error al eliminar: {error}"
             }
             return JsonResponse(datos)
 
@@ -178,12 +191,14 @@ class Nivel_Views(View):
                         "total":0
                     }
             return JsonResponse(datos)
-        except Exception as ex:
-            print("Error", ex)
+        except Exception as error:
+            print(f"Error consulta get - {error}")
             datos = {
                 "status": False,
-                'message': "Error. Error de sistema",
+                'message': f"Error de consulta: {error}",
                 "data": None,
+                "pages": None,
+                "total":0
             }
             return JsonResponse(datos)
         finally:

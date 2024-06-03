@@ -5,13 +5,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
-from ..models import TipoDocumento
+from ..models import Generos
 from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
 import json
 
-# CRUD COMPLETO DE LA TABLA DE tipo_documento
-class Tipo_Documento_Views(View):
+# CRUD COMPLETO DE LA TABLA DE GENEROS
+class Genero_Views(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -20,6 +20,7 @@ class Tipo_Documento_Views(View):
         try:
             req = json.loads(request.body)
             verify = verify_token(req["headers"])
+            print(verify)
             req = req["body"]
             if (not verify["status"]):
                 datos = {
@@ -27,10 +28,10 @@ class Tipo_Documento_Views(View):
                     'message': verify["message"],
                 }
                 return JsonResponse(datos)
-            TipoDocumento.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'])
+            Generos.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'])
             datos = {
                 "status": True,
-                'message': "Registro de Tipo de Documento completado"
+                'message': "Registro de genero completado"
             }
             return JsonResponse(datos)
 
@@ -49,15 +50,15 @@ class Tipo_Documento_Views(View):
             if(not verify["status"]):
                 datos = {
                     "status": False,
-                    'message': verify["message"]
+                    'message': verify["message"],
                 }
                 return JsonResponse(datos)
-            tipo_documento = list(TipoDocumento.objects.filter(id=id).values())
-            if len(tipo_documento) > 0:
-                tipo_documento = TipoDocumento.objects.get(id=id)
-                tipo_documento.nombre = req['nombre']
-                tipo_documento.descripcion = req['descripcion']
-                tipo_documento.save()
+            genero = list(Generos.objects.filter(id=id).values())
+            if len(genero) > 0:
+                genero = Generos.objects.get(id=id)
+                genero.nombre = req['nombre']
+                genero.descripcion = req['descripcion']
+                genero.save()
                 datos = {
                     "status": True,
                     'message': "Exito. Registro editado"
@@ -85,15 +86,15 @@ class Tipo_Documento_Views(View):
                     'message': verify["message"]
                 }
                 return JsonResponse(datos)
-            tipo_documento = list(TipoDocumento.objects.filter(id=id).values())
-            if len(tipo_documento) > 0:
-                TipoDocumento.objects.filter(id=id).delete()
+            genero = list(Generos.objects.filter(id=id).values())
+            if len(genero) > 0:
+                Generos.objects.filter(id=id).delete()
                 datos = {
                     "status": True,
-                    'message': "Registro Eliminado"
+                    'message': "Registro eliminado"
                 }
             else:
-                datos = {
+                datos  = {
                     "status": False,
                     'message': "Registro no encontrado"
                 }
@@ -126,58 +127,58 @@ class Tipo_Documento_Views(View):
                 return JsonResponse(datos)
             if (id > 0):
                 query = """
-                SELECT * FROM tipo_documentos WHERE tipo_documentos.id=%s;
+                SELECT * FROM generos WHERE generos.id=%s;
                 """
                 cursor.execute(query, [int(id)])
-                tipo_documento = dictfetchall(cursor)
-                if(len(tipo_documento)>0):
+                genero = dictfetchall(cursor)
+                if(len(genero)>0):
                     datos = {
                         "status": True,
                         'message': "Exito",
-                        "data": tipo_documento[0]
+                        "data": genero[0]
                     }
                 else:
                     datos = {
                         "status": False,
-                        'message': "Tipo de Documento no encontrado",
+                        'message': "Genero no encontrado",
                         "data": None
                     }
             else:
                 if("all" in request.GET and request.GET["all"]=="true"):
                     query = """
-                    SELECT * FROM tipo_documentos ORDER BY id ASC;
+                    SELECT * FROM generos ORDER BY id ASC;
                     """
                     cursor.execute(query)
-                    tipo_documentos = dictfetchall(cursor)
+                    generos = dictfetchall(cursor)
                 elif("page" in request.GET ):
                     query = """
-                    SELECT * FROM tipo_documentos ORDER BY id ASC id LIMIT %s, %s;
+                    SELECT * FROM generos ORDER BY id ASC id LIMIT %s, %s;
                     """
                     cursor.execute(query, [indiceInicial(int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
-                    tipo_documentos = dictfetchall(cursor)
+                    generos = dictfetchall(cursor)
                 elif("page" in request.GET and "desc" in request.GET and request.GET["desc"]=="true"):
                     query = """
-                    SELECT * FROM tipo_documentos ORDER BY id DESC LIMIT %s, %s;
+                    SELECT * FROM generos ORDER BY id DESC LIMIT %s, %s;
                     """
                     cursor.execute(query, [indiceInicial(int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
-                    tipo_documentos = dictfetchall(cursor)
+                    generos = dictfetchall(cursor)
                 else:
                     query = """
-                    SELECT * FROM tipo_documentos ORDER BY id LIMIT 25;
+                    SELECT * FROM generos ORDER BY id LIMIT 25;
                     """
                     cursor.execute(query)
-                    tipo_documentos = dictfetchall(cursor)
+                    generos = dictfetchall(cursor)
 
                 query="""
-                    SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM tipo_documentos;
+                    SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM generos;
                 """
                 cursor.execute(query)
                 result = dictfetchall(cursor)
-                if len(tipo_documentos)>0:
+                if len(generos)>0:
                     datos = {
                         "status": True,
                         'message': "Exito",
-                        "data": tipo_documentos,
+                        "data": generos,
                         "pages": int(result[0]["pages"]),
                         "total":result[0]["total"],
                     }

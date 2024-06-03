@@ -6,8 +6,8 @@ from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..funtions.identificador import determinar_valor, edit_str
-from ..models import Nivel, Recreadores, Personas, TipoDocumento
-from django.db import IntegrityError, connection
+from ..models import Nivel, Recreadores, Personas, TipoDocumento, Generos
+from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
 import json
 
@@ -19,9 +19,9 @@ class Recreadores_Views(View):
 
     def post(self, request):
         try:
-            jd = json.loads(request.body)
-            verify = verify_token(jd["headers"])
-            jd = jd["body"]
+            req = request.POST
+            img=request.FILES
+            verify = verify_token(request.headers)
             if (not verify["status"]):
                 datos = {
                     "status": False,
@@ -29,63 +29,204 @@ class Recreadores_Views(View):
                 }
                 return JsonResponse(datos)
 
-            # Comprobar si se esta registrando un nuevo recreador con los datos de una persona existente
-            if ("id_persona" in jd):
+            #* se debe comprobar si se va a registrar una persona nueva o ya existe
+
+            if ("id_persona" in req):
+                ### *comprobacion de persona
                 persona = list(Personas.objects.filter(
-                    id=jd["id_persona"]).values())
+                    id=req["id_persona"]).values())
                 if (len(persona) > 0):
-                    persona = Personas.objects.get(id=jd["id_persona"])
+                    persona = Personas.objects.get(id=req["id_persona"])
                 else:
                     datos = {
                         "status": False,
-                        'message': "Error. Compruebe id de la persona"
+                        'message': "Error. Compruebe datos de registro"
                     }
                     return JsonResponse(datos)
             else:
+                ### *comprobacion de tipo de documento
                 tipo_documento = list(TipoDocumento.objects.filter(
-                    id=jd["tipo_documento"]).values())
+                    id=req["tipo_documento"]).values())
                 if (len(tipo_documento) > 0):
                     tipo_documento = TipoDocumento.objects.get(
-                        id=jd["tipo_documento"])
+                        id=req["tipo_documento"])
                 else:
                     datos = {
                         "status": False,
-                        'message': "Error. Compruebe id del tipo de documento"
+                        'message': "Error. Compruebe el tipo de documento"
                     }
                     return JsonResponse(datos)
+
+                ### *Registro de datos de nueva persona
                 persona = Personas.objects.create(
-                    nombres=jd['nombres'].title(),
-                    apellidos=jd['apellidos'].title(),
-                    numero_documento=jd["numero_documento"],
-                    telefono_principal=jd["telefono_principal"],
-                    telefono_secundario=jd["telefono_secundario"],
-                    correo=jd["correo"],
+                    nombres=req['nombres'].title(),
+                    apellidos=req['apellidos'].title(),
+                    numero_documento=req["numero_documento"],
+                    telefono_principal=req["telefono_principal"],
+                    telefono_secundario=req["telefono_secundario"],
+                    correo=req["correo"],
                     tipo_documento=tipo_documento
                 )
-            nivel = list(Nivel.objects.filter(id=jd["nivel"]).values())
+
+            ### *comprobacion de nivel
+            nivel = list(Nivel.objects.filter(id=req["nivel"]).values())
             if (len(nivel) > 0):
-                nivel = Nivel.objects.get(id=jd["nivel"])
+                nivel = Nivel.objects.get(id=req["nivel"])
             else:
                 datos = {
                     "status": False,
-                    'message': "Error. Compruebe id del nivel"
+                    'message': "Error. Compruebe el nivel"
                 }
                 return JsonResponse(datos)
+            
+            ### *comprobacion de nivel
+            genero = list(Generos.objects.filter(id=req["genero"]).values())
+            if (len(genero) > 0):
+                genero = Generos.objects.get(id=req["genero"])
+            else:
+                datos = {
+                    "status": False,
+                    'message': "Error. Compruebe el genero"
+                }
+                return JsonResponse(datos)
+
+            ### *Registro de Recreador
             Recreadores.objects.create(
                 persona=persona,
                 nivel=nivel,
-                fecha_nacimiento=jd["fecha_nacimiento"],
+                genero=genero,
+                img_perfil=img["img_recreador"],
+                fecha_nacimiento=req["fecha_nacimiento"],
             )
             datos = {
                 "status": True,
-                'message': "Registro Completado"
+                'message': "Registro de recreador completado"
             }
             return JsonResponse(datos)
-        except Exception as ex:
-            print("Error", ex)
+        except Exception as error:
+            print(f"Error consulta post - {error}", )
             datos = {
                 "status": False,
-                'message': "Error. Compruebe Datos"
+                'message': f"Error al registrar: {error}"
+            }
+            return JsonResponse(datos)
+
+    def put(self, request, id):
+        try:
+            verify = verify_token(request.headers)
+            req = request.POST
+            img = request.FILES
+            if (not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"],
+                }
+                return JsonResponse(datos)
+
+            recreador = list(Recreadores.objects.filter(id=id).values())
+            if len(recreador) > 0:
+                recreador = Recreadores.objects.get(id=id)
+                persona = Personas.objects.get(id=recreador.persona)
+                
+                ### *comprobacion de tipo de documento
+                tipo_documento = list(TipoDocumento.objects.filter(id=req["tipo_documento"]).values())
+                if (len(tipo_documento) > 0):
+                    tipo_documento = TipoDocumento.objects.get(id=req["tipo_documento"])
+                else:
+                    datos = {
+                        "status": False,
+                        'message': "Error. Compruebe el tipo de documento"
+                    }
+                    return JsonResponse(datos)
+
+                ### *comprobacion de nivel
+                nivel = list(Nivel.objects.filter(id=req["nivel"]).values())
+                if (len(nivel) > 0):
+                    nivel = Nivel.objects.get(id=req["nivel"])
+                else:
+                    datos = {
+                        "status": False,
+                        'message': "Error. Compruebe el nivel"
+                    }
+                    return JsonResponse(datos)
+
+                ### *comprobacion de genero
+                genero = list(Generos.objects.filter(id=req["genero"]).values())
+                if (len(genero) > 0):
+                    genero = Generos.objects.get(id=req["genero"])
+                else:
+                    datos = {
+                        "status": False,
+                        'message': "Error. Compruebe el genero"
+                    }
+                    return JsonResponse(datos)
+
+                persona.nombres= req['nombres'].title()
+                persona.apellidos= req['apellidos'].title()
+                persona.numero_documento= req['numero_documento']
+                persona.telefono_principal=req["telefono_principal"],
+                persona.telefono_secundario=req["telefono_secundario"],
+                persona.correo=req["correo"],
+                persona.tipo_documento=tipo_documento
+                recreador.nivel=nivel,
+                recreador.genero=genero,
+                recreador.fecha_nacimiento=req["fecha_nacimiento"],
+                if "img_recreador" in img:
+                    recreador.img_perfil=img["img_recreador"],
+                persona.save()
+                recreador.save()
+                datos = {
+                        "status": True,
+                        'message': "Exito. Registro editado"
+                }
+            else:
+                datos = {
+                    "status": False,
+                    'message': "Error. Registro no encontrado"
+                }
+            return JsonResponse(datos)
+        except Exception as error:
+            print(f"Error de consulta put - {error}")
+            datos = {
+                "status": False,
+                'message': f"Error al editar: {error}",
+            }
+            return JsonResponse(datos)
+
+    def delete(self, request, id):
+        try:
+            verify=verify_token(request.headers)
+            if(not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"]
+                }
+                return JsonResponse(datos)
+            recreador = list(Recreadores.objects.filter(id=id).values())
+            if len(recreador) > 0:
+                Recreadores.objects.filter(id=id).delete()
+                datos = {
+                    "status": True,
+                    'message': "Registro eliminado"
+                }
+            else:
+                datos = datos = {
+                    "status": False,
+                    'message': "Registro no encontrado"
+                }
+            return JsonResponse(datos)
+        except models.ProtectedError as error:
+            print(f"Error de proteccion  - {str(error)}")
+            datos = {
+                "status": False,
+                'message': "Error. Item protejido no se puede eliminar"
+            }
+            return JsonResponse(datos)
+        except Exception as error:
+            print(f"Error consulta delete - {error}", )
+            datos = {
+                "status": False,
+                'message': f"Error al eliminar: {error}"
             }
             return JsonResponse(datos)
 

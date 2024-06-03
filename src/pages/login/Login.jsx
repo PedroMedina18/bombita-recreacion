@@ -7,7 +7,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { login } from "../../utils/API.jsx"
 import { getCookie } from "../../utils/cookie.jsx"
 import { errorAxios } from "../../utils/process.jsx"
-import { IconUserLogin, IconWarnig } from "../../components/Icon"
+import { IconUserCircleSolid, IconWarnig } from "../../components/Icon"
 import texts from '../../context/text_es.js';
 import pattern from '../../context/pattern.js';
 
@@ -63,7 +63,7 @@ function Login() {
         onSubmit={onSubmit}
       >
         <div className="icon-user" >
-          <IconUserLogin />
+          <IconUserCircleSolid />
         </div>
 
         <h1 className='h1 fw-bold mb-4 mt-5 text-white'>Inicio de Sesión</h1>

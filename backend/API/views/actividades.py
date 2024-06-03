@@ -18,18 +18,18 @@ class Actividades_Views(View):
     
     def post(self, request):
         try:
-            jd = json.loads(request.body)
-            verify = verify_token(jd["headers"])
-            jd = jd["body"]
+            req = json.loads(request.body)
+            verify = verify_token(req["headers"])
+            req = req["body"]
             if (not verify["status"]):
                 datos = {
                     "status": False,
                     'message': verify["message"],
                 }
                 return JsonResponse(datos)
-            actividad = Actividades.objects.create(nombre=jd['nombre'].title(), descripcion=jd['descripcion'])
-            if(jd['materiales']):
-                materiales = jd['materiales']
+            actividad = Actividades.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'])
+            if(req['materiales']):
+                materiales = req['materiales']
                 for material in materiales:
                         new_material = Materiales.objects.get(id=int(material))
                         MaterialesActividad.objects.create(material=new_material, actividad=actividad)
@@ -39,11 +39,45 @@ class Actividades_Views(View):
                 }
             return JsonResponse(datos)
 
-        except Exception as ex:
-            print("Error", ex)
+        except Exception as error:
+            print(f"Error consulta post - {error}", )
             datos = {
                 "status": False,
-                'message': "Error. Compruebe Datos"
+                'message': f"Error al registrar: {error}"
+            }
+            return JsonResponse(datos)
+
+    def put(self, request, id):
+        try:
+            req = json.loads(request.body)
+            verify=verify_token(req["headers"])
+            if(not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"],
+                }
+                return JsonResponse(datos)
+            actividad = list(Actividades.objects.filter(id=id).values())
+            if len(actividad) > 0:
+                actividad = Actividades.objects.get(id=id)
+                actividad.nombre = req['nombre']
+                actividad.descripcion = req['descripcion']
+                actividad.save()
+                datos = {
+                    "status": True,
+                    'message': "Exito. Registro editado"
+                }
+            else:
+                datos = {
+                    "status": False,
+                    'message': "Error. Registro no encontrado"
+                }
+            return JsonResponse(datos)
+        except Exception as error:
+            print(f"Error de consulta put - {error}")
+            datos = {
+                "status": False,
+                'message': f"Error al editar: {error}",
             }
             return JsonResponse(datos)
 
@@ -56,52 +90,31 @@ class Actividades_Views(View):
                     'message': verify["message"]
                 }
                 return JsonResponse(datos)
-            actividades = list(Actividades.objects.filter(id=id).values())
-            if len(actividades) > 0:
+            actividad = list(Actividades.objects.filter(id=id).values())
+            if len(actividad) > 0:
                 Actividades.objects.filter(id=id).delete()
                 datos = {
                     "status": True,
-                    'message': "Registro Eliminado"
+                    'message': "Registro eliminado"
                 }
             else:
                 datos  = {
                     "status": False,
-                    'message': "Registro No Encontrado"
+                    'message': "Registro no encontrado"
                 }
             return JsonResponse(datos)
-        except models.ProtectedError as e:
-            print("Erorr de proteccion")
-            print(str(e))
+        except models.ProtectedError as error:
+            print(f"Error de proteccion  - {str(error)}")
             datos = {
                 "status": False,
                 'message': "Error. Item protejido no se puede eliminar"
             }
             return JsonResponse(datos)
-
-    def put(self, request, id):
-        try:
-            jd = json.loads(request.body)
-            actividades = list(Actividades.objects.filter(id=id).values())
-            if len(actividades) > 0:
-                actividad = Actividades.objects.get(id=id)
-                actividad.nombre = jd['nombre']
-                actividad.descripcion = jd['descripcion']
-                actividad.save()
-                datos = {
-                    "status": True,
-                    'message': "Exito. Registro editado"
-                }
-            else:
-                datos = {
-                    "status": False,
-                    'message': "Error. Registro no encontrado"
-                }
-            return JsonResponse(datos)
-        except Exception as ex:
-            print("Error", ex)
+        except Exception as error:
+            print(f"Error consulta delete - {error}", )
             datos = {
                 "status": False,
-                'message': "Error. Error de sistema",
+                'message': f"Error al eliminar: {error}"
             }
             return JsonResponse(datos)
 
@@ -131,7 +144,7 @@ class Actividades_Views(View):
                 else:
                     datos = {
                         "status": False,
-                        'message': "Nivel no encontrado",
+                        'message': "Actividad no encontrado",
                         "data": None
                     }
             else:
@@ -176,17 +189,18 @@ class Actividades_Views(View):
                 else:
                     datos = {
                         "status": False,
-                        'message': "Error. No se encontraron registros",
+                        'message': "No se encontraron registros en el sistema",
                         "data": None,
                         "pages": None,
                         "total":0
                     }
             return JsonResponse(datos)
-        except Exception as ex:
-            print("Error", ex)
+        except Exception as error:
+            print(f"Error consulta get - {error}")
             datos = {
                 "status": False,
-                'message': "Error. Error de sistema",
+                'message': f"Error de consulta: {error}",
+                "data": None,
                 "pages": None,
                 "total":0
             }

@@ -137,19 +137,19 @@ function Form_Servicios() {
 
       {loading ?
         (
-          <div className="w-100 d-flex justify-content-center align-items-center bg-white p-5 border rounded heigh-85">
+          <div className="div-main justify-content-center p-4">
             <LoaderCircle />
           </div>
         )
         : errorServer ?
           (
-            <div className="w-100 d-flex flex-column justify-content-center align-items-center bg-white p-5 border rounded heigh-85">
+            <div className="div-main justify-content-center p-4">
               <ErrorSystem error={errorServer} />
             </div>
           )
           :
           (
-            <div className="w-100 bg-white p-4 border rounded d-flex flex-column justify-content-center align-items-center">
+            <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
               <form className="w-100 d-flex flex-column" onSubmit={onSubmit}>
                 <InputsGeneral
                   type={"text"}
@@ -174,6 +174,7 @@ function Form_Servicios() {
                       }
                     },
                   }}
+                  placeholder={"Nombre del Servicio"}
                 />
                 <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-items-center">
                   <div className="w-md-30 w-100">
@@ -210,7 +211,8 @@ function Form_Servicios() {
                           message: texts.inputsMessage.minRecreador,
                         },
                       }}
-                      defaultValue={0}
+                      defaultValue={1}
+                      placeholder={1}
                     />
                   </div>
                   <div className="w-md-25 w-100">
@@ -234,6 +236,7 @@ function Form_Servicios() {
                         },
                       }}
                       defaultValue={0}
+                      placeholder="0"
                     />
                   </div>
                 </div>
@@ -336,13 +339,14 @@ function Form_Servicios() {
                       }
                     },
                   }}
+                  placeholder={texts.placeholder.descripcion}
                 />
                 <ButtonSimple
                   onClick={(e) => {
                     setSubmit(true);
                   }}
                   type="submit"
-                  className="mx-auto w-50 mt-5"
+                  className="mx-auto w-50 mt-3"
                 >
                   Registrar
                 </ButtonSimple>

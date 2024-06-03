@@ -34,5 +34,5 @@ def verify_token(headers):
             except InvalidSignatureError:
                 datos = {'status':False,'message': 'Firma Invalida'}
                 return datos
-    datos = {'status':False,'message': 'Sin Autorizacion'}
+    datos = {'status':False,'message': 'Sin Autorización'}
     return datos

@@ -53,7 +53,7 @@ function Actividades() {
       })
     },
     search: {
-      placeholder: texts.registerMessage.s,
+      placeholder: texts.registerMessage.searchItem,
       function: (value) => {
         searchCode({
           value: value,

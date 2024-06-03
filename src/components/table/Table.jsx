@@ -30,7 +30,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
 
 
     return (
-        <div className='w-100 bg-white p-4 border rounded min-height d-flex flex-column justify-content-evenly'>
+        <div className='div-main justify-content-between p-2 p-md-3 p-lg-4'>
 
             {/* Primera Seccion con el buscardor y el Boton de direccionamiento */}
             <div className='w-100 d-flex flex-column flex-md-row justify-content-between'>

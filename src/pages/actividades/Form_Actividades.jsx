@@ -87,20 +87,20 @@ function Actividades() {
       {
         loading ?
           (
-            <div className="w-100 d-flex justify-content-center align-items-center bg-white p-5 border rounded heigh-85">
+            <div className="div-main justify-content-center p-4">
               <LoaderCircle />
             </div>
           )
           :
           errorServer ?
             (
-              <div className="w-100 d-flex flex-column justify-content-center align-items-center bg-white p-5 border rounded heigh-85">
+              <div className="div-main justify-content-center p-4">
                 <ErrorSystem error={errorServer} />
               </div>
             )
             :
             (
-              <div className="w-100 bg-white p-4 border rounded d-flex flex-column justify-content-center align-items-center">
+              <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
                 <form className="w-100 d-flex flex-column"
                   onSubmit={onSubmit}>
                   <InputsGeneral type={"text"} label={texts.label.nombre} name="nombre" id="nombre" form={{ errors, register }}
@@ -129,6 +129,7 @@ function Actividades() {
                         }
                       }
                     }}
+                    placeholder={"Nombre de la Actividad"}
                   />
                   <InputTextTarea label={texts.label.descripcion} name="descripcion" id="descripcion" form={{ errors, register }}
                     params={{
@@ -144,9 +145,10 @@ function Actividades() {
                         }
                       }
                     }}
+                    placeholder={texts.placeholder.descripcion}
                   />
                   <MultiSelect id="materiales" name="materiales" label={texts.label.materiales} options={options} placeholder="Materiales" save={setSelectOptions} />
-                  <ButtonSimple type="submit" className="mx-auto w-50 mt-5">
+                  <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
                     Registrar
                   </ButtonSimple>
                 </form>

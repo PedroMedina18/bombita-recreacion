@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { InputsGeneral, UnitSelect, InputCheck } from "../../components/input/Input"
+import { InputsGeneral, UnitSelect, InputCheck, InputImgPerfil } from "../../components/input/Input"
 import { ButtonSimple } from "../../components/button/Button"
 import { useForm } from "react-hook-form";
 import { LoaderCircle } from "../../components/loader/Loader";
@@ -13,7 +13,7 @@ import ErrorSystem from "../../components/errores/ErrorSystem";
 import texts from "../../context/text_es.js";
 import Navbar from "../../components/navbar/Navbar"
 import pattern from "../../context/pattern.js"
-import {IconRowLeft} from "../../components/Icon"
+import { IconRowLeft } from "../../components/Icon"
 
 function Form_Recreadores() {
     const [data_tipo_documentos, setTipoDocumentos] = useState([])
@@ -106,28 +106,29 @@ function Form_Recreadores() {
 
     return (
         <Navbar name={`${texts.pages.registerRecreadores.name}`} descripcion={`${texts.pages.registerRecreadores.description}`}>
-            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/recreadores") }}> <IconRowLeft/> Regresar</ButtonSimple>
+            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/recreadores") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
             {
                 loading ?
                     (
-                        <div className="w-100 d-flex justify-content-center align-items-center bg-white p-5 border rounded heigh-85">
+                        <div className="div-main justify-content-center p-4">
                             <LoaderCircle />
                         </div>
                     )
                     :
                     errorServer ?
                         (
-                            <div className="w-100 d-flex flex-column justify-content-center align-items-center bg-white p-5 border rounded heigh-85">
+                            <div className="div-main justify-content-center p-4">
                                 <ErrorSystem error={errorServer} />
                             </div>
                         )
                         :
                         (
                             //* Sección principal
-                            <div className="w-100 bg-white p-4 border rounded d-flex flex-column justify-content-center align-items-center">
+                            <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
                                 <form className="w-100 d-flex flex-column"
                                     onSubmit={onSubmit}>
+                                    {/* Esta seccion se encarga de verificar que no haya personas repetidas */}
                                     <input type="number" className="d-none"
                                         {
                                         ...register("id_persona")
@@ -144,6 +145,10 @@ function Form_Recreadores() {
                                                 })
                                             }
                                         } />
+                                    <div className="w-100">
+                                        <InputImgPerfil name="foto_perfil" id="foto_perfil" label={`${texts.label.fotoRecreador}`} form={{ errors, register }} />
+                                    </div>
+
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-25 pe-0 pe-md-3 d-flex align-items-center">
                                             <UnitSelect label={texts.label.tipoDocuemnto} name="tipo_documento" id="tipo_documento" form={{ errors, register }}
@@ -174,7 +179,6 @@ function Form_Recreadores() {
                                                     }
                                                 }
                                                 disabled={disabledInputs}
-
                                             />
                                         </div>
                                         <div className="w-100 w-md-75 ps-0 ps-md-3 d-flex align-items-center">
@@ -210,6 +214,7 @@ function Form_Recreadores() {
                                                     })
                                                 }}
                                                 disabled={disabledInputs}
+                                                placeholder={texts.placeholder.numeroDocumento}
                                             />
                                         </div>
                                     </div>
@@ -244,6 +249,7 @@ function Form_Recreadores() {
                                                 }}
                                                 disabled={disabledInputs}
                                                 isError={!disabledInputs}
+                                                placeholder={texts.placeholder.nombre}
                                             />
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
@@ -275,6 +281,7 @@ function Form_Recreadores() {
                                                 }}
                                                 disabled={disabledInputs}
                                                 isError={!disabledInputs}
+                                                placeholder={texts.placeholder.apellidos}
                                             />
                                         </div>
                                     </div>
@@ -299,6 +306,40 @@ function Form_Recreadores() {
                                             />
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
+                                            <UnitSelect label={texts.label.genero} name="genero" id="genero" form={{ errors, register }}
+                                                options={data_tipo_documentos}
+                                                params={{
+                                                    validate: (value) => {
+                                                        if ((value === "")) {
+                                                            return texts.inputsMessage.selectGenero
+                                                        } else {
+                                                            return true
+                                                        }
+                                                    },
+
+                                                }}
+                                                isError={!watch("genero")}
+                                                onChange={
+                                                    (e) => {
+                                                        setdataNewUser({
+                                                            ...dataNewUser,
+                                                            genero: e.target.value
+                                                        })
+                                                        getPersona({
+                                                            dataNewUser,
+                                                            setPersona,
+                                                            setValue,
+                                                            setDisabledInputs
+                                                        })
+                                                    }
+                                                }
+                                                disabled={disabledInputs}
+
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
+                                        <div className="w-100 w-md-50 pe-0 pe-md-3 ">
                                             <InputsGeneral type={"tel"} label={`${texts.label.telPrincipal}`} name="telefono_principal" id="telefono_principal" form={{ errors, register }}
                                                 params={{
                                                     required: {
@@ -316,11 +357,10 @@ function Form_Recreadores() {
                                                 }}
                                                 disabled={disabledInputs}
                                                 isError={!disabledInputs}
+                                                placeholder={texts.placeholder.telefono}
                                             />
                                         </div>
-                                    </div>
-                                    <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
-                                        <div className="w-100 w-md-50 pe-0 pe-md-3">
+                                        <div className="w-100 w-md-50 ps-0 ps-md-3">
                                             <InputsGeneral type={"tel"} label={`${texts.label.telSecundario}`} name="telefono_secundario" id="telefono_secundario" form={{ errors, register }}
                                                 params={{
                                                     maxLength: {
@@ -334,9 +374,13 @@ function Form_Recreadores() {
                                                 }}
                                                 disabled={disabledInputs}
                                                 isError={!disabledInputs}
+                                                placeholder={texts.placeholder.telefono}
                                             />
                                         </div>
-                                        <div className="w-100 w-md-50 ps-0 ps-md-3">
+
+                                    </div>
+                                    <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
+                                        <div className="w-100 w-md-50 pe-0 pe-md-3 ">
                                             <InputsGeneral type={"email"} label={`${texts.label.email}`} name="correo" id="correo" form={{ errors, register }}
                                                 params={{
                                                     minLength: {
@@ -361,11 +405,10 @@ function Form_Recreadores() {
                                                 }}
                                                 disabled={disabledInputs}
                                                 isError={!disabledInputs}
+                                                placeholder={texts.placeholder.correo}
                                             />
                                         </div>
-                                    </div>
-                                    <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
-                                        <div className="w-100 w-md-50 pe-0 pe-md-3">
+                                        <div className="w-100 w-md-50 ps-0 ps-md-3">
                                             <UnitSelect label={`${texts.label.nivel}`} name="nivel" id="nivel" form={{ errors, register }}
                                                 options={data_niveles}
                                                 params={{
@@ -381,7 +424,7 @@ function Form_Recreadores() {
                                         </div>
                                     </div>
 
-                                    <ButtonSimple type="submit" className="mx-auto w-50 mt-5">
+                                    <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
                                         Registrar
                                     </ButtonSimple>
                                 </form>

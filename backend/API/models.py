@@ -6,7 +6,7 @@ from django.db import models
 # Tabla con los permisos propios del sistema
 class Permisos(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    descripcion = models.CharField(max_length=500, null=True, blank=True)
+    descripcion = models.CharField(max_length=250, null=True, blank=True)
 
     class Meta:
         db_table = "permisos"
@@ -14,8 +14,9 @@ class Permisos(models.Model):
 # Tabla con los cargos del sistema principal funcion determinar que puede hacer cada usuario
 class Cargos(models.Model):
     nombre = models.CharField(max_length=50, unique=True)
-    descripcion = models.CharField(max_length=500, null=True, blank=True)
+    descripcion = models.CharField(max_length=250, null=True, blank=True)
     administrador = models.BooleanField()
+    img_logo = models.FileField(upload_to="img_logo_cargos", null=True, blank=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
@@ -34,8 +35,8 @@ class PermisosCargos(models.Model):
 
 # Tabla los tipos de documentos
 class TipoDocumento(models.Model):
-    nombre = models.CharField(max_length=50, unique=True)
-    descripcion = models.CharField(max_length=200, null=True, blank=True)
+    nombre = models.CharField(max_length=100, unique=True)
+    descripcion = models.CharField(max_length=250, null=True, blank=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
@@ -76,13 +77,23 @@ class Usuarios(models.Model):
 
 # Tabla los niveles de los recreadores
 class Nivel(models.Model):
-    nombre = models.CharField(max_length=50, unique=True)
-    descripcion = models.CharField(max_length=200, null=True, blank=True)
+    nombre = models.CharField(max_length=100, unique=True)
+    descripcion = models.CharField(max_length=250, null=True, blank=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "niveles"
+
+# Tabla los niveles de los recreadores
+class Generos(models.Model):
+    nombre = models.CharField(max_length=100, unique=True)
+    descripcion = models.CharField(max_length=250, null=True, blank=True)
+    fecha_registro = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "generos"
 
 # Tabla los niveles de los recreadores
 class Recreadores(models.Model):
@@ -91,6 +102,9 @@ class Recreadores(models.Model):
     inhabilitado = models.BooleanField(default=False)
     nivel = models.ForeignKey(
         Nivel, on_delete=models.PROTECT, related_name="recreadores", db_column="nivel_id")
+    genero = models.ForeignKey(
+        Generos, on_delete=models.PROTECT, related_name="recreadores", db_column="genero_id")
+    img_perfil = models.FileField(upload_to="img_recreadores", null=True, blank=True)
     fecha_nacimiento = models.DateField()
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)

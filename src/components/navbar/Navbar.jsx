@@ -3,6 +3,8 @@ import bombita from "../../assets/bomb.png"
 import { Link, useNavigate } from "react-router-dom"
 import { useContext, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
+import { alertConfim } from '../../utils/alerts.jsx'
+import texts from "../../context/text_es"
 import {
     IconHamburgue,
     IconHome,
@@ -145,13 +147,19 @@ function Navbar({ children, name, descripcion }) {
                             <li className="sidebar-item">
                                 <Link to="/tipo_documentos" className="sidebar-link">Tipo Documento</Link>
                             </li>
+                            <li className="sidebar-item">
+                                <Link to="/generos" className="sidebar-link">Generos</Link>
+                            </li>
                         </ul>
                     </li>
 
                     <li className="sidebar-item"
-                        onClick={() => {
-                            closeSession()
-                            navigate("/")
+                        onClick={async() => {
+                            const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirCloset)
+                            if (confirmacion.isConfirmed) {
+                                closeSession()
+                                navigate("/")
+                            }
                         }}>
                         <p className="sidebar-link" >
                             <IconExit />
@@ -228,13 +236,13 @@ function Navbar({ children, name, descripcion }) {
                 <section className="main" id="main-top">
                     <div className="d-flex flex-column-reverse flex-md-row justify-content-between align-items-start align-items-md-center">
                         <div className="d-flex flex-column">
-                            <h1 className="name-page m-0">{name}</h1>
-                            <p className="descripcion-page">{descripcion}</p>
+                            <h1 className="fs-4 fw-bold m-0 pb-1">{name}</h1>
+                            <p className="m-0 fw-light fs-6 colo">{descripcion}</p>
                         </div>
-                        <span className="span-fecha mb-2 mb-md-0">Inicio de sesión {startDate.getDate() < 10 ? `0${startDate.getDate()}` : startDate.getDate()}-{(startDate.getMonth() + 1) < 10 ? `0${startDate.getMonth() + 1}` : startDate.getMonth() + 1}-{startDate.getFullYear()} a las {startDate.getHours() < 10 ? `0${startDate.getHours()}` : startDate.getHours()}:{startDate.getMinutes() < 10 ? `0${startDate.getMinutes()}` : startDate.getMinutes()}:{startDate.getSeconds() < 10 ? `0${startDate.getSeconds()}` : startDate.getSeconds()}</span>
+                        <span className="fw-normal fs-6 mb-2 mb-md-0 text-dark">Inicio de sesión {startDate.getDate() < 10 ? `0${startDate.getDate()}` : startDate.getDate()}-{(startDate.getMonth() + 1) < 10 ? `0${startDate.getMonth() + 1}` : startDate.getMonth() + 1}-{startDate.getFullYear()} a las {startDate.getHours() < 10 ? `0${startDate.getHours()}` : startDate.getHours()}:{startDate.getMinutes() < 10 ? `0${startDate.getMinutes()}` : startDate.getMinutes()}:{startDate.getSeconds() < 10 ? `0${startDate.getSeconds()}` : startDate.getSeconds()}</span>
                     </div>
 
-                    <hr />
+                    <hr className="invisible my-2"/>
 
                     {children}
                 </section>

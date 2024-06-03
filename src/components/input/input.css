@@ -1,9 +1,9 @@
 .formulario-label {
   display: inline-block;
-  font-weight: 700;
+  font-weight: bold;
   padding-bottom: 5px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 15px;
 }
 .formulario-grupo-input {
   position: relative;
@@ -13,8 +13,8 @@
 .formulario-input-date {
   width: 100%;
   background: #fff;
-  border: 2px solid rgb(22, 21, 21);
-  border-radius: 5px;
+  border: 1px solid rgb(22, 21, 21);
+  border-radius: 2px;
   height: 35px;
   line-height: 40px;
   padding: 0 40px 0 10px;
@@ -34,7 +34,7 @@
 .formulario-input:focus,
 .formulario-textarea:focus,
 .formulario-input-date:focus {
-  border: 2px solid #619bdd;
+  border: 1px solid #619bdd;
   outline: none;
   box-shadow: 0 0 0 0.25rem rgb(13 110 253 / 25%);
 }
@@ -78,13 +78,13 @@
 .error .formulario-input,
 .error .formulario-input-date,
 .error .formulario-textarea {
-  border: 2px solid rgb(var(--error));
+  border: 1px solid rgb(var(--error));
 }
 .error .formulario-input:focus,
 .error .formulario-input-date:focus,
 .error .formulario-textarea:focus,
 .error .form-check-input:focus {
-  border: 2px solid rgb(var(--error));
+  border: 1px solid rgb(var(--error));
   box-shadow: 0 0 0 0.25rem rgba(253, 41, 13, 0.25);
 }
 .error .bi-x-circle-fill {
@@ -99,4 +99,34 @@
 }
 .error .form-check-input {
   border: 2px solid rgb(var(--error));
+}
+.section-perfil{
+  width: max-content;
+  border-radius: 100%;
+  border: 3px solid #5e5e5e;
+  margin-bottom: 5px;
+}
+.section-perfil-img{
+  width: max-content;
+  border-radius: 8px;
+  border: 3px solid #5e5e5e;
+  margin-bottom: 5px;
+  padding: 5px;
+}
+.img-perfil{
+  width: 200px;
+  
+}
+.section-perfil svg{
+  width: 180px;
+  color: #5e5e5e;
+}
+
+.img-perfil.sm{
+  width: 120px;
+  
+}
+.section-perfil.sm svg{
+  width: 100px;
+  color: #5e5e5e;
 }

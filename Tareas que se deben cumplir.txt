@@ -24,6 +24,8 @@ TAREAS DE LOS MODULOS
 
 IMPORTANTES
 
+--*Hacer la Pagina 404
+
 -* COMPLETA LOS CRUD DE LAS PAGINAS:
 -- USUARIO
 -- EVENTOS
@@ -44,3 +46,8 @@ no tan importantes pero TIENES QUE HACERLO CARAJO
 -* MEJORA LA PARTE ALTA DEL DISEÑO
 
 
+
+
+29/05/2024
+
+--*Tarea especial busca un efecto pavito para el hover del boton del menu

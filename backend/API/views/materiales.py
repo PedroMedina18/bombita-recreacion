@@ -30,15 +30,50 @@ class Materiales_Views(View):
             Materiales.objects.create(nombre=jd['nombre'].title(), descripcion=jd['descripcion'], total=jd['total'])
             datos = {
                 "status": True,
-                'message': "Registro Completado"
+                'message': "Registro de material completado"
             }
             return JsonResponse(datos)
 
-        except Exception as ex:
-            print("Error", ex)
+        except Exception as error:
+            print(f"Error consulta post - {error}", )
             datos = {
                 "status": False,
-                'message': "Error. Compruebe Datos"
+                'message': f"Error al registrar: {error}"
+            }
+            return JsonResponse(datos)
+
+    def put(self, request, id):
+        try:
+            jd = json.loads(request.body)
+            verify=verify_token(jd["headers"])
+            if(not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"]
+                }
+                return JsonResponse(datos)
+            material = list(Materiales.objects.filter(id=id).values())
+            if len(material) > 0:
+                material = Materiales.objects.get(id=id)
+                material.nombre = jd['nombre']
+                material.descripcion = jd['descripcion']
+                material.total = jd['total']
+                material.save()
+                datos = {
+                    "status": True,
+                    'message': "Exito. Registro editado"
+                }
+            else:
+                datos = {
+                    "status": False,
+                    'message': "Error. Registro no encontrado"
+                }
+            return JsonResponse(datos)
+        except Exception as error:
+            print(f"Error de consulta put - {error}")
+            datos = {
+                "status": False,
+                'message': f"Error al editar: {error}",
             }
             return JsonResponse(datos)
 
@@ -51,53 +86,31 @@ class Materiales_Views(View):
                     'message': verify["message"]
                 }
                 return JsonResponse(datos)
-            materiales = list(Materiales.objects.filter(id=id).values())
-            if len(materiales) > 0:
+            material = list(Materiales.objects.filter(id=id).values())
+            if len(material) > 0:
                 Materiales.objects.filter(id=id).delete()
                 datos = {
                     "status": True,
-                    'message': "Registro Eliminado"
+                    'message': "Registro eliminado"
                 }
             else:
                 datos  = {
                     "status": False,
-                    'message': "Registro No Encontrado"
+                    'message': "Registro no encontrado"
                 }
             return JsonResponse(datos)
-        except models.ProtectedError as e:
-            print("Erorr de proteccion")
-            print(str(e))
+        except models.ProtectedError as error:
+            print(f"Error de proteccion  - {str(error)}")
             datos = {
                 "status": False,
                 'message': "Error. Item protejido no se puede eliminar"
             }
             return JsonResponse(datos)
-
-    def put(self, request, id):
-        try:
-            jd = json.loads(request.body)
-            materiales = list(Materiales.objects.filter(id=id).values())
-            if len(materiales) > 0:
-                materiales = Materiales.objects.get(id=id)
-                materiales.nombre = jd['nombre']
-                materiales.descripcion = jd['descripcion']
-                materiales.total = jd['total']
-                materiales.save()
-                datos = {
-                    "status": True,
-                    'message': "Exito. Registro editado"
-                }
-            else:
-                datos = {
-                    "status": False,
-                    'message': "Error. Registro no encontrado"
-                }
-            return JsonResponse(datos)
-        except Exception as ex:
-            print("Error", ex)
+        except Exception as error:
+            print(f"Error consulta delete - {error}", )
             datos = {
                 "status": False,
-                'message': "Error. Error de sistema",
+                'message': f"Error al eliminar: {error}"
             }
             return JsonResponse(datos)
 
@@ -128,7 +141,7 @@ class Materiales_Views(View):
                 else:
                     datos = {
                         "status": False,
-                        'message': "Nivel no encontrado",
+                        'message': "Material no encontrado",
                         "data": None
                     }
             else:
@@ -179,11 +192,12 @@ class Materiales_Views(View):
                         "total":0
                     }
             return JsonResponse(datos)
-        except Exception as ex:
-            print("Error", ex)
+        except Exception as error:
+            print(f"Error consulta get - {error}")
             datos = {
                 "status": False,
-                'message': "Error. Error de sistema",
+                'message': f"Error de consulta: {error}",
+                "data": None,
                 "pages": None,
                 "total":0
             }

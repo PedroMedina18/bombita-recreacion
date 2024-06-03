@@ -1,7 +1,9 @@
 import "./input.css";
+import "../button/button.css"
 import Select from "react-select";
+import perfil from "../../assets/perfil.png"
 import MakeAnimated from "react-select/animated";
-import { IconCircleCheck, IconCircleX } from "../Icon";
+import { IconCircleCheck, IconCircleX, IconUserCircleSolid } from "../Icon";
 
 export function InputsGeneral({
   label,
@@ -9,6 +11,7 @@ export function InputsGeneral({
   type,
   name,
   form,
+  placeholder="",
   params = {},
   flexRow = false,
   isError = true,
@@ -29,6 +32,7 @@ export function InputsGeneral({
               className="formulario-input "
               type={type}
               id={id}
+              placeholder={placeholder}
               {...register(name, params)}
               {...props}
             />
@@ -47,9 +51,10 @@ export function InputsGeneral({
         <label className="formulario-label" htmlFor={id}>
           {label}
         </label>
-        <div className={`formulario-grupo-input ${type==="date"? "date":""}`}>
+        <div className={`formulario-grupo-input ${type === "date" || "datetime-local" ? "date" : ""}`}>
           <input
-            className={`formulario-input${type==="date"? "-date":""}`}
+            className={`formulario-input${type === "date" || "datetime-local" ? "-date" : ""}`}
+            placeholder={placeholder}
             type={type}
             id={id}
             {...register(name, params)}
@@ -71,6 +76,7 @@ export function InputTextTarea({
   id,
   name,
   form,
+  placeholder="",
   params = {},
   rows = null,
   ...props
@@ -86,18 +92,11 @@ export function InputTextTarea({
           className="formulario-textarea"
           rows={rows ? rows : 4}
           id={id}
+          placeholder={placeholder}
           {...register(name, params)}
           {...props}
         />
-
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="bi bi-x-circle-fill"
-        >
-          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z" />
-        </svg>
+        <IconCircleX className="bi bi-x-circle-fill" />
       </div>
       <p className="formulario-message-error">
         {errors[name] ? errors[name].message : "error"}
@@ -351,14 +350,7 @@ export function UnitSelect({
             ))
             : ""}
         </select>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="currentColor"
-          className="bi bi-x-circle-fill"
-        >
-          <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z" />
-        </svg>
+        <IconCircleX className="bi bi-x-circle-fill" />
       </div>
       <p className="formulario-message-error">
         {errors[name] ? errors[name].message : "error"}
@@ -386,8 +378,8 @@ export function MultiSelect({ name, id, label, options, save, placeholder }) {
             return {
               ...styles,
               borderColor: "rgb(22, 21, 21)",
-              borderWidth: "2px",
-              borderRadius: "5px",
+              borderWidth: "1px",
+              borderRadius: "2px",
             };
           },
         }}
@@ -401,4 +393,52 @@ export function MultiSelect({ name, id, label, options, save, placeholder }) {
       />
     </div>
   );
+}
+
+export function InputImgPerfil({ label, id, name, form, tamaño="lg" }) {
+  const { errors, register } = form;
+  const img=perfil
+  
+
+  const cambio_imagen=(e)=>{
+    const $IMG=document.getElementById("img-perfil-cecreador")
+    const $SvgPerfil=document.getElementById("svg-perfil")
+    const $sectionPerfil=document.getElementById("sectionPerfil")
+    if(e.target.files[0]){
+      const reader=new FileReader()
+      reader.onload=(response)=>{
+        $IMG.src=response.target.result
+        $IMG.classList.remove("d-none")
+        $SvgPerfil.classList.add("d-none")
+        $sectionPerfil.classList.add("section-perfil-img")
+      }
+      reader.readAsDataURL(e.target.files[0])
+      
+    }else{
+      $IMG.src=perfil
+      $IMG.classList.add("d-none")
+      $SvgPerfil.classList.remove("d-none")
+      $sectionPerfil.classList.remove("section-perfil-img")
+    }
+  }
+
+  return (
+    <div className={`w-100 d-flex flex-column align-items-center justify-content-center ${errors[name] && isError ? "error" : " "}`}>
+      <div className={`${tamaño=="sm"? 'sm':'lg'} section-perfil d-flex align-items-center justify-content-center`} id="sectionPerfil">
+        <IconUserCircleSolid id="svg-perfil"/>
+        <img id="img-perfil-cecreador" src={img} alt="img_perfil" className={`${tamaño=="sm"? 'sm':'lg'} img-perfil d-none`}/>
+      </div>
+      <label className="button-initial cursor-pointer" htmlFor={name}>
+        {label}
+      </label>
+      <input type="file" className="d-none" id={id} name={name} accept=".jpg, .jpeg, .png" multiple={false}
+        {...register(name)}
+        onChange={(e)=>{cambio_imagen(e)}}
+      />
+
+      <p className="formulario-message-error">
+        {errors[name] ? errors[name].message : "error"}
+      </p>
+    </div>
+  )
 }
