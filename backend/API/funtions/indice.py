@@ -1,3 +1,4 @@
+
 def indiceInicial(indice):
     if indice==1:
         inicial=0

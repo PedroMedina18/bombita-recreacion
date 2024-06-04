@@ -3,11 +3,12 @@ from django.http.response import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
-from ..funtions.indice import indiceFinal, indiceInicial
-from ..funtions.serializador import dictfetchall
-from ..models import Actividades, MaterialesActividad, Materiales
+from funtions.indice import indiceFinal, indiceInicial
+from funtions.serializador import dictfetchall
+from models import Actividades, MaterialesActividad, Materiales
 from django.db import IntegrityError, connection, models
-from ..funtions.token import verify_token
+from funtions.token import verify_token
+from context.message import MESSAGE
 import json
 
 # CRUD COMPLETO DE LA TABLA DE nivel
@@ -35,15 +36,15 @@ class Actividades_Views(View):
                         MaterialesActividad.objects.create(material=new_material, actividad=actividad)
                 datos = {
                     "status": True,
-                    'message': "Registro Completado"
+                    'message': f"{MESSAGE["registerActividad"]}"
                 }
             return JsonResponse(datos)
 
         except Exception as error:
-            print(f"Error consulta post - {error}", )
+            print(f"{MESSAGE["errorPost"]} - {error}", )
             datos = {
                 "status": False,
-                'message': f"Error al registrar: {error}"
+                'message': f"{MESSAGE["errorRegistro"]}: {error}"
             }
             return JsonResponse(datos)
 
@@ -66,19 +67,19 @@ class Actividades_Views(View):
                 actividad.save()
                 datos = {
                     "status": True,
-                    'message': "Exito. Registro editado"
+                    'message': f"{MESSAGE["edition"]}"
                 }
             else:
                 datos = {
                     "status": False,
-                    'message': "Error. Registro no encontrado"
+                    'message': f"{MESSAGE["errorRegistroNone"]}"
                 }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"Error de consulta put - {error}")
+            print(f"{MESSAGE["errorPut"]} - {error}")
             datos = {
                 "status": False,
-                'message': f"Error al editar: {error}",
+                'message': f"{MESSAGE["errorEdition"]}: {error}",
             }
             return JsonResponse(datos)
 
@@ -96,26 +97,26 @@ class Actividades_Views(View):
                 Actividades.objects.filter(id=id).delete()
                 datos = {
                     "status": True,
-                    'message': "Registro eliminado"
+                    'message': f"{MESSAGE["delete"]}"
                 }
             else:
                 datos  = {
                     "status": False,
-                    'message': "Registro no encontrado"
+                    'message': f"{MESSAGE["errorRegistroNone"]}"
                 }
             return JsonResponse(datos)
         except models.ProtectedError as error:
-            print(f"Error de proteccion  - {str(error)}")
+            print(f"{MESSAGE["errorProteccion"]}  - {str(error)}")
             datos = {
                 "status": False,
-                'message': "Error. Item protejido no se puede eliminar"
+                'message': f"{MESSAGE["errorProtect"]}"
             }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"Error consulta delete - {error}", )
+            print(f"{MESSAGE["errorDelete"]} - {error}", )
             datos = {
                 "status": False,
-                'message': f"Error al eliminar: {error}"
+                'message': f"{MESSAGE["errorEliminar"]}: {error}"
             }
             return JsonResponse(datos)
 
@@ -139,13 +140,13 @@ class Actividades_Views(View):
                 if(len(actividad)>0):
                     datos = {
                         "status": True,
-                        'message': "Exito",
+                        'message': f"{MESSAGE["exitoGet"]}",
                         "data": actividad[0]
                     }
                 else:
                     datos = {
                         "status": False,
-                        'message': "Actividad no encontrado",
+                        'message': f"{MESSAGE["errorRegistro"]}",
                         "data": None
                     }
             else:
@@ -182,7 +183,7 @@ class Actividades_Views(View):
                 if len(activiades)>0:
                     datos = {
                         "status": True,
-                        'message': "Exito",
+                        'message': f"{MESSAGE["exitoGet"]}",
                         "data": activiades,
                         "pages": int(result[0]["pages"]),
                         "total":result[0]["total"],
@@ -190,17 +191,17 @@ class Actividades_Views(View):
                 else:
                     datos = {
                         "status": False,
-                        'message': "No se encontraron registros en el sistema",
+                        'message': f"{MESSAGE["errorRegistrosNone"]}",
                         "data": None,
                         "pages": None,
                         "total":0
                     }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"Error consulta get - {error}")
+            print(f"{MESSAGE["errorGet"]} - {error}")
             datos = {
                 "status": False,
-                'message': f"Error de consulta: {error}",
+                'message': f"{MESSAGE["errorConsulta"]}: {error}",
                 "data": None,
                 "pages": None,
                 "total":0
