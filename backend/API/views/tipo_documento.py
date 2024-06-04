@@ -30,7 +30,7 @@ class Tipo_Documento_Views(View):
             TipoDocumento.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'])
             datos = {
                 "status": True,
-                'message': "Registro de Tipo de Documento completado"
+                'message': "Registro de tipo de documento completado"
             }
             return JsonResponse(datos)
 
@@ -46,6 +46,7 @@ class Tipo_Documento_Views(View):
         try:
             req = json.loads(request.body)
             verify=verify_token(req["headers"])
+            req = req["body"]
             if(not verify["status"]):
                 datos = {
                     "status": False,

@@ -7,6 +7,7 @@ from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..models import Cargos, PermisosCargos, Permisos
 from ..funtions.token import verify_token
+from ..funtions.editorOpciones import editorOpciones
 from django.db import IntegrityError, connection, models
 
 import json
@@ -87,26 +88,25 @@ class Cargos_Views(View):
                     ON 
                         c.id = permisos_has_cargos.cargo_id
                     INNER JOIN 
-                        permisos AS P
+                        permisos AS p
                     ON 
                         p.id = permisos_has_cargos.permiso_id
                     WHERE 
                         c.id = %s;
                     """
-                    cursor.execute(query, [int(id)])
-                    permisos = dictfetchall(cursor)
-                    ids_permisos = [permiso["id"] for permiso in permisos]
-                    eliminar = [num for num in ids_permisos if num not in req["permisos"]]
-                    for permiso in eliminar:
-                        PermisosCargos.objects.filter(cargos=id, permisos=permiso).delete()
-                    agregar = [num for num in req["permisos"] if num not in ids_permisos]
-                    for permiso in agregar:
-                        permiso = Permisos.get(id=permiso)
-                        PermisosCargos.objects.create(cargos=cargo, permisos=permiso)
-                    datos = {
-                        "status": True,
-                        'message': "Exito. Registro Editado"
-                    }
+                    editorOpciones(
+                        cursor=cursor,
+                        query=query,
+                        id=id,
+                        listTabla=req["permisos"],
+                        tablaIntermedia=PermisosCargos,
+                        itemGet=cargo,
+                        tablaAgregar=Permisos,
+                        filtro_cargos='cargos', 
+                        filtro_permisos='permisos', 
+                        campo_cargos='cargos', 
+                        campo_permisos='permisos'
+                    )
             else:
                 datos = {
                     "status": False,

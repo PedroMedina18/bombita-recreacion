@@ -9,6 +9,7 @@ from ..models import Servicios, ServiciosActividades, Materiales, Serviciosmater
 from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
 from ..funtions.time import duration
+from ..funtions.editorOpciones import editorOpciones
 import datetime
 import json
 
@@ -20,48 +21,111 @@ class Servicios_Views(View):
 
     def post(self, request,):
         try:
-            jd = json.loads(request.body)
-            verify = verify_token(jd["headers"])
-            jd = jd["body"]
+            req = json.loads(request.body)
+            verify = verify_token(req["headers"])
+            req = req["body"]
             if (not verify["status"]):
                 datos = {
                     "status": False,
                     'message': verify["message"],
                 }
                 return JsonResponse(datos)
-            duracion = datetime.timedelta(hours=jd["duracion"]["horas"], minutes=jd["duracion"]["minutos"])
-            servicio = Servicios.objects.create(nombre=jd["nombre"], precio=jd["precio"], numero_recreadores=jd["numero_recreadores"], descripcion=jd["descripcion"], duracion=duracion)
+            duracion = datetime.timedelta(hours=req["duracion"]["horas"], minutes=req["duracion"]["minutos"])
+            servicio = Servicios.objects.create(nombre=req["nombre"], precio=req["precio"], numero_recreadores=req["numero_recreadores"], descripcion=req["descripcion"], duracion=duracion)
                 
-            recreadores = jd['recreadores']
+            recreadores = req['recreadores']
             for recreador in recreadores:
                 newRecreador = Recreadores.objects.get(id=int(recreador))
                 ServiciosRecreadores.objects.create(recreador=newRecreador, servicio=servicio)
             
-            actividades = jd['actividades']
+            actividades = req['actividades']
             for actividad in actividades:
                 newAtividades = Actividades.objects.get(id=int(actividad))
                 ServiciosActividades.objects.create(actividad=newAtividades, servicio=servicio)
 
-            materiales = jd['materiales']
+            materiales = req['materiales']
             for material in materiales:
                 newMteriales = Materiales.objects.get(id=int(material["material"]))
                 Serviciosmateriales.objects.create(material=newMteriales, servicio=servicio, cantidad=material["cantidad"])
             
             datos = {
                 "status": True,
-                'message': "Registro Completado"
+                'message': "Registro de servicio completado"
             }
             return JsonResponse(datos)
-        except Exception as ex:
-            print("Error", ex)
+        except Exception as error:
+            print(f"Error consulta post - {error}", )
             datos = {
                 "status": False,
-                'message': "Error. Compruebe Datos"
+                'message': f"Error al registrar: {error}"
             }
             return JsonResponse(datos)
 
     def put(self, request, id):
-        pass
+        try:
+            req = json.loads(request.body)
+            verify = verify_token(req["headers"])
+            req = req["body"]
+            if (not verify["status"]):
+                datos = {
+                    "status": False,
+                    'message': verify["message"],
+                }
+                return JsonResponse(datos)
+            duracion = datetime.timedelta(hours=req["duracion"]["horas"], minutes=req["duracion"]["minutos"])
+            servicio = list(Servicios.objects.filter(id=id).values())
+            cursor = connection.cursor()
+            if len(servicio) > 0:
+                servicio = Servicios.objects.get(id=id)
+                servicio.nombre = req['nombre']
+                servicio.descripcion = req['descripcion']
+                servicio.precio = req['precio']
+                servicio.duracion = duracion
+                servicio.numero_recreadores = req["numero_recreadores"]
+                servicio.save()
+                
+                recreadores = req['recreadores']
+                query = """"
+                SELECT c.id FROM
+                    servicios AS s
+                INNER JOIN 
+                    servicios_has_recreadores 
+                ON 
+                    s.id = servicios_has_recreadores.servicio_id
+                INNER JOIN 
+                    recreadores AS c
+                ON 
+                    c.id = servicios_has_recreadores.recreador_id
+                WHERE 
+                    s.id = %s;
+                """
+                editorOpciones(
+                    cursor=cursor,
+                    query=query,
+                    id=id,
+                    listTabla=req["permisos"],
+                    tablaIntermedia=PermisosCargos,
+                    itemGet=cargo,
+                    tablaAgregar=Permisos,
+                    filtro_cargos='cargos', 
+                    filtro_permisos='permisos', 
+                    campo_cargos='cargos', 
+                    campo_permisos='permisos'
+                )
+            else:
+                datos = {
+                    "status": False,
+                    'message': "Error. Registro no encontrado"
+                }
+            return JsonResponse(datos)
+
+        except Exception as error:
+            print(f"Error de consulta put - {error}")
+            datos = {
+                "status": False,
+                'message': f"Error al editar: {error}",
+            }
+            return JsonResponse(datos)
 
     def delete(self, request, id):
         try:
@@ -182,13 +246,14 @@ class Servicios_Views(View):
                         "total": 0
                     }
             return JsonResponse(datos)
-        except Exception as ex:
-            print("Error", ex)
+        except Exception as error:
+            print(f"Error consulta get - {error}")
             datos = {
                 "status": False,
-                'message': "Error. Error de sistema",
+                'message': f"Error de consulta: {error}",
+                "data": None,
                 "pages": None,
-                "total": 0
+                "total":0
             }
             return JsonResponse(datos)
         finally:

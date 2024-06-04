@@ -6,7 +6,7 @@ def determinar_valor(argumento):
         string=argumento
         return {"type":"str", "valor":string}
 
-
+#  funcion para editar un string y añadir % % al inicio y final de cada palabra
 def edit_str(input_str):
     # Convertir la cadena de entrada a minúsculas.
     input_str = input_str.lower()

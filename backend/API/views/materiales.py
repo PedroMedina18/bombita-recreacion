@@ -18,16 +18,16 @@ class Materiales_Views(View):
     
     def post(self, request):
         try:
-            jd = json.loads(request.body)
-            verify = verify_token(jd["headers"])
-            jd = jd["body"]
+            req = json.loads(request.body)
+            verify = verify_token(req["headers"])
+            req = req["body"]
             if (not verify["status"]):
                 datos = {
                     "status": False,
                     'message': verify["message"],
                 }
                 return JsonResponse(datos)
-            Materiales.objects.create(nombre=jd['nombre'].title(), descripcion=jd['descripcion'], total=jd['total'])
+            Materiales.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'], total=req['total'])
             datos = {
                 "status": True,
                 'message': "Registro de material completado"
@@ -44,8 +44,9 @@ class Materiales_Views(View):
 
     def put(self, request, id):
         try:
-            jd = json.loads(request.body)
-            verify=verify_token(jd["headers"])
+            req = json.loads(request.body)
+            verify=verify_token(req["headers"])
+            req = req["body"]
             if(not verify["status"]):
                 datos = {
                     "status": False,
@@ -55,9 +56,9 @@ class Materiales_Views(View):
             material = list(Materiales.objects.filter(id=id).values())
             if len(material) > 0:
                 material = Materiales.objects.get(id=id)
-                material.nombre = jd['nombre']
-                material.descripcion = jd['descripcion']
-                material.total = jd['total']
+                material.nombre = req['nombre']
+                material.descripcion = req['descripcion']
+                material.total = req['total']
                 material.save()
                 datos = {
                     "status": True,

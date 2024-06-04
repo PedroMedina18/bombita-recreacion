@@ -20,7 +20,6 @@ class Genero_Views(View):
         try:
             req = json.loads(request.body)
             verify = verify_token(req["headers"])
-            print(verify)
             req = req["body"]
             if (not verify["status"]):
                 datos = {
@@ -47,6 +46,7 @@ class Genero_Views(View):
         try:
             req = json.loads(request.body)
             verify=verify_token(req["headers"])
+            req = req["body"]
             if(not verify["status"]):
                 datos = {
                     "status": False,

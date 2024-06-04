@@ -18,20 +18,19 @@ class Nivel_Views(View):
     
     def post(self, request):
         try:
-            requ = json.loads(request.body)
-            verify = verify_token(requ["headers"])
-            print(verify)
-            requ = requ["body"]
+            req = json.loads(request.body)
+            verify = verify_token(req["headers"])
+            req = req["body"]
             if (not verify["status"]):
                 datos = {
                     "status": False,
                     'message': verify["message"],
                 }
                 return JsonResponse(datos)
-            Nivel.objects.create(nombre=requ['nombre'].title(), descripcion=requ['descripcion'])
+            Nivel.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'])
             datos = {
                 "status": True,
-                'message': "Registro Completado"
+                'message': "Registro de nivel completado"
             }
             return JsonResponse(datos)
 
@@ -45,8 +44,8 @@ class Nivel_Views(View):
 
     def put(self, request, id):
         try:
-            requ = json.loads(request.body)
-            verify=verify_token(requ["headers"])
+            req = json.loads(request.body)
+            verify=verify_token(req["headers"])
             if(not verify["status"]):
                 datos = {
                     "status": False,
@@ -56,8 +55,8 @@ class Nivel_Views(View):
             nivel = list(Nivel.objects.filter(id=id).values())
             if len(nivel) > 0:
                 nivel = Nivel.objects.get(id=id)
-                nivel.nombre = requ['nombre']
-                nivel.descripcion = requ['descripcion']
+                nivel.nombre = req['nombre']
+                nivel.descripcion = req['descripcion']
                 nivel.save()
                 datos = {
                     "status": True,
