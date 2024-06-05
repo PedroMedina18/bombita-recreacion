@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from jwt import encode, decode, ExpiredSignatureError, InvalidSignatureError, DecodeError
 from decouple import config
 
+#  INFO: Para crear un nuevo token
 def new_token(user):
     fecha=datetime.now()
     fechaNew=datetime.now() + timedelta(hours=10)
@@ -11,10 +12,13 @@ def new_token(user):
             "id":user["id"],
             "nombre":user["nombre"],
             "cargo":user["cargo_id"],
-            # "administrador":administrador,
-            # "permisos":permisos
+            # // "administrador":administrador,
+            # // "permisos":permisos
         }
     return {"token":encode(payload, config('TOKEN'), algorithm="HS256"), "fecha":fechaNew}
+
+
+#  INFO: Para verificar si el token es correcto y devolver la informacion que contiene
 
 def verify_token(headers):
     if 'Authorization' in headers:

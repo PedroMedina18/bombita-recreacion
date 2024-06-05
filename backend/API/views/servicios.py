@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
-from ..models import Servicios, ServiciosActividades, Materiales, Serviciosmateriales, ServiciosRecreadores, Recreadores, Actividades
+from ..models import Servicios, ServiciosActividades, Materiales, ServiciosMateriales, ServiciosRecreadores, Recreadores, Actividades
 from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
 from ..funtions.time import duration
@@ -46,7 +46,7 @@ class Servicios_Views(View):
             materiales = req['materiales']
             for material in materiales:
                 newMteriales = Materiales.objects.get(id=int(material["material"]))
-                Serviciosmateriales.objects.create(material=newMteriales, servicio=servicio, cantidad=material["cantidad"])
+                ServiciosMateriales.objects.create(material=newMteriales, servicio=servicio, cantidad=material["cantidad"])
             
             datos = {
                 "status": True,
@@ -86,39 +86,94 @@ class Servicios_Views(View):
                 
                 recreadores = req['recreadores']
                 query = """"
-                SELECT c.id FROM
-                    servicios AS s
-                INNER JOIN 
-                    servicios_has_recreadores 
-                ON 
-                    s.id = servicios_has_recreadores.servicio_id
-                INNER JOIN 
-                    recreadores AS c
-                ON 
-                    c.id = servicios_has_recreadores.recreador_id
-                WHERE 
-                    s.id = %s;
+                    SELECT re.id FROM
+                        recreadores AS re
+                    INNER JOIN 
+                        servicios_has_recreadores
+                    ON 
+                        re.id = servicios_has_recreadores.recreador_id
+                    WHERE 
+                        servicios_has_recreadores.servicio_id = %s;
                 """
                 editorOpciones(
                     cursor=cursor,
                     query=query,
                     id=id,
-                    listTabla=req["permisos"],
-                    tablaIntermedia=PermisosCargos,
-                    itemGet=cargo,
-                    tablaAgregar=Permisos,
+                    listTabla=recreadores,
+                    tablaIntermedia=ServiciosRecreadores,
+                    itemGet=servicio,
+                    tablaAgregar=Recreadores,
                     filtro_cargos='cargos', 
                     filtro_permisos='permisos', 
                     campo_cargos='cargos', 
                     campo_permisos='permisos'
                 )
+
+                # ------------------------------------------------
+
+                actividades = req['actividades']
+                query = """"
+                    SELECT ac.id FROM
+                        actividades AS ac
+                    INNER JOIN 
+                        servicios_has_actvidades
+                    ON 
+                        ac.id = servicios_has_actvidades.actividad_id
+                    WHERE 
+                        servicios_has_actvidades.servicio_id = %s;
+                """
+                editorOpciones(
+                    cursor=cursor,
+                    query=query,
+                    id=id,
+                    listTabla=actividades,
+                    tablaIntermedia=ServiciosActividades,
+                    itemGet=servicio,
+                    tablaAgregar=Actividades,
+                    filtro_cargos='cargos', 
+                    filtro_permisos='permisos', 
+                    campo_cargos='cargos', 
+                    campo_permisos='permisos'
+                )
+
+                # ------------------------------------------------
+
+                materiales = req['materiales']
+                query = """"
+                    SELECT ma.id FROM
+                        materiales AS ma
+                    INNER JOIN 
+                        servicios_has_materiales
+                    ON 
+                        ma.id = servicios_has_materiales.material_id
+                    WHERE 
+                        servicios_has_materiales.servicio_id = %s;
+                """
+                editorOpciones(
+                    cursor=cursor,
+                    query=query,
+                    id=id,
+                    listTabla=materiales,
+                    tablaIntermedia=ServiciosMateriales,
+                    itemGet=servicio,
+                    tablaAgregar=Actividades,
+                    filtro_cargos='cargos', 
+                    filtro_permisos='permisos', 
+                    campo_cargos='cargos', 
+                    campo_permisos='permisos'
+                )
+
+                datos = {
+                    "status": True,
+                    'message': "Exito. Registro editado"
+                }
             else:
                 datos = {
                     "status": False,
                     'message': "Error. Registro no encontrado"
                 }
+            
             return JsonResponse(datos)
-
         except Exception as error:
             print(f"Error de consulta put - {error}")
             datos = {

@@ -1,4 +1,7 @@
 from .serializador import dictfetchall
+
+
+# INFO: sirve para agregar y eliminar registros en una tabla intermedia dependiendo de una lista de indices 
 def editorOpciones(cursor, query, tablaIntermedia, tablaAgregar, itemGet, listTabla, id, **kwargs):
     cursor.execute(query, [int(id)])
     items = dictfetchall(cursor)

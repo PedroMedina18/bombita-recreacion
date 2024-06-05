@@ -9,7 +9,7 @@ from ..models import Cargos, PermisosCargos, Permisos
 from ..funtions.token import verify_token
 from ..funtions.editorOpciones import editorOpciones
 from django.db import IntegrityError, connection, models
-
+from context.message import MESSAGE
 import json
 
 # CRUD COMPLETO DE LA TABLA DE CARGOS
@@ -40,14 +40,14 @@ class Cargos_Views(View):
                         permisos=getPermiso, cargos=cargo)
             datos = {
                 "status": True,
-                'message': "Registro de Cargo completado"
+                'message': f"{MESSAGE["registerCargo"]}"
             }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"Error consulta post - {error}", )
+            print(f"{MESSAGE["errorPost"]} - {error}", )
             datos = {
                 "status": False,
-                'message': f"Error al registrar: {error}"
+                'message': f"{MESSAGE["errorRegistro"]}: {error}"
             }
             return JsonResponse(datos)
 
@@ -77,22 +77,18 @@ class Cargos_Views(View):
                     PermisosCargos.objects.filter(cargos=id).delete()
                     datos = {
                         "status": True,
-                        'message': "Exito. Registro editado"
+                        'message': f"{MESSAGE["edition"]}"
                     }
                 else:
                     query = """"
                     SELECT p.id FROM
-                        cargos AS c
+                        permisos AS p
                     INNER JOIN 
                         permisos_has_cargos 
                     ON 
-                        c.id = permisos_has_cargos.cargo_id
-                    INNER JOIN 
-                        permisos AS p
-                    ON 
                         p.id = permisos_has_cargos.permiso_id
                     WHERE 
-                        c.id = %s;
+                        permisos_has_cargos.cargo_id = %s;
                     """
                     editorOpciones(
                         cursor=cursor,
@@ -107,17 +103,21 @@ class Cargos_Views(View):
                         campo_cargos='cargos', 
                         campo_permisos='permisos'
                     )
+                    datos = {
+                        "status": True,
+                        'message': f"{MESSAGE["edition"]}"
+                    }
             else:
                 datos = {
                     "status": False,
-                    'message': "Error. Registro no encontrado"
+                    'message': f"{MESSAGE["errorRegistroNone"]}"
                 }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"Error de consulta put - {error}")
+            print(f"{MESSAGE["errorPut"]} - {error}")
             datos = {
                 "status": False,
-                'message': f"Error al editar: {error}",
+                'message': f"{MESSAGE["errorEdition"]}: {error}",
             }
             return JsonResponse(datos)
         finally:
@@ -138,26 +138,26 @@ class Cargos_Views(View):
                 Cargos.objects.filter(id=id).delete()
                 datos = {
                     "status": True,
-                    'message': "Registro eliminado"
+                    'message': f"{MESSAGE["delete"]}"
                 }
             else:
                 datos = datos = {
                     "status": False,
-                    'message': "Registro no encontrado"
+                    'message': f"{MESSAGE["errorRegistroNone"]}"
                 }
             return JsonResponse(datos)
         except models.ProtectedError as error:
-            print(f"Error de proteccion  - {str(error)}")
+            print(f"{MESSAGE["errorProteccion"]} - {str(error)}")
             datos = {
                 "status": False,
-                'message': "Error. Item protejido no se puede eliminar"
+                'message': f"{MESSAGE["errorProtect"]}"
             }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"Error consulta delete - {error}", )
+            print(f"{MESSAGE["errorDelete"]} - {error}", )
             datos = {
                 "status": False,
-                'message': f"Error al eliminar: {error}"
+                'message': f"{MESSAGE["errorEliminar"]}: {error}"
             }
             return JsonResponse(datos)
 
@@ -204,13 +204,13 @@ class Cargos_Views(View):
                         cargo[0]["permisos"] = permisos
                     datos = {
                         "status": True,
-                        'message': "Exito",
+                        'message': f"{MESSAGE["exitoGet"]}",
                         "data": cargo[0]
                     }
                 else:
                     datos = {
                         "status": False,
-                        'message': "Error. Cargo no Encontrado",
+                        'message': f"{MESSAGE["errorRegistroNone"]}",
                         "data": None,
                     }
             else:
@@ -250,7 +250,7 @@ class Cargos_Views(View):
                 if len(cargos) > 0:
                     datos = {
                         "status": True,
-                        'message': "Exito",
+                        'message': f"{MESSAGE["exitoGet"]}",
                         "data": cargos,
                         "pages": int(result[0]["pages"]),
                         "total":result[0]["total"],
@@ -258,7 +258,7 @@ class Cargos_Views(View):
                 else:
                     datos = {
                         "status": False,
-                        'message': "Error. No se encontraron registros",
+                        'message': f"{MESSAGE["errorRegistrosNone"]}",
                         "data": None,
                         "pages": None,
                         "total":0
@@ -266,10 +266,10 @@ class Cargos_Views(View):
             
             return JsonResponse(datos)
         except Exception as error:
-            print(f"Error consulta get - {error}")
+            print(f"{MESSAGE["errorGet"]} - {error}")
             datos = {
                 "status": False,
-                'message': f"Error de consulta: {error}",
+                'message': f"{MESSAGE["errorConsulta"]}: {error}",
                 "data": None,
                 "pages": None,
                 "total":0

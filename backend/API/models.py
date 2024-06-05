@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 
 
-# Tabla con los permisos propios del sistema
+# *Tabla con los permisos propios del sistema
 class Permisos(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     descripcion = models.CharField(max_length=250, null=True, blank=True)
@@ -11,7 +11,7 @@ class Permisos(models.Model):
     class Meta:
         db_table = "permisos"
 
-# Tabla con los cargos del sistema principal funcion determinar que puede hacer cada usuario
+# *Tabla con los cargos del sistema principal funcion determinar que puede hacer cada usuario
 class Cargos(models.Model):
     nombre = models.CharField(max_length=50, unique=True)
     descripcion = models.CharField(max_length=250, null=True, blank=True)
@@ -23,7 +23,7 @@ class Cargos(models.Model):
     class Meta:
         db_table = "cargos"
 
-# Tabla intermedia entre los cargos y los permisos
+# *Tabla intermedia entre los cargos y los permisos
 class PermisosCargos(models.Model):
     permisos = models.ForeignKey(
         Permisos, on_delete=models.CASCADE, related_name="cargos", db_column="permiso_id")
@@ -33,7 +33,7 @@ class PermisosCargos(models.Model):
     class Meta:
         db_table = "permisos_has_cargos"
 
-# Tabla los tipos de documentos
+# *Tabla los tipos de documentos
 class TipoDocumento(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     descripcion = models.CharField(max_length=250, null=True, blank=True)
@@ -43,7 +43,7 @@ class TipoDocumento(models.Model):
     class Meta:
         db_table = "tipo_documentos"
 
-# Tabla base de las personas o entidades
+# *Tabla base de las personas o entidades
 class Personas(models.Model):
     nombres = models.CharField(max_length=200)
     apellidos = models.CharField(max_length=200)
@@ -60,7 +60,7 @@ class Personas(models.Model):
     class Meta:
         db_table = "personas"
 
-# Tabla de los usuarios del sistema
+# *Tabla de los usuarios del sistema
 class Usuarios(models.Model):
     persona = models.OneToOneField(
         Personas, on_delete=models.PROTECT, related_name="usuario", db_column="persona_id")
@@ -75,7 +75,7 @@ class Usuarios(models.Model):
     class Meta:
         db_table = "usuarios"
 
-# Tabla los niveles de los recreadores
+# *Tabla los niveles de los recreadores
 class Nivel(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     descripcion = models.CharField(max_length=250, null=True, blank=True)
@@ -85,7 +85,7 @@ class Nivel(models.Model):
     class Meta:
         db_table = "niveles"
 
-# Tabla los niveles de los recreadores
+# *Tabla los generos de los recreadores
 class Generos(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     descripcion = models.CharField(max_length=250, null=True, blank=True)
@@ -95,7 +95,7 @@ class Generos(models.Model):
     class Meta:
         db_table = "generos"
 
-# Tabla los niveles de los recreadores
+# *Tabla los recreadores que asisten a los eventos
 class Recreadores(models.Model):
     persona = models.OneToOneField(
         Personas, on_delete=models.PROTECT, related_name="recreador", db_column="persona_id")
@@ -112,6 +112,7 @@ class Recreadores(models.Model):
     class Meta:
         db_table = "recreadores"
 
+# *Tabla los actividades de los eventos
 class Actividades(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     descripcion = models.CharField(max_length=300, null=True, blank=True)
@@ -121,6 +122,7 @@ class Actividades(models.Model):
     class Meta:
         db_table = "actividades"
 
+# *Tabla los materiales de los eventos
 class Materiales(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     descripcion = models.CharField(max_length=300, null=True, blank=True)
@@ -131,6 +133,7 @@ class Materiales(models.Model):
     class Meta:
         db_table = "materiales"
 
+# *Tabla los servicios que se ofrecen
 class Servicios(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
     precio = models.FloatField(default=0)
@@ -143,6 +146,7 @@ class Servicios(models.Model):
     class Meta:
         db_table = "servicios"
 
+# *Tabla intermedia entre los materiales y los actividades
 class MaterialesActividad(models.Model):
     material = models.ForeignKey(
         Materiales, on_delete=models.CASCADE, related_name="actividades", db_column="material_id")
@@ -152,6 +156,7 @@ class MaterialesActividad(models.Model):
     class Meta:
         db_table = "materiales_has_actvidades"
 
+# *Tabla intermedia entre los servicios y los recreadores
 class ServiciosRecreadores(models.Model):
     servicio = models.ForeignKey(
         Servicios, on_delete=models.CASCADE, related_name="recreador", db_column="servicio_id")
@@ -161,6 +166,7 @@ class ServiciosRecreadores(models.Model):
     class Meta:
         db_table = "servicios_has_recreadores"
 
+# *Tabla intermedia entre los servicios y los actividades
 class ServiciosActividades(models.Model):
     servicio = models.ForeignKey(
         Servicios, on_delete=models.CASCADE, related_name="actividades", db_column="servicio_id")
@@ -170,7 +176,8 @@ class ServiciosActividades(models.Model):
     class Meta:
         db_table = "servicios_has_actvidades"
 
-class Serviciosmateriales(models.Model):
+# *Tabla intermedia entre los servicios y los materiales
+class ServiciosMateriales(models.Model):
     servicio = models.ForeignKey(
         Servicios, on_delete=models.CASCADE, related_name="materiales", db_column="servicio_id")
     material = models.ForeignKey(
@@ -180,6 +187,7 @@ class Serviciosmateriales(models.Model):
     class Meta:
         db_table = "servicios_has_materiales"
 
+# *Tabla de los clientes que solicitan los eventos
 class Clientes(models.Model):
     persona = models.ForeignKey(Personas, on_delete=models.PROTECT, related_name="clientes", db_column="persona_id")
     fecha_registro = models.DateTimeField(auto_now_add=True)
@@ -188,6 +196,7 @@ class Clientes(models.Model):
     class Meta:
         db_table = "clientes"
 
+# *Tabla del precio del dolar registrado
 class PrecioDolar(models.Model):
     precio=models.FloatField()
     fecha_registro = models.DateTimeField(auto_now_add=True)
@@ -195,6 +204,7 @@ class PrecioDolar(models.Model):
     class Meta:
         db_table = "precio_dolar"
 
+# *Tabla de los eventos registrados
 class Eventos(models.Model):
     fecha_evento = models.DateTimeField()
     direccion = models.CharField(max_length=500)
