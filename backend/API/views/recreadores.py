@@ -21,6 +21,8 @@ class Recreadores_Views(View):
         try:
             req = request.POST
             img=request.FILES
+            print(req)
+            print(img)
             verify = verify_token(request.headers)
             if (not verify["status"]):
                 datos = {
@@ -94,7 +96,7 @@ class Recreadores_Views(View):
                 persona=persona,
                 nivel=nivel,
                 genero=genero,
-                img_perfil=img["img_perfil"] if "img_perfil" in img else None,
+                img_perfil=img["img_perfil"] if "img_perfil" in img else None
                 fecha_nacimiento=req["fecha_nacimiento"],
             )
             datos = {
