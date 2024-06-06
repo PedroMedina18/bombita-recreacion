@@ -61,12 +61,7 @@ function Niveles() {
     get:(row)=>{
       alertInfo(
         row.nombre, 
-        {
-          id:row.id, 
-          descripcion:row.descripcion,
-          fecha_actualizacion:row.fecha_actualizacion,
-          fecha_registro:row.fecha_registro,
-        }
+        row
       )
     },
     search: {

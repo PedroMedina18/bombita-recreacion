@@ -2,10 +2,11 @@ import { useEffect, useState, useRef } from "react"
 import { Toaster } from "sonner";
 import { generos } from "../../utils/API.jsx";
 import { useNavigate } from 'react-router-dom';
-import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx"
-import {formatoNumero} from "../../utils/process.jsx"
-import Navbar from "../../components/navbar/Navbar"
-import Table from "../../components/table/Table"
+import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx";
+import { formatoNumero } from "../../utils/process.jsx";
+import { alertInfo } from "../../utils/alerts.jsx";
+import Navbar from "../../components/navbar/Navbar";
+import Table from "../../components/table/Table";
 import texts from "../../context/text_es.js";
 
 function Generos() {
@@ -64,6 +65,12 @@ function Generos() {
                     setList: setGeneros
                 })
             }
+        },
+        get:(row)=>{
+            alertInfo(
+              row.nombre, 
+              row
+            )
         },
         register: {
             name: texts.registerMessage.buttonRegisterGenero,

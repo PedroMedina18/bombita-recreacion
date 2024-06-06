@@ -96,7 +96,7 @@ class Recreadores_Views(View):
                 persona=persona,
                 nivel=nivel,
                 genero=genero,
-                img_perfil=img["img_recreador"] if "img_recreador" in img else None,
+                img_perfil=img["img_perfil"] if "img_perfil" in img else None
                 fecha_nacimiento=req["fecha_nacimiento"],
             )
             datos = {

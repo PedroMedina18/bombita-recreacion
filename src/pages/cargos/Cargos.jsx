@@ -3,7 +3,8 @@ import { cargos } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import {deleteItem, searchCode, getListItems} from "../../utils/actions.jsx"
-import {formatoNumero} from "../../utils/process.jsx"
+import { formatoNumero } from "../../utils/process.jsx";
+import { alertCargo } from "../../utils/alerts.jsx";
 import Navbar from "../../components/navbar/Navbar"
 import Table from "../../components/table/Table"
 import texts from "../../context/text_es.js";
@@ -69,6 +70,12 @@ function Cargos() {
                     setList: setCargos
                 })
             }
+        },
+        get:(row)=>{
+            alertCargo(
+              row.nombre, 
+              row
+            )
         },
         register: {
             name: texts.registerMessage.buttonRegisterCargo,

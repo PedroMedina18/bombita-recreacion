@@ -78,7 +78,7 @@ function Form_Recreadores() {
             const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirRegister)
             if (confirmacion.isConfirmed) {
                 const Form = new FormData()
-                if (Form.id_persona) {
+                if (data.id_persona) {
                     Form.append('id_persona', data.id_persona)
                     Form.append('fecha_nacimiento', data.fecha_nacimiento)
                     Form.append('nivel', data.nivel)

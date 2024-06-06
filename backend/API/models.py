@@ -154,7 +154,7 @@ class MaterialesActividad(models.Model):
         Actividades, on_delete=models.CASCADE, related_name="materiales", db_column="actividad_id")
 
     class Meta:
-        db_table = "materiales_has_actvidades"
+        db_table = "materiales_has_actividades"
 
 # *Tabla intermedia entre los servicios y los recreadores
 class ServiciosRecreadores(models.Model):
@@ -174,7 +174,7 @@ class ServiciosActividades(models.Model):
         Actividades, on_delete=models.CASCADE, related_name="servicios", db_column="actividad_id")
 
     class Meta:
-        db_table = "servicios_has_actvidades"
+        db_table = "servicios_has_actividades"
 
 # *Tabla intermedia entre los servicios y los materiales
 class ServiciosMateriales(models.Model):

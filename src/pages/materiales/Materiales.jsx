@@ -2,10 +2,11 @@ import { useEffect, useState, useRef } from "react"
 import { materiales } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
-import {deleteItem, searchCode, getListItems} from "../../utils/actions.jsx"
-import {formatoNumero} from "../../utils/process.jsx"
-import Navbar from "../../components/navbar/Navbar"
-import Table from "../../components/table/Table"
+import {deleteItem, searchCode, getListItems} from "../../utils/actions.jsx";
+import { formatoNumero } from "../../utils/process.jsx";
+import { alertInfo } from "../../utils/alerts.jsx";
+import Navbar from "../../components/navbar/Navbar";
+import Table from "../../components/table/Table";
 import texts from "../../context/text_es.js";
 
 function Materiales() {
@@ -55,6 +56,12 @@ function Materiales() {
                 objet: materiales,
                 functionGet: getMateriales
             })
+        },
+        get:(row)=>{
+            alertInfo(
+              row.nombre, 
+              row
+            )
         },
         search: {
             placeholder: texts.registerMessage.searchItem,
