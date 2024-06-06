@@ -1,15 +1,16 @@
 import { useEffect, useState, useRef } from "react"
 import { Toaster } from "sonner";
-import { tipo_documentos } from "../../utils/API.jsx";
+import { generos } from "../../utils/API.jsx";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx"
+import {formatoNumero} from "../../utils/process.jsx"
 import Navbar from "../../components/navbar/Navbar"
 import Table from "../../components/table/Table"
 import texts from "../../context/text_es.js";
 
 function Generos() {
-    const [listTipo_Documentos, setTipo_Documentos] = useState([])
-    const [dataTipo_Documentos, setDataTipo_Documentos] = useState({ pages: 0, total: 0 })
+    const [listGeneros, setGeneros] = useState([])
+    const [dataGeneros, setDataGeneros] = useState({ pages: 0, total: 0 })
     const [tableLoading, setTableLoaing] = useState(true)
     const renderizado = useRef(0)
 
@@ -17,24 +18,24 @@ function Generos() {
     useEffect(() => {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
-            getTipo_Documentos()
+            getGenero()
             return
         }
     }, [])
 
-    const getTipo_Documentos = () => {
+    const getGenero = () => {
         getListItems({
-            object: tipo_documentos,
-            setList: setTipo_Documentos,
-            setData: setDataTipo_Documentos,
+            object: generos,
+            setList: setGeneros,
+            setData: setDataGeneros,
             setLoading: setTableLoaing
         })
     }
 
     const columns = [
         {
-            name: "Item",
-            row: (row) => { return row.id }
+            name: "Codigo",
+            row: (row) => { const codigo = formatoNumero(Number(row.id)); return codigo}
         },
         {
             name: "Nombre",
@@ -50,8 +51,8 @@ function Generos() {
         delete: (row) => {
             deleteItem({
                 row: row,
-                objet: tipo_documentos,
-                functionGet: getTipo_Documentos()
+                objet: generos,
+                functionGet: getGenero()
             })
         },
         search: {
@@ -59,13 +60,13 @@ function Generos() {
             function: (value) => {
                 searchCode({
                     value: value,
-                    object: tipo_documentos,
-                    setList: setTipo_Documentos
+                    object: generos,
+                    setList: setGeneros
                 })
             }
         },
         register: {
-            name: texts.registerMessage.buttonRegisterTipoDocumento,
+            name: texts.registerMessage.buttonRegisterGenero,
             function: () => {
                 navigate("/register/genero")
             }
@@ -77,9 +78,9 @@ function Generos() {
 
             <Table
                 columns={columns}
-                rows={listTipo_Documentos}
-                totalElements={dataTipo_Documentos.total}
-                totalPages={dataTipo_Documentos.pages}
+                rows={listGeneros}
+                totalElements={dataGeneros.total}
+                totalPages={dataGeneros.pages}
                 options={options}
                 loading={tableLoading}
             />

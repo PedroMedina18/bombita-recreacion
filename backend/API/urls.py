@@ -33,7 +33,8 @@ urlpatterns=[
     path('personas/<int:tipo_documento>/<int:documento>/', Persona_Views.as_view(), name='personas'),
     path('usuarios/', Usuario_Views.as_view(), name='usuarios'),
     path('recreadores/', Recreadores_Views.as_view(), name='recreadores'),
-    path('recreadores/<str:identificador>', Recreadores_Views.as_view(), name='recreadores'),
+    path('recreadores/<int:id>/', Recreadores_Views.as_view(), name='recreadores'),
+    path('recreadores/<str:identificador>/', Recreadores_Views.as_view(), name='recreadores'),
     path('login/', Login.as_view(), name='login'),
     path('verify/', Verify_Token_Views.as_view(), name='verify'),
 ]

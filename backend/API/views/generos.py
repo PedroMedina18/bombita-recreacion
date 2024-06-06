@@ -19,17 +19,17 @@ class Genero_Views(View):
     def post(self, request):
         try:
             req = json.loads(request.body)
-            verify = verify_token(req["headers"])
-            req = req["body"]
-            if (not verify["status"]):
+            verify = verify_token(req['headers'])
+            req = req['body']
+            if (not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"],
+                    'status': False,
+                    'message': verify['message'],
                 }
                 return JsonResponse(datos)
             Generos.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'])
             datos = {
-                "status": True,
+                'status': True,
                 'message': "Registro de genero completado"
             }
             return JsonResponse(datos)
@@ -37,7 +37,7 @@ class Genero_Views(View):
         except Exception as error:
             print(f"Error consulta post - {error}", )
             datos = {
-                "status": False,
+                'status': False,
                 'message': f"Error al registrar: {error}"
             }
             return JsonResponse(datos)
@@ -45,12 +45,12 @@ class Genero_Views(View):
     def put(self, request, id):
         try:
             req = json.loads(request.body)
-            verify=verify_token(req["headers"])
-            req = req["body"]
-            if(not verify["status"]):
+            verify=verify_token(req['headers'])
+            req = req['body']
+            if(not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"],
+                    'status': False,
+                    'message': verify['message'],
                 }
                 return JsonResponse(datos)
             genero = list(Generos.objects.filter(id=id).values())
@@ -60,19 +60,19 @@ class Genero_Views(View):
                 genero.descripcion = req['descripcion']
                 genero.save()
                 datos = {
-                    "status": True,
+                    'status': True,
                     'message': "Exito. Registro editado"
                 }
             else:
                 datos = {
-                    "status": False,
+                    'status': False,
                     'message': "Error. Registro no encontrado"
                 }
             return JsonResponse(datos)
         except Exception as error:
             print(f"Error de consulta put - {error}")
             datos = {
-                "status": False,
+                'status': False,
                 'message': f"Error al editar: {error}",
             }
             return JsonResponse(datos)
@@ -80,36 +80,36 @@ class Genero_Views(View):
     def delete(self, request, id):
         try:
             verify=verify_token(request.headers)
-            if(not verify["status"]):
+            if(not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"]
+                    'status': False,
+                    'message': verify['message']
                 }
                 return JsonResponse(datos)
             genero = list(Generos.objects.filter(id=id).values())
             if len(genero) > 0:
                 Generos.objects.filter(id=id).delete()
                 datos = {
-                    "status": True,
+                    'status': True,
                     'message': "Registro eliminado"
                 }
             else:
                 datos  = {
-                    "status": False,
+                    'status': False,
                     'message': "Registro no encontrado"
                 }
             return JsonResponse(datos)
         except models.ProtectedError as error:
             print(f"Error de proteccion  - {str(error)}")
             datos = {
-                "status": False,
+                'status': False,
                 'message': "Error. Item protejido no se puede eliminar"
             }
             return JsonResponse(datos)
         except Exception as error:
             print(f"Error consulta delete - {error}", )
             datos = {
-                "status": False,
+                'status': False,
                 'message': f"Error al eliminar: {error}"
             }
             return JsonResponse(datos)
@@ -118,11 +118,11 @@ class Genero_Views(View):
         try:
             cursor = connection.cursor()
             verify=verify_token(request.headers)
-            if(not verify["status"]):
+            if(not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"],
-                    "data": None
+                    'status': False,
+                    'message': verify['message'],
+                    'data': None
                 }
                 return JsonResponse(datos)
             if (id > 0):
@@ -133,18 +133,18 @@ class Genero_Views(View):
                 genero = dictfetchall(cursor)
                 if(len(genero)>0):
                     datos = {
-                        "status": True,
+                        'status': True,
                         'message': "Exito",
-                        "data": genero[0]
+                        'data': genero[0]
                     }
                 else:
                     datos = {
-                        "status": False,
+                        'status': False,
                         'message': "Genero no encontrado",
-                        "data": None
+                        'data': None
                     }
             else:
-                if("all" in request.GET and request.GET["all"]=="true"):
+                if("all" in request.GET and request.GET['all']=="true"):
                     query = """
                     SELECT * FROM generos ORDER BY id ASC;
                     """
@@ -154,13 +154,13 @@ class Genero_Views(View):
                     query = """
                     SELECT * FROM generos ORDER BY id ASC id LIMIT %s, %s;
                     """
-                    cursor.execute(query, [indiceInicial(int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
+                    cursor.execute(query, [indiceInicial(int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                     generos = dictfetchall(cursor)
-                elif("page" in request.GET and "desc" in request.GET and request.GET["desc"]=="true"):
+                elif("page" in request.GET and "desc" in request.GET and request.GET['desc']=="true"):
                     query = """
                     SELECT * FROM generos ORDER BY id DESC LIMIT %s, %s;
                     """
-                    cursor.execute(query, [indiceInicial(int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
+                    cursor.execute(query, [indiceInicial(int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                     generos = dictfetchall(cursor)
                 else:
                     query = """
@@ -176,17 +176,17 @@ class Genero_Views(View):
                 result = dictfetchall(cursor)
                 if len(generos)>0:
                     datos = {
-                        "status": True,
+                        'status': True,
                         'message': "Exito",
-                        "data": generos,
-                        "pages": int(result[0]["pages"]),
-                        "total":result[0]["total"],
+                        'data': generos,
+                        "pages": int(result[0]['pages']),
+                        "total":result[0]['total'],
                     }
                 else:
                     datos = {
-                        "status": False,
+                        'status': False,
                         'message': "Error. No se encontraron registros",
-                        "data": None,
+                        'data': None,
                         "pages": None,
                         "total":0
                     }
@@ -194,9 +194,9 @@ class Genero_Views(View):
         except Exception as error:
             print(f"Error consulta get - {error}")
             datos = {
-                "status": False,
+                'status': False,
                 'message': f"Error de consulta: {error}",
-                "data": None,
+                'data': None,
                 "pages": None,
                 "total":0
             }

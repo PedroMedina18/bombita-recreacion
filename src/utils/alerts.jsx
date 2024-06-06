@@ -1,6 +1,6 @@
 import Swal from 'sweetalert2';
 import { toast } from "sonner";
-
+import {formatDateWithTime12Hour, formatoNumero} from "./process.jsx"
 export const alertConfim = async (title, text) => {
     return Swal.fire({
         title: `${title}`,
@@ -18,7 +18,7 @@ export const alertConfim = async (title, text) => {
         cancelButtonColor: "rgb(var(--secundario))",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "rgb(var(--principal))",
-        width: "90%",
+        width: "70%",
         allowOutsideClick: false,
     })
 }
@@ -36,10 +36,45 @@ export const alertAceptar = async (title, text) => {
         icon: "success",
         confirmButtonText: "Aceptar",
         confirmButtonColor: "rgb(var(--principal))",
-        width: "90%",
+        width: "70%",
         allowOutsideClick: false,
     })
 }
+
+export const alertInfo = async (title, data) => {
+    return Swal.fire({
+        title: `${title}`,
+        showCloseButton: true,
+        color: "black",
+        html: `
+        <div class='p-2 d-flex flex-column justify-content-start align-items-start'>
+            <p class="m-0 mb-2"><b>Codigo: </b>${formatoNumero(data.id)}</p>
+            <p class="m-0 mb-2"><b>Descripción: </b>${data.descripcion}</p>
+            <p class="m-0 mb-2"><b>Fecha de Registro: </b>${formatDateWithTime12Hour(data.fecha_actualizacion)}</p>
+            <p class="m-0 mb-2"><b>Fecha de Actualización: </b>${formatDateWithTime12Hour(data.fecha_registro)}</p>
+        </div>
+        `,
+        customClass: {
+            title: "h1 fw-bold text-black",
+            confirmButton: "px-5 py-3 mx-3 fs-6 fw-bold",
+        },
+        confirmButtonText: "Aceptar",
+        confirmButtonColor: "rgb(var(--principal))",
+        showCancelButton: false,
+        width: "50%",
+        allowOutsideClick: true,
+    })
+}
+// export const alertInfo = async (title) => {
+//     return (
+//         <div className='p-2'>
+//             <p><b>Codigo: </b></p>
+//             <p><b>Descripción: </b></p>
+//             <p><b>Fecha de Registro: </b></p>
+//             <p><b>Fecha de Actualización: </b></p>
+//         </div>
+//     )
+// }
 
 export const alertLoading = async (message) => {
     return Swal.fire({

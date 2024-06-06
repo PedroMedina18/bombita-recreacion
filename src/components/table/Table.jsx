@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { ButtonSimple } from "../button/Button.jsx"
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
-import {IconCheck, IconX, IconTrash, IconEdit} from "../Icon"
+import {IconCheck, IconX, IconTrash, IconEdit, IconDetail} from "../Icon"
 
 function Table({ columns, rows, totalPages, totalElements = 0, options = null, loading = true }) {
     const [pages, setPages] = useState(1)
@@ -77,6 +77,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                             <table className='table-data'>
                                 <thead>
                                     <tr>
+                                        <th scope="col">N°</th>
                                         {
                                             columns.map((column, index) => (
                                                 <th key={`${index}-${column.name}`} scope="col">{column.name}</th>
@@ -140,6 +141,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                             :
                                             rows.map((row, index) => (
                                                 <tr key={`row-${index}`}>
+                                                    <td key={`N°-${index}`}>{index+1}</td>
                                                     {
                                                         columns.map((column, index) => {
                                                             if (column.row(row) === true) {
@@ -158,18 +160,24 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                                                 <div className='d-flex justify-content-around'>
 
                                                                     {
+                                                                        options.get ?
+                                                                            (<IconDetail onClick={() => { options.get(row) }} className='cursor-pointer eliminate'/>)
+                                                                            :
+                                                                            ("")
+                                                                    }
+                                                                    {
                                                                         options.delete ?
-                                                                            (<IconTrash onClick={() => { options.delete(row) }} className='me-1 cursor-pointer eliminate'/>)
+                                                                            (<IconTrash onClick={() => { options.delete(row) }} className='cursor-pointer eliminate'/>)
                                                                             :
                                                                             ("")
                                                                     }
                                                                     {
                                                                         options.put ?
-                                                                            (<IconEdit className='ms-1 cursor-pointer edit'/>)
+                                                                            (<IconEdit onClick={() => { options.put(row) }} className='cursor-pointer edit'/>)
                                                                             :
                                                                             ("")
                                                                     }
-
+                                                                    
                                                                 </div>
                                                             </td>)
                                                             :

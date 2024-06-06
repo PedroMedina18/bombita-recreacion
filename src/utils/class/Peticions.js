@@ -46,6 +46,18 @@ export default class Petisions{
         })
     }
 
+    async postData(data){
+        const token=getCookie("token")
+        return API.request(`${this.params}/`, {
+            method: 'POST',
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "Authorization": `Bearer ${token}`
+            },
+            data:data
+        })
+    }
+
     async delete(code){
         const token=getCookie("token")
         return API.delete(`${this.params}/${code}/`, {

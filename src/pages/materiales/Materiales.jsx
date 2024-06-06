@@ -3,6 +3,7 @@ import { materiales } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import {deleteItem, searchCode, getListItems} from "../../utils/actions.jsx"
+import {formatoNumero} from "../../utils/process.jsx"
 import Navbar from "../../components/navbar/Navbar"
 import Table from "../../components/table/Table"
 import texts from "../../context/text_es.js";
@@ -34,8 +35,8 @@ function Materiales() {
 
     const columns = [
         {
-            name: "Item",
-            row: (row) => { return row.id }
+            name: "Codigo",
+            row: (row) => { const codigo = formatoNumero(Number(row.id)); return codigo}
         },
         {
             name: "Nombre",

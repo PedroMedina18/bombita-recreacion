@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom'
 import { InputsGeneral, InputTextTarea } from "../../components/input/Input"
 import { ButtonSimple } from "../../components/button/Button"
-import { tipo_documentos } from "../../utils/API.jsx";
+import { generos } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../utils/alerts.jsx"
 import { Toaster } from "sonner";
 import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx"
@@ -35,11 +35,11 @@ function Form_Tipo_Generos() {
                         descripcion: data.descripcion,
                     }
                     alertLoading("Cargando")
-                    const res = await tipo_documentos.post(body)
+                    const res = await generos.post(body)
                     controlResultPost({
                         respuesta:res, 
                         messageExito:texts.successMessage.tipoDocumento, 
-                        useNavigate:{navigate:navigate, direction:"/tipo_documentos"}
+                        useNavigate:{navigate:navigate, direction:"/generos"}
                     })
                 }
 
@@ -53,7 +53,7 @@ function Form_Tipo_Generos() {
 
     return (
         <Navbar name={texts.pages.registerGenero.name} descripcion={texts.pages.registerGenero.description}>
-            <ButtonSimple type="button" className="mb-2" onClick={()=>{navigate("/tipo_documentos")}}> <IconRowLeft/> Regresar</ButtonSimple>
+            <ButtonSimple type="button" className="mb-2" onClick={()=>{navigate("/generos")}}> <IconRowLeft/> Regresar</ButtonSimple>
 
             <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
                 <form className="w-100 d-flex flex-column"

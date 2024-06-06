@@ -22,16 +22,16 @@ class Servicios_Views(View):
     def post(self, request,):
         try:
             req = json.loads(request.body)
-            verify = verify_token(req["headers"])
-            req = req["body"]
-            if (not verify["status"]):
+            verify = verify_token(req['headers'])
+            req = req['body']
+            if (not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"],
+                    'status': False,
+                    'message': verify['message'],
                 }
                 return JsonResponse(datos)
-            duracion = datetime.timedelta(hours=req["duracion"]["horas"], minutes=req["duracion"]["minutos"])
-            servicio = Servicios.objects.create(nombre=req["nombre"], precio=req["precio"], numero_recreadores=req["numero_recreadores"], descripcion=req["descripcion"], duracion=duracion)
+            duracion = datetime.timedelta(hours=req['duracion']['horas'], minutes=req['duracion']['minutos'])
+            servicio = Servicios.objects.create(nombre=req['nombre'], precio=req['precio'], numero_recreadores=req['numero_recreadores'], descripcion=req['descripcion'], duracion=duracion)
                 
             recreadores = req['recreadores']
             for recreador in recreadores:
@@ -45,18 +45,18 @@ class Servicios_Views(View):
 
             materiales = req['materiales']
             for material in materiales:
-                newMteriales = Materiales.objects.get(id=int(material["material"]))
-                ServiciosMateriales.objects.create(material=newMteriales, servicio=servicio, cantidad=material["cantidad"])
+                newMteriales = Materiales.objects.get(id=int(material['material']))
+                ServiciosMateriales.objects.create(material=newMteriales, servicio=servicio, cantidad=material['cantidad'])
             
             datos = {
-                "status": True,
+                'status': True,
                 'message': "Registro de servicio completado"
             }
             return JsonResponse(datos)
         except Exception as error:
             print(f"Error consulta post - {error}", )
             datos = {
-                "status": False,
+                'status': False,
                 'message': f"Error al registrar: {error}"
             }
             return JsonResponse(datos)
@@ -64,15 +64,15 @@ class Servicios_Views(View):
     def put(self, request, id):
         try:
             req = json.loads(request.body)
-            verify = verify_token(req["headers"])
-            req = req["body"]
-            if (not verify["status"]):
+            verify = verify_token(req['headers'])
+            req = req['body']
+            if (not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"],
+                    'status': False,
+                    'message': verify['message'],
                 }
                 return JsonResponse(datos)
-            duracion = datetime.timedelta(hours=req["duracion"]["horas"], minutes=req["duracion"]["minutos"])
+            duracion = datetime.timedelta(hours=req['duracion']['horas'], minutes=req['duracion']['minutos'])
             servicio = list(Servicios.objects.filter(id=id).values())
             cursor = connection.cursor()
             if len(servicio) > 0:
@@ -81,7 +81,7 @@ class Servicios_Views(View):
                 servicio.descripcion = req['descripcion']
                 servicio.precio = req['precio']
                 servicio.duracion = duracion
-                servicio.numero_recreadores = req["numero_recreadores"]
+                servicio.numero_recreadores = req['numero_recreadores']
                 servicio.save()
                 
                 recreadores = req['recreadores']
@@ -164,12 +164,12 @@ class Servicios_Views(View):
                 )
 
                 datos = {
-                    "status": True,
+                    'status': True,
                     'message': "Exito. Registro editado"
                 }
             else:
                 datos = {
-                    "status": False,
+                    'status': False,
                     'message': "Error. Registro no encontrado"
                 }
             
@@ -177,7 +177,7 @@ class Servicios_Views(View):
         except Exception as error:
             print(f"Error de consulta put - {error}")
             datos = {
-                "status": False,
+                'status': False,
                 'message': f"Error al editar: {error}",
             }
             return JsonResponse(datos)
@@ -185,36 +185,36 @@ class Servicios_Views(View):
     def delete(self, request, id):
         try:
             verify=verify_token(request.headers)
-            if(not verify["status"]):
+            if(not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"]
+                    'status': False,
+                    'message': verify['message']
                 }
                 return JsonResponse(datos)
             servicio = list(Servicios.objects.filter(id=id).values())
             if len(servicio) > 0:
                 Servicios.objects.filter(id=id).delete()
                 datos = {
-                    "status": True,
+                    'status': True,
                     'message': "Registro Eliminado"
                 }
             else:
                 datos  = {
-                    "status": False,
+                    'status': False,
                     'message': "Registro no encontrado"
                 }
             return JsonResponse(datos)
         except models.ProtectedError as error:
             print(f"Error de proteccion  - {str(error)}")
             datos = {
-                "status": False,
+                'status': False,
                 'message': "Error. Item protejido no se puede eliminar"
             }
             return JsonResponse(datos)
         except Exception as error:
             print(f"Error consulta delete - {error}", )
             datos = {
-                "status": False,
+                'status': False,
                 'message': f"Error al eliminar: {error}"
             }
             return JsonResponse(datos)
@@ -223,11 +223,11 @@ class Servicios_Views(View):
         try:
             cursor = connection.cursor()
             verify = verify_token(request.headers)
-            if (not verify["status"]):
+            if (not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"],
-                    "data": None
+                    'status': False,
+                    'message': verify['message'],
+                    'data': None
                 }
                 return JsonResponse(datos)
 
@@ -239,18 +239,18 @@ class Servicios_Views(View):
                 servicio = dictfetchall(cursor)
                 if (len(servicio) > 0):
                     datos = {
-                        "status": True,
+                        'status': True,
                         'message': "Exito",
-                        "data": servicio[0]
+                        'data': servicio[0]
                     }
                 else:
                     datos = {
-                        "status": False,
+                        'status': False,
                         'message': "Servicio no encontrado",
-                        "data": None
+                        'data': None
                     }
             else:
-                if ("all" in request.GET and request.GET["all"] == "true"):
+                if ("all" in request.GET and request.GET['all'] == "true"):
                     query = """
                     SELECT * FROM servicios ORDER BY id ASC;
                     """
@@ -261,14 +261,14 @@ class Servicios_Views(View):
                     SELECT * FROM servicios ORDER BY id ASC id LIMIT %s, %s;
                     """
                     cursor.execute(query, [indiceInicial(
-                        int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
+                        int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                     servicios = dictfetchall(cursor)
-                elif ("page" in request.GET and "desc" in request.GET and request.GET["desc"] == "true"):
+                elif ("page" in request.GET and "desc" in request.GET and request.GET['desc'] == "true"):
                     query = """
                     SELECT * FROM servicios ORDER BY id DESC LIMIT %s, %s;
                     """
                     cursor.execute(query, [indiceInicial(
-                        int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
+                        int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                     servicios = dictfetchall(cursor)
                 else:
                     query = """
@@ -281,22 +281,22 @@ class Servicios_Views(View):
                     SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM servicios;
                 """
                 for servicio in servicios:
-                    servicio["duracion"]=duration(servicio["duracion"])
+                    servicio['duracion']=duration(servicio['duracion'])
                 cursor.execute(query)
                 result = dictfetchall(cursor)
                 if len(servicios) > 0:
                     datos = {
-                        "status": True,
+                        'status': True,
                         'message': "Exito",
-                        "data": servicios,
-                        "pages": int(result[0]["pages"]),
-                        "total": result[0]["total"],
+                        'data': servicios,
+                        "pages": int(result[0]['pages']),
+                        "total": result[0]['total'],
                     }
                 else:
                     datos = {
-                        "status": False,
+                        'status': False,
                         'message': "Error. No se encontraron registros",
-                        "data": None,
+                        'data': None,
                         "pages": None,
                         "total": 0
                     }
@@ -304,9 +304,9 @@ class Servicios_Views(View):
         except Exception as error:
             print(f"Error consulta get - {error}")
             datos = {
-                "status": False,
+                'status': False,
                 'message': f"Error de consulta: {error}",
-                "data": None,
+                'data': None,
                 "pages": None,
                 "total":0
             }

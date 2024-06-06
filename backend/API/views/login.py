@@ -38,20 +38,20 @@ class Login(View):
             usuario=dictfetchall(cursor)
             if(len(usuario)>0):
                 # se comprueba de que la contraseña este correcta
-                contraseña = desencriptado_contraseña(usuario[0]["contraseña"], jd['contraseña'])
+                contraseña = desencriptado_contraseña(usuario[0]['contraseña'], jd['contraseña'])
                 if(contraseña):
-                    # user_administrador=Cargos.objects.filter(id=usuario[0]["cargo_id"]).values("administrador")
-                    # if(user_administrador[0]["administrador"]):
-                    #     token=new_token(usuario[0], None, user_administrador[0]["administrador"])
+                    # user_administrador=Cargos.objects.filter(id=usuario[0]['cargo_id']).values("administrador")
+                    # if(user_administrador[0]['administrador']):
+                    #     token=new_token(usuario[0], None, user_administrador[0]['administrador'])
                     #     response={
                     #         'status':True,
                     #         'message': "Acceso permitido", 
-                    #         'token':token["token"], 
-                    #         "data":{
-                    #             "nombre":usuario[0]["nombre"], 
-                    #             "cargo":usuario[0]["cargo"], 
-                    #             "usuario":usuario[0]["usuario"],
-                    #             "administador":user_administrador[0]["administrador"],
+                    #         'token':token['token'], 
+                    #         'data':{
+                    #             "nombre":usuario[0]['nombre'], 
+                    #             "cargo":usuario[0]['cargo'], 
+                    #             "usuario":usuario[0]['usuario'],
+                    #             "administador":user_administrador[0]['administrador'],
                     #             "permisos": None
                     #         }
                     #     }
@@ -71,19 +71,19 @@ class Login(View):
                     #     WHERE 
                     #         c.id = %s;
                     #     """
-                    #     cursor.execute(query, [int(usuario[0]["cargo_id"])])
+                    #     cursor.execute(query, [int(usuario[0]['cargo_id'])])
                     #     permisos=dictfetchall(cursor)
-                    # token=new_token(usuario[0], [permiso["id"] for permiso in permisos], False)
+                    # token=new_token(usuario[0], [permiso['id'] for permiso in permisos], False)
                     token=new_token(usuario[0])
                     response={
                         'status':True,
                         'message': "Acceso permitido", 
-                        'token':token["token"], 
-                        "data":{
-                            "id":usuario[0]["id"],
-                            "nombre":usuario[0]["nombre"],
-                            "cargo":usuario[0]["cargo"],
-                            "inicio_sesion":datetime.now()
+                        'token':token['token'], 
+                        'data':{
+                            'id':usuario[0]['id'],
+                            'nombre':usuario[0]['nombre'],
+                            'cargo':usuario[0]['cargo'],
+                            'inicio_sesion':datetime.now()
                         }
                     }
                     return JsonResponse(response)
@@ -91,7 +91,7 @@ class Login(View):
                     response={
                         'status':False, 
                         'message': "Usuario o contraseña incorrecta por favor verifique", 
-                        "token":None, 
+                        'token':None, 
                         'data':None
                     }
                     return JsonResponse(response)
@@ -99,7 +99,7 @@ class Login(View):
                 response={
                     'status':False, 
                     'message': "Usuario o contraseña incorrecta por favor verifique", 
-                    "token":None, 
+                    'token':None, 
                     'data':None
                 }
                 return JsonResponse(response)
@@ -108,7 +108,7 @@ class Login(View):
             datos = {
                 'status':False,
                 'message': 'Error en el sistema. Intente mas tarde', 
-                "token":None, 
+                'token':None, 
                 'data':None}
             return JsonResponse(datos)
         finally:

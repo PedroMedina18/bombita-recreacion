@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { LoaderCircle } from "../../components/loader/Loader";
 import { useNavigate } from 'react-router-dom'
 import { Toaster } from "sonner";
-import { niveles, tipo_documentos, recreadores } from "../../utils/API.jsx";
+import { niveles, tipo_documentos, recreadores, generos } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../utils/alerts.jsx";
 import { hasLeadingOrTrailingSpace, calcularEdad } from "../../utils/process.jsx";
 import { habilitarEdicion, verifyOptionsSelect, getPersona, controlResultPost } from "../../utils/actions.jsx"
@@ -14,10 +14,12 @@ import texts from "../../context/text_es.js";
 import Navbar from "../../components/navbar/Navbar"
 import pattern from "../../context/pattern.js"
 import { IconRowLeft } from "../../components/Icon"
+import Swal from 'sweetalert2';
 
 function Form_Recreadores() {
     const [data_tipo_documentos, setTipoDocumentos] = useState([])
     const [data_niveles, setNiveles] = useState([])
+    const [data_generos, setGeneros] = useState([])
     const [loading, setLoading] = useState(true)
     const [errorServer, setErrorServer] = useState("")
     const [dataNewUser, setdataNewUser] = useState({ tipo_documento: null, numero_documento: null })
@@ -35,6 +37,7 @@ function Form_Recreadores() {
         try {
             const get_niveles = await niveles.get()
             const get_tipo_documentos = await tipo_documentos.get()
+            const get_generos = await generos.get()
             verifyOptionsSelect({
                 respuesta: get_niveles,
                 setError: setErrorServer,
@@ -44,6 +47,11 @@ function Form_Recreadores() {
                 respuesta: get_tipo_documentos,
                 setError: setErrorServer,
                 setOptions: setTipoDocumentos
+            })
+            verifyOptionsSelect({
+                respuesta: get_generos,
+                setError: setErrorServer,
+                setOptions: setGeneros
             })
         } catch (error) {
             console.log(error)
@@ -66,39 +74,40 @@ function Form_Recreadores() {
     const onSubmit = handleSubmit(
         async (data) => {
             try {
-                const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirRegister)
-                console.log(data)
-                if (confirmacion.isConfirmed) {
-                    let body
-                    if (data.id_persona) {
-                        body = {
-                            id_persona: data.id_persona,
-                            fecha_nacimiento: data.fecha_nacimiento,
-                            nivel: Number(data.nivel)
-                        }
-                    } else {
-                        body = {
-                            nombres: data.nombres,
-                            apellidos: data.apellidos,
-                            numero_documento: data.numero_documento,
-                            tipo_documento: Number(data.tipo_documento),
-                            telefono_principal: Number(data.telefono_principal),
-                            telefono_secundario: Number(data.telefono_secundario),
-                            correo: data.correo,
-                            fecha_nacimiento: data.fecha_nacimiento,
-                            nivel: Number(data.nivel)
-                        }
-                    }
-                    alertLoading("Cargando")
-                    const res = await recreadores.post(body)
-                    controlResultPost({
-                        respuesta: res,
-                        messageExito: texts.successMessage.recreador,
-                        useNavigate: { navigate: navigate, direction: "/recreadores" }
-                    })
+            const $archivo = document.getElementById(`foto_perfil`).files[0]
+            const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirRegister)
+            if (confirmacion.isConfirmed) {
+                const Form = new FormData()
+                if (Form.id_persona) {
+                    Form.append('id_persona', data.id_persona)
+                    Form.append('fecha_nacimiento', data.fecha_nacimiento)
+                    Form.append('nivel', data.nivel)
+                    Form.append('genero', data.genero)
+                    Form.append('img_perfil', $archivo?$archivo:null)
+                } else {
+                    Form.append('nombres', data.nombres)
+                    Form.append('apellidos', data.apellidos)
+                    Form.append('numero_documento', data.numero_documento)
+                    Form.append('tipo_documento', Number(data.tipo_documento))
+                    Form.append('telefono_principal', Number(data.telefono_principal))
+                    Form.append('telefono_secundario', Number(data.telefono_secundario))
+                    Form.append('correo', data.correo)
+                    Form.append('fecha_nacimiento', data.fecha_nacimiento)
+                    Form.append('nivel', Number(data.nivel))
+                    Form.append('genero', Number(data.genero))
+                    Form.append('img_perfil', $archivo?$archivo:null)
                 }
-
+                alertLoading("Cargando")
+                const res = await recreadores.postData(Form)
+                controlResultPost({
+                    respuesta: res,
+                    messageExito: texts.successMessage.recreador,
+                    useNavigate: { navigate: navigate, direction: "/recreadores" }
+                })
+            }
             } catch (error) {
+                console.log(error)
+                Swal.close()
                 toastError(texts.errorMessage.errorConexion)
             }
         }
@@ -126,7 +135,7 @@ function Form_Recreadores() {
                         (
                             //* Sección principal
                             <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
-                                <form className="w-100 d-flex flex-column"
+                                <form className="w-100 d-flex flex-column" encType="multiport/form-data"
                                     onSubmit={onSubmit}>
                                     {/* Esta seccion se encarga de verificar que no haya personas repetidas */}
                                     <input type="number" className="d-none"
@@ -221,7 +230,8 @@ function Form_Recreadores() {
 
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-50 pe-0 pe-md-3">
-                                            <InputsGeneral type={"text"} label={`${texts.label.namesRecreador}`} name="nombres" id="nombres" form={{ errors, register }}
+                                            <InputsGeneral type={"text"} label={`${texts.label.namesRecreador}`} 
+                                                name="nombres" id="nombres" form={{ errors, register }}
                                                 params={{
                                                     required: {
                                                         value: true,
@@ -253,7 +263,8 @@ function Form_Recreadores() {
                                             />
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
-                                            <InputsGeneral type={"text"} label={`${texts.label.lastNamesRecreador}`} name="apellidos" id="apellidos" form={{ errors, register }}
+                                            <InputsGeneral type={"text"} label={`${texts.label.lastNamesRecreador}`} 
+                                                name="apellidos" id="apellidos" form={{ errors, register }}
                                                 params={{
                                                     required: {
                                                         value: true,
@@ -287,7 +298,8 @@ function Form_Recreadores() {
                                     </div>
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-50 pe-0 pe-md-3">
-                                            <InputsGeneral type={"date"} label={`${texts.label.birthDate}`} name="fecha_nacimiento" id="fecha_nacimiento" form={{ errors, register }}
+                                            <InputsGeneral type={"date"} label={`${texts.label.birthDate}`} 
+                                                name="fecha_nacimiento" id="fecha_nacimiento" form={{ errors, register }}
                                                 max={`${fechaActual.getFullYear()}-${(fechaActual.getMonth() + 1) < 10 ? `0${fechaActual.getMonth() + 1}` : `${fechaActual.getMonth() + 1}`}-${fechaActual.getDate() < 10 ? `0${fechaActual.getDate()}` : fechaActual.getDate()}`}
                                                 params={{
                                                     required: {
@@ -307,7 +319,7 @@ function Form_Recreadores() {
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
                                             <UnitSelect label={texts.label.genero} name="genero" id="genero" form={{ errors, register }}
-                                                options={data_tipo_documentos}
+                                                options={data_generos}
                                                 params={{
                                                     validate: (value) => {
                                                         if ((value === "")) {
@@ -333,7 +345,6 @@ function Form_Recreadores() {
                                                         })
                                                     }
                                                 }
-                                                disabled={disabledInputs}
 
                                             />
                                         </div>
