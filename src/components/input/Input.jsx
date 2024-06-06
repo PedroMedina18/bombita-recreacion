@@ -401,7 +401,7 @@ export function InputImgPerfil({ label, id, name, form, tamaño="lg" }) {
   
 
   const cambio_imagen=(e)=>{
-    const $IMG=document.getElementById("img-perfil-cecreador")
+    const $IMG=document.getElementById("img-perfil-creador")
     const $SvgPerfil=document.getElementById("svg-perfil")
     const $sectionPerfil=document.getElementById("sectionPerfil")
     if(e.target.files[0]){
@@ -426,7 +426,7 @@ export function InputImgPerfil({ label, id, name, form, tamaño="lg" }) {
     <div className={`w-100 d-flex flex-column align-items-center justify-content-center ${errors[name] && isError ? "error" : " "}`}>
       <div className={`${tamaño=="sm"? 'sm':'lg'} section-perfil d-flex align-items-center justify-content-center`} id="sectionPerfil">
         <IconUserCircleSolid id="svg-perfil"/>
-        <img id="img-perfil-cecreador" src={img} alt="img_perfil" className={`${tamaño=="sm"? 'sm':'lg'} img-perfil d-none`}/>
+        <img id="img-perfil-creador" src={img} alt="img_perfil" className={`${tamaño=="sm"? 'sm':'lg'} img-perfil d-none`}/>
       </div>
       <label className="button-initial cursor-pointer" htmlFor={name}>
         {label}

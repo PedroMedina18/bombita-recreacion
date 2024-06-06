@@ -41,3 +41,31 @@ export const errorAxios = async (error) => {
     return ('Error', error.message)
   }
 }
+
+export const formatoNumero = (numero) => {
+  const strNumero = numero.toString();
+  const longitud = strNumero.length;
+
+  if (longitud < 4) {
+    let ceros = '';
+    for (let i = 0; i < 4 - longitud; i++) {
+      ceros += '0';
+    }
+    return ceros + strNumero;
+  } else {
+    return strNumero;
+  }
+}
+
+export function formatDateWithTime12Hour(date) {
+  const fecha = new Date(date);
+  const options = {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  };
+  return new Intl.DateTimeFormat('es-ES', options).format(fecha);
+}

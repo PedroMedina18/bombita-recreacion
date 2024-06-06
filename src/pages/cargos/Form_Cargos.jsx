@@ -57,16 +57,17 @@ function Cargos() {
         async (data) => {
             try {
                 const permisos = selectOptions.map((elements) => { return elements.value })
+                const $archivo = document.getElementById(`icono`).files[0]
                 const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirRegister)
                 if (confirmacion.isConfirmed) {
-                    const body = {
-                        nombre: data.nombre,
-                        descripcion: data.descripcion,
-                        administrador: data.administrador,
-                        permisos: permisos
-                    }
+                    const Form = new FormData()
+                    Form.append('nombre', data.nombre)
+                    Form.append('descripcion', data.descripcion)
+                    Form.append('administrador', data.administrador)
+                    Form.append('permisos', permisos)
+                    Form.append('img_logo', $archivo?$archivo:null)
                     alertLoading("Cargando")
-                    const res = await cargos.post(body)
+                    const res = await cargos.postData(Form)
                     controlResultPost({
                         respuesta:res, 
                         messageExito:texts.successMessage.cargo,

@@ -3,12 +3,12 @@ from django.http.response import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
-from funtions.indice import indiceFinal, indiceInicial
-from funtions.serializador import dictfetchall
-from models import Actividades, MaterialesActividad, Materiales
+from ..funtions.indice import indiceFinal, indiceInicial
+from ..funtions.serializador import dictfetchall
+from ..models import Actividades, MaterialesActividad, Materiales
 from django.db import IntegrityError, connection, models
-from funtions.token import verify_token
-from context.message import MESSAGE
+from ..funtions.token import verify_token
+from ..message import MESSAGE
 import json
 
 # CRUD COMPLETO DE LA TABLA DE nivel
@@ -20,12 +20,12 @@ class Actividades_Views(View):
     def post(self, request):
         try:
             req = json.loads(request.body)
-            verify = verify_token(req["headers"])
-            req = req["body"]
-            if (not verify["status"]):
+            verify = verify_token(req['headers'])
+            req = req['body']
+            if (not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"],
+                    'status': False,
+                    'message': verify['message'],
                 }
                 return JsonResponse(datos)
             actividad = Actividades.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'])
@@ -35,28 +35,28 @@ class Actividades_Views(View):
                         new_material = Materiales.objects.get(id=int(material))
                         MaterialesActividad.objects.create(material=new_material, actividad=actividad)
                 datos = {
-                    "status": True,
-                    'message': f"{MESSAGE["registerActividad"]}"
+                    'status': True,
+                    'message': f"{MESSAGE['registerActividad']}"
                 }
             return JsonResponse(datos)
 
         except Exception as error:
-            print(f"{MESSAGE["errorPost"]} - {error}", )
+            print(f"{MESSAGE['errorPost']} - {error}", )
             datos = {
-                "status": False,
-                'message': f"{MESSAGE["errorRegistro"]}: {error}"
+                'status': False,
+                'message': f"{MESSAGE['errorRegistro']}: {error} "
             }
             return JsonResponse(datos)
 
     def put(self, request, id):
         try:
             req = json.loads(request.body)
-            verify=verify_token(req["headers"])
-            req = req["body"]
-            if(not verify["status"]):
+            verify=verify_token(req['headers'])
+            req = req['body']
+            if(not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"],
+                    'status': False,
+                    'message': verify['message'],
                 }
                 return JsonResponse(datos)
             actividad = list(Actividades.objects.filter(id=id).values())
@@ -66,57 +66,57 @@ class Actividades_Views(View):
                 actividad.descripcion = req['descripcion']
                 actividad.save()
                 datos = {
-                    "status": True,
-                    'message': f"{MESSAGE["edition"]}"
+                    'status': True,
+                    'message': f"{MESSAGE['edition']}"
                 }
             else:
                 datos = {
-                    "status": False,
-                    'message': f"{MESSAGE["errorRegistroNone"]}"
+                    'status': False,
+                    'message': f"{MESSAGE['errorRegistroNone']}"
                 }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"{MESSAGE["errorPut"]} - {error}")
+            print(f"{MESSAGE['errorPut']} - {error}")
             datos = {
-                "status": False,
-                'message': f"{MESSAGE["errorEdition"]}: {error}",
+                'status': False,
+                'message': f"{MESSAGE['errorEdition']}: {error}",
             }
             return JsonResponse(datos)
 
     def delete(self, request, id):
         try:
             verify=verify_token(request.headers)
-            if(not verify["status"]):
+            if(not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"]
+                    'status': False,
+                    'message': verify['message']
                 }
                 return JsonResponse(datos)
             actividad = list(Actividades.objects.filter(id=id).values())
             if len(actividad) > 0:
                 Actividades.objects.filter(id=id).delete()
                 datos = {
-                    "status": True,
-                    'message': f"{MESSAGE["delete"]}"
+                    'status': True,
+                    'message': f"{MESSAGE['delete']}"
                 }
             else:
                 datos  = {
-                    "status": False,
-                    'message': f"{MESSAGE["errorRegistroNone"]}"
+                    'status': False,
+                    'message': f"{MESSAGE['errorRegistroNone']}"
                 }
             return JsonResponse(datos)
         except models.ProtectedError as error:
-            print(f"{MESSAGE["errorProteccion"]}  - {str(error)}")
+            print(f"{MESSAGE['errorProteccion']}  - {str(error)}")
             datos = {
-                "status": False,
-                'message': f"{MESSAGE["errorProtect"]}"
+                'status': False,
+                'message': f"{MESSAGE['errorProtect']}"
             }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"{MESSAGE["errorDelete"]} - {error}", )
+            print(f"{MESSAGE['errorDelete']} - {error}", )
             datos = {
-                "status": False,
-                'message': f"{MESSAGE["errorEliminar"]}: {error}"
+                'status': False,
+                'message': f"{MESSAGE['errorEliminar']}: {error}"
             }
             return JsonResponse(datos)
 
@@ -124,11 +124,11 @@ class Actividades_Views(View):
         try:
             cursor = connection.cursor()
             verify=verify_token(request.headers)
-            if(not verify["status"]):
+            if(not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"],
-                    "data": None
+                    'status': False,
+                    'message': verify['message'],
+                    'data': None
                 }
                 return JsonResponse(datos)
             if (id > 0):
@@ -139,18 +139,18 @@ class Actividades_Views(View):
                 actividad = dictfetchall(cursor)
                 if(len(actividad)>0):
                     datos = {
-                        "status": True,
-                        'message': f"{MESSAGE["exitoGet"]}",
-                        "data": actividad[0]
+                        'status': True,
+                        'message': f"{MESSAGE['exitoGet']}",
+                        'data': actividad[0]
                     }
                 else:
                     datos = {
-                        "status": False,
-                        'message': f"{MESSAGE["errorRegistro"]}",
-                        "data": None
+                        'status': False,
+                        'message': f"{MESSAGE['errorRegistro']}",
+                        'data': None
                     }
             else:
-                if("all" in request.GET and request.GET["all"]=="true"):
+                if("all" in request.GET and request.GET['all']=="true"):
                     query = """
                     SELECT * FROM actividades ORDER BY id ASC;
                     """
@@ -160,13 +160,13 @@ class Actividades_Views(View):
                     query = """
                     SELECT * FROM actividades ORDER BY id ASC id LIMIT %s, %s;
                     """
-                    cursor.execute(query, [indiceInicial(int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
+                    cursor.execute(query, [indiceInicial(int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                     activiades = dictfetchall(cursor)
-                elif("page" in request.GET and "desc" in request.GET and request.GET["desc"]=="true"):
+                elif("page" in request.GET and "desc" in request.GET and request.GET['desc']=="true"):
                     query = """
                     SELECT * FROM actividades ORDER BY id DESC LIMIT %s, %s;
                     """
-                    cursor.execute(query, [indiceInicial(int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
+                    cursor.execute(query, [indiceInicial(int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                     activiades = dictfetchall(cursor)
                 else:
                     query = """
@@ -182,29 +182,29 @@ class Actividades_Views(View):
                 result = dictfetchall(cursor)
                 if len(activiades)>0:
                     datos = {
-                        "status": True,
-                        'message': f"{MESSAGE["exitoGet"]}",
-                        "data": activiades,
-                        "pages": int(result[0]["pages"]),
-                        "total":result[0]["total"],
+                        'status': True,
+                        'message': f"{MESSAGE['exitoGet']}",
+                        'data': activiades,
+                        'pages': int(result[0]['pages']),
+                        'total':result[0]['total'],
                     }
                 else:
                     datos = {
-                        "status": False,
-                        'message': f"{MESSAGE["errorRegistrosNone"]}",
-                        "data": None,
-                        "pages": None,
-                        "total":0
+                        'status': False,
+                        'message': f"{MESSAGE['errorRegistrosNone']}",
+                        'data': None,
+                        'pages': None,
+                        'total':0
                     }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"{MESSAGE["errorGet"]} - {error}")
+            print(f"{MESSAGE['errorGet']} - {error}")
             datos = {
-                "status": False,
-                'message': f"{MESSAGE["errorConsulta"]}: {error}",
-                "data": None,
-                "pages": None,
-                "total":0
+                'status': False,
+                'message': f"{MESSAGE['errorConsulta']}: {error}",
+                'data': None,
+                'pages': None,
+                'total':0
             }
             return JsonResponse(datos)
         finally:

@@ -28,9 +28,8 @@ class Recreadores_Views(View):
                     'message': verify["message"],
                 }
                 return JsonResponse(datos)
-
+            
             #* se debe comprobar si se va a registrar una persona nueva o ya existe
-
             if ("id_persona" in req):
                 ### *comprobacion de persona
                 persona = list(Personas.objects.filter(
@@ -79,7 +78,7 @@ class Recreadores_Views(View):
                 }
                 return JsonResponse(datos)
             
-            ### *comprobacion de nivel
+            ### *comprobacion de genero
             genero = list(Generos.objects.filter(id=req["genero"]).values())
             if (len(genero) > 0):
                 genero = Generos.objects.get(id=req["genero"])
@@ -95,7 +94,7 @@ class Recreadores_Views(View):
                 persona=persona,
                 nivel=nivel,
                 genero=genero,
-                img_perfil=img["img_recreador"],
+                img_perfil=img["img_perfil"] if "img_perfil" in img else None,
                 fecha_nacimiento=req["fecha_nacimiento"],
             )
             datos = {

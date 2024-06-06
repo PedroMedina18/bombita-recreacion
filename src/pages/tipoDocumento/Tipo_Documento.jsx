@@ -2,9 +2,11 @@ import { useEffect, useState, useRef } from "react"
 import { Toaster } from "sonner";
 import { tipo_documentos } from "../../utils/API.jsx";
 import { useNavigate } from 'react-router-dom';
-import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx"
-import Navbar from "../../components/navbar/Navbar"
-import Table from "../../components/table/Table"
+import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx";
+import { formatoNumero } from "../../utils/process.jsx"
+import { alertInfo } from "../../utils/alerts.jsx"
+import Navbar from "../../components/navbar/Navbar";
+import Table from "../../components/table/Table";
 import texts from "../../context/text_es.js";
 
 function Tipo_Documento() {
@@ -33,8 +35,8 @@ function Tipo_Documento() {
 
     const columns = [
         {
-            name: "Item",
-            row: (row) => { return row.id }
+            name: "Codigo",
+            row: (row) => { const codigo = formatoNumero(Number(row.id)); return codigo}
         },
         {
             name: "Nombre",
@@ -63,6 +65,12 @@ function Tipo_Documento() {
                     setList: setTipo_Documentos
                 })
             }
+        },
+        get:(row)=>{
+            alertInfo(
+              row.nombre, 
+              row
+            )
         },
         register: {
             name: texts.registerMessage.buttonRegisterTipoDocumento,

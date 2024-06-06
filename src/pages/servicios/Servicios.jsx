@@ -2,9 +2,10 @@ import { useEffect, useState, useRef } from "react"
 import { servicios } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
-import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx"
-import Table from "../../components/table/Table"
-import Navbar from "../../components/navbar/Navbar"
+import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx";
+import {formatoNumero} from "../../utils/process.jsx";
+import Table from "../../components/table/Table";
+import Navbar from "../../components/navbar/Navbar";
 import texts from "../../context/text_es.js";
 
 
@@ -34,9 +35,9 @@ function Servicios() {
 
   const columns = [
     {
-      name: "Item",
-      row: (row) => { return row.id }
-    },
+      name: "Codigo",
+      row: (row) => { const codigo = formatoNumero(Number(row.id)); return codigo}
+  },
     {
       name: "Nombre",
       row: (row) => { return row.nombre }

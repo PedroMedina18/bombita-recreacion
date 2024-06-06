@@ -124,7 +124,7 @@ const texts={
         apellidos:"Ambos Apellidos",
         descripcion:"Describa de manera concreta el elemento",
         correo:"ejemplo@dominio.com",
-        numeroDocumento:"00.000.000",
+        numeroDocumento:"0.000.000",
         nombreElement:"Nombre del Elemento",
         direccion:"Dirección exacta del evento",
         numeroPersonas:"Numero aproximado de asistentes al evento"
@@ -143,7 +143,7 @@ const texts={
             name:"Registrar un Tipo de Documento",
             description:"Intruduzca los datos para agregar un nuevo tipo de documento"
         },
-        registerTipoGenero:{
+        registerGenero:{
             name:"Registrar un Genero",
             description:"Intruduzca los datos para agregar un nuevo genero"
         },
@@ -175,7 +175,7 @@ const texts={
             name:"Lista de Tipos de Documentos",
             description:"Verifique los Tipos de Documentos agregados"
         },
-        getTipoDocumentos:{
+        getGenero:{
             name:"Lista de Generos",
             description:"Verifique los Generos agregados"
         },
@@ -209,6 +209,7 @@ const texts={
         searchItem:"Buscar por su Item",
         searchNameDocument:"Buscar por número de Documento o Nombre",
         buttonRegisterTipoDocumento:"Agregar un Nuevo Tipo de Documento",
+        buttonRegisterGenero:"Agregar un Nuevo Genero",
         buttonRegisterNivel:"Agregar un Nuevo Nivel",
         buttonRegisterMaterial:"Agregar un Nuevo Material",
         buttonRegisterCargo:"Agregar un nuevo cargo",
