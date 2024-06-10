@@ -42,7 +42,7 @@ const texts={
         selectValor:"Seleccione un valor",
         selectCliente:"Seleccione un cliente o cree uno nuevo",
         selectTipoDocumento:"Seleccione un tipo de documento",
-        selectTipoDocumento:"Seleccione el genero",
+        selectGenero:"Seleccione el genero",
         invalidUser:"Usuario invalido",
         invalidName:"Nombre invalido",
         invalidEmail:"Correo Electronico invalido",
@@ -67,11 +67,13 @@ const texts={
     confirmMessage:{
         confirmDelete:"Confirmar la Solicitud de Eliminación",
         confirRegister:"Por favor confirmar la solicitud de Registro",
+        confirEdit:"Confirmar la Solicitud de Actualizacion",
         confirCloset:"Desea cerrar sesión",
     },
 
     errorMessage:{
         errorDelete:`Error de Sistema al eliminar. Intente mas tarde`,
+        errorObjet:`Error información no encontrada.`,
         errorSystem:`Error de Sistema. Por favor intente mas tarde`,
         errorConexion:"Error de conexion. Por favor intente mas tarde",
         errorRequest:"No se ha obtenido una respuesta. Por favor vuelva a intentar",

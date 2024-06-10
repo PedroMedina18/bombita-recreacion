@@ -4,7 +4,7 @@ import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import {deleteItem, searchCode, getListItems} from "../../utils/actions.jsx";
 import { formatoNumero } from "../../utils/process.jsx";
-import { alertInfo } from "../../utils/alerts.jsx";
+import { alertInfo } from "../../components/alerts.jsx";
 import Navbar from "../../components/navbar/Navbar";
 import Table from "../../components/table/Table";
 import texts from "../../context/text_es.js";
@@ -47,6 +47,10 @@ function Materiales() {
             name: "Descripcion",
             row: (row) => { return row.descripcion }
         },
+        {
+            name: "Total",
+            row: (row) => { return row.total }
+        },
     ]
 
     const options = {
@@ -72,6 +76,9 @@ function Materiales() {
                     setList: setMateriales
                 })
             }
+        },
+        put: (row)=>{
+            navigate(`/edit/material/${row.id}`)
         },
         register: {
             name: texts.registerMessage.buttonRegisterMaterial,

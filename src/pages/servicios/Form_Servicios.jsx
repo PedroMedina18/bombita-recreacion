@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect,useRef } from "react";
 import { Toaster } from "sonner";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { recreadores, servicios, materiales, actividades, } from "../../utils/API.jsx";
 import { LoaderCircle } from "../../components/loader/Loader";
 import { ButtonSimple } from "../../components/button/Button";
-import { alertConfim, toastError, alertLoading } from "../../utils/alerts.jsx";
-import { InputsGeneral, InputTextTarea, InputDuration, MultiSelect } from "../../components/input/Input";
+import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
+import { InputsGeneral, InputTextTarea, InputDuration, MultiSelect } from "../../components/input/Inputs.jsx";
 import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
 import { verifyOptionsSelect, controlResultPost } from "../../utils/actions.jsx"
 import ErrorSystem from "../../components/errores/ErrorSystem";
@@ -25,11 +25,15 @@ function Form_Servicios() {
   const [saveMateriales, setSaveMateriales] = useState([]);
   const [saveActividades, setSaveActividades] = useState([]);
   const [submit, setSubmit] = useState(false);
-
+  const renderizado = useRef(0)
   const navigate = useNavigate();
 
   useEffect(() => {
-    get_data();
+    if (renderizado.current === 0) {
+      renderizado.current = renderizado.current + 1
+      get_data()
+      return
+    }
   }, []);
 
   //* funcion para buscar los permisos en la vase de datos

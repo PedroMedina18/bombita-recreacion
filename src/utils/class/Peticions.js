@@ -10,7 +10,7 @@ export default class Petisions{
     }
 
     async get(paramOne=null, paramTwo=null){
-        const token=getCookie("token")
+        const token = getCookie("token")
         if(paramTwo){
             return API.get(`${this.params}/${paramOne}/${paramTwo}/`, {
                 headers: {
@@ -36,7 +36,7 @@ export default class Petisions{
     }
 
     async post(data){
-        const token=getCookie("token")
+        const token = getCookie("token")
         return API.post(`${this.params}/`, {
             headers: {
                 "Content-Type": "application/json",
@@ -46,8 +46,9 @@ export default class Petisions{
         })
     }
 
+
     async postData(data){
-        const token=getCookie("token")
+        const token = getCookie("token")
         return API.request(`${this.params}/`, {
             method: 'POST',
             headers: {
@@ -58,8 +59,31 @@ export default class Petisions{
         })
     }
 
+    async putData(data, code){
+        const token = getCookie("token")
+        return API.request(`${this.params}/${code}/`, {
+            method: 'PUT',
+            headers: {
+                "Content-Type": "multipart/form-data",
+                "Authorization": `Bearer ${token}`
+            },
+            data:data
+        })
+    }
+
+    async put(data, code){
+        const token = getCookie("token")
+        return API.post(`${this.params}/${code}/`, {
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+            },
+            body: data,
+        })
+    }
+
     async delete(code){
-        const token=getCookie("token")
+        const token = getCookie("token")
         return API.delete(`${this.params}/${code}/`, {
             headers: {
                 "Content-Type": "application/json",

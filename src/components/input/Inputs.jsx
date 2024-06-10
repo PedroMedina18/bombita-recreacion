@@ -395,10 +395,9 @@ export function MultiSelect({ name, id, label, options, save, placeholder }) {
   );
 }
 
-export function InputImgPerfil({ label, id, name, form, tamaño="lg" }) {
+export function InputImgPerfil({ label, id, name, form, tamaño="lg", imgPerfil=null }) {
   const { errors, register } = form;
-  const img=perfil
-  
+  const img=imgPerfil? imgPerfil : perfil
 
   const cambio_imagen=(e)=>{
     const $IMG=document.getElementById("img-perfil-creador")
@@ -408,25 +407,31 @@ export function InputImgPerfil({ label, id, name, form, tamaño="lg" }) {
       const reader=new FileReader()
       reader.onload=(response)=>{
         $IMG.src=response.target.result
-        $IMG.classList.remove("d-none")
-        $SvgPerfil.classList.add("d-none")
-        $sectionPerfil.classList.add("section-perfil-img")
+        if(!imgPerfil){
+          $IMG.classList.remove("d-none")
+          $SvgPerfil.classList.add("d-none")
+          $sectionPerfil.classList.add("section-perfil-img")
+        }
+        
       }
       reader.readAsDataURL(e.target.files[0])
       
     }else{
-      $IMG.src=perfil
-      $IMG.classList.add("d-none")
-      $SvgPerfil.classList.remove("d-none")
-      $sectionPerfil.classList.remove("section-perfil-img")
+      $IMG.src=img
+      if(!imgPerfil){
+        $IMG.classList.add("d-none")
+        $SvgPerfil.classList.remove("d-none")
+        $sectionPerfil.classList.remove("section-perfil-img")
+      }
+      
     }
   }
 
   return (
     <div className={`w-100 d-flex flex-column align-items-center justify-content-center ${errors[name] && isError ? "error" : " "}`}>
-      <div className={`${tamaño=="sm"? 'sm':'lg'} section-perfil d-flex align-items-center justify-content-center`} id="sectionPerfil">
-        <IconUserCircleSolid id="svg-perfil"/>
-        <img id="img-perfil-creador" src={img} alt="img_perfil" className={`${tamaño=="sm"? 'sm':'lg'} img-perfil d-none`}/>
+      <div className={`${tamaño=="sm"? 'sm':'lg'} section-perfil d-flex align-items-center justify-content-center ${imgPerfil? "section-perfil-img":""}`} id="sectionPerfil">
+        <IconUserCircleSolid id="svg-perfil" className={`${imgPerfil? "d-none" : ""}`}/>
+        <img id="img-perfil-creador" src={img} alt="img_perfil" className={`${tamaño=="sm"? 'sm':'lg'} img-perfil ${imgPerfil? "":"d-none"}`}/>
       </div>
       <label className="button-initial cursor-pointer" htmlFor={name}>
         {label}

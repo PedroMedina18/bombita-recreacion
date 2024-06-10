@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef } from "react"
+import { useForm } from "react-hook-form";
 import { niveles } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx"
 import { formatoNumero } from "../../utils/process.jsx"
-import { alertInfo } from "../../utils/alerts.jsx"
+import { alertInfo } from "../../components/alerts.jsx"
 import Navbar from "../../components/navbar/Navbar"
 import Table from "../../components/table/Table"
 import texts from "../../context/text_es.js";
@@ -55,9 +56,9 @@ function Niveles() {
         functionGet: getNiveles
       })
     },
-    put:(row)=>{
-      console.log(row)
-    },
+    put: (row)=>{
+            navigate(`/edit/nivel/${row.id}`)
+        },
     get:(row)=>{
       alertInfo(
         row.nombre, 

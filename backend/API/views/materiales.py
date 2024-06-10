@@ -129,7 +129,7 @@ class Materiales_Views(View):
 
             if (id > 0):
                 query = """
-                SELECT * FROM mat WHERE materiales.id=%s;
+                SELECT * FROM materiales WHERE materiales.id=%s;
                 """
                 cursor.execute(query, [int(id)])
                 material = dictfetchall(cursor)

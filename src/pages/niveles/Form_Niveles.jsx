@@ -1,27 +1,68 @@
 
-import { InputsGeneral, InputTextTarea } from "../../components/input/Input"
-import { ButtonSimple } from "../../components/button/Button"
+import { useState, useEffect, useRef } from 'react'
 import { useForm } from "react-hook-form";
-import { useNavigate } from 'react-router-dom'
+import { InputsGeneral, InputTextTarea } from "../../components/input/Inputs.jsx"
+import { ButtonSimple } from "../../components/button/Button"
+import { useParams, useNavigate } from "react-router-dom";
 import { niveles } from "../../utils/API.jsx";
-import { alertConfim, toastError, alertLoading } from "../../utils/alerts.jsx"
+import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx"
 import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx"
 import { Toaster } from "sonner";
-import {controlResultPost} from "../../utils/actions.jsx"
+import { controlResultPost } from "../../utils/actions.jsx"
 import Navbar from "../../components/navbar/Navbar"
 import texts from "../../context/text_es.js";
 import Swal from 'sweetalert2';
 import pattern from "../../context/pattern.js";
-import {IconRowLeft} from "../../components/Icon"
+import { IconRowLeft } from "../../components/Icon"
 
 function Form_Niveles() {
     const navigate = useNavigate();
+    const params = useParams();
+    const [loading, setLoading] = useState(true)
+    const renderizado = useRef(0)
+    const [errorServer, setErrorServer] = useState("")
+
+    useEffect(() => {
+        if (renderizado.current === 0) {
+            renderizado.current = renderizado.current + 1
+            if (params.id){
+                get_nivel()
+            }
+            return
+        }
+    }, [])
+
+    const get_nivel = async () => {
+        try {
+            const respuesta = await niveles.get(Number(params.id))
+            if (respuesta.status !== 200) {
+                setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
+                return
+            }
+            if (respuesta.data.status === false) {
+                setErrorServer(`${respuesta.data.message}`)
+                return
+            } 
+            setErrorServer("")
+            const keys = Object.keys(respuesta.data.data);
+            keys.forEach(key => {
+                setValue(key, `${respuesta.data.data[`${key}`]}`)
+            });
+            
+        } catch (error) {
+            console.log(error)
+            setErrorServer(texts.errorMessage.errorObjet)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     // *the useform
     const {
         register,
         handleSubmit,
         formState: { errors },
+        setValue,
         watch
     } = useForm()
 
@@ -29,14 +70,15 @@ function Form_Niveles() {
     const onSubmit = handleSubmit(
         async (data) => {
             try {
-                const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirRegister)
+                const message = params.id? texts.confirmMessage.confirEdit : texts.confirmMessage.confirRegister
+                const confirmacion = await alertConfim("Confirmar", message)
                 if (confirmacion.isConfirmed) {
                     const body = {
                         nombre: data.nombre,
                         descripcion: data.descripcion,
                     }
                     alertLoading("Cargando")
-                    const res = await niveles.post(body)
+                    const res = generos.id? await niveles.put(body, Number(params.id)) : await niveles.post(body)
                     controlResultPost({
                         respuesta: res,
                         messageExito: texts.successMessage.nivel,

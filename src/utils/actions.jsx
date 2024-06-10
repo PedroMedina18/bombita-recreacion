@@ -1,5 +1,5 @@
 import { personas } from "./API.jsx"
-import { toastError, alertConfim, alertLoading, alertAceptar } from './alerts.jsx'
+import { toastError, alertConfim, alertLoading, alertAceptar } from '../components/alerts.jsx'
 import Swal from 'sweetalert2';
 import texts from "../context/text_es.js"
 
@@ -25,7 +25,6 @@ export const verifyOptionsSelect = ({ respuesta, setError, setOptions }) => {
                 }
             })
             setOptions(options)
-            setError(``)
         } else {
             setError(`${respuesta.data.message}`)
         }
@@ -39,18 +38,38 @@ export const getPersona = async ({ dataNewUser, setPersona, setValue, setDisable
     try {
         if (dataNewUser.tipo_documento && dataNewUser.numero_documento && dataNewUser.numero_documento.length >= 8) {
             const respuesta = await personas.get(dataNewUser.tipo_documento, dataNewUser.numero_documento)
-            if (respuesta.status === 200) {
-                if (respuesta.data.status === true) {
-                    setPersona({
-                        ...respuesta.data.data
-                    })
-                    const keys = Object.keys(respuesta.data.data);
-                    keys.forEach(key => {
-                        setValue(`${key}`, `${respuesta.data.data[key]}`)
-                    });
-                    setValue("id_persona", respuesta.data.data.id)
-                    setDisabledInputs(true)
-                }
+            if (respuesta.status === 200 && respuesta.data.status === true) {
+                console.log(respuesta)
+                setPersona({
+                    ...respuesta.data.data
+                })
+                const keys = Object.keys(respuesta.data.data);
+                keys.forEach(key => {
+                    setValue(`${key}`, `${respuesta.data.data[key]}`)
+                });
+                setValue("id_persona", respuesta.data.data.id)
+                setDisabledInputs(true)
+            }
+        }
+    } catch (error) {
+        console.log(error)
+    }
+}
+// *Funcion encargada de buscar los datos del y agregarlos al formulario
+export const getRecreador = async ({ dataNewUser, setPersona, setValue, setDisabledInputs }) => {
+    try {
+        if (dataNewUser.tipo_documento && dataNewUser.numero_documento && dataNewUser.numero_documento.length >= 8) {
+            const respuesta = await personas.get(dataNewUser.tipo_documento, dataNewUser.numero_documento)
+            if (respuesta.status === 200 && respuesta.data.status === true) {
+                setPersona({
+                    ...respuesta.data.data
+                })
+                const keys = Object.keys(respuesta.data.data);
+                keys.forEach(key => {
+                    setValue(`${key}`, `${respuesta.data.data[key]}`)
+                });
+                setValue("id_persona", respuesta.data.data.id)
+                setDisabledInputs(true)
             }
         }
     } catch (error) {

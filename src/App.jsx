@@ -36,18 +36,23 @@ function App() {
             <Route path="/register/eventos" element={<Form_Eventos />} />
             <Route path="/actividades" element={<Actividades />} />
             <Route path="/register/actividad" element={<Form_Actividades />} />
+            <Route path="/edit/actividad/:id" element={<Form_Actividades />} />
             <Route path="/niveles" element={<Niveles />} />
             <Route path="/register/nivel" element={<Form_Niveles />} />
+            <Route path="/edit/nivel/:id" element={<Form_Niveles/>} />
             <Route path="/materiales" element={<Materiales />} />
             <Route path="/register/material" element={<Form_Materiales />} />
+            <Route path="/edit/material/:id" element={<Form_Materiales />} />
             <Route path="/tipo_documentos" element={<Tipo_Documento />} />
             <Route path="/register/tipo_documento" element={<Form_Tipo_Documento />} />
+            <Route path="/edit/tipo_documento/:id" element={<Form_Tipo_Documento />} />
             <Route path="/generos" element={<Generos />} />
             <Route path="/register/genero" element={<Form_Generos />} />
-            <Route path="/recreador/:id" element={<Form_Recreadores />} />
+            <Route path="/edit/genero/:id" element={<Form_Generos />} />
+            <Route path="/recreador/:numero_documento" element={<Recreador/>} />
             <Route path="/recreadores" element={<Recreadores />} />
             <Route path="/register/recreador" element={<Form_Recreadores />} />
-            <Route path="/edit/recreador/:id" element={<Form_Recreadores />} />
+            <Route path="/edit/recreador/:numero_documento" element={<Form_Recreadores />} />
             <Route path="/inicio" element={<Inicio />} />
             <Route path="/servicios" element={<Servicios />} />
             <Route path="/register/servicio" element={<Form_Servicios />} />

@@ -13,7 +13,7 @@ from .views.niveles import Nivel_Views
 from .views.verify_token import Verify_Token_Views
 from .views.servicios import Servicios_Views
 from .views.generos import Genero_Views
-from .views.dollar import Dollar_View
+# from .views.dollar import Dollar_View
 
 urlpatterns=[
     path('cargos/', Cargos_Views.as_view(), name='cargos'),
@@ -34,9 +34,9 @@ urlpatterns=[
     path('personas/<int:tipo_documento>/<int:documento>/', Persona_Views.as_view(), name='personas'),
     path('usuarios/', Usuario_Views.as_view(), name='usuarios'),
     path('recreadores/', Recreadores_Views.as_view(), name='recreadores'),
-    path('recreadores/<int:id>/', Recreadores_Views.as_view(), name='recreadores'),
+    # path('recreadores/<int:id>/', Recreadores_Views.as_view(), name='recreadores'),
     path('recreadores/<str:identificador>/', Recreadores_Views.as_view(), name='recreadores'),
-    path('dollar/', Dollar_View.as_view(), name='dollar'),
+    # path('dollar/', Dollar_View.as_view(), name='dollar'),
     path('login/', Login.as_view(), name='login'),
     path('verify/', Verify_Token_Views.as_view(), name='verify'),
 ]

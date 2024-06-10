@@ -43,6 +43,10 @@ function Recreadores() {
             row: (row) => { return `${row.tipo_documento}-${row.numero_documento}` }
         },
         {
+            name: "Genero",
+            row: (row) => { return `${row.genero}` }
+        },
+        {
             name: "Nombre",
             row: (row) => { return `${row.nombres} ${row.apellidos}` }
         },
@@ -86,6 +90,9 @@ function Recreadores() {
             function: () => {
                 navigate("/register/recreador")
             }
+        },
+        put: (row)=>{
+            navigate(`/edit/recreador/${row.numero_documento}`)
         },
         delete: (row) => {
             deleteItem({

@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Toaster } from "sonner";
 import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
 import { permisos, cargos } from "../../utils/API.jsx";
 import { LoaderCircle } from "../../components/loader/Loader";
 import { ButtonSimple } from "../../components/button/Button"
-import { alertConfim, toastError, alertLoading } from "../../utils/alerts.jsx"
-import { InputsGeneral, InputTextTarea, InputCheck, MultiSelect, InputImgPerfil } from "../../components/input/Input"
+import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx"
+import { InputsGeneral, InputTextTarea, InputCheck, MultiSelect, InputImgPerfil } from "../../components/input/Inputs.jsx"
 import {verifyOptionsSelect, controlResultPost} from "../../utils/actions.jsx"
 import {hasLeadingOrTrailingSpace} from "../../utils/process.jsx"
 import ErrorSystem from "../../components/errores/ErrorSystem";
@@ -22,9 +22,14 @@ function Cargos() {
     const [options, setOptions] = useState([])
     const [selectOptions, setSelectOptions] = useState([])
     const navigate = useNavigate();
+    const renderizado = useRef(0)
 
     useEffect(() => {
-        get_Permisos()
+        if (renderizado.current === 0) {
+            renderizado.current = renderizado.current + 1
+            get_Permisos()
+            return
+        }
     }, [])
 
     // *funcion para buscar los permisos en la base de datos

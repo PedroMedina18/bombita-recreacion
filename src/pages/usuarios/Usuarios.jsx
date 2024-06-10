@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { InputsGeneral, UnitSelect, InputCheck } from "../../components/input/Input"
+import { InputsGeneral, UnitSelect, InputCheck } from "../../components/input/Inputs.jsx"
 import { ButtonSimple } from "../../components/button/Button"
 import { LoaderCircle } from "../../components/loader/Loader";
 import { useNavigate } from 'react-router-dom'
 import { useForm } from "react-hook-form";
 import { Toaster } from "sonner";
 import { cargos, tipo_documentos, usuarios } from "../../utils/API.jsx";
-import { alertConfim, toastError, alertLoading } from "../../utils/alerts.jsx"
+import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx"
 import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx"
 import {getPersona, verifyOptionsSelect, controlResultPost, habilitarEdicion} from "../../utils/actions.jsx"
 import Navbar from "../../components/navbar/Navbar"

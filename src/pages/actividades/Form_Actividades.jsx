@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
-import { InputsGeneral, InputTextTarea, MultiSelect } from "../../components/input/Input";
+import { useState, useEffect, useRef } from "react";
+import { InputsGeneral, InputTextTarea, MultiSelect } from "../../components/input/Inputs.jsx";
 import { ButtonSimple } from "../../components/button/Button";
 import { useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom';
 import { actividades, materiales } from "../../utils/API.jsx";
-import { alertConfim, toastError, alertLoading } from "../../utils/alerts.jsx";
+import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { LoaderCircle } from "../../components/loader/Loader";
 import { verifyOptionsSelect, controlResultPost } from "../../utils/actions.jsx"
 import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
@@ -14,7 +14,7 @@ import Swal from 'sweetalert2';
 import Navbar from "../../components/navbar/Navbar";
 import texts from "../../context/text_es.js";
 import pattern from "../../context/pattern.js";
-import {IconRowLeft} from "../../components/Icon"
+import { IconRowLeft } from "../../components/Icon"
 
 function Actividades() {
   const [errorServer, setErrorServer] = useState("")
@@ -22,9 +22,14 @@ function Actividades() {
   const [loading, setLoading] = useState(true)
   const [selectOptions, setSelectOptions] = useState([])
   const navigate = useNavigate();
+  const renderizado = useRef(0)
 
   useEffect(() => {
-    getMateriales()
+    if (renderizado.current === 0) {
+      renderizado.current = renderizado.current + 1
+      getMateriales()
+      return
+    }
   }, [])
 
   //* funcion para buscar los permisos en la vase de datos

@@ -3,7 +3,7 @@ import bombita from "../../assets/bomb.png"
 import { Link, useNavigate } from "react-router-dom"
 import { useContext, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
-import { alertConfim } from '../../utils/alerts.jsx'
+import { alertConfim } from '../alerts.jsx'
 import texts from "../../context/text_es"
 import {
     IconHamburgue,

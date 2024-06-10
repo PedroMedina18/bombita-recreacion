@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
-import { InputsGeneral, UnitSelect, InputCheck, InputTextTarea } from "../../components/input/Input"
+import { useState, useEffect, useRef } from "react";
+import { InputsGeneral, UnitSelect, InputCheck, InputTextTarea } from "../../components/input/Inputs.jsx"
 import { ButtonSimple } from "../../components/button/Button"
 import { LoaderCircle } from "../../components/loader/Loader";
 import { useNavigate } from 'react-router-dom'
 import { useForm } from "react-hook-form";
 import { Toaster } from "sonner";
 import { tipo_documentos } from "../../utils/API.jsx";
-import { alertConfim, toastError, alertLoading } from "../../utils/alerts.jsx"
+import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx"
 import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx"
 import { getPersona, verifyOptionsSelect, controlResultPost, habilitarEdicion } from "../../utils/actions.jsx"
 import Navbar from "../../components/navbar/Navbar"
@@ -22,9 +22,14 @@ function Form_Eventos() {
     const [loading, setLoading] = useState(true)
     const [errorServer, setErrorServer] = useState("")
     const navigate = useNavigate();
+    const renderizado = useRef(0)
 
     useEffect(() => {
-        getData()
+        if (renderizado.current === 0) {
+            renderizado.current = renderizado.current + 1
+            getData()
+            return
+        }
     }, [])
 
     // *funcion para buscar los tipos de documentos y los cargos

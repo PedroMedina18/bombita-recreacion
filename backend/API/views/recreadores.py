@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.http import Http404
 from django.http.response import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
@@ -9,6 +10,7 @@ from ..funtions.identificador import determinar_valor, edit_str
 from ..models import Nivel, Recreadores, Personas, TipoDocumento, Generos
 from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
+from decouple import config
 import json
 
 
@@ -21,8 +23,6 @@ class Recreadores_Views(View):
         try:
             req = request.POST
             img=request.FILES
-            print(req)
-            print(img)
             verify = verify_token(request.headers)
             if (not verify["status"]):
                 datos = {
@@ -96,7 +96,7 @@ class Recreadores_Views(View):
                 persona=persona,
                 nivel=nivel,
                 genero=genero,
-                img_perfil=img["img_perfil"] if "img_perfil" in img else None
+                img_perfil=img["img_perfil"] if "img_perfil" in img else None,
                 fecha_nacimiento=req["fecha_nacimiento"],
             )
             datos = {
@@ -112,8 +112,11 @@ class Recreadores_Views(View):
             }
             return JsonResponse(datos)
 
-    def put(self, request, id):
+    def put(self, request, identificador=0):
         try:
+            tipo = determinar_valor(identificador)
+            if tipo["type"] != "int":
+                raise Http404('No se puede editar este objeto')
             verify = verify_token(request.headers)
             req = request.POST
             img = request.FILES
@@ -124,9 +127,9 @@ class Recreadores_Views(View):
                 }
                 return JsonResponse(datos)
 
-            recreador = list(Recreadores.objects.filter(id=id).values())
+            recreador = list(Recreadores.objects.filter(id=int(identificador)).values())
             if len(recreador) > 0:
-                recreador = Recreadores.objects.get(id=id)
+                recreador = Recreadores.objects.get(id=int(identificador))
                 persona = Personas.objects.get(id=recreador.persona)
                 
                 ### *comprobacion de tipo de documento
@@ -194,8 +197,11 @@ class Recreadores_Views(View):
             }
             return JsonResponse(datos)
 
-    def delete(self, request, id):
+    def delete(self, request, identificador=0):
         try:
+            tipo = determinar_valor(identificador)
+            if tipo["type"] != "int":
+                raise Http404('No se puede eliminar este objeto')
             verify=verify_token(request.headers)
             if(not verify["status"]):
                 datos = {
@@ -203,9 +209,9 @@ class Recreadores_Views(View):
                     'message': verify["message"]
                 }
                 return JsonResponse(datos)
-            recreador = list(Recreadores.objects.filter(id=id).values())
+            recreador = list(Recreadores.objects.filter(id=int(identificador)).values())
             if len(recreador) > 0:
-                Recreadores.objects.filter(id=id).delete()
+                Recreadores.objects.filter(id=int(identificador)).delete()
                 datos = {
                     "status": True,
                     'message': "Registro eliminado"
@@ -252,20 +258,28 @@ class Recreadores_Views(View):
                         	re.id, 
                             pe.nombres, 
                             pe.apellidos, 
+                            pe.correo,
+                            ge.id AS genero_id,
+                            ge.nombre AS genero_nombre,
                             re.fecha_nacimiento, 
-                            ni.nombre AS nivel, 
-                            tido.nombre AS tipo_documento, 
+                            ni.id AS nivel_id, 
+                            ni.nombre AS nivel_nombre, 
+                            tido.id AS tipo_documento_id, 
+                            tido.nombre AS tipo_documento_nombre, 
                             pe.numero_documento,
                             CONCAT('0', pe.telefono_principal) AS telefono_principal,
-                            re.inhabilitado
+                            CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
+                            re.inhabilitado,
+                            re.img_perfil
                         FROM recreadores AS re
                         LEFT JOIN niveles AS ni ON re.nivel_id=ni.id
+                        LEFT JOIN generos AS ge ON re.genero_id=ge.id
                         LEFT JOIN personas AS pe ON re.persona_id=pe.id
                         LEFT JOIN tipo_documentos AS tido ON pe.tipo_documento_id=tido.id
                         WHERE pe.numero_documento LIKE %s ;
                     """
                     cursor.execute(query, [numero_documento])
-                    recreador = dictfetchall(cursor)
+                    
                     
                 else:
                     str_validate=edit_str(tipo["valor"])
@@ -274,20 +288,30 @@ class Recreadores_Views(View):
                         	re.id, 
                             pe.nombres, 
                             pe.apellidos, 
+                            pe.correo,
+                            ge.id AS genero_id,
+                            ge.nombre AS genero_nombre,
                             re.fecha_nacimiento, 
-                            ni.nombre AS nivel, 
-                            tido.nombre AS tipo_documento, 
+                            ni.id AS nivel_id, 
+                            ni.nombre AS nivel_nombre, 
+                            tido.id AS tipo_documento_id, 
+                            tido.nombre AS tipo_documento_nombre, 
                             pe.numero_documento,
                             CONCAT('0', pe.telefono_principal) AS telefono_principal,
-                            re.inhabilitado
+                            CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
+                            re.inhabilitado,
+                            re.img_perfil
                         FROM recreadores AS re
                         LEFT JOIN niveles AS ni ON re.nivel_id=ni.id
+                        LEFT JOIN generos AS ge ON re.genero_id=ge.id
                         LEFT JOIN personas AS pe ON re.persona_id=pe.id
                         LEFT JOIN tipo_documentos AS tido ON pe.tipo_documento_id=tido.id
                         WHERE CONCAT(pe.nombres, ' ', pe.apellidos) LIKE %s ;
                     """
                     cursor.execute(query, [str_validate])
-                    recreador = dictfetchall(cursor)
+                    
+                recreador = dictfetchall(cursor)
+                recreador[0]["img_perfil"]=f"{config('URL')}media/{recreador[0]['img_perfil']}" if recreador[0]['img_perfil'] else None
                 query = """
                 SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM recreadores;
                 """
@@ -297,7 +321,9 @@ class Recreadores_Views(View):
                     datos = {
                         "status": True,
                         'message': "Exito",
-                        "data": recreador,
+                        "data": {
+                            "info":recreador[0]
+                        },
                         "total": result[0]["total"],
                         "pages":1
                     }
@@ -316,6 +342,7 @@ class Recreadores_Views(View):
                     	re.id, 
                         pe.nombres, 
                         pe.apellidos, 
+                        ge.nombre AS genero,
                         re.fecha_nacimiento, 
                         ni.nombre AS nivel, 
                         tido.nombre AS tipo_documento, 
@@ -324,6 +351,7 @@ class Recreadores_Views(View):
                         re.inhabilitado
                     FROM recreadores AS re
                     LEFT JOIN niveles AS ni ON re.nivel_id=ni.id
+                    LEFT JOIN generos AS ge ON re.genero_id=ge.id
                     LEFT JOIN personas AS pe ON re.persona_id=pe.id
                     LEFT JOIN tipo_documentos AS tido ON pe.tipo_documento_id=tido.id
                     ORDER BY re.id ASC LIMIT %s, %s;
@@ -338,6 +366,7 @@ class Recreadores_Views(View):
                     	re.id, 
                         pe.nombres, 
                         pe.apellidos, 
+                        ge.nombre AS genero,
                         re.fecha_nacimiento, 
                         ni.nombre AS nivel, 
                         tido.nombre AS tipo_documento, 
@@ -346,6 +375,7 @@ class Recreadores_Views(View):
                         re.inhabilitado
                     FROM recreadores AS re
                     LEFT JOIN niveles AS ni ON re.nivel_id=ni.id
+                    LEFT JOIN generos AS ge ON re.genero_id=ge.id
                     LEFT JOIN personas AS pe ON re.persona_id=pe.id
                     LEFT JOIN tipo_documentos AS tido ON pe.tipo_documento_id=tido.id
                     ORDER BY re.id DESC LIMIT %s, %s;
@@ -360,6 +390,7 @@ class Recreadores_Views(View):
                     	re.id, 
                         pe.nombres, 
                         pe.apellidos, 
+                        ge.nombre AS genero,
                         re.fecha_nacimiento, 
                         ni.nombre AS nivel, 
                         tido.nombre AS tipo_documento, 
@@ -368,6 +399,7 @@ class Recreadores_Views(View):
                         re.inhabilitado
                     FROM recreadores AS re
                     LEFT JOIN niveles AS ni ON re.nivel_id=ni.id
+                    LEFT JOIN generos AS ge ON re.genero_id=ge.id
                     LEFT JOIN personas AS pe ON re.persona_id=pe.id
                     LEFT JOIN tipo_documentos AS tido ON pe.tipo_documento_id=tido.id
                     ORDER BY id LIMIT 25;

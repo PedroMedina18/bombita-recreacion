@@ -1,26 +1,67 @@
-import { useForm } from "react-hook-form";
-import { useNavigate } from 'react-router-dom'
-import { InputsGeneral, InputTextTarea } from "../../components/input/Input"
-import { ButtonSimple } from "../../components/button/Button"
+import { useState, useForm, useRef } from 'react'
+import { useNavigate, useParams } from 'react-router-dom';
+import { InputsGeneral, InputTextTarea } from "../../components/input/Inputs.jsx";
+import { ButtonSimple } from "../../components/button/Button";
 import { tipo_documentos } from "../../utils/API.jsx";
-import { alertConfim, toastError, alertLoading } from "../../utils/alerts.jsx"
+import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { Toaster } from "sonner";
-import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx"
-import { controlResultPost} from "../../utils/actions.jsx"
-import Navbar from "../../components/navbar/Navbar"
+import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
+import { controlResultPost} from "../../utils/actions.jsx";
+import Navbar from "../../components/navbar/Navbar";
 import Swal from 'sweetalert2';
 import texts from "../../context/text_es.js";
 import pattern from "../../context/pattern.js";
-import {IconRowLeft} from "../../components/Icon"
+import {IconRowLeft} from "../../components/Icon";
 
 function Form_Tipo_Documento() {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
+    const params = useParams();
+    const renderizado = useRef(0);
+    const [errorServer, setErrorServer] = useState("");
+
+    useEffect(() => {
+        if (renderizado.current === 0) {
+            renderizado.current = renderizado.current + 1
+            if (params.id){
+                get_tipoDocumento()
+            }
+            return
+        }
+    }, [])
+
+    const get_tipoDocumento = async () => {
+        try {
+            const respuesta = await tipo_documentos.get(Number(params.id))
+            if (respuesta.status !== 200) {
+                setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
+                return
+            }
+            if (respuesta.data.status === false) {
+                setErrorServer(`${respuesta.data.message}`)
+                return
+            } 
+            setErrorServer("")
+            const keys = Object.keys(respuesta.data.data);
+            keys.forEach(key => {
+                setValue(key, `${respuesta.data.data[`${key}`]}`)
+            });
+            
+        } catch (error) {
+            console.log(error)
+            setErrorServer(texts.errorMessage.errorObjet)
+        } finally {
+            setLoading(false)
+        }
+    }
+
 
     // *the useform
     const {
         register,
         handleSubmit,
         formState: { errors },
+        setValue,
         watch
     } = useForm();
 
@@ -28,14 +69,15 @@ function Form_Tipo_Documento() {
     const onSubmit = handleSubmit(
         async (data) => {
             try {
-                const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirRegister)
+                const message = params.id? texts.confirmMessage.confirEdit : texts.confirmMessage.confirRegister
+                const confirmacion = await alertConfim("Confirmar", message)
                 if (confirmacion.isConfirmed) {
                     const body = {
                         nombre: data.nombre,
                         descripcion: data.descripcion,
                     }
                     alertLoading("Cargando")
-                    const res = await tipo_documentos.post(body)
+                    const res = params.id? await tipo_documentos.put(body, Number(params.id)) : await tipo_documentos.post(body)
                     controlResultPost({
                         respuesta:res, 
                         messageExito:texts.successMessage.tipoDocumento, 
