@@ -61,6 +61,9 @@ function Cargos() {
                 functionGet: getCargos
             })
         },
+        put: (row)=>{
+            navigate(`/edit/cargo/${row.id}`)
+        },
         search: {
             placeholder: texts.registerMessage.searchItem,
             function: (value) => {

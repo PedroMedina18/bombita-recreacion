@@ -142,11 +142,11 @@ const texts={
             description:"Intruduzca los datos para agregar un nuevo usuario al sistema"
         },
         registerTipoDocumento:{
-            name:"Registrar un Tipo de Documento",
+            name:"Registrar un nuevo Tipo de Documento",
             description:"Intruduzca los datos para agregar un nuevo tipo de documento"
         },
         registerGenero:{
-            name:"Registrar un Genero",
+            name:"Registrar un nuevo Genero",
             description:"Intruduzca los datos para agregar un nuevo genero"
         },
         registerServicio:{
@@ -158,8 +158,12 @@ const texts={
             description:"Intruduzca los datos para agregar un nuevo material"
         },
         registerCargos:{
-            name:"Registrar un Cargo",
+            name:"Registrar un nuevo Cargo",
             description:"Intruduzca los datos para agregar un nuevo cargo"
+        },
+        registerNiveles:{
+            name:"Registrar un nuevo Nivel",
+            description:"Intruduzca los datos para agregar un nuevo nivel"
         },
         registerActividades:{
             name:"Registrar una Actividad",
@@ -172,6 +176,34 @@ const texts={
         registerRecreadores:{
             name:"Registrar un Nuevo Recreador",
             description:"Intruduzca los datos para agregar un nuevo recreador al sistema"
+        },
+        editRecreadores:{
+            name:"Editar un Recreador",
+            description:"Intruduzca los datos para editar un recreador en el sistema"
+        },
+        editActividades:{
+            name:"Editar una Actividad",
+            description:"Intruduzca los datos para editar una Actividad"
+        },
+        editCargos:{
+            name:"Editar un Cargo",
+            description:"Intruduzca los datos para editar un cargo"
+        },
+        editNiveles:{
+            name:"Editar un  Nivel",
+            description:"Intruduzca los datos para editar un nivel"
+        },
+        editMaterial:{
+            name:"Editar un Material",
+            description:"Intruduzca los datos para editar un material"
+        },
+        editTipoDocumento:{
+            name:"Editar un Tipo de Documento",
+            description:"Intruduzca los datos para editar un tipo de documento"
+        },
+        editGenero:{
+            name:"Editar un Genero",
+            description:"Intruduzca los datos para editar un genero"
         },
         getTipoDocumentos:{
             name:"Lista de Tipos de Documentos",
@@ -204,6 +236,10 @@ const texts={
         getServicios:{
             name:"Lista de Servicios",
             description:"Verifique los servicios agregados"
+        },
+        recreador:{
+            name:"Información del Recreador",
+            description:"Toda la información del recreador"
         },
     },
 

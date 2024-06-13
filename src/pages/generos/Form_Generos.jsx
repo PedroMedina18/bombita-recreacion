@@ -94,7 +94,7 @@ function Form_Tipo_Generos() {
     )
 
     return (
-        <Navbar name={texts.pages.registerGenero.name} descripcion={texts.pages.registerGenero.description}>
+        <Navbar name={params.id? texts.pages.editGenero.name : texts.pages.registerGenero.name} descripcion={params.id? texts.pages.editGenero.description : texts.pages.registerGenero.description}>
             <ButtonSimple type="button" className="mb-2" onClick={()=>{navigate("/generos")}}> <IconRowLeft/> Regresar</ButtonSimple>
 
             <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">

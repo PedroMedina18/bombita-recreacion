@@ -360,7 +360,7 @@ export function UnitSelect({
 }
 
 const animatedComponent = MakeAnimated();
-export function MultiSelect({ name, id, label, options, save, placeholder }) {
+export function MultiSelect({ id, label, options, save, placeholder, optionsDefault }) {
   return (
     <div className="w-100">
       <label className="formulario-label" htmlFor={id}>
@@ -372,6 +372,7 @@ export function MultiSelect({ name, id, label, options, save, placeholder }) {
         options={options}
         components={animatedComponent}
         closeMenuOnSelect={false}
+        defaultValue={optionsDefault}
         placeholder={placeholder}
         styles={{
           control: (styles) => {

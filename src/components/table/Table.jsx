@@ -32,12 +32,14 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
     return (
         <div className='div-main justify-content-between p-2 p-md-3 p-lg-4'>
 
-            {/* Primera Seccion con el buscardor y el Boton de direccionamiento */}
+            {/* info:Primera Seccion con el buscardor y el Boton de direccionamiento */}
             <div className='w-100 d-flex flex-column flex-md-row justify-content-between'>
                 {
                     options.register ?
                         (
-                            <ButtonSimple type="button" onClick={() => { options.register.function() }}>{options.register.name}</ButtonSimple>
+                            <div className='w-100 w-md-50 px-2 px-md-4'>
+                                <ButtonSimple type="button" className={"w-100"} onClick={() => { options.register.function() }}>{options.register.name}</ButtonSimple>
+                            </div>
                         )
                         :
                         ""
@@ -45,7 +47,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
 
                 {
                     options.search ?
-                        (<div className='ms-auto d-flex align-items-center w-100 w-sm-50 mt-3 mt-md-0'>
+                        (<div className='ms-auto d-flex align-items-center w-100 w-md-50 mt-3 mt-md-0'>
                             <ButtonSimple
                                 type="button"
                                 onClick={(e) => {

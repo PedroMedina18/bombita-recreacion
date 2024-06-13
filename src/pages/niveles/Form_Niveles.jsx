@@ -1,19 +1,19 @@
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from "react-hook-form";
-import { InputsGeneral, InputTextTarea } from "../../components/input/Inputs.jsx"
-import { ButtonSimple } from "../../components/button/Button"
+import { InputsGeneral, InputTextTarea } from "../../components/input/Inputs.jsx";
+import { ButtonSimple } from "../../components/button/Button";
 import { useParams, useNavigate } from "react-router-dom";
 import { niveles } from "../../utils/API.jsx";
-import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx"
-import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx"
+import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
+import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
 import { Toaster } from "sonner";
-import { controlResultPost } from "../../utils/actions.jsx"
-import Navbar from "../../components/navbar/Navbar"
+import { controlResultPost } from "../../utils/actions.jsx";
+import Navbar from "../../components/navbar/Navbar";
 import texts from "../../context/text_es.js";
 import Swal from 'sweetalert2';
 import pattern from "../../context/pattern.js";
-import { IconRowLeft } from "../../components/Icon"
+import { IconRowLeft } from "../../components/Icon";
 
 function Form_Niveles() {
     const navigate = useNavigate();
@@ -78,7 +78,7 @@ function Form_Niveles() {
                         descripcion: data.descripcion,
                     }
                     alertLoading("Cargando")
-                    const res = generos.id? await niveles.put(body, Number(params.id)) : await niveles.post(body)
+                    const res = params.id? await niveles.put(body, Number(params.id)) : await niveles.post(body)
                     controlResultPost({
                         respuesta: res,
                         messageExito: texts.successMessage.nivel,
@@ -93,7 +93,7 @@ function Form_Niveles() {
         }
     )
     return (
-        <Navbar name={`${texts.pages.registerServicio.name}`} descripcion={`${texts.pages.registerServicio.description}`}>
+        <Navbar name={`${params.id? texts.pages.editNiveles.name : texts.pages.registerNiveles.name}`} descripcion={`${params.id? texts.pages.editNiveles.description : texts.pages.registerNiveles.description}`}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/niveles") }}><IconRowLeft/> Regresar</ButtonSimple>
 
             <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">

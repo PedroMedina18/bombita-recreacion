@@ -12,7 +12,7 @@
     width: 25px;
 }
 .button-initial:hover{
-    transform: scale(1.05);
+    transform: scale(1.03);
 }
 .button-initial:active{
     background-color: rgb(var(--secundario), 0.75);

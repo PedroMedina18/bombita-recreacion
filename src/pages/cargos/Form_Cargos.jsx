@@ -1,28 +1,32 @@
 import { useState, useEffect, useRef } from "react";
-import { Toaster } from "sonner";
 import { useForm } from "react-hook-form";
-import { useNavigate } from 'react-router-dom';
+import { Toaster } from "sonner";
+import { useNavigate, useParams } from 'react-router-dom';
 import { permisos, cargos } from "../../utils/API.jsx";
 import { LoaderCircle } from "../../components/loader/Loader";
-import { ButtonSimple } from "../../components/button/Button"
-import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx"
-import { InputsGeneral, InputTextTarea, InputCheck, MultiSelect, InputImgPerfil } from "../../components/input/Inputs.jsx"
-import {verifyOptionsSelect, controlResultPost} from "../../utils/actions.jsx"
-import {hasLeadingOrTrailingSpace} from "../../utils/process.jsx"
+import { ButtonSimple } from "../../components/button/Button";
+import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
+import { InputsGeneral, InputTextTarea, InputCheck, MultiSelect, InputImgPerfil } from "../../components/input/Inputs.jsx";
+import { verifyOptionsSelect, controlResultPost } from "../../utils/actions.jsx";
+import { hasLeadingOrTrailingSpace, coincidences } from "../../utils/process.jsx";
 import ErrorSystem from "../../components/errores/ErrorSystem";
-import Navbar from "../../components/navbar/Navbar"
+import Navbar from "../../components/navbar/Navbar";
 import Swal from 'sweetalert2';
 import texts from "../../context/text_es.js";
 import pattern from "../../context/pattern.js";
-import {IconRowLeft} from "../../components/Icon"
+import { IconRowLeft } from "../../components/Icon";
 
 function Cargos() {
-    const [loading, setLoading] = useState(true)
-    const [errorServer, setErrorServer] = useState("")
-    const [options, setOptions] = useState([])
-    const [selectOptions, setSelectOptions] = useState([])
+    const [loading, setLoading] = useState(true);
+    const [errorServer, setErrorServer] = useState("");
+    const [options, setOptions] = useState([]);
+    const [imgLogo, setImgLogo] = useState(null)
+    const [optionsDefault, setOptionsDefault] = useState([]);
+    const [selectOptions, setSelectOptions] = useState([]);
+    const [checkInput, setCheckInput] = useState(false);
     const navigate = useNavigate();
-    const renderizado = useRef(0)
+    const renderizado = useRef(0);
+    const params = useParams();
 
     useEffect(() => {
         if (renderizado.current === 0) {
@@ -31,6 +35,14 @@ function Cargos() {
             return
         }
     }, [])
+
+    useEffect(() => {
+        if (options.length) {
+            if (params.id){
+                get_cargos()
+            }
+        }
+    }, [options])
 
     // *funcion para buscar los permisos en la base de datos
     const get_Permisos = async () => {
@@ -45,6 +57,37 @@ function Cargos() {
             console.log(error)
             setErrorServer(texts.errorMessage.errorSystem)
         } finally{
+            if (!params.id){
+                setLoading(false)
+            }
+        }
+    }
+
+    const get_cargos = async () => {
+        try {
+            const respuesta = await cargos.get(Number(params.id))
+            if (respuesta.status !== 200) {
+                setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
+                return
+            }
+            if (respuesta.data.status === false) {
+                setErrorServer(`${respuesta.data.message}`)
+                return
+            } 
+            setErrorServer("")
+            if(respuesta.data.data.permisos){
+                setOptionsDefault(coincidences(options, respuesta.data.data.permisos))
+                setSelectOptions(coincidences(options, respuesta.data.data.permisos))
+            }
+            setValue("nombre", respuesta.data.data.nombre)
+            setValue("descripcion", respuesta.data.data.descripcion)
+            setValue("administrador", respuesta.data.data.administrador? true : false)
+            setCheckInput(respuesta.data.data.administrador? true : false)
+            setImgLogo(respuesta.data.data.img_logo? respuesta.data.data.img_logo : null)
+        } catch (error) {
+            console.log(error)
+            setErrorServer(texts.errorMessage.errorObjet)
+        } finally {
             setLoading(false)
         }
     }
@@ -53,6 +96,7 @@ function Cargos() {
     const {
         register,
         handleSubmit,
+        setValue,
         formState: { errors },
         watch
     } = useForm();
@@ -63,7 +107,8 @@ function Cargos() {
             try {
                 const permisos = selectOptions.map((elements) => { return elements.value })
                 const $archivo = document.getElementById(`icono`).files[0]
-                const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirRegister)
+                const message = params.id? texts.confirmMessage.confirEdit : texts.confirmMessage.confirRegister
+                const confirmacion = await alertConfim("Confirmar", message)
                 if (confirmacion.isConfirmed) {
                     const Form = new FormData()
                     Form.append('nombre', data.nombre)
@@ -72,7 +117,7 @@ function Cargos() {
                     Form.append('permisos', permisos)
                     Form.append('img_logo', $archivo?$archivo:null)
                     alertLoading("Cargando")
-                    const res = await cargos.postData(Form)
+                    const res = params.id? await cargos.putData(Form, Number(params.id)) : await cargos.postData(Form)
                     controlResultPost({
                         respuesta:res, 
                         messageExito:texts.successMessage.cargo,
@@ -88,7 +133,7 @@ function Cargos() {
     )
 
     return (
-        <Navbar  name={texts.pages.registerCargos.name} descripcion={texts.pages.registerCargos.description}>
+        <Navbar  name={params.id? texts.pages.editCargos.name : texts.pages.registerCargos.name} descripcion={params.id? texts.pages.editCargos.description : texts.pages.registerCargos.description}>
             <ButtonSimple type="button" className="mb-2" onClick={()=>{navigate("/cargos")}}> <IconRowLeft/> Regresar</ButtonSimple>
             {
                 loading ?
@@ -154,7 +199,7 @@ function Cargos() {
                                         }}
                                         placeholder={texts.placeholder.descripcion}
                                     />
-                                    <InputCheck label={`${texts.label.admin}`} name="administrador" id="administrador" form={{ errors, register }} isError={Boolean(!selectOptions.length)}
+                                    <InputCheck label={`${texts.label.admin}`} name="administrador" id="administrador" form={{ errors, register }} isError={Boolean(!selectOptions.length)} checked={checkInput}
                                         params={{
                                             validate: (value) => {
                                                 if (!selectOptions.length && !value) {
@@ -164,15 +209,20 @@ function Cargos() {
                                                 }
                                             }
                                         }}
+                                        onClick={
+                                            (e) => {
+                                                setCheckInput(!checkInput)
+                                            }
+                                        } 
                                     />
                                     {
                                         !watch("administrador") ?
-                                            (<MultiSelect name="permisos" label={`${texts.label.permisos}`} id="permisos" options={options} save={setSelectOptions} placeholder={"Permisos"} />)
+                                            (<MultiSelect name="permisos" label={`${texts.label.permisos}`} id="permisos" options={options} save={setSelectOptions} optionsDefault={optionsDefault} placeholder={"Permisos"} />)
                                             :
                                             ""
                                     }
                                     <div className="w-100 mt-2">
-                                        <InputImgPerfil name="icono" id="icono" label={`Icono`} form={{ errors, register }} tamaño="sm"/>
+                                        <InputImgPerfil name="icono" id="icono" label={`Icono`} form={{ errors, register }} tamaño="sm" imgPerfil={imgLogo}/>
                                     </div>
 
                                     {Boolean(!selectOptions.length && errors["administrador"]) ? <span className="message-error visible">{texts.inputsMessage.selecPermisos}</span> : <span className="message-error invisible">Sin errores</span>}

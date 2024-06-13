@@ -16,21 +16,22 @@ export const habilitarEdicion = ({ setValue, setdataNewUser, dataPersona }) => {
 
 // *verifica la respuesta de la peticion al buscar las opciones de los selects
 export const verifyOptionsSelect = ({ respuesta, setError, setOptions }) => {
-    if (respuesta.status === 200) {
-        if (respuesta.data.status === true) {
-            const options = respuesta.data.data.map((elements) => {
-                return {
-                    value: elements.id,
-                    label: elements.nombre || `${elements.nombres} ${elements.apellidos}`
-                }
-            })
-            setOptions(options)
-        } else {
-            setError(`${respuesta.data.message}`)
-        }
-    } else {
+    if (respuesta.status !== 200) {
         setError(`Error. ${respuesta.status} ${respuesta.statusText}`)
+        return
     }
+
+    if (respuesta.data.status === false) {
+        setError(`${respuesta.data.message}`)
+        return
+    }
+    const options = respuesta.data.data.map((elements) => {
+        return {
+            value: elements.id,
+            label: elements.nombre || `${elements.nombres} ${elements.apellidos}`
+        }
+    })
+    setOptions(options)
 }
 
 // *Funcion encargada de buscar los datos de una persona si cuenta con el tipo de documento y su numero
@@ -39,7 +40,6 @@ export const getPersona = async ({ dataNewUser, setPersona, setValue, setDisable
         if (dataNewUser.tipo_documento && dataNewUser.numero_documento && dataNewUser.numero_documento.length >= 8) {
             const respuesta = await personas.get(dataNewUser.tipo_documento, dataNewUser.numero_documento)
             if (respuesta.status === 200 && respuesta.data.status === true) {
-                console.log(respuesta)
                 setPersona({
                     ...respuesta.data.data
                 })

@@ -13,15 +13,13 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  /* color: rgb(67, 191, 51); */
 }
 
 /* background */
 
 .haikus{
-  background: #fd746c;  /* fallback for old browsers */
-  background: -webkit-linear-gradient(to right, #ff9068, #fd746c);  /* Chrome 10-25, Safari 5.1-6 */
-  background: linear-gradient(to right, #ff9068, #fd746c); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+  background: rgb(194,101,122);
+  background: linear-gradient(180deg, rgba(194,101,122,0.835171568627451) 0%, rgba(195,20,50,1) 100%);
 }
 
 /* modificaciondesl input number */
@@ -151,7 +149,16 @@ input[type="number"] {
   height: 100vh;
 }
 
-@media (max-width: 992px) {
+.svg-check svg {
+  color: rgb(0, 167, 0);
+  width: 50px;
+}
+.svg-x svg {
+  color: rgb(204, 19, 19);
+  width: 50px;
+}
+
+@media (min-width: 992px) {
   .w-lg-25 {
     width: 25% !important;
   }

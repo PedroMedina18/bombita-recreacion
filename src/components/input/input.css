@@ -115,6 +115,7 @@
 }
 .img-perfil{
   width: 200px;
+  max-height: 200px;
   
 }
 .section-perfil svg{
@@ -123,7 +124,7 @@
 }
 
 .img-perfil.sm{
-  width: 120px;
+  width: 150px;
   
 }
 .section-perfil.sm svg{

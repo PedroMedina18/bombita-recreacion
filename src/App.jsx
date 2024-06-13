@@ -30,8 +30,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route element={<ProtectedRouter />}>
-            <Route path="/register/cargo" element={<Form_Cargos />} />
             <Route path="/cargos" element={<Cargos />} />
+            <Route path="/register/cargo" element={<Form_Cargos />} />
+            <Route path="/edit/cargo/:id" element={<Form_Cargos />} />
             <Route path="/usuarios" element={<Usuarios />} />
             <Route path="/register/eventos" element={<Form_Eventos />} />
             <Route path="/actividades" element={<Actividades />} />

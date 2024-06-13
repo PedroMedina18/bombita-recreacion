@@ -42,6 +42,7 @@ export const errorAxios = async (error) => {
   }
 }
 
+// *Para el formato de numeros utilizados en vez de id
 export const formatoNumero = (numero) => {
   const strNumero = numero.toString();
   const longitud = strNumero.length;
@@ -57,6 +58,7 @@ export const formatoNumero = (numero) => {
   }
 }
 
+// *Para devolver un formato de fecha y hora  de 12 horas
 export function formatDateWithTime12Hour(date) {
   const fecha = new Date(date);
   const options = {
@@ -68,4 +70,12 @@ export function formatDateWithTime12Hour(date) {
     hour12: true
   };
   return new Intl.DateTimeFormat('es-ES', options).format(fecha);
+}
+
+// *Para devolver una lista con los objetos que coinciden
+export function coincidences(options, optionDefault) {
+  const resultado = options.filter(item1 => {
+    return optionDefault.some(item2 => item1.value === item2.id);
+  });
+  return resultado;
 }

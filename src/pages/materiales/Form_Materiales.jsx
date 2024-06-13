@@ -79,7 +79,7 @@ function Form_Materiales() {
                         descripcion: data.descripcion,
                     }
                     alertLoading("Cargando")
-                    const res = recreador.id? await materiales.put(body, Number(params.id)) : await materiales.post(body)
+                    const res = params.id? await materiales.put(body, Number(params.id)) : await materiales.post(body)
                     controlResultPost({
                         respuesta: res,
                         messageExito: texts.successMessage.material,
@@ -94,7 +94,7 @@ function Form_Materiales() {
         }
     )
     return (
-        <Navbar name={texts.pages.registerMaterial.name} descripcion={texts.pages.registerMaterial.description}>
+        <Navbar name={params.id? texts.pages.editMaterial.name : texts.pages.registerMaterial.name} descripcion={params.id? texts.pages.editMaterial.description : texts.pages.registerMaterial.description}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/materiales") }}> <IconRowLeft/> Regresar</ButtonSimple>
 
             <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">

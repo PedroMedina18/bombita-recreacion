@@ -165,7 +165,7 @@ function Form_Recreadores() {
     )
 
     return (
-        <Navbar name={`${texts.pages.registerRecreadores.name}`} descripcion={`${texts.pages.registerRecreadores.description}`}>
+        <Navbar name={`${recreador.id? texts.pages.editRecreadores.name : texts.pages.registerRecreadores.name}`} descripcion={`${recreador.id? texts.pages.editRecreadores.description : texts.pages.registerRecreadores.description}`}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/recreadores") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
             {
@@ -205,7 +205,8 @@ function Form_Recreadores() {
                                                     dataPersona
                                                 })
                                             }
-                                        } />
+                                        } 
+                                    />
                                     <div className="w-100">
                                         <InputImgPerfil name="img_perfil" id="img_perfil" label={`${texts.label.fotoRecreador}`} form={{ errors, register }} imgPerfil={recreador.img}/>
                                     </div>

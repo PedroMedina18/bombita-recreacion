@@ -1,4 +1,5 @@
-import { useState, useForm, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from 'react-router-dom';
 import { InputsGeneral, InputTextTarea } from "../../components/input/Inputs.jsx";
 import { ButtonSimple } from "../../components/button/Button";
@@ -94,7 +95,7 @@ function Form_Tipo_Documento() {
     )
 
     return (
-        <Navbar name={texts.pages.registerTipoDocumento.name} descripcion={texts.pages.registerTipoDocumento.description}>
+        <Navbar name={params.id? texts.pages.editTipoDocumento.name : texts.pages.registerTipoDocumento.name} descripcion={params.id? texts.pages.editTipoDocumento.description : texts.pages.registerTipoDocumento.description}>
             <ButtonSimple type="button" className="mb-2" onClick={()=>{navigate("/tipo_documentos")}}> <IconRowLeft/> Regresar</ButtonSimple>
 
             <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">

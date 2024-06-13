@@ -167,7 +167,6 @@ class Cargos_Views(View):
             return JsonResponse(datos)
 
     def get(self, request, id=0):
-
         try:
             cursor = connection.cursor()
             verify=verify_token(request.headers)
@@ -192,17 +191,13 @@ class Cargos_Views(View):
                             p.nombre,
                             P.descripcion
                         FROM 
-                            cargos AS c
+                            permisos AS p
                         INNER JOIN 
                             permisos_has_cargos 
                         ON 
-                            c.id = permisos_has_cargos.cargo_id
-                        INNER JOIN 
-                            permisos AS P
-                        ON 
                             p.id = permisos_has_cargos.permiso_id
                         WHERE 
-                            c.id = %s;
+                            permisos_has_cargos.cargo_id = %s;
                         """
                         cursor.execute(query, [int(id)])
                         permisos = dictfetchall(cursor)

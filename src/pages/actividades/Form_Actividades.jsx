@@ -2,38 +2,48 @@ import { useState, useEffect, useRef } from "react";
 import { InputsGeneral, InputTextTarea, MultiSelect } from "../../components/input/Inputs.jsx";
 import { ButtonSimple } from "../../components/button/Button";
 import { useForm } from "react-hook-form";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { actividades, materiales } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { LoaderCircle } from "../../components/loader/Loader";
-import { verifyOptionsSelect, controlResultPost } from "../../utils/actions.jsx"
-import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
+import { verifyOptionsSelect, controlResultPost } from "../../utils/actions.jsx";
+import { hasLeadingOrTrailingSpace, coincidences } from "../../utils/process.jsx";
 import { Toaster } from "sonner";
 import ErrorSystem from "../../components/errores/ErrorSystem";
 import Swal from 'sweetalert2';
 import Navbar from "../../components/navbar/Navbar";
 import texts from "../../context/text_es.js";
 import pattern from "../../context/pattern.js";
-import { IconRowLeft } from "../../components/Icon"
+import { IconRowLeft } from "../../components/Icon";
 
 function Actividades() {
-  const [errorServer, setErrorServer] = useState("")
-  const [options, setOptions] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [selectOptions, setSelectOptions] = useState([])
+  const [errorServer, setErrorServer] = useState("");
+  const [options, setOptions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectOptions, setSelectOptions] = useState([]);
+  const [optionsDefault, setOptionsDefault] = useState([]);
   const navigate = useNavigate();
-  const renderizado = useRef(0)
+  const renderizado = useRef(0);
+  const params = useParams();
 
   useEffect(() => {
     if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1
-      getMateriales()
+      get_materiales()
       return
     }
   }, [])
 
+  useEffect(() => {
+    if (options.length) {
+      if (params.id){
+        get_actividades()
+      }
+    }
+  }, [options])
+
   //* funcion para buscar los permisos en la vase de datos
-  const getMateriales = async () => {
+  const get_materiales = async () => {
     try {
       const res = await materiales.get()
       verifyOptionsSelect({
@@ -45,13 +55,41 @@ function Actividades() {
       console.log(error)
       setErrorServer(texts.errorMessage.errorSystem)
     } finally {
-      setLoading(false)
+      if (!params.id){
+        setLoading(false)
+      }
     }
   }
+
+  const get_actividades = async () => {
+    try {
+        const respuesta = await actividades.get(Number(params.id))
+        if (respuesta.status !== 200) {
+          setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
+          return
+        }
+        if (respuesta.data.status === false) {
+          setErrorServer(`${respuesta.data.message}`)
+          return
+        } 
+        setErrorServer("")
+        setValue("nombre", respuesta.data.data.nombre)
+        setValue("descripcion", respuesta.data.data.descripcion)
+        setOptionsDefault(coincidences(options, respuesta.data.data.materiales))
+        setSelectOptions(coincidences(options, respuesta.data.data.materiales))
+    } catch (error) {
+        console.log(error)
+        setErrorServer(texts.errorMessage.errorObjet)
+    } finally {
+        setLoading(false)
+    }
+}
+
 
   //* the useform
   const {
     register,
+    setValue,
     handleSubmit,
     formState: { errors },
     watch
@@ -61,7 +99,8 @@ function Actividades() {
   const onSubmit = handleSubmit(
     async (data) => {
       try {
-        const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirRegister)
+        const message = params.id? texts.confirmMessage.confirEdit : texts.confirmMessage.confirRegister
+        const confirmacion = await alertConfim("Confirmar", message)
         if (confirmacion.isConfirmed) {
           const materiales = selectOptions.map((elements) => { return elements.value })
           const body = {
@@ -70,7 +109,7 @@ function Actividades() {
             materiales: materiales
           }
           alertLoading("Cargando")
-          const res = await actividades.post(body)
+          const res = params.id? await actividades.put(body, Number(params.id)) : await actividades.post(body)
           controlResultPost({
             respuesta: res,
             messageExito: texts.successMessage.actividades,
@@ -86,7 +125,7 @@ function Actividades() {
     }
   )
   return (
-    <Navbar name={texts.pages.registerActividades.name} descripcion={texts.pages.registerActividades.description}>
+    <Navbar name={params.id? texts.pages.editActividades.name : texts.pages.registerActividades.name} descripcion={params.id? texts.pages.editActividades.description : texts.pages.registerActividades.description}>
       <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/actividades") }}> <IconRowLeft/> Regresar</ButtonSimple>
 
       {
@@ -152,7 +191,7 @@ function Actividades() {
                     }}
                     placeholder={texts.placeholder.descripcion}
                   />
-                  <MultiSelect id="materiales" name="materiales" label={texts.label.materiales} options={options} placeholder="Materiales" save={setSelectOptions} />
+                  <MultiSelect id="materiales" name="materiales" label={texts.label.materiales} options={options} placeholder="Materiales" save={setSelectOptions} optionsDefault={optionsDefault}/>
                   <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
                     Registrar
                   </ButtonSimple>

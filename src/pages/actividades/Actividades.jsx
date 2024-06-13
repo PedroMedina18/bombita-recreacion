@@ -1,12 +1,12 @@
-import { useEffect, useState, useRef } from "react"
-import { actividades } from "../../utils/API.jsx"
+import { useEffect, useState, useRef } from "react";
+import { actividades } from "../../utils/API.jsx";
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
-import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx"
-import { formatoNumero } from "../../utils/process.jsx"
-import { alertInfo } from "../../components/alerts.jsx"
-import Navbar from "../../components/navbar/Navbar"
-import Table from "../../components/table/Table"
+import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx";
+import { formatoNumero } from "../../utils/process.jsx";
+import { alertInfo } from "../../components/alerts.jsx";
+import Navbar from "../../components/navbar/Navbar";
+import Table from "../../components/table/Table";
 import texts from "../../context/text_es.js";
 
 function Actividades() {
@@ -63,6 +63,9 @@ function Actividades() {
           setList: setActividades
         })
       }
+    },
+    put: (row)=>{
+      navigate(`/edit/actividad/${row.id}`)
     },
     get:(row)=>{
       alertInfo(

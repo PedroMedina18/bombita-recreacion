@@ -3,8 +3,8 @@ import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { recreadores } from "../../utils/API.jsx"
 import { calcularEdad } from "../../utils/process.jsx"
-import { searchCode, getListItems, deleteItem} from "../../utils/actions.jsx"
-import {formatoNumero} from "../../utils/process.jsx"
+import { searchCode, getListItems, deleteItem } from "../../utils/actions.jsx"
+import { formatoNumero } from "../../utils/process.jsx"
 import Navbar from "../../components/navbar/Navbar"
 import Table from "../../components/table/Table"
 import texts from "../../context/text_es.js";
@@ -93,6 +93,9 @@ function Recreadores() {
         },
         put: (row)=>{
             navigate(`/edit/recreador/${row.numero_documento}`)
+        },
+        get: (row)=>{
+            navigate(`/recreador/${row.numero_documento}`)
         },
         delete: (row) => {
             deleteItem({

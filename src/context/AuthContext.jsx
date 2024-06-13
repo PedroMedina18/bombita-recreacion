@@ -1,7 +1,7 @@
 import { useEffect, useState, createContext } from 'react'
 import { verify_token } from "../utils/API.jsx"
 import { getCookie } from "../utils/cookie.jsx"
-import { LoaderCircle } from "../components/loader/Loader.jsx"
+import { LoaderRule } from "../components/loader/Loader.jsx"
 export const AuthContext = createContext();
 
 export function AuthContextProvider({ children }) {
@@ -43,14 +43,14 @@ export function AuthContextProvider({ children }) {
           saveUser(respuesta.data.data, respuesta.data.token)
         } else {
           setUser({})
-          setIsAuthenticated(false)
+          setIsAuthenticated(true)
           document.cookie = `token=; path=/; max-age=0`
         }
       }
     } catch (error) {
       console.log(error)
       setUser({})
-      setIsAuthenticated(false)
+      setIsAuthenticated(true)
       document.cookie = `token=; path=/; max-age=0`
     } finally {
       setIsLoading(false)
@@ -73,7 +73,13 @@ export function AuthContextProvider({ children }) {
         closeSession,
       }
     }>
-      {isloading ? <div className="w-100 d-flex justify-content-center align-items-center heigh-100 haikus"><LoaderCircle /></div> : children}
+      {isloading ? 
+        <div className="w-100 d-flex justify-content-center align-items-center heigh-100 haikus">
+          <LoaderRule />
+        </div> 
+        : 
+        children
+      }
     </AuthContext.Provider>
 
   )

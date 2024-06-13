@@ -138,6 +138,23 @@ class Actividades_Views(View):
                 cursor.execute(query, [int(id)])
                 actividad = dictfetchall(cursor)
                 if(len(actividad)>0):
+                    query = """
+                        SELECT 
+                            m.id,
+                            m.nombre,
+                            m.descripcion
+                        FROM 
+                            materiales AS m
+                        INNER JOIN 
+                            materiales_has_actividades 
+                        ON 
+                            m.id = materiales_has_actividades.material_id
+                        WHERE 
+                            materiales_has_actividades.actividad_id = %s;
+                        """
+                    cursor.execute(query, [int(id)])
+                    materiales = dictfetchall(cursor)
+                    actividad[0]['materiales'] = materiales
                     datos = {
                         'status': True,
                         'message': f"{MESSAGE['exitoGet']}",
