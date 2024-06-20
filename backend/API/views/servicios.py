@@ -46,7 +46,7 @@ class Servicios_Views(View):
             materiales = req['materiales']
             for material in materiales:
                 newMteriales = Materiales.objects.get(id=int(material['material']))
-                ServiciosMateriales.objects.create(material=newMteriales, servicio=servicio, cantidad=material['cantidad'])
+                ServiciosMateriales.objects.create(material=newMteriales, servicio=servicio, cantidad=int(material['cantidad']))
             
             datos = {
                 'status': True,
@@ -62,7 +62,7 @@ class Servicios_Views(View):
             return JsonResponse(datos)
 
     def put(self, request, id):
-        try:
+        # try:
             req = json.loads(request.body)
             verify = verify_token(req['headers'])
             req = req['body']
@@ -85,7 +85,7 @@ class Servicios_Views(View):
                 servicio.save()
                 
                 recreadores = req['recreadores']
-                query = """"
+                query = """
                     SELECT re.id FROM
                         recreadores AS re
                     INNER JOIN 
@@ -95,73 +95,76 @@ class Servicios_Views(View):
                     WHERE 
                         servicios_has_recreadores.servicio_id = %s;
                 """
+                cursor.execute(query, [int(id)])
+                listRecreador = dictfetchall(cursor)
                 editorOpciones(
-                    cursor=cursor,
-                    query=query,
+                    items=listRecreador,
                     id=id,
                     listTabla=recreadores,
                     tablaIntermedia=ServiciosRecreadores,
                     itemGet=servicio,
                     tablaAgregar=Recreadores,
-                    filtro_cargos='cargos', 
-                    filtro_permisos='permisos', 
-                    campo_cargos='cargos', 
-                    campo_permisos='permisos'
+                    filtro_principal='servicio', 
+                    filtro_secundario='recreador', 
+                    campo_principal='servicio', 
+                    campo_secundario='recreador'
                 )
 
                 # ------------------------------------------------
 
                 actividades = req['actividades']
-                query = """"
+                query = """
                     SELECT ac.id FROM
                         actividades AS ac
                     INNER JOIN 
-                        servicios_has_actvidades
+                        servicios_has_actividades
                     ON 
-                        ac.id = servicios_has_actvidades.actividad_id
+                        ac.id = servicios_has_actividades.actividad_id
                     WHERE 
-                        servicios_has_actvidades.servicio_id = %s;
+                        servicios_has_actividades.servicio_id = %s;
                 """
+                cursor.execute(query, [int(id)])
+                listActidades = dictfetchall(cursor)
                 editorOpciones(
-                    cursor=cursor,
-                    query=query,
+                    items=listActidades,
                     id=id,
                     listTabla=actividades,
                     tablaIntermedia=ServiciosActividades,
                     itemGet=servicio,
                     tablaAgregar=Actividades,
-                    filtro_cargos='cargos', 
-                    filtro_permisos='permisos', 
-                    campo_cargos='cargos', 
-                    campo_permisos='permisos'
+                    filtro_principal='servicio', 
+                    filtro_secundario='actividad', 
+                    campo_principal='servicio', 
+                    campo_secundario='actividad'
                 )
 
                 # ------------------------------------------------
 
                 materiales = req['materiales']
-                query = """"
-                    SELECT ma.id FROM
-                        materiales AS ma
-                    INNER JOIN 
-                        servicios_has_materiales
-                    ON 
-                        ma.id = servicios_has_materiales.material_id
+                query = """
+                    SELECT 
+                        serma.material_id AS id, 
+                        serma.cantidad 
+                    FROM
+                        servicios_has_materiales AS serma
                     WHERE 
-                        servicios_has_materiales.servicio_id = %s;
+                        serma.servicio_id = %s;
                 """
-                editorOpciones(
-                    cursor=cursor,
-                    query=query,
-                    id=id,
-                    listTabla=materiales,
-                    tablaIntermedia=ServiciosMateriales,
-                    itemGet=servicio,
-                    tablaAgregar=Actividades,
-                    filtro_cargos='cargos', 
-                    filtro_permisos='permisos', 
-                    campo_cargos='cargos', 
-                    campo_permisos='permisos'
-                )
+                cursor.execute(query, [int(id)])
+                listMateriales = dictfetchall(cursor)
+                material_items = [{"material":item["id"], "cantidad":item["cantidad"]} for item in listMateriales]
+                editar = [objetMaterial for objetMaterial in materiales if objetMaterial  in material_items]
+                for item in editar:
+                    material=ServiciosMateriales.objects.get(servicio=int(id), material=item["material"])
+                    material.cantidad = item["cantidad"]
+                    material.save()
+                eliminar = [objetMaterial for objetMaterial in material_items if objetMaterial not in materiales]
+                for item in eliminar:
+                    ServiciosMateriales.objects.filter(servicio=int(id), material=item["material"]).delete()
+                agregar = [objetMaterial for objetMaterial in materiales if objetMaterial not in material_items]
+                for item in agregar:
+                    newMaterial = Materiales.objects.get(id=int(item["material"]))
+                    ServiciosMateriales.objects.create(servicio=servicio, material=newMaterial, cantidad=int(item["cantidad"]))
 
                 datos = {
                     'status': True,
@@ -174,13 +177,13 @@ class Servicios_Views(View):
                 }
             
             return JsonResponse(datos)
-        except Exception as error:
-            print(f"Error de consulta put - {error}")
-            datos = {
-                'status': False,
-                'message': f"Error al editar: {error}",
-            }
-            return JsonResponse(datos)
+        # except Exception as error:
+        #     print(f"Error de consulta put - {error}")
+        #     datos = {
+        #         'status': False,
+        #         'message': f"Error al editar: {error}",
+        #     }
+        #     return JsonResponse(datos)
 
     def delete(self, request, id):
         try:
@@ -231,12 +234,70 @@ class Servicios_Views(View):
                 }
                 return JsonResponse(datos)
 
-            if (id > 0):
+            if (int(id) > 0):
                 query = """
-                SELECT * FROM mat WHERE servicios.id=%s;
+                SELECT 
+                    *
+                FROM 
+                    servicios 
+                WHERE servicios.id=%s;
                 """
                 cursor.execute(query, [int(id)])
                 servicio = dictfetchall(cursor)
+
+                query = """
+                SELECT 
+                    re.id,
+                    pe.nombres AS nombres,
+                    pe.apellidos AS apellidos
+                FROM 
+                    recreadores AS re
+                LEFT JOIN personas AS pe ON re.persona_id=pe.id
+                INNER JOIN 
+                        servicios_has_recreadores
+                    ON 
+                        re.id = servicios_has_recreadores.recreador_id
+                 
+                WHERE servicios_has_recreadores.servicio_id=%s;
+                """
+                cursor.execute(query, [int(id)])
+                recreadores = dictfetchall(cursor)
+                query = """
+                    SELECT 
+                        ac.id,
+                        ac.nombre
+                    FROM
+                        actividades AS ac
+                    INNER JOIN 
+                        servicios_has_actividades
+                    ON 
+                        ac.id = servicios_has_actividades.actividad_id
+                    WHERE 
+                        servicios_has_actividades.servicio_id = %s;
+                """
+                cursor.execute(query, [int(id)])
+                actividades = dictfetchall(cursor)
+                query = """
+                    SELECT 
+                        serma.material_id AS id, 
+                        serma.cantidad,
+                        ma.nombre AS nombre
+                    FROM
+                        servicios_has_materiales AS serma
+                    INNER JOIN 
+                        materiales AS ma
+                    ON 
+                        serma.material_id = ma.id
+                    WHERE 
+                        serma.servicio_id = %s;
+                """
+                cursor.execute(query, [int(id)])
+                materiales = dictfetchall(cursor)
+
+                servicio[0]["recreadores"] = recreadores
+                servicio[0]["actividades"] = actividades
+                servicio[0]["materiales"] = materiales
+                servicio[0]['duracion'] = duration(servicio[0]['duracion'])
                 if (len(servicio) > 0):
                     datos = {
                         'status': True,
@@ -281,7 +342,7 @@ class Servicios_Views(View):
                     SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM servicios;
                 """
                 for servicio in servicios:
-                    servicio['duracion']=duration(servicio['duracion'])
+                    servicio['duracion'] = duration(servicio['duracion'])
                 cursor.execute(query)
                 result = dictfetchall(cursor)
                 if len(servicios) > 0:
@@ -300,6 +361,7 @@ class Servicios_Views(View):
                         "pages": None,
                         "total": 0
                     }
+            
             return JsonResponse(datos)
         except Exception as error:
             print(f"Error consulta get - {error}")

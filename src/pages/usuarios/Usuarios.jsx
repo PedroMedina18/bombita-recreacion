@@ -32,8 +32,8 @@ function Usuarios() {
     // *funcion para buscar los tipos de documentos y los cargos
     const getData = async () => {
         try {
-            const get_cargos = await cargos.get()
-            const get_tipo_documentos = await tipo_documentos.get()
+            const get_cargos = await cargos.get({})
+            const get_tipo_documentos = await tipo_documentos.get({})
             verifyOptionsSelect({
                 respuesta:get_cargos,
                 setError:setErrorServer,

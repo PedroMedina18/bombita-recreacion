@@ -43,9 +43,9 @@ function Form_Recreadores() {
     // *Funcion para buscar los niveles y tipos de documentos
     const get_data = async () => {
         try {
-            const get_niveles = await niveles.get()
-            const get_tipo_documentos = await tipo_documentos.get()
-            const get_generos = await generos.get()
+            const get_niveles = await niveles.get({})
+            const get_tipo_documentos = await tipo_documentos.get({})
+            const get_generos = await generos.get({})
             verifyOptionsSelect({
                 respuesta: get_niveles,
                 setError: setErrorServer,
@@ -78,7 +78,7 @@ function Form_Recreadores() {
 
     const get_recreador = async () => {
         try {
-            const respuesta = await recreadores.get(Number(params.numero_documento))
+            const respuesta = await recreadores.get({paramOne:Number(params.numero_documento), params:{"_info":"true"} })
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
                 return
@@ -88,6 +88,7 @@ function Form_Recreadores() {
                 return
             } 
             setErrorServer("")
+            console.log(respuesta)
             setRecreador({
                 ...recreador,
                 img:respuesta.data.data.info.img_perfil,
@@ -152,7 +153,7 @@ function Form_Recreadores() {
                 
                 controlResultPost({
                     respuesta: res,
-                    messageExito: texts.successMessage.recreador,
+                    messageExito:recreador.id? texts.successMessage.editionRecreador : texts.successMessage.registerRecreador,
                     useNavigate: { navigate: navigate, direction: "/recreadores" }
                 })
             }

@@ -50,8 +50,8 @@ export const alertInfo = async (title, data) => {
         <div class='p-2 d-flex flex-column justify-content-start align-items-start'>
             <p class="m-0 mb-2 text-start"><b>Codigo: </b>${formatoNumero(data.id)}</p>
             <p class="m-0 mb-2 text-start"><b>Descripción: </b>${data.descripcion}</p>
-            <p class="m-0 mb-2 text-start"><b>Fecha de Registro: </b>${formatDateWithTime12Hour(data.fecha_actualizacion)}</p>
-            <p class="m-0 mb-2 text-start"><b>Fecha de Actualización: </b>${formatDateWithTime12Hour(data.fecha_registro)}</p>
+            <p class="m-0 mb-2 text-start"><b>Fecha de Registro: </b>${formatDateWithTime12Hour(data.fecha_registro)}</p>
+            <p class="m-0 mb-2 text-start"><b>Fecha de Actualización: </b>${formatDateWithTime12Hour(data.fecha_actualizacion)}</p>
         </div>
         `,
         customClass: {

@@ -79,3 +79,14 @@ export function coincidences(options, optionDefault) {
   });
   return resultado;
 }
+
+export function addOptionalQueryParams(url, queryParams) {
+  if (queryParams) {
+    const params = new URLSearchParams();
+    Object.keys(queryParams).forEach(key => {
+      params.append(key, queryParams[key]);
+    });
+    url += `?${params.toString()}`;
+  }
+  return url;
+}

@@ -2,18 +2,16 @@ from .serializador import dictfetchall
 
 
 # INFO: sirve para agregar y eliminar registros en una tabla intermedia dependiendo de una lista de indices 
-def editorOpciones(cursor, query, tablaIntermedia, tablaAgregar, itemGet, listTabla, id, **kwargs):
-    cursor.execute(query, [int(id)])
-    items = dictfetchall(cursor)
+def editorOpciones(items, tablaIntermedia, tablaAgregar, itemGet, listTabla, id, **kwargs):
     ids_items = [item["id"] for item in items]
     eliminar = [num for num in ids_items if num not in listTabla]
     for item in eliminar:
-        filter_kwargs = {kwargs['filtro_cargos']: id, kwargs['filtro_permisos']: item}
+        filter_kwargs = {kwargs['filtro_principal']: id, kwargs['filtro_secundario']: item}
         tablaIntermedia.objects.filter(**filter_kwargs).delete()
-        agregar = [num for num in listTabla if num not in ids_items]
+    agregar = [num for num in listTabla if num not in ids_items]
     for item in agregar:
-        item = tablaAgregar.get(id=item)
-        create_kwargs = {kwargs['campo_cargos']: itemGet, kwargs['campo_permisos']: item}
+        item = tablaAgregar.objects.get(id=item)
+        create_kwargs = {kwargs['campo_principal']: itemGet, kwargs['campo_secundario']: item}
         tablaIntermedia.objects.create(**create_kwargs)
 
 

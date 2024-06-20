@@ -33,7 +33,7 @@ function Form_Tipo_Documento() {
 
     const get_tipoDocumento = async () => {
         try {
-            const respuesta = await tipo_documentos.get(Number(params.id))
+            const respuesta = await tipo_documentos.get({paramOne:Number(params.id)})
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
                 return
@@ -81,7 +81,7 @@ function Form_Tipo_Documento() {
                     const res = params.id? await tipo_documentos.put(body, Number(params.id)) : await tipo_documentos.post(body)
                     controlResultPost({
                         respuesta:res, 
-                        messageExito:texts.successMessage.tipoDocumento, 
+                        messageExito:params.id? texts.successMessage.editionTipoDocumento : texts.successMessage.registerTipoDocumento, 
                         useNavigate:{navigate:navigate, direction:"/tipo_documentos"}
                     })
                 }
@@ -108,8 +108,8 @@ function Form_Tipo_Documento() {
                                 message: texts.inputsMessage.requireName,
                             },
                             maxLength: {
-                                value: 50,
-                                message: texts.inputsMessage.max50,
+                                value: 100,
+                                message: texts.inputsMessage.max100,
                             },
                             pattern: {
                                 value: pattern.textWithNumber,
@@ -123,13 +123,13 @@ function Form_Tipo_Documento() {
                                 }
                             }
                         }}
-                        placeholder={"Nombre del tipo de documento"}
+                        placeholder={texts.placeholder.nameTipoDocumento}
                     />
                     <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
                         params={{
                             maxLength: {
-                                value: 200,
-                                message: texts.inputsMessage.max200
+                                value: 600,
+                                message: texts.inputsMessage.max600
                             },
                             validate: (value) => {
                                 if (hasLeadingOrTrailingSpace(value)) {

@@ -1,13 +1,15 @@
 import Navbar from '../components/navbar/Navbar'
-
+import { useContext, useState } from 'react';
+import { AuthContext } from '../context/AuthContext.jsx';
 
 function Inicio() {
+  const { getUser } = useContext(AuthContext)
+  const [dataUser] = useState(getUser())
   return (
     <Navbar name="Bienvenido">
-      <p>Hoila</p>
-      <div className='w-100 bg-danger'>
-        <p>dssdsd</p>
-
+      <div className='w-100 justify-content-between px-3 px-md-4 px-lg-5 py-3'>
+        dsd
+        <p className='h2'>{`${dataUser.dollar.price} Bs`}</p>
       </div>
     </Navbar>
   )

@@ -7,6 +7,7 @@ from ..funtions.encriptado_contraseña import encriptado_constraseña, desencrip
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.token import new_token, verify_token
 from ..funtions.serializador import dictfetchall
+from ..funtions.dollar import consultDollar
 from ..models import Cargos
 from django.db import IntegrityError, connection
 import json
@@ -40,6 +41,15 @@ class Login(View):
                 # se comprueba de que la contraseña este correcta
                 contraseña = desencriptado_contraseña(usuario[0]['contraseña'], jd['contraseña'])
                 if(contraseña):
+                    
+                    
+                    
+
+
+
+                    
+
+
                     # user_administrador=Cargos.objects.filter(id=usuario[0]['cargo_id']).values("administrador")
                     # if(user_administrador[0]['administrador']):
                     #     token=new_token(usuario[0], None, user_administrador[0]['administrador'])
@@ -74,6 +84,7 @@ class Login(View):
                     #     cursor.execute(query, [int(usuario[0]['cargo_id'])])
                     #     permisos=dictfetchall(cursor)
                     # token=new_token(usuario[0], [permiso['id'] for permiso in permisos], False)
+                    precioDollar=consultDollar(cursor)
                     token=new_token(usuario[0])
                     response={
                         'status':True,
@@ -83,7 +94,8 @@ class Login(View):
                             'id':usuario[0]['id'],
                             'nombre':usuario[0]['nombre'],
                             'cargo':usuario[0]['cargo'],
-                            'inicio_sesion':datetime.now()
+                            'inicio_sesion':datetime.now(),
+                            'dollar':precioDollar,
                         }
                     }
                     return JsonResponse(response)

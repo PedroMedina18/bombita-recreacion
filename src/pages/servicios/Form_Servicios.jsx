@@ -1,19 +1,19 @@
-import { useState, useEffect,useRef } from "react";
-import { Toaster } from "sonner";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { Toaster } from "sonner";
+import { useNavigate, useParams } from "react-router-dom";
 import { recreadores, servicios, materiales, actividades, } from "../../utils/API.jsx";
 import { LoaderCircle } from "../../components/loader/Loader";
 import { ButtonSimple } from "../../components/button/Button";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { InputsGeneral, InputTextTarea, InputDuration, MultiSelect } from "../../components/input/Inputs.jsx";
-import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
+import { hasLeadingOrTrailingSpace, coincidences } from "../../utils/process.jsx";
 import { verifyOptionsSelect, controlResultPost } from "../../utils/actions.jsx"
 import ErrorSystem from "../../components/errores/ErrorSystem";
 import texts from "../../context/text_es.js";
 import Navbar from "../../components/navbar/Navbar";
 import Swal from "sweetalert2";
-import {IconRowLeft} from "../../components/Icon"
+import { IconRowLeft } from "../../components/Icon"
 
 function Form_Servicios() {
   const [loading, setLoading] = useState(true);
@@ -21,12 +21,16 @@ function Form_Servicios() {
   const [dataRecreadores, setDataRecreadores] = useState([]);
   const [dataMateriales, setDataMateriales] = useState([]);
   const [dataActividades, setDataActividades] = useState([]);
+  const [dataRecreadoresDefault, setDataRecreadoresDefault] = useState([]);
+  const [dataMaterialesDefault, setDataMaterialesDefault] = useState([]);
+  const [dataActividadesDefault, setDataActividadesDefault] = useState([]);
   const [saveRecreadores, setSaveRecreadores] = useState([]);
   const [saveMateriales, setSaveMateriales] = useState([]);
   const [saveActividades, setSaveActividades] = useState([]);
   const [submit, setSubmit] = useState(false);
   const renderizado = useRef(0)
   const navigate = useNavigate();
+  const params = useParams();
 
   useEffect(() => {
     if (renderizado.current === 0) {
@@ -36,12 +40,20 @@ function Form_Servicios() {
     }
   }, []);
 
+  useEffect(() => {
+    if (dataMateriales.length && dataActividades.length && dataRecreadores.length) {
+      if (params.id) {
+        get_servicio()
+      }
+    }
+  }, [dataMateriales, dataActividades, dataRecreadores])
+
   //* funcion para buscar los permisos en la vase de datos
   const get_data = async () => {
     try {
-      const getRecreadores = await recreadores.get();
-      const getMateriales = await materiales.get();
-      const getActividades = await actividades.get();
+      const getRecreadores = await recreadores.get({});
+      const getMateriales = await materiales.get({});
+      const getActividades = await actividades.get({});
       verifyOptionsSelect({
         respuesta: getRecreadores,
         setError: setErrorServer,
@@ -61,13 +73,55 @@ function Form_Servicios() {
       console.log(error);
       setErrorServer(texts.errorMessage.errorSystem);
     } finally {
-      setLoading(false);
+      if (!params.id){
+        setLoading(false)
+      }
     }
   };
+
+  const get_servicio = async () => {
+    try {
+      const respuesta = await servicios.get({paramOne:Number(params.id)})
+      if (respuesta.status !== 200) {
+        setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
+        return
+      }
+      if (respuesta.data.status === false) {
+        setErrorServer(`${respuesta.data.message}`)
+        return
+      }
+      setErrorServer("")
+      if (respuesta.data.data.permisos) {
+        setOptionsDefault(coincidences(options, respuesta.data.data.permisos))
+        setSelectOptions(coincidences(options, respuesta.data.data.permisos))
+      }
+      setValue("nombre", respuesta.data.data.nombre)
+      setValue("precio", respuesta.data.data.precio)
+      setValue("numero_recreadores", respuesta.data.data.numero_recreadores)
+      setValue("descripcion", respuesta.data.data.descripcion)
+      setValue("duracion-hours", respuesta.data.data.duracion.horas),
+      setValue("duracion-minutes", respuesta.data.data.duracion.minutos),
+      setSaveActividades(coincidences(dataActividades, respuesta.data.data.actividades))
+      setDataActividadesDefault(coincidences(dataActividades, respuesta.data.data.actividades))
+      setSaveRecreadores(coincidences(dataRecreadores, respuesta.data.data.recreadores))
+      setDataRecreadoresDefault(coincidences(dataRecreadores, respuesta.data.data.recreadores))
+      setSaveMateriales(coincidences(dataMateriales, respuesta.data.data.materiales))
+      setDataMaterialesDefault(coincidences(dataMateriales, respuesta.data.data.materiales))
+      respuesta.data.data.materiales.forEach(element => {
+        setValue(`${element.nombre}`, element.cantidad)
+      });
+    } catch (error) {
+      console.log(error)
+      setErrorServer(texts.errorMessage.errorObjet)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   //* the useform
   const {
     register,
+    setValue,
     handleSubmit,
     formState: { errors },
     watch,
@@ -75,14 +129,11 @@ function Form_Servicios() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      if (
-        !saveRecreadores.length ||
-        !saveMateriales.length ||
-        !saveActividades.length
-      ) {
+      if (!saveRecreadores.length || !saveMateriales.length || !saveActividades.length) {
         return;
       }
-      const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirRegister);
+      const message = params.id ? texts.confirmMessage.confirEdit : texts.confirmMessage.confirRegister
+      const confirmacion = await alertConfim("Confirmar", message);
       if (!confirmacion) {
         return;
       }
@@ -112,10 +163,11 @@ function Form_Servicios() {
         materiales: materiales,
       };
       alertLoading("Cargando")
-      const res = await servicios.post(body);
+      const res = params.id? await servicios.put(body, Number(params.id)) : await servicios.post(body);
       controlResultPost({
         respuesta: res,
-        messageExito: texts.successMessage.servicios,
+
+        messageExito: params.id ? texts.successMessage.editionServicio : texts.successMessage.registerServicio,
         useNavigate: { navigate: navigate, direction: "/servicios" },
       });
     } catch {
@@ -126,16 +178,13 @@ function Form_Servicios() {
   });
 
   return (
-    <Navbar
-      name={texts.pages.registerServicio.name}
-      descripcion={texts.pages.registerServicio.description}
-    >
-      <ButtonSimple type="button"  className="mb-3"
+    <Navbar name={params.id? texts.pages.editServicio.name : texts.pages.registerServicio.name} descripcion={params.id? texts.pages.editServicio.description : texts.pages.registerServicio.description}>
+      <ButtonSimple type="button" className="mb-3"
         onClick={() => {
           navigate("/servicios");
         }}
       >
-        <IconRowLeft/>
+        <IconRowLeft />
         Regresar
       </ButtonSimple>
 
@@ -168,7 +217,7 @@ function Form_Servicios() {
                     },
                     maxLength: {
                       value: 100,
-                      message: texts.inputsMessage.max50,
+                      message: texts.inputsMessage.max100,
                     },
                     validate: (value) => {
                       if (hasLeadingOrTrailingSpace(value)) {
@@ -178,7 +227,7 @@ function Form_Servicios() {
                       }
                     },
                   }}
-                  placeholder={"Nombre del Servicio"}
+                  placeholder={texts.placeholder.nameServicio}
                 />
                 <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-items-center">
                   <div className="w-md-30 w-100">
@@ -252,6 +301,7 @@ function Form_Servicios() {
                     options={dataRecreadores}
                     save={setSaveRecreadores}
                     placeholder={"Recreadores"}
+                    optionsDefault={dataRecreadoresDefault}
                   />
                   {Boolean(!saveRecreadores.length && submit) ? (
                     <span className="message-error visible">
@@ -269,6 +319,7 @@ function Form_Servicios() {
                     options={dataActividades}
                     save={setSaveActividades}
                     placeholder={"Activiades que se realizan"}
+                    optionsDefault={dataActividadesDefault}
                   />
                   {Boolean(!saveActividades.length && submit) ? (
                     <span className="message-error visible">
@@ -286,6 +337,7 @@ function Form_Servicios() {
                     options={dataMateriales}
                     save={setSaveMateriales}
                     placeholder={"Materiales que se necesitan"}
+                    optionsDefault={dataMaterialesDefault}
                   />
                   {Boolean(!saveMateriales.length && submit) ? (
                     <span className="message-error visible">

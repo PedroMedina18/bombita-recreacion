@@ -1,5 +1,6 @@
 import { getCookie } from "../cookie.jsx"
 import {API} from "../API.jsx"
+import {addOptionalQueryParams} from "../process.jsx"
 
 
 
@@ -9,10 +10,14 @@ export default class Petisions{
         this.params=params
     }
 
-    async get(paramOne=null, paramTwo=null){
+    async get({paramOne=null, paramTwo=null, params=null}){
+        
         const token = getCookie("token")
-        if(paramTwo){
-            return API.get(`${this.params}/${paramOne}/${paramTwo}/`, {
+        let url
+        if(paramTwo && paramOne){
+            url = `${this.params}/${paramOne}/${paramTwo}/`
+            url = addOptionalQueryParams(url, params)
+            return API.get(url, {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`
@@ -20,14 +25,18 @@ export default class Petisions{
             })
         }
         if(paramOne){
-            return API.get(`${this.params}/${paramOne}/`, {
+            url = `${this.params}/${paramOne}/`
+            url = addOptionalQueryParams(url, params)
+            return API.get(url, {
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`
                 }
             })
         }
-        return API.get(`${this.params}/`, {
+        url = `${this.params}/`
+        url = addOptionalQueryParams(url, params)
+        return API.get(url, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`
@@ -46,7 +55,6 @@ export default class Petisions{
         })
     }
 
-
     async postData(data){
         const token = getCookie("token")
         return API.request(`${this.params}/`, {
@@ -61,8 +69,8 @@ export default class Petisions{
 
     async putData(data, code){
         const token = getCookie("token")
-        return API.request(`${this.params}/${code}/`, {
-            method: 'PUT',
+        return API.request(`${this.params}/${code}/?_method=PUT`, {
+            method: 'POST',
             headers: {
                 "Content-Type": "multipart/form-data",
                 "Authorization": `Bearer ${token}`
@@ -73,7 +81,7 @@ export default class Petisions{
 
     async put(data, code){
         const token = getCookie("token")
-        return API.post(`${this.params}/${code}/`, {
+        return API.put(`${this.params}/${code}/`, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`

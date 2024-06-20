@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { InputsGeneral, UnitSelect, InputCheck, InputTextTarea } from "../../components/input/Inputs.jsx"
+import { InputsGeneral, UnitSelect, InputCheck, InputTextTarea, MultiSelect } from "../../components/input/Inputs.jsx"
 import { ButtonSimple } from "../../components/button/Button"
 import { LoaderCircle } from "../../components/loader/Loader";
 import { useNavigate } from 'react-router-dom'
 import { useForm } from "react-hook-form";
 import { Toaster } from "sonner";
-import { tipo_documentos } from "../../utils/API.jsx";
+import { tipo_documentos, servicios, sobrecargos } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx"
 import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx"
 import { getPersona, verifyOptionsSelect, controlResultPost, habilitarEdicion } from "../../utils/actions.jsx"
@@ -17,12 +17,17 @@ import pattern from "../../context/pattern.js";
 import { Collapse } from "bootstrap";
 
 function Form_Eventos() {
-    const [data_tipo_documentos, setTipoDocumentos] = useState([])
+    const [dataTipo_documentos, setTipoDocumentos] = useState([])
     const [disabledInputs, setDisabledInputs] = useState(false)
+    const [dataServicios, setServicios] = useState([])
+    const [SaveDataServicios, setSaveDataServicios] = useState([])
+    const [dataSobrecargos, setSobrecargos] = useState([])
+    const [SaveDataSobrecargos, setSaveDataSobrecargos] = useState([])
     const [loading, setLoading] = useState(true)
     const [errorServer, setErrorServer] = useState("")
     const navigate = useNavigate();
     const renderizado = useRef(0)
+    const [submit, setSubmit] = useState(false);
 
     useEffect(() => {
         if (renderizado.current === 0) {
@@ -35,11 +40,23 @@ function Form_Eventos() {
     // *funcion para buscar los tipos de documentos y los cargos
     const getData = async () => {
         try {
-            const get_tipo_documentos = await tipo_documentos.get()
+            const get_tipo_documentos = await tipo_documentos.get({})
+            const get_servicios = await servicios.get({})
+            const get_sobrecargos = await sobrecargos.get({})
             verifyOptionsSelect({
                 respuesta: get_tipo_documentos,
                 setError: setErrorServer,
                 setOptions: setTipoDocumentos
+            })
+            verifyOptionsSelect({
+                respuesta: get_servicios,
+                setError: setErrorServer,
+                setOptions: setServicios
+            })
+            verifyOptionsSelect({
+                respuesta: get_sobrecargos,
+                setError: setErrorServer,
+                setOptions: setSobrecargos
             })
         } catch (error) {
             console.log(error)
@@ -156,7 +173,7 @@ function Form_Eventos() {
                                         <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                             <div className="w-md-25  w-100 pe-0 pe-md-3">
                                                 <UnitSelect label={texts.label.tipoDocuemnto} name="tipo_documento" id="tipo_documento" form={{ errors, register }}
-                                                    options={data_tipo_documentos}
+                                                    options={dataTipo_documentos}
                                                     params={{
                                                         validate: (value) => {
                                                             if (!value) {
@@ -389,6 +406,7 @@ function Form_Eventos() {
                                         <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                             <div className="w-100 w-md-50 pe-0 pe-md-3">
                                                 <InputsGeneral type={"datetime-local"} label={`${texts.label.fechaEvento}`} name="fecha_evento" id="fecha_evento" form={{ errors, register }}
+                                                    // max={`${fechaActual.getFullYear()}-${(fechaActual.getMonth() + 1) < 10 ? `0${fechaActual.getMonth() + 1}` : `${fechaActual.getMonth() + 1}`}-${fechaActual.getDate() < 10 ? `0${fechaActual.getDate()}` : fechaActual.getDate()}`}
                                                     params={{
                                                         required: {
                                                             value: true,
@@ -415,7 +433,36 @@ function Form_Eventos() {
                                             </div>
 
                                         </div>
+                                        
 
+                                        <div className="mb-1">
+                                            <MultiSelect
+                                              name="servicios"
+                                              label={`Servicios`}
+                                              id="actividades"
+                                              options={dataServicios}
+                                              save={setSaveDataServicios}
+                                              placeholder={"Escoja que servicios desea"}
+                                            />
+                                            {Boolean(!SaveDataServicios.length && submit) ? (
+                                              <span className="message-error visible">
+                                                {texts.inputsMessage.selecServicios}
+                                              </span>
+                                            ) : (
+                                              <span className="message-error invisible">Sin errores</span>
+                                            )}
+                                        </div>
+
+                                        <div className="mb-1">
+                                            <MultiSelect
+                                              name="sobrecargos"
+                                              label={`Sobrecargos`}
+                                              id="sobrecargos"
+                                              options={dataSobrecargos}
+                                              save={setSaveDataSobrecargos}
+                                              placeholder={"Seleccione si es necesario un sobrecargo"}
+                                            />
+                                        </div>
                                     </div>
 
                                     <ButtonSimple type="submit" className="mx-auto w-50 mt-3">

@@ -21,7 +21,7 @@ import {
 
 } from "../../components/Icon.jsx"
 
-function Navbar({ children, name, descripcion }) {
+function Navbar({ children, name, descripcion, dollar=false }) {
     const { getUser, closeSession } = useContext(AuthContext)
     const [dataUser] = useState(getUser())
     const startDate = new Date(dataUser.fecha);
@@ -87,6 +87,9 @@ function Navbar({ children, name, descripcion }) {
                             </li>
                             <li className="sidebar-item">
                                 <Link to="/servicios" className="sidebar-link">Servicios</Link>
+                            </li>
+                            <li className="sidebar-item">
+                                <Link to="/sobrecargos" className="sidebar-link">Sobrecargos</Link>
                             </li>
                         </ul>
                     </li>
@@ -238,6 +241,11 @@ function Navbar({ children, name, descripcion }) {
                         <div className="d-flex flex-column">
                             <h1 className="fs-4 fw-bold m-0 pb-1">{name}</h1>
                             <p className="m-0 fw-light fs-6 colo">{descripcion}</p>
+                        </div>
+                        <div className="d-flex flex-column">
+                            <h1 className="fs-5 fw-bold m-0 pb-1">Precio del Dolar $</h1>
+                            <p className="m-0 fs-6 colo">{`${dataUser.dollar.price} Bs.S`}</p>
+                            
                         </div>
                         <span className="fw-normal fs-6 mb-2 mb-md-0 text-dark">Inicio de sesión {startDate.getDate() < 10 ? `0${startDate.getDate()}` : startDate.getDate()}-{(startDate.getMonth() + 1) < 10 ? `0${startDate.getMonth() + 1}` : startDate.getMonth() + 1}-{startDate.getFullYear()} a las {startDate.getHours() < 10 ? `0${startDate.getHours()}` : startDate.getHours()}:{startDate.getMinutes() < 10 ? `0${startDate.getMinutes()}` : startDate.getMinutes()}:{startDate.getSeconds() < 10 ? `0${startDate.getSeconds()}` : startDate.getSeconds()}</span>
                     </div>

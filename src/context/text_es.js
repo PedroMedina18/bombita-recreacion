@@ -6,6 +6,7 @@ const texts={
         errorPassword:"Las contraseña no Coinciden",
         max500:"Máximo 500 caracteres",
         max200:"Máximo 200 caracteres",
+        max300:"Máximo 300 caracteres",
         max100:"Máximo 100 caracteres",
         max50:"Máximo 50 caracteres",
         max20:"Máximo 20 caracteres",
@@ -14,11 +15,12 @@ const texts={
         min8:"Minimo 8 caracteres",
         min7:"Minimo 7 caracteres",
         min5:"Minimo 5 caracteres",
-        minRecreador:"Minimo un recreador",
-        minPrecio:"Agregue un precio al servicio",
-        minNegative:"Valor no admitido",
         min0:"Minimo 0",
         min1:"Minimo 1",
+        minRecreador:"Minimo un recreador",
+        minPrecio:"Agregue un precio al servicio",
+        minMonto:"Agregue un monto extra",
+        minNegative:"Valor no admitido",
         step1:"Solo números enteros",
         requireName:"Se requiere un nombre",
         requireNames:"Se requiere los nombres",
@@ -29,6 +31,7 @@ const texts={
         requireTel:"Se requiere un número de teléfono",
         requireFechaEvent:"Se requiere la fecha del evento",
         requireRecreadores:"Se requiere el numero de recreadores",
+        requireMonto:"Se requiere un monto",
         requirePersonas:"Se requiere el numero de personas",
         requireDocumento:"Se requiere el numero de recreadores",
         requirePrecio:"Se requiere el precio",
@@ -39,6 +42,7 @@ const texts={
         selectMateriales:"Seleccione los materiales a utilizar",
         selectNivel:"Seleccione un Nivel",
         selecPermisos:"Seleccione los permisos del Cargo",
+        selecPermisos:"Seleccione los servicios que desea",
         selectValor:"Seleccione un valor",
         selectCliente:"Seleccione un cliente o cree uno nuevo",
         selectTipoDocumento:"Seleccione un tipo de documento",
@@ -54,20 +58,33 @@ const texts={
     },
 
     successMessage:{
-        usuario:"Usuario Registrado",
-        nivel:"Nivel Registrado",
-        tipoDocumento:"Tipo de Documento Registrado",
-        material:"Material Registrado",
-        cargo:"Cargo Registrado",
-        actividades:"Actividad Registrado",
-        recreador:"Recreador Registrado",
-        servicios:"Servicio Registrado",
+        registerUsuario:"Usuario Registrado",
+        registerNivel:"Nivel Registrado",
+        registerTipoDocumento:"Tipo de Documento Registrado",
+        registerMaterial:"Material Registrado",
+        registerCargo:"Cargo Registrado",
+        registerActividad:"Actividad Registrado",
+        registerRecreador:"Recreador Registrado",
+        registerServicio:"Servicio Registrado",
+        registerGenero:"Genero Registrado",
+        registerSobrecargo:"Sobrecargo Registrado",
+        // -----------------------------------------------------------
+        editionUsuario:"Usuario Editado",
+        editionNivel:"Nivel Editado",
+        editionTipoDocumento:"Tipo de Documento Editado",
+        editionMaterial:"Material Editado",
+        editionCargo:"Cargo Editado",
+        editionActividad:"Actividad Editado",
+        editionRecreador:"Recreador Editado",
+        editionServicio:"Servicio Editado",
+        editionGenero:"Genero Editado",
+        editionSobrecargo:"Sobrecargo Editado",
     },
 
     confirmMessage:{
         confirmDelete:"Confirmar la Solicitud de Eliminación",
         confirRegister:"Por favor confirmar la solicitud de Registro",
-        confirEdit:"Confirmar la Solicitud de Actualizacion",
+        confirEdit:"Confirmar la Solicitud de Edición",
         confirCloset:"Desea cerrar sesión",
     },
 
@@ -83,6 +100,7 @@ const texts={
     label:{
         descripcion:"Descripción",
         direccion:"Direccion del Evento",
+        monto:"Monto Extra",
         nombre:"Nombre",
         materiales:"Materiales",
         fotoRecreador:"Foto del Recreador",
@@ -129,7 +147,16 @@ const texts={
         numeroDocumento:"0.000.000",
         nombreElement:"Nombre del Elemento",
         direccion:"Dirección exacta del evento",
-        numeroPersonas:"Numero aproximado de asistentes al evento"
+        numeroPersonas:"Numero aproximado de asistentes al evento",
+        nameActividad:"Nombre de la Actividad",
+        nameCargo:"Nombre del Cargo",
+        nameGenero:"Nombre del Genero",
+        nameMaterial:"Nombre del Material",
+        nameNivel:"Nombre de la Nivel",
+        nameSobrecargos:"Nombre de la Sobrecargos",
+        nameServicio:"Nombre del Servicio",
+        nameTipoDocumento:"Nombre del Tipo de Documento",
+
     },
 
     pages:{
@@ -149,10 +176,6 @@ const texts={
             name:"Registrar un nuevo Genero",
             description:"Intruduzca los datos para agregar un nuevo genero"
         },
-        registerServicio:{
-            name:"Registrar un nuevo Nivel",
-            description:"Intruduzca los datos para agregar un nuevo nivel"
-        },
         registerMaterial:{
             name:"Registrar un nuevo Material",
             description:"Intruduzca los datos para agregar un nuevo material"
@@ -168,6 +191,10 @@ const texts={
         registerActividades:{
             name:"Registrar una Actividad",
             description:"Intruduzca los datos para agregar una nueva Actividad"
+        },
+        registerSobrecargos:{
+            name:"Registrar un Sobrecargo",
+            description:"Intruduzca los datos para agregar un nuevo Sobrecargo"
         },
         registerEventos:{
             name:"Registrar un Evento",
@@ -193,6 +220,10 @@ const texts={
             name:"Editar un  Nivel",
             description:"Intruduzca los datos para editar un nivel"
         },
+        editSobrecargo:{
+            name:"Editar un Sobrecargo",
+            description:"Intruduzca los datos para editar un sobrecargo"
+        },
         editMaterial:{
             name:"Editar un Material",
             description:"Intruduzca los datos para editar un material"
@@ -200,6 +231,10 @@ const texts={
         editTipoDocumento:{
             name:"Editar un Tipo de Documento",
             description:"Intruduzca los datos para editar un tipo de documento"
+        },
+        editServicio:{
+            name:"Editar un  Servicio",
+            description:"Intruduzca los datos para editar un nuevo servicio"
         },
         editGenero:{
             name:"Editar un Genero",
@@ -216,6 +251,10 @@ const texts={
         getNiveles:{
             name:"Lista de Niveles",
             description:"Verifique los Niveles de recreador agregados"
+        },
+        getSobrecargos:{
+            name:"Lista de Sobrecargos",
+            description:"Verifique los Sobrecargos agregados"
         },
         getMateriales:{
             name:"Lista de Materiales",
@@ -253,6 +292,7 @@ const texts={
         buttonRegisterCargo:"Agregar un nuevo cargo",
         buttonRegisterActividad:"Agregar una nueva actividad",
         buttonRegisterRecreador:"Agregar un nuevo recreador",
+        buttonRegisterSobrecargo:"Agregar un nuevo sobrecargo",
         buttonRegisterServicio:"Agregar un nuevo servicio",
     }
 }

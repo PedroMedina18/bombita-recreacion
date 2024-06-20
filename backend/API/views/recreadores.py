@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
-from ..funtions.identificador import determinar_valor, edit_str
+from ..funtions.identificador import determinar_valor, edit_str, normalize_id_list
 from ..models import Nivel, Recreadores, Personas, TipoDocumento, Generos
 from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
@@ -19,7 +19,7 @@ class Recreadores_Views(View):
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
-    def post(self, request):
+    def post(self, request, identificador=0):
         try:
             req = request.POST
             img=request.FILES
@@ -30,118 +30,121 @@ class Recreadores_Views(View):
                     'message': verify["message"],
                 }
                 return JsonResponse(datos)
-            
-            #* se debe comprobar si se va a registrar una persona nueva o ya existe
-            if ("id_persona" in req):
-                ### *comprobacion de persona
-                persona = list(Personas.objects.filter(
-                    id=req["id_persona"]).values())
-                if (len(persona) > 0):
-                    persona = Personas.objects.get(id=req["id_persona"])
-                else:
-                    datos = {
-                        "status": False,
-                        'message': "Error. Compruebe datos de registro"
-                    }
-                    return JsonResponse(datos)
-            else:
-                ### *comprobacion de tipo de documento
-                tipo_documento = list(TipoDocumento.objects.filter(
-                    id=req["tipo_documento"]).values())
-                if (len(tipo_documento) > 0):
-                    tipo_documento = TipoDocumento.objects.get(
-                        id=req["tipo_documento"])
-                else:
-                    datos = {
-                        "status": False,
-                        'message': "Error. Compruebe el tipo de documento"
-                    }
-                    return JsonResponse(datos)
 
-                ### *Registro de datos de nueva persona
-                persona = Personas.objects.create(
-                    nombres=req['nombres'].title(),
-                    apellidos=req['apellidos'].title(),
-                    numero_documento=req["numero_documento"],
-                    telefono_principal=req["telefono_principal"],
-                    telefono_secundario=req["telefono_secundario"],
-                    correo=req["correo"],
-                    tipo_documento=tipo_documento
-                )
-
-            ### *comprobacion de nivel
-            nivel = list(Nivel.objects.filter(id=req["nivel"]).values())
-            if (len(nivel) > 0):
-                nivel = Nivel.objects.get(id=req["nivel"])
-            else:
-                datos = {
-                    "status": False,
-                    'message': "Error. Compruebe el nivel"
-                }
-                return JsonResponse(datos)
-            
-            ### *comprobacion de genero
-            genero = list(Generos.objects.filter(id=req["genero"]).values())
-            if (len(genero) > 0):
-                genero = Generos.objects.get(id=req["genero"])
-            else:
-                datos = {
-                    "status": False,
-                    'message': "Error. Compruebe el genero"
-                }
-                return JsonResponse(datos)
-
-            ### *Registro de Recreador
-            Recreadores.objects.create(
-                persona=persona,
-                nivel=nivel,
-                genero=genero,
-                img_perfil=img["img_perfil"] if "img_perfil" in img else None,
-                fecha_nacimiento=req["fecha_nacimiento"],
-            )
-            datos = {
-                "status": True,
-                'message': "Registro de recreador completado"
-            }
-            return JsonResponse(datos)
-        except Exception as error:
-            print(f"Error consulta post - {error}", )
-            datos = {
-                "status": False,
-                'message': f"Error al registrar: {error}"
-            }
-            return JsonResponse(datos)
-
-    def put(self, request, identificador=0):
-        try:
-            tipo = determinar_valor(identificador)
-            if tipo["type"] != "int":
-                raise Http404('No se puede editar este objeto')
-            verify = verify_token(request.headers)
-            req = request.POST
-            img = request.FILES
-            if (not verify["status"]):
-                datos = {
-                    "status": False,
-                    'message': verify["message"],
-                }
-                return JsonResponse(datos)
-
-            recreador = list(Recreadores.objects.filter(id=int(identificador)).values())
-            if len(recreador) > 0:
-                recreador = Recreadores.objects.get(id=int(identificador))
-                persona = Personas.objects.get(id=recreador.persona)
+            if request.GET["_method"] and request.GET["_method"]=="PUT":
                 
-                ### *comprobacion de tipo de documento
-                tipo_documento = list(TipoDocumento.objects.filter(id=req["tipo_documento"]).values())
-                if (len(tipo_documento) > 0):
-                    tipo_documento = TipoDocumento.objects.get(id=req["tipo_documento"])
+                tipo = determinar_valor(identificador)
+                if tipo["type"] != "int":
+                    raise Http404('No se puede editar este objeto')
+                verify = verify_token(request.headers)
+                req = request.POST
+                img = request.FILES
+                if (not verify["status"]):
+                    datos = {
+                        "status": False,
+                        'message': verify["message"],
+                    }
+                    return JsonResponse(datos)
+
+                recreador = list(Recreadores.objects.filter(id=int(identificador)).values())
+                if len(recreador) > 0:
+                    recreador = Recreadores.objects.get(id=int(identificador))
+                    persona = Personas.objects.get(id=recreador.persona)
+                    
+                    ### *comprobacion de tipo de documento
+                    tipo_documento = list(TipoDocumento.objects.filter(id=req["tipo_documento"]).values())
+                    if (len(tipo_documento) > 0):
+                        tipo_documento = TipoDocumento.objects.get(id=req["tipo_documento"])
+                    else:
+                        datos = {
+                            "status": False,
+                            'message': "Error. Compruebe el tipo de documento"
+                        }
+                        return JsonResponse(datos)
+    
+                    ### *comprobacion de nivel
+                    nivel = list(Nivel.objects.filter(id=req["nivel"]).values())
+                    if (len(nivel) > 0):
+                        nivel = Nivel.objects.get(id=req["nivel"])
+                    else:
+                        datos = {
+                            "status": False,
+                            'message': "Error. Compruebe el nivel"
+                        }
+                        return JsonResponse(datos)
+
+                    ### *comprobacion de genero
+                    genero = list(Generos.objects.filter(id=req["genero"]).values())
+                    if (len(genero) > 0):
+                        genero = Generos.objects.get(id=req["genero"])
+                    else:
+                        datos = {
+                            "status": False,
+                            'message': "Error. Compruebe el genero"
+                        }
+                        return JsonResponse(datos)
+    
+                    persona.nombres= req['nombres'].title()
+                    persona.apellidos= req['apellidos'].title()
+                    persona.numero_documento= req['numero_documento']
+                    persona.telefono_principal=req["telefono_principal"],
+                    persona.telefono_secundario=req["telefono_secundario"],
+                    persona.correo=req["correo"],
+                    persona.tipo_documento=tipo_documento
+                    recreador.nivel=nivel,
+                    recreador.genero=genero,
+                    recreador.fecha_nacimiento=req["fecha_nacimiento"],
+                    if "img_recreador" in img:
+                        recreador.img_perfil=img["img_recreador"],
+                    persona.save()
+                    recreador.save()
+                    datos = {
+                        "status": True,
+                        'message': "Exito. Registro editado"
+                    }
                 else:
                     datos = {
                         "status": False,
-                        'message': "Error. Compruebe el tipo de documento"
+                        'message': "Error. Registro no encontrado"
                     }
-                    return JsonResponse(datos)
+            else:
+                #* se debe comprobar si se va a registrar una persona nueva o ya existe
+                if ("id_persona" in req):
+                    ### *comprobacion de persona
+                    persona = list(Personas.objects.filter(
+                        id=req["id_persona"]).values())
+                    if (len(persona) > 0):
+                        persona = Personas.objects.get(id=req["id_persona"])
+                    else:
+                        datos = {
+                            "status": False,
+                            'message': "Error. Compruebe datos de registro"
+                        }
+                        return JsonResponse(datos)
+                else:
+                    ### *comprobacion de tipo de documento
+                    tipo_documento = list(TipoDocumento.objects.filter(
+                        id=req["tipo_documento"]).values())
+                    if (len(tipo_documento) > 0):
+                        tipo_documento = TipoDocumento.objects.get(
+                            id=req["tipo_documento"])
+                    else:
+                        datos = {
+                            "status": False,
+                            'message': "Error. Compruebe el tipo de documento"
+                        }
+                        return JsonResponse(datos)
+
+                    ### *Registro de datos de nueva persona
+                    persona = Personas.objects.create(
+                        nombres=req['nombres'].title(),
+                        apellidos=req['apellidos'].title(),
+                        numero_documento=req["numero_documento"],
+                        telefono_principal=req["telefono_principal"],
+                        telefono_secundario=req["telefono_secundario"],
+                        correo=req["correo"],
+                        tipo_documento=tipo_documento
+                    )
 
                 ### *comprobacion de nivel
                 nivel = list(Nivel.objects.filter(id=req["nivel"]).values())
@@ -165,37 +168,118 @@ class Recreadores_Views(View):
                     }
                     return JsonResponse(datos)
 
-                persona.nombres= req['nombres'].title()
-                persona.apellidos= req['apellidos'].title()
-                persona.numero_documento= req['numero_documento']
-                persona.telefono_principal=req["telefono_principal"],
-                persona.telefono_secundario=req["telefono_secundario"],
-                persona.correo=req["correo"],
-                persona.tipo_documento=tipo_documento
-                recreador.nivel=nivel,
-                recreador.genero=genero,
-                recreador.fecha_nacimiento=req["fecha_nacimiento"],
-                if "img_recreador" in img:
-                    recreador.img_perfil=img["img_recreador"],
-                persona.save()
-                recreador.save()
+                ### *Registro de Recreador
+                Recreadores.objects.create(
+                    persona=persona,
+                    nivel=nivel,
+                    genero=genero,
+                    img_perfil=img["img_perfil"] if "img_perfil" in img else None,
+                    fecha_nacimiento=req["fecha_nacimiento"],
+                )
                 datos = {
-                        "status": True,
-                        'message': "Exito. Registro editado"
-                }
-            else:
-                datos = {
-                    "status": False,
-                    'message': "Error. Registro no encontrado"
+                    "status": True,
+                    'message': "Registro de recreador completado"
                 }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"Error de consulta put - {error}")
-            datos = {
-                "status": False,
-                'message': f"Error al editar: {error}",
-            }
+            if request.GET["_method"] and request.GET["_method"]=="PUT":
+                print(f"Error consulta delete - {error}", )
+                datos = {
+                    "status": False,
+                    'message': f"Error al eliminar: {error}"
+                }
+            else:
+                print(f"Error consulta post - {error}", )
+                datos = {
+                    "status": False,
+                    'message': f"Error al registrar: {error}"
+                }
             return JsonResponse(datos)
+
+    # def put(self, request, identificador=0):
+    #     try:
+    #         tipo = determinar_valor(identificador)
+    #         if tipo["type"] != "int":
+    #             raise Http404('No se puede editar este objeto')
+    #         verify = verify_token(request.headers)
+    #         req = request.POST
+    #         img = request.FILES
+    #         if (not verify["status"]):
+    #             datos = {
+    #                 "status": False,
+    #                 'message': verify["message"],
+    #             }
+    #             return JsonResponse(datos)
+
+    #         recreador = list(Recreadores.objects.filter(id=int(identificador)).values())
+    #         if len(recreador) > 0:
+    #             recreador = Recreadores.objects.get(id=int(identificador))
+    #             persona = Personas.objects.get(id=recreador.persona)
+                
+    #             ### *comprobacion de tipo de documento
+    #             tipo_documento = list(TipoDocumento.objects.filter(id=req["tipo_documento"]).values())
+    #             if (len(tipo_documento) > 0):
+    #                 tipo_documento = TipoDocumento.objects.get(id=req["tipo_documento"])
+    #             else:
+    #                 datos = {
+    #                     "status": False,
+    #                     'message': "Error. Compruebe el tipo de documento"
+    #                 }
+    #                 return JsonResponse(datos)
+
+    #             ### *comprobacion de nivel
+    #             nivel = list(Nivel.objects.filter(id=req["nivel"]).values())
+    #             if (len(nivel) > 0):
+    #                 nivel = Nivel.objects.get(id=req["nivel"])
+    #             else:
+    #                 datos = {
+    #                     "status": False,
+    #                     'message': "Error. Compruebe el nivel"
+    #                 }
+    #                 return JsonResponse(datos)
+
+    #             ### *comprobacion de genero
+    #             genero = list(Generos.objects.filter(id=req["genero"]).values())
+    #             if (len(genero) > 0):
+    #                 genero = Generos.objects.get(id=req["genero"])
+    #             else:
+    #                 datos = {
+    #                     "status": False,
+    #                     'message': "Error. Compruebe el genero"
+    #                 }
+    #                 return JsonResponse(datos)
+
+    #             persona.nombres= req['nombres'].title()
+    #             persona.apellidos= req['apellidos'].title()
+    #             persona.numero_documento= req['numero_documento']
+    #             persona.telefono_principal=req["telefono_principal"],
+    #             persona.telefono_secundario=req["telefono_secundario"],
+    #             persona.correo=req["correo"],
+    #             persona.tipo_documento=tipo_documento
+    #             recreador.nivel=nivel,
+    #             recreador.genero=genero,
+    #             recreador.fecha_nacimiento=req["fecha_nacimiento"],
+    #             if "img_recreador" in img:
+    #                 recreador.img_perfil=img["img_recreador"],
+    #             persona.save()
+    #             recreador.save()
+    #             datos = {
+    #                     "status": True,
+    #                     'message': "Exito. Registro editado"
+    #             }
+    #         else:
+    #             datos = {
+    #                 "status": False,
+    #                 'message': "Error. Registro no encontrado"
+    #             }
+    #         return JsonResponse(datos)
+    #     except Exception as error:
+    #         print(f"Error de consulta put - {error}")
+    #         datos = {
+    #             "status": False,
+    #             'message': f"Error al editar: {error}",
+    #         }
+    #         return JsonResponse(datos)
 
     def delete(self, request, identificador=0):
         try:
@@ -241,6 +325,7 @@ class Recreadores_Views(View):
         try:
             cursor = connection.cursor()
             verify = verify_token(request.headers)
+            info = request.GET.get("_info", "false")
             if (not verify["status"]):
                 datos = {
                     "status": False,
@@ -260,12 +345,12 @@ class Recreadores_Views(View):
                             pe.apellidos, 
                             pe.correo,
                             ge.id AS genero_id,
-                            ge.nombre AS genero_nombre,
+                            ge.nombre AS genero,
                             re.fecha_nacimiento, 
                             ni.id AS nivel_id, 
-                            ni.nombre AS nivel_nombre, 
+                            ni.nombre AS nivel, 
                             tido.id AS tipo_documento_id, 
-                            tido.nombre AS tipo_documento_nombre, 
+                            tido.nombre AS tipo_documento, 
                             pe.numero_documento,
                             CONCAT('0', pe.telefono_principal) AS telefono_principal,
                             CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
@@ -280,7 +365,6 @@ class Recreadores_Views(View):
                     """
                     cursor.execute(query, [numero_documento])
                     
-                    
                 else:
                     str_validate=edit_str(tipo["valor"])
                     query="""
@@ -290,12 +374,12 @@ class Recreadores_Views(View):
                             pe.apellidos, 
                             pe.correo,
                             ge.id AS genero_id,
-                            ge.nombre AS genero_nombre,
+                            ge.nombre AS genero,
                             re.fecha_nacimiento, 
                             ni.id AS nivel_id, 
-                            ni.nombre AS nivel_nombre, 
+                            ni.nombre AS nivel, 
                             tido.id AS tipo_documento_id, 
-                            tido.nombre AS tipo_documento_nombre, 
+                            tido.nombre AS tipo_documento, 
                             pe.numero_documento,
                             CONCAT('0', pe.telefono_principal) AS telefono_principal,
                             CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
@@ -311,20 +395,26 @@ class Recreadores_Views(View):
                     cursor.execute(query, [str_validate])
                     
                 recreador = dictfetchall(cursor)
-                recreador[0]["img_perfil"]=f"{config('URL')}media/{recreador[0]['img_perfil']}" if recreador[0]['img_perfil'] else None
-                query = """
-                SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM recreadores;
-                """
-                cursor.execute(query)
-                result = dictfetchall(cursor)
-                if len(recreador) > 0:
+                if info == "true" and  len(recreador) > 0:
+
+                    recreador[0]["img_perfil"]=f"{config('URL')}media/{recreador[0]['img_perfil']}" if recreador[0]['img_perfil'] else None
                     datos = {
                         "status": True,
                         'message': "Exito",
                         "data": {
                             "info":recreador[0]
                         },
-                        "total": result[0]["total"],
+                    }
+                    
+                elif info == "false" and  len(recreador) > 0:
+                    for data in recreador:
+                        data["img_perfil"]=f"{config('URL')}media/{recreador[0]['img_perfil']}" if recreador[0]['img_perfil'] else None
+                    
+                    datos = {
+                        "status": True,
+                        'message': "Exito",
+                        "data": recreador,
+                        "total": len(recreador),
                         "pages":1
                     }
                 else:
@@ -342,12 +432,17 @@ class Recreadores_Views(View):
                     	re.id, 
                         pe.nombres, 
                         pe.apellidos, 
+                        pe.correo,
+                        ge.id AS genero_id,
                         ge.nombre AS genero,
                         re.fecha_nacimiento, 
+                        ni.id AS nivel_id, 
                         ni.nombre AS nivel, 
+                        tido.id AS tipo_documento_id, 
                         tido.nombre AS tipo_documento, 
                         pe.numero_documento,
                         CONCAT('0', pe.telefono_principal) AS telefono_principal,
+                        CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
                         re.inhabilitado
                     FROM recreadores AS re
                     LEFT JOIN niveles AS ni ON re.nivel_id=ni.id
@@ -356,8 +451,7 @@ class Recreadores_Views(View):
                     LEFT JOIN tipo_documentos AS tido ON pe.tipo_documento_id=tido.id
                     ORDER BY re.id ASC LIMIT %s, %s;
                     """
-                    cursor.execute(query, [indiceInicial(
-                        int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
+                    cursor.execute(query, [indiceInicial(int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
                     recreadores = dictfetchall(cursor)
 
                 elif ("page" in request.GET and "desc" in request.GET and request.GET["desc"] == "true"):
@@ -366,12 +460,17 @@ class Recreadores_Views(View):
                     	re.id, 
                         pe.nombres, 
                         pe.apellidos, 
+                        pe.correo,
+                        ge.id AS genero_id,
                         ge.nombre AS genero,
                         re.fecha_nacimiento, 
+                        ni.id AS nivel_id, 
                         ni.nombre AS nivel, 
+                        tido.id AS tipo_documento_id, 
                         tido.nombre AS tipo_documento, 
                         pe.numero_documento,
                         CONCAT('0', pe.telefono_principal) AS telefono_principal,
+                        CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
                         re.inhabilitado
                     FROM recreadores AS re
                     LEFT JOIN niveles AS ni ON re.nivel_id=ni.id
@@ -390,19 +489,24 @@ class Recreadores_Views(View):
                     	re.id, 
                         pe.nombres, 
                         pe.apellidos, 
+                        pe.correo,
+                        ge.id AS genero_id,
                         ge.nombre AS genero,
                         re.fecha_nacimiento, 
+                        ni.id AS nivel_id, 
                         ni.nombre AS nivel, 
+                        tido.id AS tipo_documento_id, 
                         tido.nombre AS tipo_documento, 
                         pe.numero_documento,
                         CONCAT('0', pe.telefono_principal) AS telefono_principal,
+                        CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
                         re.inhabilitado
                     FROM recreadores AS re
                     LEFT JOIN niveles AS ni ON re.nivel_id=ni.id
                     LEFT JOIN generos AS ge ON re.genero_id=ge.id
                     LEFT JOIN personas AS pe ON re.persona_id=pe.id
                     LEFT JOIN tipo_documentos AS tido ON pe.tipo_documento_id=tido.id
-                    ORDER BY id LIMIT 25;
+                    ORDER BY re.id LIMIT 25;
                     """
                     cursor.execute(query)
                     recreadores = dictfetchall(cursor)

@@ -33,7 +33,7 @@ function Form_Materiales() {
 
     const get_materiales = async () => {
         try {
-            const respuesta = await materiales.get(Number(params.id))
+            const respuesta = await materiales.get({paramOne:Number(params.id)})
             console.log(respuesta)
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
@@ -82,7 +82,7 @@ function Form_Materiales() {
                     const res = params.id? await materiales.put(body, Number(params.id)) : await materiales.post(body)
                     controlResultPost({
                         respuesta: res,
-                        messageExito: texts.successMessage.material,
+                        messageExito: params.id? texts.successMessage.editionMaterial : texts.successMessage.registerMaterial,
                         useNavigate: { navigate: navigate, direction: "/materiales" }
                     })
                 }
@@ -107,8 +107,8 @@ function Form_Materiales() {
                                 message: texts.inputsMessage.requireName
                             },
                             maxLength: {
-                                value: 50,
-                                message: texts.inputsMessage.max50
+                                value: 100,
+                                message: texts.inputsMessage.max100
                             },
                             minLength: {
                                 value: 5,
@@ -126,7 +126,7 @@ function Form_Materiales() {
                                 }
                             }
                         }}
-                        placeholder={"Nombre del Material"}
+                        placeholder={texts.placeholder.nameMaterial}
                     />
                     <InputsGeneral type={"number"} label={`${texts.label.cantidadTotal}`} name="total" id="total" form={{ errors, register }}
                         defaultValue={0}
@@ -145,8 +145,8 @@ function Form_Materiales() {
                     <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
                         params={{
                             maxLength: {
-                                value: 200,
-                                message: texts.inputsMessage.max200
+                                value: 300,
+                                message: texts.inputsMessage.max300
                             },
                             validate: (value) => {
                                 if (hasLeadingOrTrailingSpace(value)) {

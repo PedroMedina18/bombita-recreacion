@@ -22,7 +22,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
         }
         const timeout = setTimeout(() => {
             options.search.function(searchTerm)
-        }, 1000);
+        }, 900);
 
         setDebounceTimeout(timeout);
     }, [searchTerm])
@@ -70,10 +70,11 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
 
             {/* Segunda Seccion de la Tabla */}
             {
-                rows.length===0 ?
+                loading ?
                     (
                         skeletonTable()
-                    ) :
+                    ) 
+                    :
                     (
                         <div className='container-table mt-4'>
                             <table className='table-data'>
@@ -86,7 +87,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                             ))
                                         }
                                         {
-                                            options.delete || options.put ?
+                                            (options.delete || options.put || options.get)?
                                                 <th scope="col">Opciones</th>
                                                 :
                                                 ("")
@@ -96,8 +97,9 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                 <tbody>
                                     {
                                         rows.length === 0 ?
-                                            <>
+                                            <>  
                                                 <tr>
+                                                    <td className="py-3"></td>
                                                     {
 
                                                         columns.map((column, index) => {
@@ -105,13 +107,14 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                                         })
                                                     }
                                                     {
-                                                        options.delete || options.put ?
+                                                        options.delete || options.put || options.get ?
                                                             (<td className="py-3"></td>)
                                                             :
                                                             ("")
                                                     }
                                                 </tr>
                                                 <tr>
+                                                    <td className="py-3"></td>
                                                     {
 
                                                         columns.map((column, index) => {
@@ -119,13 +122,14 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                                         })
                                                     }
                                                     {
-                                                        options.delete || options.put ?
+                                                        options.delete || options.put || options.get ?
                                                             (<td className="py-3"></td>)
                                                             :
                                                             ("")
                                                     }
                                                 </tr>
                                                 <tr>
+                                                    <td className="py-3"></td>
                                                     {
 
                                                         columns.map((column, index) => {
@@ -133,7 +137,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                                         })
                                                     }
                                                     {
-                                                        options.delete || options.put ?
+                                                        options.delete || options.put || options.get ?
                                                             (<td className="py-3"></td>)
                                                             :
                                                             ("")
@@ -157,7 +161,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                                         })
                                                     }
                                                     {
-                                                        options.delete || options.put ?
+                                                        options.delete || options.put || options.get ?
                                                             (<td >
                                                                 <div className='d-flex justify-content-around'>
 
@@ -183,7 +187,11 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                                                 </div>
                                                             </td>)
                                                             :
-                                                            ("")
+                                                            (
+                                                                <td>
+
+                                                                </td>
+                                                            )
                                                     }
                                                 </tr>
                                             ))

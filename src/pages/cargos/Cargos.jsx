@@ -70,7 +70,9 @@ function Cargos() {
                 searchCode({
                     value: value,
                     object: cargos,
-                    setList: setCargos
+                    setList: setCargos,
+                    setData: setDataCargos,
+                    setLoading: setTableLoaing
                 })
             }
         },

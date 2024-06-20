@@ -47,7 +47,7 @@ function Cargos() {
     // *funcion para buscar los permisos en la base de datos
     const get_Permisos = async () => {
         try {
-            const res = await permisos.get()
+            const res = await permisos.get({})
             verifyOptionsSelect({
                 respuesta:res,
                 setError:setErrorServer,
@@ -65,7 +65,7 @@ function Cargos() {
 
     const get_cargos = async () => {
         try {
-            const respuesta = await cargos.get(Number(params.id))
+            const respuesta = await cargos.get({paramOne:Number(params.id)})
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
                 return
@@ -120,7 +120,7 @@ function Cargos() {
                     const res = params.id? await cargos.putData(Form, Number(params.id)) : await cargos.postData(Form)
                     controlResultPost({
                         respuesta:res, 
-                        messageExito:texts.successMessage.cargo,
+                        messageExito:params.id? texts.successMessage.editionCargo : texts.successMessage.registerCargo, 
                         useNavigate:{navigate:navigate, direction:"/cargos"}
                     })
                 }
@@ -153,7 +153,7 @@ function Cargos() {
                         (
                             <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
                                 
-                                <form className="w-100 d-flex flex-column"
+                                <form className="w-100 d-flex flex-column" encType="multiport/form-data"
                                     onSubmit={onSubmit}>
                                     <InputsGeneral type={"text"} label={`${texts.label.nombre}`} name="nombre" id="nombre" form={{ errors, register }}
                                         params={{
@@ -181,13 +181,13 @@ function Cargos() {
                                                 }
                                             }
                                         }}
-                                        placeholder={"Nombre del Cargo"}
+                                        placeholder={texts.placeholder.nameCargo}
                                     />
                                     <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
                                         params={{
                                             maxLength: {
-                                                value: 500,
-                                                message: texts.inputsMessage.max500
+                                                value: 300,
+                                                message: texts.inputsMessage.max300
                                             },
                                             validate:(value)=>{
                                                 if(hasLeadingOrTrailingSpace(value)){

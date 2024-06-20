@@ -27,6 +27,8 @@ export const niveles=new Petisions("niveles")
 
 export const generos=new Petisions("generos")
 
+export const sobrecargos=new Petisions("sobrecargos")
+
 export const materiales=new Petisions("materiales")
 
 export const tipo_documentos=new Petisions("tipo_documentos")

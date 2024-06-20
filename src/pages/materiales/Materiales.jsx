@@ -73,7 +73,9 @@ function Materiales() {
                 searchCode({
                     value: value,
                     object: materiales,
-                    setList: setMateriales
+                    setList: setMateriales,
+                    setData: setDataMateriales,
+                    setLoading: setTableLoaing,
                 })
             }
         },

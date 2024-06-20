@@ -6,7 +6,7 @@ from django.db import models
 # *Tabla con los permisos propios del sistema
 class Permisos(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    descripcion = models.CharField(max_length=250, null=True, blank=True)
+    descripcion = models.CharField(max_length=300, null=True, blank=True)
 
     class Meta:
         db_table = "permisos"
@@ -14,7 +14,7 @@ class Permisos(models.Model):
 # *Tabla con los cargos del sistema principal funcion determinar que puede hacer cada usuario
 class Cargos(models.Model):
     nombre = models.CharField(max_length=50, unique=True)
-    descripcion = models.CharField(max_length=250, null=True, blank=True)
+    descripcion = models.CharField(max_length=300, null=True, blank=True)
     administrador = models.BooleanField()
     img_logo = models.FileField(upload_to="img_logo_cargos", null=True, blank=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
@@ -36,7 +36,7 @@ class PermisosCargos(models.Model):
 # *Tabla los tipos de documentos
 class TipoDocumento(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    descripcion = models.CharField(max_length=250, null=True, blank=True)
+    descripcion = models.CharField(max_length=300, null=True, blank=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
@@ -78,7 +78,7 @@ class Usuarios(models.Model):
 # *Tabla los niveles de los recreadores
 class Nivel(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    descripcion = models.CharField(max_length=250, null=True, blank=True)
+    descripcion = models.CharField(max_length=300, null=True, blank=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
@@ -88,7 +88,7 @@ class Nivel(models.Model):
 # *Tabla los generos de los recreadores
 class Generos(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    descripcion = models.CharField(max_length=250, null=True, blank=True)
+    descripcion = models.CharField(max_length=300, null=True, blank=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
@@ -139,7 +139,7 @@ class Servicios(models.Model):
     precio = models.FloatField(default=0)
     duracion = models.DurationField()
     numero_recreadores = models.IntegerField(default=1)
-    descripcion = models.CharField(max_length=300, null=True, blank=True)
+    descripcion = models.CharField(max_length=500, null=True, blank=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     
@@ -182,7 +182,7 @@ class ServiciosMateriales(models.Model):
         Servicios, on_delete=models.CASCADE, related_name="materiales", db_column="servicio_id")
     material = models.ForeignKey(
         Materiales, on_delete=models.CASCADE, related_name="servicios", db_column="material_id")
-    cantidad = models.ImageField(default=1)
+    cantidad = models.IntegerField(default=1)
 
     class Meta:
         db_table = "servicios_has_materiales"
@@ -204,6 +204,15 @@ class PrecioDolar(models.Model):
     class Meta:
         db_table = "precio_dolar"
 
+# *Tabla del precio del dolar registrado
+class Sobrecargos(models.Model):
+    nombre = models.CharField(max_length=100, unique=True)
+    descripcion = models.CharField(max_length=300, null=True, blank=True)
+    monto = models.FloatField(default=0)
+
+    class Meta:
+        db_table = "sobrecargos"
+
 # *Tabla de los eventos registrados
 class Eventos(models.Model):
     fecha_evento = models.DateTimeField()
@@ -219,4 +228,21 @@ class Eventos(models.Model):
         db_table = "eventos"
 
 
+# *Tabla intermedia entre los sobrecargo y los eventos
+class EventosSobrecargos(models.Model):
+    evento = models.ForeignKey(
+        Eventos, on_delete=models.CASCADE, related_name="sobrecargo", db_column="evento_id")
+    sobrecargo = models.ForeignKey(
+        Sobrecargos, on_delete=models.CASCADE, related_name="evento", db_column="sobrecargo_id")
 
+    class Meta:
+        db_table = "sobrecargo_has_eventos"
+
+class EventosServicios(models.Model):
+    evento = models.ForeignKey(
+        Eventos, on_delete=models.CASCADE, related_name="servicio", db_column="evento_id")
+    servicios = models.ForeignKey(
+        Servicios, on_delete=models.CASCADE, related_name="evento", db_column="servicios_id")
+
+    class Meta:
+        db_table = "servicios_has_eventos"

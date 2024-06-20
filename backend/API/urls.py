@@ -10,6 +10,7 @@ from .views.materiales import Materiales_Views
 from .views.actividades import Actividades_Views
 from .views.recreadores import Recreadores_Views
 from .views.niveles import Nivel_Views
+from .views.sobrecargos import Sobrecargo_Views
 from .views.verify_token import Verify_Token_Views
 from .views.servicios import Servicios_Views
 from .views.generos import Genero_Views
@@ -25,6 +26,8 @@ urlpatterns=[
     path('niveles/<int:id>/', Nivel_Views.as_view(), name='nivel'),
     path('generos/', Genero_Views.as_view(), name='generos'),
     path('generos/<int:id>/', Genero_Views.as_view(), name='genero'),
+    path('sobrecargos/', Sobrecargo_Views.as_view(), name='sobrecargos'),
+    path('sobrecargos/<int:id>/', Sobrecargo_Views.as_view(), name='sobrecargo'),
     path('actividades/', Actividades_Views.as_view(), name='actividades'),
     path('actividades/<int:id>/', Actividades_Views.as_view(), name='actividad'),
     path('materiales/', Materiales_Views.as_view(), name='materiales'),

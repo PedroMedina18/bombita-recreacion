@@ -31,7 +31,7 @@ function Recreador() {
 
   const get_data = async () => {
     try {
-      const respuesta = await recreadores.get(Number(params.numero_documento))
+      const respuesta = await recreadores.get({paramOne:Number(params.numero_documento), params:{"_info":"true"}})
       if (respuesta.status !== 200) {
         setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
         return
@@ -40,7 +40,6 @@ function Recreador() {
         setErrorServer(`${respuesta.data.message}`)
         return
       }
-      console.log(respuesta.data.data.info)
       setData(respuesta.data.data.info)
     } catch (error) {
       console.log(error)

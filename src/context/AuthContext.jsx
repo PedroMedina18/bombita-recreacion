@@ -21,7 +21,8 @@ export function AuthContextProvider({ children }) {
         id: json.id,
         nombre: json.nombre,
         cargo: json.cargo,
-        fecha: json.inicio_sesion
+        fecha: json.inicio_sesion,
+        dollar: json.dollar
       }
     )
     setIsAuthenticated(true)
@@ -38,7 +39,7 @@ export function AuthContextProvider({ children }) {
     try {
       const token = getCookie("token")
       if (token) {
-        const respuesta = await verify_token.get()
+        const respuesta = await verify_token.get({})
         if (respuesta.statusText = "OK" && respuesta.data.status && respuesta.data.token) {
           saveUser(respuesta.data.data, respuesta.data.token)
         } else {

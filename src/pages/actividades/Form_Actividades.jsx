@@ -45,7 +45,7 @@ function Actividades() {
   //* funcion para buscar los permisos en la vase de datos
   const get_materiales = async () => {
     try {
-      const res = await materiales.get()
+      const res = await materiales.get({})
       verifyOptionsSelect({
         respuesta: res,
         setError: setErrorServer,
@@ -63,7 +63,7 @@ function Actividades() {
 
   const get_actividades = async () => {
     try {
-        const respuesta = await actividades.get(Number(params.id))
+        const respuesta = await actividades.get({paramOne:Number(params.id)})
         if (respuesta.status !== 200) {
           setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
           return
@@ -112,7 +112,7 @@ function Actividades() {
           const res = params.id? await actividades.put(body, Number(params.id)) : await actividades.post(body)
           controlResultPost({
             respuesta: res,
-            messageExito: texts.successMessage.actividades,
+            messageExito: params.id? texts.successMessage.editionActividad : texts.successMessage.registerActividad,
             useNavigate: { navigate: navigate, direction: "/actividades" }
           })
         }
@@ -173,13 +173,13 @@ function Actividades() {
                         }
                       }
                     }}
-                    placeholder={"Nombre de la Actividad"}
+                    placeholder={texts.placeholder.nameActividad}
                   />
                   <InputTextTarea label={texts.label.descripcion} name="descripcion" id="descripcion" form={{ errors, register }}
                     params={{
                       maxLength: {
-                        value: 200,
-                        message: texts.inputsMessage.max200,
+                        value: 300,
+                        message: texts.inputsMessage.max300,
                       },
                       validate: (value) => {
                         if (hasLeadingOrTrailingSpace(value)) {

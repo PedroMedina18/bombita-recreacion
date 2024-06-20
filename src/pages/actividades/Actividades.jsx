@@ -60,7 +60,9 @@ function Actividades() {
         searchCode({
           value: value,
           object: actividades,
-          setList: setActividades
+          setList: setActividades,
+          setData: setDataActividades,
+          setLoading: setTableLoaing,
         })
       }
     },
@@ -82,15 +84,15 @@ function Actividades() {
   }
 
   return (
-    <Navbar name={texts.pages.getActividades.name} descripcion={texts.pages.getActividades.description}>
+    <Navbar name = {texts.pages.getActividades.name} descripcion = {texts.pages.getActividades.description}>
 
       <Table
-        columns={columns}
-        rows={listActividades}
-        totalElements={dataActividades.total}
-        totalPages={dataActividades.pages}
-        options={options}
-        loading={tableLoading}
+        columns = {columns}
+        rows = {listActividades}
+        totalElements = {dataActividades.total}
+        totalPages = {dataActividades.pages}
+        options = {options}
+        loading = {tableLoading}
       />
       <Toaster />
     </Navbar>

@@ -27,3 +27,20 @@ def edit_str(input_str):
     edited_str = "_".join(edited_words)
     # *Devuelve la cadena editada.
     return edited_str
+
+def returnBoolean(str):
+    if str == "true":
+        return True
+    elif str == "false":
+        return False
+    else:
+        return str
+
+
+def normalize_id_list(param):
+    if isinstance(param, list):
+        return param
+    elif isinstance(param, str):
+        return [int(x) for x in param.split(",")]
+    else:
+        raise ValueError("Invalid parameter type")

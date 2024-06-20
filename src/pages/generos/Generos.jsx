@@ -53,7 +53,7 @@ function Generos() {
             deleteItem({
                 row: row,
                 objet: generos,
-                functionGet: getGenero()
+                functionGet: getGenero
             })
         },
         search: {
@@ -62,7 +62,9 @@ function Generos() {
                 searchCode({
                     value: value,
                     object: generos,
-                    setList: setGeneros
+                    setList: setGeneros,
+                    setLoading: setTableLoaing,
+                    setData: setDataGeneros,
                 })
             }
         },

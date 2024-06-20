@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react"
 import { useForm } from "react-hook-form";
-import { niveles } from "../../utils/API.jsx"
+import { sobrecargos } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx"
@@ -11,8 +11,8 @@ import Table from "../../components/table/Table"
 import texts from "../../context/text_es.js";
 
 function Niveles() {
-  const [listNiveles, setNiveles] = useState([])
-  const [dataNiveles, setDataNiveles] = useState({ pages: 0, total: 0 })
+  const [listSobrecargo, setSobrecargo] = useState([])
+  const [dataSobrecargos, setDataSobrecargos] = useState({ pages: 0, total: 0 })
   const [tableLoading, setTableLoaing] = useState(true)
   const renderizado = useRef(0)
   const navigate = useNavigate()
@@ -20,16 +20,16 @@ function Niveles() {
   useEffect(() => {
     if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1
-      getNiveles()
+      getSobrecargos()
       return
     }
   }, [])
 
-  const getNiveles = () => {
+  const getSobrecargos = () => {
     getListItems({
-      object: niveles,
-      setList: setNiveles,
-      setData: setDataNiveles,
+      object: sobrecargos,
+      setList: setSobrecargo,
+      setData: setDataSobrecargos,
       setLoading: setTableLoaing
     })
   }
@@ -47,17 +47,21 @@ function Niveles() {
       name: "Descripcion",
       row: (row) => { return row.descripcion }
     },
+    {
+        name: "Monto",
+        row: (row) => { return `${row.monto} $` }
+    },
   ]
   const options = {
     delete: (row) => {
       deleteItem({
         row: row,
-        objet: niveles,
-        functionGet: getNiveles
+        objet: sobrecargos,
+        functionGet: getSobrecargos
       })
     },
     put: (row)=>{
-            navigate(`/edit/nivel/${row.id}`)
+            navigate(`/edit/sobrecargo/${row.id}`)
         },
     get:(row)=>{
       alertInfo(
@@ -70,28 +74,28 @@ function Niveles() {
       function: (value) => {
         searchCode({
           value: value,
-          object: niveles,
-          setList: setNiveles,
-          setData: setDataNiveles,
+          object: sobrecargos,
+          setList: setSobrecargo,
+          setData: setDataSobrecargos,
           setLoading: setTableLoaing
         })
       }
     },
     register: {
-      name: texts.registerMessage.buttonRegisterNivel,
+      name: texts.registerMessage.buttonRegisterSobrecargo,
       function: () => {
-        navigate("/register/nivel")
+        navigate("/register/sobrecargo")
       }
     }
   }
   return (
-    <Navbar name={`${texts.pages.getNiveles.name}`} descripcion={`${texts.pages.getNiveles.description}`}>
+    <Navbar name={`${texts.pages.getSobrecargos.name}`} descripcion={`${texts.pages.getSobrecargos.description}`}>
 
       <Table
         columns={columns}
-        rows={listNiveles}
-        totalElements={dataNiveles.total}
-        totalPages={dataNiveles.pages}
+        rows={listSobrecargo}
+        totalElements={dataSobrecargos.total}
+        totalPages={dataSobrecargos.pages}
         options={options}
         loading={tableLoading}
       />

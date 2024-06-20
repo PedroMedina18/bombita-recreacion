@@ -53,7 +53,7 @@ function Tipo_Documento() {
             deleteItem({
                 row: row,
                 objet: tipo_documentos,
-                functionGet: getTipo_Documentos()
+                functionGet: getTipo_Documentos
             })
         },
         search: {
@@ -62,7 +62,9 @@ function Tipo_Documento() {
                 searchCode({
                     value: value,
                     object: tipo_documentos,
-                    setList: setTipo_Documentos
+                    setList: setTipo_Documentos,
+                    setData: setDataTipo_Documentos,
+                    setLoading: setTableLoaing
                 })
             }
         },

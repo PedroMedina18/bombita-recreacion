@@ -24,6 +24,7 @@ function Recreadores() {
         }
     }, [])
 
+
     const getRecreadores = () => {
         getListItems({
             object: recreadores,
@@ -81,7 +82,9 @@ function Recreadores() {
                 searchCode({
                     value: value,
                     object: recreadores,
-                    setList: setRecreadores
+                    setList: setRecreadores,
+                    setData: setDataRecreadores,
+                    setLoading: setTableLoaing
                 })
             }
         },

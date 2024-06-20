@@ -79,9 +79,14 @@ function Servicios() {
         searchCode({
           value: value,
           object: servicios,
-          setList: setServicios
+          setList: setServicios,
+          setLoading: setTableLoaing,
+          setData: setDataServicios,
         })
       }
+    },
+    put: (row)=>{
+      navigate(`/edit/servicio/${row.id}`)
     },
     register: {
       name: texts.registerMessage.buttonRegisterServicio,

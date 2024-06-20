@@ -8,6 +8,7 @@ from ..funtions.serializador import dictfetchall
 from ..models import Actividades, MaterialesActividad, Materiales
 from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
+from ..funtions.editorOpciones import editorOpciones
 from ..message import MESSAGE
 import json
 
@@ -53,6 +54,7 @@ class Actividades_Views(View):
             req = json.loads(request.body)
             verify=verify_token(req['headers'])
             req = req['body']
+            cursor = connection.cursor()
             if(not verify['status']):
                 datos = {
                     'status': False,
@@ -69,6 +71,30 @@ class Actividades_Views(View):
                     'status': True,
                     'message': f"{MESSAGE['edition']}"
                 }
+                query = """
+                    SELECT ma.id FROM
+                        materiales AS ma
+                    INNER JOIN 
+                        materiales_has_actividades
+                    ON 
+                        ma.id = materiales_has_actividades.material_id
+                    WHERE 
+                        materiales_has_actividades.actividad_id = %s;
+                """
+                cursor.execute(query, [int(id)])
+                materiales = dictfetchall(cursor)
+                editorOpciones(
+                    items = materiales,
+                    id = id,
+                    listTabla = req['materiales'],
+                    tablaIntermedia = MaterialesActividad,
+                    itemGet = actividad,
+                    tablaAgregar = Materiales,
+                    filtro_principal = 'actividad', 
+                    filtro_secundario = 'material', 
+                    campo_principal = 'actividad', 
+                    campo_secundario = 'material'
+                )
             else:
                 datos = {
                     'status': False,
@@ -82,6 +108,9 @@ class Actividades_Views(View):
                 'message': f"{MESSAGE['errorEdition']}: {error}",
             }
             return JsonResponse(datos)
+        finally:
+            cursor.close()
+            connection.close()
 
     def delete(self, request, id):
         try:

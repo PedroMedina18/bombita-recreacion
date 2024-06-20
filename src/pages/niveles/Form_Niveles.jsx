@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react';
 import { useForm } from "react-hook-form";
 import { InputsGeneral, InputTextTarea } from "../../components/input/Inputs.jsx";
@@ -81,7 +80,7 @@ function Form_Niveles() {
                     const res = params.id? await niveles.put(body, Number(params.id)) : await niveles.post(body)
                     controlResultPost({
                         respuesta: res,
-                        messageExito: texts.successMessage.nivel,
+                        messageExito: params.id? texts.successMessage.editionNivel : texts.successMessage.registerMaterial,
                         useNavigate:{navigate:navigate, direction:"/niveles"}
                     })
                 }
@@ -106,8 +105,8 @@ function Form_Niveles() {
                                 message: texts.inputsMessage.requireName,
                             },
                             maxLength: {
-                                value: 50,
-                                message: texts.inputsMessage.max50
+                                value: 100,
+                                message: texts.inputsMessage.max100
                             },
                             minLength: {
                                 value: 5,
@@ -125,13 +124,13 @@ function Form_Niveles() {
                                 }
                             }
                         }}
-                        placeholder={"Nombre de la Actividad"}
+                        placeholder={texts.placeholder.nameNivel}
                     />
                     <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
                         params={{
                             maxLength: {
-                                value: 200,
-                                message: texts.inputsMessage.max200
+                                value: 300,
+                                message: texts.inputsMessage.max300
                             },
                             validate: (value) => {
                                 if (hasLeadingOrTrailingSpace(value)) {

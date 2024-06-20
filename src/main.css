@@ -149,14 +149,14 @@ input[type="number"] {
   height: 100vh;
 }
 
-.svg-check svg {
+/* .svg-check svg {
   color: rgb(0, 167, 0);
   width: 50px;
 }
 .svg-x svg {
   color: rgb(204, 19, 19);
   width: 50px;
-}
+} */
 
 @media (min-width: 992px) {
   .w-lg-25 {
