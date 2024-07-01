@@ -1,8 +1,8 @@
 import "./navbar.css"
 import bombita from "../../assets/bomb.png"
 import { Link, useNavigate } from "react-router-dom"
-import { useContext, useState } from 'react';
-import { AuthContext } from '../../context/AuthContext';
+import { useState } from 'react';
+import { useAuthContext } from '../../context/AuthContext';
 import { alertConfim } from '../alerts.jsx'
 import texts from "../../context/text_es"
 import {
@@ -22,8 +22,8 @@ import {
 } from "../../components/Icon.jsx"
 
 function Navbar({ children, name, descripcion, dollar=false }) {
-    const { getUser, closeSession } = useContext(AuthContext)
-    const [dataUser] = useState(getUser())
+    const { getUser, closeSession } = useAuthContext();
+    const [dataUser] = useState(getUser());
     const startDate = new Date(dataUser.fecha);
     const navigate = useNavigate();
 

@@ -73,7 +73,7 @@ function Form_Servicios() {
       console.log(error);
       setErrorServer(texts.errorMessage.errorSystem);
     } finally {
-      if (!params.id){
+      if (!params.id) {
         setLoading(false)
       }
     }
@@ -81,7 +81,7 @@ function Form_Servicios() {
 
   const get_servicio = async () => {
     try {
-      const respuesta = await servicios.get({paramOne:Number(params.id)})
+      const respuesta = await servicios.get({ paramOne: Number(params.id) })
       if (respuesta.status !== 200) {
         setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
         return
@@ -100,8 +100,8 @@ function Form_Servicios() {
       setValue("numero_recreadores", respuesta.data.data.numero_recreadores)
       setValue("descripcion", respuesta.data.data.descripcion)
       setValue("duracion-hours", respuesta.data.data.duracion.horas),
-      setValue("duracion-minutes", respuesta.data.data.duracion.minutos),
-      setSaveActividades(coincidences(dataActividades, respuesta.data.data.actividades))
+        setValue("duracion-minutes", respuesta.data.data.duracion.minutos),
+        setSaveActividades(coincidences(dataActividades, respuesta.data.data.actividades))
       setDataActividadesDefault(coincidences(dataActividades, respuesta.data.data.actividades))
       setSaveRecreadores(coincidences(dataRecreadores, respuesta.data.data.recreadores))
       setDataRecreadoresDefault(coincidences(dataRecreadores, respuesta.data.data.recreadores))
@@ -163,7 +163,7 @@ function Form_Servicios() {
         materiales: materiales,
       };
       alertLoading("Cargando")
-      const res = params.id? await servicios.put(body, Number(params.id)) : await servicios.post(body);
+      const res = params.id ? await servicios.put(body, Number(params.id)) : await servicios.post(body);
       controlResultPost({
         respuesta: res,
 
@@ -178,7 +178,7 @@ function Form_Servicios() {
   });
 
   return (
-    <Navbar name={params.id? texts.pages.editServicio.name : texts.pages.registerServicio.name} descripcion={params.id? texts.pages.editServicio.description : texts.pages.registerServicio.description}>
+    <Navbar name={params.id ? texts.pages.editServicio.name : texts.pages.registerServicio.name} descripcion={params.id ? texts.pages.editServicio.description : texts.pages.registerServicio.description}>
       <ButtonSimple type="button" className="mb-3"
         onClick={() => {
           navigate("/servicios");
@@ -330,15 +330,7 @@ function Form_Servicios() {
                   )}
                 </div>
                 <div className="mb-1">
-                  <MultiSelect
-                    name="materiales"
-                    label={`${texts.label.materiales}`}
-                    id="materiales"
-                    options={dataMateriales}
-                    save={setSaveMateriales}
-                    placeholder={"Materiales que se necesitan"}
-                    optionsDefault={dataMaterialesDefault}
-                  />
+                  <MultiSelect name="materiales" label={`${texts.label.materiales}`} id="materiales" options={dataMateriales} save={setSaveMateriales} placeholder={"Materiales que se necesitan"} optionsDefault={dataMaterialesDefault} />
                   {Boolean(!saveMateriales.length && submit) ? (
                     <span className="message-error visible">
                       {texts.inputsMessage.selectMateriales}
@@ -353,58 +345,47 @@ function Form_Servicios() {
                       Escoja la cantidad de materiales
                     </h4>
                     {saveMateriales.map((element, index) => (
-                      <InputsGeneral
-                        type={"number"}
-                        key={`${element.label}-${index}`}
-                        name={element.label}
-                        label={element.label}
-                        id={`${element.value}-material`}
-                        form={{ errors, register }}
-                        flexRow={true}
-                        params={{
-                          required: {
-                            value: true,
-                            message: texts.inputsMessage.requireCantidadMaterial,
-                          },
-                          min: {
-                            value: 0,
-                            message: texts.inputsMessage.minNegative,
-                          },
-                        }}
+                      <InputsGeneral type={"number"} key={`${element.label}-${index}`} name={element.label} label={element.label} id={`${element.value}-material`} form={{ errors, register }} flexRow={true} params={{
+                        required: {
+                          value: true,
+                          message: texts.inputsMessage.requireCantidadMaterial,
+                        },
+                        min: {
+                          value: 0,
+                          message: texts.inputsMessage.minNegative,
+                        },
+                      }}
                       />
                     ))}
                   </div>
                 ) : (
                   ""
                 )}
-                <InputTextTarea
-                  label={texts.label.descripcion}
-                  name="descripcion"
-                  id="descripcion"
-                  form={{ errors, register }}
-                  params={{
-                    maxLength: {
-                      value: 500,
-                      message: texts.inputsMessage.max500,
-                    },
-                    validate: (value) => {
-                      if (hasLeadingOrTrailingSpace(value)) {
-                        return texts.inputsMessage.noneSpace;
-                      } else {
-                        return true;
-                      }
-                    },
-                  }}
+                <InputTextTarea label={texts.label.descripcion} name="descripcion" id="descripcion" form={{ errors, register }} params={{
+                  required: {
+                    value: true,
+                    message: texts.inputsMessage.requiredDesription,
+                  },
+                  maxLength: {
+                    value: 500,
+                    message: texts.inputsMessage.max500,
+                  },
+                  validate: (value) => {
+                    if (hasLeadingOrTrailingSpace(value)) {
+                      return texts.inputsMessage.noneSpace;
+                    } else {
+                      return true;
+                    }
+                  },
+                }}
                   placeholder={texts.placeholder.descripcion}
                 />
-                <ButtonSimple
+                <ButtonSimple className="mx-auto w-50 mt-3" type="submit"
                   onClick={(e) => {
                     setSubmit(true);
                   }}
-                  type="submit"
-                  className="mx-auto w-50 mt-3"
                 >
-                  Registrar
+                  {params.id ? "Guardar" : "Registrar"}
                 </ButtonSimple>
               </form>
             </div>

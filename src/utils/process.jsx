@@ -71,6 +71,16 @@ export function formatDateWithTime12Hour(date) {
   };
   return new Intl.DateTimeFormat('es-ES', options).format(fecha);
 }
+export function formatoFechaInput(date) {
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hour = String(date.getHours()).padStart(2, '0');
+  const minute = String(date.getMinutes()).padStart(2, '0');
+
+  return `${year}-${month}-${day}T${hour}:${minute}`;
+}
 
 // *Para devolver una lista con los objetos que coinciden
 export function coincidences(options, optionDefault) {
@@ -89,4 +99,11 @@ export function addOptionalQueryParams(url, queryParams) {
     url += `?${params.toString()}`;
   }
   return url;
+}
+
+export function truncateString(str, maxLength) {
+  if (str.length > maxLength) {
+    return str.substring(0, maxLength) + '...';
+  }
+  return str;
 }

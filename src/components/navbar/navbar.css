@@ -29,7 +29,7 @@
     width: var(--width-sidebar);
     min-width: var(--width-sidebar);
     height: 100vh;
-    z-index: 1000;
+    z-index: 100;
     transition: all 0.25s ease-in-out;
     background-color: rgb(var(--principal));
     display: flex;
@@ -60,7 +60,7 @@
     color: #fff;
     padding: 15px 15px 15px calc(var(--width-sidebar) + 16px);
     position: fixed;
-    z-index: 999;
+    z-index: 99;
     transition: all 0.25s ease-in-out;
 }
 

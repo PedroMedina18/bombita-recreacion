@@ -4,6 +4,7 @@ import "./button.css"
 export function ButtonSimple({children, type, className=null, ...props}){
     return (
         <button type={type} className={`button-initial ${className}`}
+        
         {
             ...props
         }>

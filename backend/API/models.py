@@ -6,17 +6,17 @@ from django.db import models
 # *Tabla con los permisos propios del sistema
 class Permisos(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    descripcion = models.CharField(max_length=300, null=True, blank=True)
+    descripcion = models.CharField(max_length=300)
 
     class Meta:
         db_table = "permisos"
 
 # *Tabla con los cargos del sistema principal funcion determinar que puede hacer cada usuario
 class Cargos(models.Model):
-    nombre = models.CharField(max_length=50, unique=True)
-    descripcion = models.CharField(max_length=300, null=True, blank=True)
+    nombre = models.CharField(max_length=100, unique=True)
+    descripcion = models.CharField(max_length=300)
     administrador = models.BooleanField()
-    img_logo = models.FileField(upload_to="img_logo_cargos", null=True, blank=True)
+    img = models.FileField(upload_to="img_logo_cargos", null=True, blank=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
@@ -24,19 +24,19 @@ class Cargos(models.Model):
         db_table = "cargos"
 
 # *Tabla intermedia entre los cargos y los permisos
-class PermisosCargos(models.Model):
+class Privilegios(models.Model):
     permisos = models.ForeignKey(
         Permisos, on_delete=models.CASCADE, related_name="cargos", db_column="permiso_id")
     cargos = models.ForeignKey(
         Cargos, on_delete=models.CASCADE, related_name="permisos", db_column="cargo_id")
 
     class Meta:
-        db_table = "permisos_has_cargos"
+        db_table = "privilegios"
 
 # *Tabla los tipos de documentos
 class TipoDocumento(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    descripcion = models.CharField(max_length=300, null=True, blank=True)
+    descripcion = models.CharField(max_length=300)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
@@ -78,7 +78,7 @@ class Usuarios(models.Model):
 # *Tabla los niveles de los recreadores
 class Nivel(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    descripcion = models.CharField(max_length=300, null=True, blank=True)
+    descripcion = models.CharField(max_length=300)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
@@ -88,7 +88,7 @@ class Nivel(models.Model):
 # *Tabla los generos de los recreadores
 class Generos(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    descripcion = models.CharField(max_length=300, null=True, blank=True)
+    descripcion = models.CharField(max_length=300)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
@@ -104,7 +104,7 @@ class Recreadores(models.Model):
         Nivel, on_delete=models.PROTECT, related_name="recreadores", db_column="nivel_id")
     genero = models.ForeignKey(
         Generos, on_delete=models.PROTECT, related_name="recreadores", db_column="genero_id")
-    img_perfil = models.FileField(upload_to="img_recreadores", null=True, blank=True)
+    img = models.FileField(upload_to="img_recreadores", null=True, blank=True)
     fecha_nacimiento = models.DateField()
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
@@ -115,7 +115,7 @@ class Recreadores(models.Model):
 # *Tabla los actividades de los eventos
 class Actividades(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    descripcion = models.CharField(max_length=300, null=True, blank=True)
+    descripcion = models.CharField(max_length=300)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
 
@@ -125,7 +125,7 @@ class Actividades(models.Model):
 # *Tabla los materiales de los eventos
 class Materiales(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    descripcion = models.CharField(max_length=300, null=True, blank=True)
+    descripcion = models.CharField(max_length=300)
     total = models.IntegerField(default=0)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
@@ -139,7 +139,7 @@ class Servicios(models.Model):
     precio = models.FloatField(default=0)
     duracion = models.DurationField()
     numero_recreadores = models.IntegerField(default=1)
-    descripcion = models.CharField(max_length=500, null=True, blank=True)
+    descripcion = models.CharField(max_length=500)
     fecha_registro = models.DateTimeField(auto_now_add=True)
     fecha_actualizacion = models.DateTimeField(auto_now=True)
     
@@ -154,17 +154,8 @@ class MaterialesActividad(models.Model):
         Actividades, on_delete=models.CASCADE, related_name="materiales", db_column="actividad_id")
 
     class Meta:
-        db_table = "materiales_has_actividades"
+        db_table = "materiales_actividades"
 
-# *Tabla intermedia entre los servicios y los recreadores
-class ServiciosRecreadores(models.Model):
-    servicio = models.ForeignKey(
-        Servicios, on_delete=models.CASCADE, related_name="recreador", db_column="servicio_id")
-    recreador = models.ForeignKey(
-        Recreadores, on_delete=models.CASCADE, related_name="servicio", db_column="recreador_id")
-
-    class Meta:
-        db_table = "servicios_has_recreadores"
 
 # *Tabla intermedia entre los servicios y los actividades
 class ServiciosActividades(models.Model):
@@ -174,7 +165,7 @@ class ServiciosActividades(models.Model):
         Actividades, on_delete=models.CASCADE, related_name="servicios", db_column="actividad_id")
 
     class Meta:
-        db_table = "servicios_has_actividades"
+        db_table = "servicios_actividades"
 
 # *Tabla intermedia entre los servicios y los materiales
 class ServiciosMateriales(models.Model):
@@ -185,13 +176,12 @@ class ServiciosMateriales(models.Model):
     cantidad = models.IntegerField(default=1)
 
     class Meta:
-        db_table = "servicios_has_materiales"
+        db_table = "servicios_materiales"
 
 # *Tabla de los clientes que solicitan los eventos
 class Clientes(models.Model):
     persona = models.ForeignKey(Personas, on_delete=models.PROTECT, related_name="clientes", db_column="persona_id")
     fecha_registro = models.DateTimeField(auto_now_add=True)
-    fecha_actualizacion = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "clientes"
@@ -207,7 +197,7 @@ class PrecioDolar(models.Model):
 # *Tabla del precio del dolar registrado
 class Sobrecargos(models.Model):
     nombre = models.CharField(max_length=100, unique=True)
-    descripcion = models.CharField(max_length=300, null=True, blank=True)
+    descripcion = models.CharField(max_length=300)
     monto = models.FloatField(default=0)
 
     class Meta:
@@ -236,7 +226,7 @@ class EventosSobrecargos(models.Model):
         Sobrecargos, on_delete=models.CASCADE, related_name="evento", db_column="sobrecargo_id")
 
     class Meta:
-        db_table = "sobrecargo_has_eventos"
+        db_table = "sobrecargo_eventos"
 
 class EventosServicios(models.Model):
     evento = models.ForeignKey(
@@ -245,4 +235,4 @@ class EventosServicios(models.Model):
         Servicios, on_delete=models.CASCADE, related_name="evento", db_column="servicios_id")
 
     class Meta:
-        db_table = "servicios_has_eventos"
+        db_table = "servicios_eventos"

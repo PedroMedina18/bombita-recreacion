@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
-from ..models import Cargos, PermisosCargos, Permisos
+from ..models import Cargos, Privilegios, Permisos
 from ..funtions.token import verify_token
 from ..funtions.editorOpciones import editorOpciones
 from ..funtions.identificador import returnBoolean, normalize_id_list
@@ -24,7 +24,7 @@ class Cargos_Views(View):
     def post(self, request, id=0):
         try:
             req = request.POST
-            img = request.FILES
+            imgs = request.FILES
             method = request.GET.get("_method", "POST")
             verify = verify_token(request.headers)
             if (not verify['status']):
@@ -44,11 +44,11 @@ class Cargos_Views(View):
                     cargo.nombre = req['nombre']
                     cargo.descripcion = req['descripcion']
                     cargo.administrador = returnBoolean(req['administrador'])
-                    if "img_logo" in img:
-                        cargo.img_logo=img['img_logo']
+                    if "img" in imgs:
+                        cargo.img=imgs['img']
                     cargo.save()
                     if (returnBoolean(req['administrador'])):
-                        PermisosCargos.objects.filter(cargos=id).delete()
+                        Privilegios.objects.filter(cargos=id).delete()
                         datos = {
                             'status': True,
                             'message': f"{MESSAGE['edition']}"
@@ -58,11 +58,11 @@ class Cargos_Views(View):
                         SELECT p.id FROM
                             permisos AS p
                         INNER JOIN 
-                            permisos_has_cargos
+                            privilegios
                         ON
-                            p.id = permisos_has_cargos.permiso_id
+                            p.id = privilegios.permiso_id
                         WHERE
-                            permisos_has_cargos.cargo_id = %s;
+                            privilegios.cargo_id = %s;
                         """
                         cursor.execute(query, [int(id)])
                         permisos = dictfetchall(cursor)
@@ -71,7 +71,7 @@ class Cargos_Views(View):
                             items = permisos,
                             id = id,
                             listTabla = listTabla,
-                            tablaIntermedia = PermisosCargos,
+                            tablaIntermedia = Privilegios,
                             itemGet = cargo,
                             tablaAgregar = Permisos,
                             filtro_principal = 'cargos', 
@@ -95,14 +95,14 @@ class Cargos_Views(View):
                     nombre = req['nombre'].title(), 
                     descripcion = req['descripcion'], 
                     administrador = returnBoolean(req['administrador']), 
-                    img_logo=img['img_logo'] if "img_logo" in img else None,
+                    img=imgs['img'] if "img" in imgs else None,
                 )
             
                 if (not returnBoolean(req['administrador'])):
                     permisos = req['permisos']
                     for permiso in permisos:
                         getPermiso = Permisos.objects.get(id=int(permiso))
-                        PermisosCargos.objects.create(
+                        Privilegios.objects.create(
                             permisos=getPermiso, cargos=cargo)
                 datos = {
                     'status': True,
@@ -110,6 +110,23 @@ class Cargos_Views(View):
                 }
             return JsonResponse(datos)
         
+        except IntegrityError as error:
+            print(f"{MESSAGE['errorIntegrity']} - {error}", )
+            if error.args[0]==1062:
+                if "nombre" in error.args[1]:
+                    message = MESSAGE['nombreDuplicate']
+                else:
+                    message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
+                datos = {
+                'status': False,
+                'message': message
+                }
+            else:
+                datos = {
+                'status': False,
+                'message': f"{MESSAGE['errorIntegrity']}: {error}"
+                }
+            return JsonResponse(datos)
         except Exception as error:
             if method=="PUT":
                 print(f"{MESSAGE['errorPut']} - {error}")
@@ -127,78 +144,6 @@ class Cargos_Views(View):
         finally:
             cursor.close()
             connection.close()
-
-    # def put(self, request, id):
-    #     try:
-    #         verify = verify_token(request.headers)
-    #         req = request.POST
-    #         img = request.FILES
-    #         if (not verify['status']):
-    #             datos = {
-    #                 'status': False,
-    #                 'message': verify['message'],
-    #             }
-    #             return JsonResponse(datos)
-    #         cargos = list(Cargos.objects.filter(id=id).values())
-    #         cursor = connection.cursor()
-    #         if len(cargos) > 0:
-    #             cargo = Cargos.objects.get(id=id)
-    #             cargo.nombre = req['nombre']
-    #             cargo.descripcion = req['descripcion']
-    #             cargo.administrador = returnBoolean(req['administrador'])
-    #             if "img_logo" in img:
-    #                 cargo.img_logo=img['img_logo']
-    #             cargo.save()
-    #             if (returnBoolean(req['administrador'])):
-    #                 PermisosCargos.objects.filter(cargos=id).delete()
-    #                 datos = {
-    #                     'status': True,
-    #                     'message': f"{MESSAGE['edition']}"
-    #                 }
-    #             else:
-    #                 query = """"
-    #                 SELECT p.id FROM
-    #                     permisos AS p
-    #                 INNER JOIN 
-    #                     permisos_has_cargos 
-    #                 ON 
-    #                     p.id = permisos_has_cargos.permiso_id
-    #                 WHERE 
-    #                     permisos_has_cargos.cargo_id = %s;
-    #                 """
-    #                 editorOpciones(
-    #                     cursor=cursor,
-    #                     query=query,
-    #                     id=id,
-    #                     listTabla = req['permisos'],
-    #                     tablaIntermedia=PermisosCargos,
-    #                     itemGet=cargo,
-    #                     tablaAgregar=Permisos,
-    #                     filtro_cargos='cargos', 
-    #                     filtro_permisos='permisos', 
-    #                     campo_cargos='cargos', 
-    #                     campo_permisos='permisos'
-    #                 )
-    #                 datos = {
-    #                     'status': True,
-    #                     'message': f"{MESSAGE['edition']}"
-    #                 }
-    #         else:
-    #             datos = {
-    #                 'status': False,
-    #                 'message': f"{MESSAGE['errorRegistroNone']}"
-    #             }
-    #         return JsonResponse(datos)
-    #     except Exception as error:
-    #         print(f"{MESSAGE['errorPut']} - {error}")
-    #         datos = {
-    #             'status': False,
-    #             'message': f"{MESSAGE['errorEdition']}: {error}",
-    #         }
-    #         return JsonResponse(datos)
-    #     # finally:
-    #         # cursor.close()
-    #         # connection.close()
     
     def delete(self, request, id):
         try:
@@ -222,6 +167,7 @@ class Cargos_Views(View):
                     'message': f"{MESSAGE['errorRegistroNone']}"
                 }
             return JsonResponse(datos)
+
         except models.ProtectedError as error:
             print(f"{MESSAGE['errorProteccion']} - {str(error)}")
             datos = {
@@ -254,7 +200,7 @@ class Cargos_Views(View):
                 """
                 cursor.execute(query, [int(id)])
                 cargo = dictfetchall(cursor)
-                cargo[0]["img_logo"]=f"{config('URL')}media/{cargo[0]['img_logo']}" if cargo[0]['img_logo'] else None
+                cargo[0]["img"]=f"{config('URL')}media/{cargo[0]['img']}" if cargo[0]['img'] else None
                 if(len(cargo)>0):
                     if (not cargo[0]['administrador']):
                         query = """
@@ -265,11 +211,11 @@ class Cargos_Views(View):
                         FROM 
                             permisos AS p
                         INNER JOIN 
-                            permisos_has_cargos 
+                            privilegios 
                         ON 
-                            p.id = permisos_has_cargos.permiso_id
+                            p.id = privilegios.permiso_id
                         WHERE 
-                            permisos_has_cargos.cargo_id = %s;
+                            privilegios.cargo_id = %s;
                         """
                         cursor.execute(query, [int(id)])
                         permisos = dictfetchall(cursor)

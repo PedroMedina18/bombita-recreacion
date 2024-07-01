@@ -1,10 +1,10 @@
-import Navbar from '../components/navbar/Navbar'
-import { useContext, useState } from 'react';
-import { AuthContext } from '../context/AuthContext.jsx';
+import Navbar from '../components/navbar/Navbar';
+import { useState } from 'react';
+import { useAuthContext } from '../context/AuthContext.jsx';
 
 function Inicio() {
-  const { getUser } = useContext(AuthContext)
-  const [dataUser] = useState(getUser())
+  const { getUser } = useAuthContext();
+  const [dataUser] = useState(getUser());
   return (
     <Navbar name="Bienvenido">
       <div className='w-100 justify-content-between px-3 px-md-4 px-lg-5 py-3'>

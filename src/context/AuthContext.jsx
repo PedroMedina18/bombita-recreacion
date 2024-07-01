@@ -1,8 +1,13 @@
-import { useEffect, useState, createContext } from 'react'
+import { useEffect, useState, createContext, useContext } from 'react'
 import { verify_token } from "../utils/API.jsx"
 import { getCookie } from "../utils/cookie.jsx"
 import { LoaderRule } from "../components/loader/Loader.jsx"
-export const AuthContext = createContext();
+
+const AuthContext = createContext();
+
+export const useAuthContext=()=>{
+  return useContext(AuthContext)
+}
 
 export function AuthContextProvider({ children }) {
   const [user, setUser] = useState({})
@@ -26,7 +31,7 @@ export function AuthContextProvider({ children }) {
       }
     )
     setIsAuthenticated(true)
-    document.cookie = `token=${token}; path=/`
+    document.cookie = `token=${token}; path=/; SameSite=Strict`
   }
 
   // *funcion que devuelve los datos del usuario

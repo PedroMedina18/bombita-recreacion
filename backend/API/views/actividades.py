@@ -40,12 +40,29 @@ class Actividades_Views(View):
                     'message': f"{MESSAGE['registerActividad']}"
                 }
             return JsonResponse(datos)
-
+        
+        except IntegrityError as error:
+            print(f"{MESSAGE['errorIntegrity']} - {error}", )
+            if error.args[0]==1062:
+                if "nombre" in error.args[1]:
+                    message = MESSAGE['nombreDuplicate']
+                else:
+                    message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
+                datos = {
+                'status': False,
+                'message': message
+                }
+            else:
+                datos = {
+                'status': False,
+                'message': f"{MESSAGE['errorIntegrity']}: {error}"
+                }
+            return JsonResponse(datos)
         except Exception as error:
             print(f"{MESSAGE['errorPost']} - {error}", )
             datos = {
                 'status': False,
-                'message': f"{MESSAGE['errorRegistro']}: {error} "
+                'message': f"{MESSAGE['errorRegistro']}: {error}"
             }
             return JsonResponse(datos)
 
@@ -67,10 +84,7 @@ class Actividades_Views(View):
                 actividad.nombre = req['nombre']
                 actividad.descripcion = req['descripcion']
                 actividad.save()
-                datos = {
-                    'status': True,
-                    'message': f"{MESSAGE['edition']}"
-                }
+                
                 query = """
                     SELECT ma.id FROM
                         materiales AS ma
@@ -95,10 +109,32 @@ class Actividades_Views(View):
                     campo_principal = 'actividad', 
                     campo_secundario = 'material'
                 )
+                datos = {
+                    'status': True,
+                    'message': f"{MESSAGE['edition']}"
+                }
             else:
                 datos = {
                     'status': False,
                     'message': f"{MESSAGE['errorRegistroNone']}"
+                }
+            return JsonResponse(datos)
+            
+        except IntegrityError as error:
+            print(f"{MESSAGE['errorIntegrity']} - {error}", )
+            if error.args[0]==1062:
+                if "nombre" in error.args[1]:
+                    message = MESSAGE['nombreDuplicate']
+                else:
+                    message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
+                datos = {
+                'status': False,
+                'message': message
+                }
+            else:
+                datos = {
+                'status': False,
+                'message': f"{MESSAGE['errorIntegrity']}: {error}"
                 }
             return JsonResponse(datos)
         except Exception as error:

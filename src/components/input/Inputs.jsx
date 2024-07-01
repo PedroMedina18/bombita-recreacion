@@ -5,19 +5,8 @@ import perfil from "../../assets/perfil.png"
 import MakeAnimated from "react-select/animated";
 import { IconCircleCheck, IconCircleX, IconUserCircleSolid } from "../Icon";
 
-export function InputsGeneral({
-  label,
-  id,
-  type,
-  name,
-  form,
-  placeholder="",
-  params = {},
-  flexRow = false,
-  isError = true,
-  className = "",
-  ...props
-}) {
+
+export function InputsGeneral({label, id, type, name, form, placeholder = "", params = {}, flexRow = false, isError = true, className = "", ...props}) {
   const { errors, register } = form;
 
   if (flexRow) {
@@ -71,16 +60,7 @@ export function InputsGeneral({
   }
 }
 
-export function InputTextTarea({
-  label,
-  id,
-  name,
-  form,
-  placeholder="",
-  params = {},
-  rows = null,
-  ...props
-}) {
+export function InputTextTarea({label, id, name, form, placeholder = "", params = {}, rows = null, ...props}) {
   const { errors, register } = form;
   return (
     <div className={`w-100 mb-1 ${errors[name] ? "error" : " "}`}>
@@ -105,17 +85,8 @@ export function InputTextTarea({
   );
 }
 
-export function InputCheck({
-  label,
-  id,
-  name,
-  form,
-  params = {},
-  isError = true,
-  className = "",
-  ...props
-}) {
-  const { errors, register } = form;
+export function InputCheck({label, id, name, form, params = {}, isError = true, className = "", ...props }){
+  const { errors, register } = form
   return (
     <div
       className={`w-100 d-flex check ${errors[name] && isError ? "error" : " "
@@ -133,18 +104,11 @@ export function InputCheck({
         {label}
       </label>
     </div>
-  );
+  )
 }
 
-export function InputDuration({
-  label,
-  id,
-  name,
-  form,
-  params = {},
-  isError = true,
-  ...props
-}) {
+
+export function InputDuration({label, id, name, form, params = {}, isError = true, ...props}) {
   const { errors, register } = form;
   const hours = [
     { value: 0, label: "00" },
@@ -316,17 +280,7 @@ export function InputDuration({
   );
 }
 
-export function UnitSelect({
-  label,
-  id,
-  name,
-  form,
-  params = {},
-  options,
-  placeholder = "...",
-  isError = true,
-  ...props
-}) {
+export function UnitSelect({label, id, name, form, params = {}, options, placeholder = "...", isError = true, ...props}) {
   const { errors, register } = form;
   return (
     <div className={`w-100 ${errors[name] && isError ? "error" : " "}`}>
@@ -360,7 +314,7 @@ export function UnitSelect({
 }
 
 const animatedComponent = MakeAnimated();
-export function MultiSelect({ id, label, options, save, placeholder, optionsDefault }) {
+export function MultiSelect({id, label, options, save, placeholder, optionsDefault }) {
   return (
     <div className="w-100">
       <label className="formulario-label" htmlFor={id}>
@@ -396,50 +350,50 @@ export function MultiSelect({ id, label, options, save, placeholder, optionsDefa
   );
 }
 
-export function InputImgPerfil({ label, id, name, form, tamaño="lg", imgPerfil=null }) {
+export function InputImgPerfil({label, id, name, form, tamaño = "lg", imgPerfil = null }) {
   const { errors, register } = form;
-  const img=imgPerfil? imgPerfil : perfil
+  const img = imgPerfil ? imgPerfil : perfil
 
-  const cambio_imagen=(e)=>{
-    const $IMG=document.getElementById("img-perfil-creador")
-    const $SvgPerfil=document.getElementById("svg-perfil")
-    const $sectionPerfil=document.getElementById("sectionPerfil")
-    if(e.target.files[0]){
-      const reader=new FileReader()
-      reader.onload=(response)=>{
-        $IMG.src=response.target.result
-        if(!imgPerfil){
+  const cambio_imagen = (e) => {
+    const $IMG = document.getElementById("img-perfil-creador")
+    const $SvgPerfil = document.getElementById("svg-perfil")
+    const $sectionPerfil = document.getElementById("sectionPerfil")
+    if (e.target.files[0]) {
+      const reader = new FileReader()
+      reader.onload = (response) => {
+        $IMG.src = response.target.result
+        if (!imgPerfil) {
           $IMG.classList.remove("d-none")
           $SvgPerfil.classList.add("d-none")
           $sectionPerfil.classList.add("section-perfil-img")
         }
-        
+
       }
       reader.readAsDataURL(e.target.files[0])
-      
-    }else{
-      $IMG.src=img
-      if(!imgPerfil){
+
+    } else {
+      $IMG.src = img
+      if (!imgPerfil) {
         $IMG.classList.add("d-none")
         $SvgPerfil.classList.remove("d-none")
         $sectionPerfil.classList.remove("section-perfil-img")
       }
-      
+
     }
   }
 
   return (
     <div className={`w-100 d-flex flex-column align-items-center justify-content-center ${errors[name] && isError ? "error" : " "}`}>
-      <div className={`${tamaño=="sm"? 'sm':'lg'} section-perfil d-flex align-items-center justify-content-center ${imgPerfil? "section-perfil-img":""}`} id="sectionPerfil">
-        <IconUserCircleSolid id="svg-perfil" className={`${imgPerfil? "d-none" : ""}`}/>
-        <img id="img-perfil-creador" src={img} alt="img_perfil" className={`${tamaño=="sm"? 'sm':'lg'} img-perfil ${imgPerfil? "":"d-none"}`}/>
+      <div className={`${tamaño == "sm" ? 'sm' : 'lg'} section-perfil d-flex align-items-center justify-content-center ${imgPerfil ? "section-perfil-img" : ""}`} id="sectionPerfil">
+        <IconUserCircleSolid id="svg-perfil" className={`${imgPerfil ? "d-none" : ""}`} />
+        <img id="img-perfil-creador" src={img} alt="img_perfil" className={`${tamaño == "sm" ? 'sm' : 'lg'} img-perfil ${imgPerfil ? "" : "d-none"}`} />
       </div>
       <label className="button-initial cursor-pointer" htmlFor={name}>
         {label}
       </label>
       <input type="file" className="d-none" id={id} name={name} accept=".jpg, .jpeg, .png" multiple={false}
         {...register(name)}
-        onChange={(e)=>{cambio_imagen(e)}}
+        onChange={(e) => { cambio_imagen(e) }}
       />
 
       <p className="formulario-message-error">

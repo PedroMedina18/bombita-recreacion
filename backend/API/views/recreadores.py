@@ -10,6 +10,7 @@ from ..funtions.identificador import determinar_valor, edit_str, normalize_id_li
 from ..models import Nivel, Recreadores, Personas, TipoDocumento, Generos
 from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
+from ..message import MESSAGE
 from decouple import config
 import json
 
@@ -22,7 +23,8 @@ class Recreadores_Views(View):
     def post(self, request, identificador=0):
         try:
             req = request.POST
-            img=request.FILES
+            img = request.FILES
+            method = request.GET.get("_method", "POST")
             verify = verify_token(request.headers)
             if (not verify["status"]):
                 datos = {
@@ -31,81 +33,70 @@ class Recreadores_Views(View):
                 }
                 return JsonResponse(datos)
 
-            if request.GET["_method"] and request.GET["_method"]=="PUT":
+            if method=="PUT":
                 
                 tipo = determinar_valor(identificador)
                 if tipo["type"] != "int":
                     raise Http404('No se puede editar este objeto')
-                verify = verify_token(request.headers)
-                req = request.POST
-                img = request.FILES
-                if (not verify["status"]):
-                    datos = {
-                        "status": False,
-                        'message': verify["message"],
-                    }
-                    return JsonResponse(datos)
-
                 recreador = list(Recreadores.objects.filter(id=int(identificador)).values())
                 if len(recreador) > 0:
                     recreador = Recreadores.objects.get(id=int(identificador))
-                    persona = Personas.objects.get(id=recreador.persona)
+                    persona = Personas.objects.get(id=int(recreador.persona.id))
                     
                     ### *comprobacion de tipo de documento
-                    tipo_documento = list(TipoDocumento.objects.filter(id=req["tipo_documento"]).values())
+                    tipo_documento = list(TipoDocumento.objects.filter(id=int(req["tipo_documento"])).values())
                     if (len(tipo_documento) > 0):
-                        tipo_documento = TipoDocumento.objects.get(id=req["tipo_documento"])
+                        tipo_documento = TipoDocumento.objects.get(id=int(req["tipo_documento"]))
                     else:
                         datos = {
                             "status": False,
-                            'message': "Error. Compruebe el tipo de documento"
+                            'message': MESSAGE['errorTipoDocumento']
                         }
                         return JsonResponse(datos)
     
                     ### *comprobacion de nivel
-                    nivel = list(Nivel.objects.filter(id=req["nivel"]).values())
+                    nivel = list(Nivel.objects.filter(id=int(req["nivel"])).values())
                     if (len(nivel) > 0):
-                        nivel = Nivel.objects.get(id=req["nivel"])
+                        nivel = Nivel.objects.get(id=int(req["nivel"]))
                     else:
                         datos = {
                             "status": False,
-                            'message': "Error. Compruebe el nivel"
+                            'message': MESSAGE['errorNivel']
                         }
                         return JsonResponse(datos)
 
                     ### *comprobacion de genero
-                    genero = list(Generos.objects.filter(id=req["genero"]).values())
+                    genero = list(Generos.objects.filter(id=int(req["genero"])).values())
                     if (len(genero) > 0):
-                        genero = Generos.objects.get(id=req["genero"])
+                        genero = Generos.objects.get(id=int(req["genero"]))
                     else:
                         datos = {
                             "status": False,
-                            'message': "Error. Compruebe el genero"
+                            'message': MESSAGE['errorGenero']
                         }
                         return JsonResponse(datos)
-    
-                    persona.nombres= req['nombres'].title()
-                    persona.apellidos= req['apellidos'].title()
-                    persona.numero_documento= req['numero_documento']
-                    persona.telefono_principal=req["telefono_principal"],
-                    persona.telefono_secundario=req["telefono_secundario"],
-                    persona.correo=req["correo"],
-                    persona.tipo_documento=tipo_documento
-                    recreador.nivel=nivel,
-                    recreador.genero=genero,
-                    recreador.fecha_nacimiento=req["fecha_nacimiento"],
+                    persona.nombres = req['nombres'].title()
+                    persona.apellidos = req['apellidos'].title()
+                    persona.numero_documento = req['numero_documento']
+                    persona.telefono_principal = req["telefono_principal"]
+                    persona.telefono_secundario = req["telefono_secundario"]
+                    persona.correo = req["correo"]
+                    persona.tipo_documento = tipo_documento
+                    recreador.nivel = nivel
+                    recreador.genero = genero
+                    recreador.fecha_nacimiento = req["fecha_nacimiento"]
                     if "img_recreador" in img:
-                        recreador.img_perfil=img["img_recreador"],
+                        recreador.img = img["img_recreador"]
                     persona.save()
                     recreador.save()
                     datos = {
                         "status": True,
-                        'message': "Exito. Registro editado"
+                        'message': f"{MESSAGE['edition']}"
                     }
                 else:
                     datos = {
                         "status": False,
-                        'message': "Error. Registro no encontrado"
+                        'message': f"{MESSAGE['errorRegistroNone']}"
                     }
             else:
                 #* se debe comprobar si se va a registrar una persona nueva o ya existe
@@ -131,7 +122,7 @@ class Recreadores_Views(View):
                     else:
                         datos = {
                             "status": False,
-                            'message': "Error. Compruebe el tipo de documento"
+                            'message': MESSAGE['errorTipoDocumento']
                         }
                         return JsonResponse(datos)
 
@@ -153,7 +144,7 @@ class Recreadores_Views(View):
                 else:
                     datos = {
                         "status": False,
-                        'message': "Error. Compruebe el nivel"
+                        'message': MESSAGE['errorNivel']
                     }
                     return JsonResponse(datos)
 
@@ -164,7 +155,7 @@ class Recreadores_Views(View):
                 else:
                     datos = {
                         "status": False,
-                        'message': "Error. Compruebe el genero"
+                        'message': MESSAGE['errorGenero']
                     }
                     return JsonResponse(datos)
 
@@ -173,113 +164,50 @@ class Recreadores_Views(View):
                     persona=persona,
                     nivel=nivel,
                     genero=genero,
-                    img_perfil=img["img_perfil"] if "img_perfil" in img else None,
+                    img=img["img_perfil"] if "img_perfil" in img else None,
                     fecha_nacimiento=req["fecha_nacimiento"],
                 )
                 datos = {
                     "status": True,
-                    'message': "Registro de recreador completado"
+                    'message': f"{MESSAGE['registerRecreador']}"
+                }
+            return JsonResponse(datos)
+
+        except IntegrityError as error:
+            print(f"{MESSAGE['errorIntegrity']} - {error}", )
+            if error.args[0]==1062:
+                if "telefono_principal" in error.args[1]:
+                    message = MESSAGE['telefonoPrincipalDuplicate']
+                elif "correo" in error.args[1]:
+                    message = MESSAGE['correoDuplicate']
+                elif "numero_documento" in error.args[1]:
+                    message = MESSAGE['documentoDuplicate']
+                else:
+                    message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
+                datos = {
+                'status': False,
+                'message': message
+                }
+            else:
+                datos = {
+                'status': False,
+                'message': f"{MESSAGE['errorIntegrity']}: {error}"
                 }
             return JsonResponse(datos)
         except Exception as error:
-            if request.GET["_method"] and request.GET["_method"]=="PUT":
-                print(f"Error consulta delete - {error}", )
+            if method=="PUT":
+                print(f"{MESSAGE['errorPut']} - {error}")
                 datos = {
-                    "status": False,
-                    'message': f"Error al eliminar: {error}"
+                    'status': False,
+                    'message': f"{MESSAGE['errorEdition']}: {error}",
                 }
             else:
-                print(f"Error consulta post - {error}", )
+                print(f"{MESSAGE['errorPost']} - {error}", )
                 datos = {
-                    "status": False,
-                    'message': f"Error al registrar: {error}"
+                    'status': False,
+                    'message': f"{MESSAGE['errorRegistro']}: {error}"
                 }
             return JsonResponse(datos)
-
-    # def put(self, request, identificador=0):
-    #     try:
-    #         tipo = determinar_valor(identificador)
-    #         if tipo["type"] != "int":
-    #             raise Http404('No se puede editar este objeto')
-    #         verify = verify_token(request.headers)
-    #         req = request.POST
-    #         img = request.FILES
-    #         if (not verify["status"]):
-    #             datos = {
-    #                 "status": False,
-    #                 'message': verify["message"],
-    #             }
-    #             return JsonResponse(datos)
-
-    #         recreador = list(Recreadores.objects.filter(id=int(identificador)).values())
-    #         if len(recreador) > 0:
-    #             recreador = Recreadores.objects.get(id=int(identificador))
-    #             persona = Personas.objects.get(id=recreador.persona)
-                
-    #             ### *comprobacion de tipo de documento
-    #             tipo_documento = list(TipoDocumento.objects.filter(id=req["tipo_documento"]).values())
-    #             if (len(tipo_documento) > 0):
-    #                 tipo_documento = TipoDocumento.objects.get(id=req["tipo_documento"])
-    #             else:
-    #                 datos = {
-    #                     "status": False,
-    #                     'message': "Error. Compruebe el tipo de documento"
-    #                 }
-    #                 return JsonResponse(datos)
-
-    #             ### *comprobacion de nivel
-    #             nivel = list(Nivel.objects.filter(id=req["nivel"]).values())
-    #             if (len(nivel) > 0):
-    #                 nivel = Nivel.objects.get(id=req["nivel"])
-    #             else:
-    #                 datos = {
-    #                     "status": False,
-    #                     'message': "Error. Compruebe el nivel"
-    #                 }
-    #                 return JsonResponse(datos)
-
-    #             ### *comprobacion de genero
-    #             genero = list(Generos.objects.filter(id=req["genero"]).values())
-    #             if (len(genero) > 0):
-    #                 genero = Generos.objects.get(id=req["genero"])
-    #             else:
-    #                 datos = {
-    #                     "status": False,
-    #                     'message': "Error. Compruebe el genero"
-    #                 }
-    #                 return JsonResponse(datos)
-
-    #             persona.nombres= req['nombres'].title()
-    #             persona.apellidos= req['apellidos'].title()
-    #             persona.numero_documento= req['numero_documento']
-    #             persona.telefono_principal=req["telefono_principal"],
-    #             persona.telefono_secundario=req["telefono_secundario"],
-    #             persona.correo=req["correo"],
-    #             persona.tipo_documento=tipo_documento
-    #             recreador.nivel=nivel,
-    #             recreador.genero=genero,
-    #             recreador.fecha_nacimiento=req["fecha_nacimiento"],
-    #             if "img_recreador" in img:
-    #                 recreador.img_perfil=img["img_recreador"],
-    #             persona.save()
-    #             recreador.save()
-    #             datos = {
-    #                     "status": True,
-    #                     'message': "Exito. Registro editado"
-    #             }
-    #         else:
-    #             datos = {
-    #                 "status": False,
-    #                 'message': "Error. Registro no encontrado"
-    #             }
-    #         return JsonResponse(datos)
-    #     except Exception as error:
-    #         print(f"Error de consulta put - {error}")
-    #         datos = {
-    #             "status": False,
-    #             'message': f"Error al editar: {error}",
-    #         }
-    #         return JsonResponse(datos)
 
     def delete(self, request, identificador=0):
         try:
@@ -298,26 +226,26 @@ class Recreadores_Views(View):
                 Recreadores.objects.filter(id=int(identificador)).delete()
                 datos = {
                     "status": True,
-                    'message': "Registro eliminado"
+                    'message': f"{MESSAGE['delete']}"
                 }
             else:
                 datos = datos = {
                     "status": False,
-                    'message': "Registro no encontrado"
+                    'message': f"{MESSAGE['errorRegistroNone']}"
                 }
             return JsonResponse(datos)
         except models.ProtectedError as error:
-            print(f"Error de proteccion  - {str(error)}")
+            print(f"{MESSAGE['errorProteccion']}  - {str(error)}")
             datos = {
-                "status": False,
-                'message': "Error. Item protejido no se puede eliminar"
+                'status': False,
+                'message': f"{MESSAGE['errorProtect']}"
             }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"Error consulta delete - {error}", )
+            print(f"{MESSAGE['errorDelete']} - {error}", )
             datos = {
-                "status": False,
-                'message': f"Error al eliminar: {error}"
+                'status': False,
+                'message': f"{MESSAGE['errorEliminar']}: {error}"
             }
             return JsonResponse(datos)
 
@@ -355,7 +283,7 @@ class Recreadores_Views(View):
                             CONCAT('0', pe.telefono_principal) AS telefono_principal,
                             CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
                             re.inhabilitado,
-                            re.img_perfil
+                            re.img
                         FROM recreadores AS re
                         LEFT JOIN niveles AS ni ON re.nivel_id=ni.id
                         LEFT JOIN generos AS ge ON re.genero_id=ge.id
@@ -384,7 +312,7 @@ class Recreadores_Views(View):
                             CONCAT('0', pe.telefono_principal) AS telefono_principal,
                             CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
                             re.inhabilitado,
-                            re.img_perfil
+                            re.img
                         FROM recreadores AS re
                         LEFT JOIN niveles AS ni ON re.nivel_id=ni.id
                         LEFT JOIN generos AS ge ON re.genero_id=ge.id
@@ -397,10 +325,10 @@ class Recreadores_Views(View):
                 recreador = dictfetchall(cursor)
                 if info == "true" and  len(recreador) > 0:
 
-                    recreador[0]["img_perfil"]=f"{config('URL')}media/{recreador[0]['img_perfil']}" if recreador[0]['img_perfil'] else None
+                    recreador[0]["img"]=f"{config('URL')}media/{recreador[0]['img']}" if recreador[0]['img'] else None
                     datos = {
                         "status": True,
-                        'message': "Exito",
+                        'message': f"{MESSAGE['exitoGet']}",
                         "data": {
                             "info":recreador[0]
                         },
@@ -408,11 +336,11 @@ class Recreadores_Views(View):
                     
                 elif info == "false" and  len(recreador) > 0:
                     for data in recreador:
-                        data["img_perfil"]=f"{config('URL')}media/{recreador[0]['img_perfil']}" if recreador[0]['img_perfil'] else None
+                        data["img"]=f"{config('URL')}media/{recreador[0]['img']}" if recreador[0]['img'] else None
                     
                     datos = {
                         "status": True,
-                        'message': "Exito",
+                        'message': f"{MESSAGE['exitoGet']}",
                         "data": recreador,
                         "total": len(recreador),
                         "pages":1
@@ -420,7 +348,7 @@ class Recreadores_Views(View):
                 else:
                     datos = {
                         "status": False,
-                        'message': "Error. No se encontraron registros",
+                        'message': f"{MESSAGE['errorRegistrosNone']}",
                         "data": None,
                         "total": 0,
                         "pages":0
@@ -519,7 +447,7 @@ class Recreadores_Views(View):
                 if len(recreadores) > 0:
                     datos = {
                         "status": True,
-                        'message': "Exito",
+                        'message':  f"{MESSAGE['exitoGet']}",
                         "data": recreadores,
                         "pages": int(result[0]["pages"]),
                         "total": result[0]["total"],
@@ -527,18 +455,21 @@ class Recreadores_Views(View):
                 else:
                     datos = {
                         "status": False,
-                        'message': "Error. No se encontraron registros",
+                        'message': f"{MESSAGE['errorRegistrosNone']}",
                         "data": None,
                         "pages": None,
                         "total": 0
                     }
 
             return JsonResponse(datos)
-        except Exception as ex:
-            print("Error", ex)
+        except Exception as error:
+            print(f"{MESSAGE['errorGet']} - {error}")
             datos = {
-                "status": False,
-                'message': "Error. Compruebe Datos"
+                'status': False,
+                'message': f"{MESSAGE['errorConsulta']}: {error}",
+                'data': None,
+                'pages': None,
+                'total':0
             }
             return JsonResponse(datos)
         finally:

@@ -9,6 +9,7 @@ from ..funtions.token import new_token, verify_token
 from ..funtions.serializador import dictfetchall
 from ..funtions.dollar import consultDollar
 from ..models import Cargos
+from ..message import MESSAGE
 from django.db import IntegrityError, connection
 import json
 from datetime import datetime 
@@ -41,15 +42,6 @@ class Login(View):
                 # se comprueba de que la contraseña este correcta
                 contraseña = desencriptado_contraseña(usuario[0]['contraseña'], jd['contraseña'])
                 if(contraseña):
-                    
-                    
-                    
-
-
-
-                    
-
-
                     # user_administrador=Cargos.objects.filter(id=usuario[0]['cargo_id']).values("administrador")
                     # if(user_administrador[0]['administrador']):
                     #     token=new_token(usuario[0], None, user_administrador[0]['administrador'])
@@ -88,7 +80,7 @@ class Login(View):
                     token=new_token(usuario[0])
                     response={
                         'status':True,
-                        'message': "Acceso permitido", 
+                        'message': MESSAGE["Acceso"],
                         'token':token['token'], 
                         'data':{
                             'id':usuario[0]['id'],
@@ -102,7 +94,7 @@ class Login(View):
                 else:
                     response={
                         'status':False, 
-                        'message': "Usuario o contraseña incorrecta por favor verifique", 
+                        'message': MESSAGE["userPassword"],
                         'token':None, 
                         'data':None
                     }
@@ -110,7 +102,7 @@ class Login(View):
             else:
                 response={
                     'status':False, 
-                    'message': "Usuario o contraseña incorrecta por favor verifique", 
+                    'message': MESSAGE["userPassword"],
                     'token':None, 
                     'data':None
                 }
@@ -119,7 +111,7 @@ class Login(View):
             print("Error", ex)
             datos = {
                 'status':False,
-                'message': 'Error en el sistema. Intente mas tarde', 
+                'message': MESSAGE["errorSystem"],
                 'token':None, 
                 'data':None}
             return JsonResponse(datos)

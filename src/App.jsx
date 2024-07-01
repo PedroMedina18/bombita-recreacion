@@ -24,6 +24,9 @@ import Sobrecargos from "./pages/sobrecargos/Sobrecargos";
 import Form_Sobrecargos from "./pages/sobrecargos/Form_Sobrecargos";
 import Form_Servicios from "./pages/servicios/Form_Servicios";
 import Form_Eventos from "./pages/eventos/Form_Eventos";
+import FormDataEvent from "./pages/eventos/FormDataEvent";
+import FormAccount from "./pages/eventos/FormAccount";
+import {FormEventContextProvider} from "./context/FormEventContext.jsx";
 
 function App() {
   return (
@@ -36,16 +39,19 @@ function App() {
             <Route path="/register/cargo" element={<Form_Cargos />} />
             <Route path="/edit/cargo/:id" element={<Form_Cargos />} />
             <Route path="/usuarios" element={<Usuarios />} />
-            <Route path="/register/eventos" element={<Form_Eventos />} />
+            <Route path="/register/eventos/" element={<FormEventContextProvider />} >
+              <Route path="" element={<FormDataEvent />} />
+              <Route path="account" element={<FormAccount />} />
+            </Route>
             <Route path="/actividades" element={<Actividades />} />
             <Route path="/register/actividad" element={<Form_Actividades />} />
             <Route path="/edit/actividad/:id" element={<Form_Actividades />} />
             <Route path="/niveles" element={<Niveles />} />
             <Route path="/register/nivel" element={<Form_Niveles />} />
-            <Route path="/edit/nivel/:id" element={<Form_Niveles/>} />
+            <Route path="/edit/nivel/:id" element={<Form_Niveles />} />
             <Route path="/sobrecargos" element={<Sobrecargos />} />
             <Route path="/register/sobrecargo" element={<Form_Sobrecargos />} />
-            <Route path="/edit/sobrecargo/:id" element={<Form_Sobrecargos/>} />
+            <Route path="/edit/sobrecargo/:id" element={<Form_Sobrecargos />} />
             <Route path="/materiales" element={<Materiales />} />
             <Route path="/register/material" element={<Form_Materiales />} />
             <Route path="/edit/material/:id" element={<Form_Materiales />} />
@@ -55,7 +61,7 @@ function App() {
             <Route path="/generos" element={<Generos />} />
             <Route path="/register/genero" element={<Form_Generos />} />
             <Route path="/edit/genero/:id" element={<Form_Generos />} />
-            <Route path="/recreador/:numero_documento" element={<Recreador/>} />
+            <Route path="/recreador/:numero_documento" element={<Recreador />} />
             <Route path="/recreadores" element={<Recreadores />} />
             <Route path="/register/recreador" element={<Form_Recreadores />} />
             <Route path="/edit/recreador/:numero_documento" element={<Form_Recreadores />} />

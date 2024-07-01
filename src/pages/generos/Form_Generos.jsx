@@ -1,18 +1,20 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from 'react-router-dom'
-import { InputsGeneral, InputTextTarea } from "../../components/input/Inputs.jsx"
-import { ButtonSimple } from "../../components/button/Button"
+import { InputsGeneral, InputTextTarea } from "../../components/input/Inputs.jsx";
+import { ButtonSimple } from "../../components/button/Button";
+import { LoaderCircle } from "../../components/loader/Loader.jsx";
+import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import { generos } from "../../utils/API.jsx";
-import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx"
+import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { Toaster } from "sonner";
-import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx"
-import { controlResultPost } from "../../utils/actions.jsx"
-import Navbar from "../../components/navbar/Navbar"
+import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
+import { controlResultPost } from "../../utils/actions.jsx";
+import Navbar from "../../components/navbar/Navbar";
 import Swal from 'sweetalert2';
 import texts from "../../context/text_es.js";
 import pattern from "../../context/pattern.js";
-import { IconRowLeft } from "../../components/Icon"
+import { IconRowLeft } from "../../components/Icon";
 
 function Form_Generos() {
     const navigate = useNavigate();
@@ -24,16 +26,17 @@ function Form_Generos() {
     useEffect(() => {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
-            if (params.id){
+            if (params.id) {
                 get_genero()
             }
+            setLoading(false)
             return
         }
     }, [])
 
     const get_genero = async () => {
         try {
-            const respuesta = await generos.get({paramOne:Number(params.id)})
+            const respuesta = await generos.get({ paramOne: Number(params.id) })
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
                 return
@@ -41,13 +44,13 @@ function Form_Generos() {
             if (respuesta.data.status === false) {
                 setErrorServer(`${respuesta.data.message}`)
                 return
-            } 
+            }
             setErrorServer("")
             const keys = Object.keys(respuesta.data.data);
             keys.forEach(key => {
                 setValue(key, `${respuesta.data.data[`${key}`]}`)
             });
-            
+
         } catch (error) {
             console.log(error)
             setErrorServer(texts.errorMessage.errorObjet)
@@ -69,7 +72,7 @@ function Form_Generos() {
     const onSubmit = handleSubmit(
         async (data) => {
             try {
-                const message = params.id? texts.confirmMessage.confirEdit : texts.confirmMessage.confirRegister
+                const message = params.id ? texts.confirmMessage.confirEdit : texts.confirmMessage.confirRegister
                 const confirmacion = await alertConfim("Confirmar", message)
                 if (confirmacion.isConfirmed) {
                     const body = {
@@ -78,11 +81,11 @@ function Form_Generos() {
                     }
                     alertLoading("Cargando")
                     console.log(params.id)
-                    const res = params.id? await generos.put(body, Number(params.id)) : await generos.post(body)
+                    const res = params.id ? await generos.put(body, Number(params.id)) : await generos.post(body)
                     controlResultPost({
-                        respuesta:res, 
-                        messageExito:params.id? texts.successMessage.editionGenero : texts.successMessage.registerGenero, 
-                        useNavigate:{navigate:navigate, direction:"/generos"}
+                        respuesta: res,
+                        messageExito: params.id ? texts.successMessage.editionGenero : texts.successMessage.registerGenero,
+                        useNavigate: { navigate: navigate, direction: "/generos" }
                     })
                 }
 
@@ -95,57 +98,80 @@ function Form_Generos() {
     )
 
     return (
-        <Navbar name={params.id? texts.pages.editGenero.name : texts.pages.registerGenero.name} descripcion={params.id? texts.pages.editGenero.description : texts.pages.registerGenero.description}>
-            <ButtonSimple type="button" className="mb-2" onClick={()=>{navigate("/generos")}}> <IconRowLeft/> Regresar</ButtonSimple>
+        <Navbar name={params.id ? texts.pages.editGenero.name : texts.pages.registerGenero.name} descripcion={params.id ? texts.pages.editGenero.description : texts.pages.registerGenero.description}>
+            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/generos") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
-            <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
-                <form className="w-100 d-flex flex-column"
-                    onSubmit={onSubmit}>
-                    <InputsGeneral type={"text"} label={`${texts.label.nombre}`} name="nombre" id="nombre" form={{ errors, register }}
-                        params={{
-                            required: {
-                                value: true,
-                                message: texts.inputsMessage.requireName,
-                            },
-                            maxLength: {
-                                value: 100,
-                                message: texts.inputsMessage.max100,
-                            },
-                            pattern: {
-                                value: pattern.textWithNumber,
-                                message: texts.inputsMessage.invalidName,
-                            },
-                            validate: (value) => {
-                                if (hasLeadingOrTrailingSpace(value)) {
-                                    return texts.inputsMessage.noneSpace
-                                } else {
-                                    return true
-                                }
-                            }
-                        }}
-                        placeholder={texts.placeholder.nameGenero}
-                    />
-                    <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
-                        params={{
-                            maxLength: {
-                                value: 300,
-                                message: texts.inputsMessage.max300
-                            },
-                            validate: (value) => {
-                                if (hasLeadingOrTrailingSpace(value)) {
-                                    return texts.inputsMessage.noneSpace
-                                } else {
-                                    return true
-                                }
-                            }
-                        }}
-                        placeholder={texts.placeholder.descripcion}
-                    />
-                    <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
-                        Registrar
-                    </ButtonSimple>
-                </form>
-            </div>
+            {
+                loading ?
+                    (
+                        <div className="div-main justify-content-center p-4">
+                            <LoaderCircle />
+                        </div>
+                    )
+                    :
+                    errorServer ?
+                        (
+                            <div className="div-main justify-content-center p-4">
+                                <ErrorSystem error={errorServer} />
+                            </div>
+                        )
+                        :
+                        (
+                            <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
+                                <form className="w-100 d-flex flex-column"
+                                    onSubmit={onSubmit}>
+                                    <InputsGeneral type={"text"} label={`${texts.label.nombre}`} name="nombre" id="nombre" form={{ errors, register }}
+                                        params={{
+                                            required: {
+                                                value: true,
+                                                message: texts.inputsMessage.requireName,
+                                            },
+                                            maxLength: {
+                                                value: 100,
+                                                message: texts.inputsMessage.max100,
+                                            },
+                                            pattern: {
+                                                value: pattern.textWithNumber,
+                                                message: texts.inputsMessage.invalidName,
+                                            },
+                                            validate: (value) => {
+                                                if (hasLeadingOrTrailingSpace(value)) {
+                                                    return texts.inputsMessage.noneSpace
+                                                } else {
+                                                    return true
+                                                }
+                                            }
+                                        }}
+                                        placeholder={texts.placeholder.nameGenero}
+                                    />
+                                    <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
+                                        params={{
+                                            required: {
+                                                value: true,
+                                                message: texts.inputsMessage.requiredDesription,
+                                            },
+                                            maxLength: {
+                                                value: 300,
+                                                message: texts.inputsMessage.max300
+                                            },
+                                            validate: (value) => {
+                                                if (hasLeadingOrTrailingSpace(value)) {
+                                                    return texts.inputsMessage.noneSpace
+                                                } else {
+                                                    return true
+                                                }
+                                            }
+                                        }}
+                                        placeholder={texts.placeholder.descripcion}
+                                    />
+                                    <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
+                                        {params.id ? "Guardar" : "Registrar"}
+                                    </ButtonSimple>
+                                </form>
+                            </div>
+                        )
+            }
+
             <Toaster />
         </Navbar>
     )

@@ -234,7 +234,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
 }
 
 
-function totalItems(pages, items) {
+export function totalItems(pages, items) {
     if (pages === 1) {
         return items
     }

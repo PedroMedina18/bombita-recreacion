@@ -5,10 +5,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
-from ..models import Servicios, ServiciosActividades, Materiales, ServiciosMateriales, ServiciosRecreadores, Recreadores, Actividades
+from ..models import Servicios, ServiciosActividades, Materiales, ServiciosMateriales, Recreadores, Actividades
 from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
 from ..funtions.time import duration
+from ..message import MESSAGE
 from ..funtions.editorOpciones import editorOpciones
 import datetime
 import json
@@ -33,10 +34,6 @@ class Servicios_Views(View):
             duracion = datetime.timedelta(hours=req['duracion']['horas'], minutes=req['duracion']['minutos'])
             servicio = Servicios.objects.create(nombre=req['nombre'], precio=req['precio'], numero_recreadores=req['numero_recreadores'], descripcion=req['descripcion'], duracion=duracion)
                 
-            recreadores = req['recreadores']
-            for recreador in recreadores:
-                newRecreador = Recreadores.objects.get(id=int(recreador))
-                ServiciosRecreadores.objects.create(recreador=newRecreador, servicio=servicio)
             
             actividades = req['actividades']
             for actividad in actividades:
@@ -50,19 +47,36 @@ class Servicios_Views(View):
             
             datos = {
                 'status': True,
-                'message': "Registro de servicio completado"
+                'message': f"{MESSAGE['registerServicio']}"
             }
             return JsonResponse(datos)
+        except IntegrityError as error:
+            print(f"{MESSAGE['errorIntegrity']} - {error}", )
+            if error.args[0]==1062:
+                if "nombre" in error.args[1]:
+                    message = MESSAGE['nombreDuplicate']
+                else:
+                    message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
+                datos = {
+                'status': False,
+                'message': message
+                }
+            else:
+                datos = {
+                'status': False,
+                'message': f"{MESSAGE['errorIntegrity']}: {error}"
+                }
+            return JsonResponse(datos)
         except Exception as error:
-            print(f"Error consulta post - {error}", )
+            print(f"{MESSAGE['errorPost']} - {error}", )
             datos = {
                 'status': False,
-                'message': f"Error al registrar: {error}"
+                'message': f"{MESSAGE['errorRegistro']}: {error}"
             }
             return JsonResponse(datos)
 
     def put(self, request, id):
-        # try:
+        try:
             req = json.loads(request.body)
             verify = verify_token(req['headers'])
             req = req['body']
@@ -84,31 +98,6 @@ class Servicios_Views(View):
                 servicio.numero_recreadores = req['numero_recreadores']
                 servicio.save()
                 
-                recreadores = req['recreadores']
-                query = """
-                    SELECT re.id FROM
-                        recreadores AS re
-                    INNER JOIN 
-                        servicios_has_recreadores
-                    ON 
-                        re.id = servicios_has_recreadores.recreador_id
-                    WHERE 
-                        servicios_has_recreadores.servicio_id = %s;
-                """
-                cursor.execute(query, [int(id)])
-                listRecreador = dictfetchall(cursor)
-                editorOpciones(
-                    items=listRecreador,
-                    id=id,
-                    listTabla=recreadores,
-                    tablaIntermedia=ServiciosRecreadores,
-                    itemGet=servicio,
-                    tablaAgregar=Recreadores,
-                    filtro_principal='servicio', 
-                    filtro_secundario='recreador', 
-                    campo_principal='servicio', 
-                    campo_secundario='recreador'
-                )
 
                 # ------------------------------------------------
 
@@ -117,11 +106,11 @@ class Servicios_Views(View):
                     SELECT ac.id FROM
                         actividades AS ac
                     INNER JOIN 
-                        servicios_has_actividades
+                        servicios_actividades
                     ON 
-                        ac.id = servicios_has_actividades.actividad_id
+                        ac.id = servicios_actividades.actividad_id
                     WHERE 
-                        servicios_has_actividades.servicio_id = %s;
+                        servicios_actividades.servicio_id = %s;
                 """
                 cursor.execute(query, [int(id)])
                 listActidades = dictfetchall(cursor)
@@ -146,7 +135,7 @@ class Servicios_Views(View):
                         serma.material_id AS id, 
                         serma.cantidad 
                     FROM
-                        servicios_has_materiales AS serma
+                        servicios_materiales AS serma
                     WHERE 
                         serma.servicio_id = %s;
                 """
@@ -168,22 +157,39 @@ class Servicios_Views(View):
 
                 datos = {
                     'status': True,
-                    'message': "Exito. Registro editado"
+                    'message': f"{MESSAGE['edition']}"
                 }
             else:
                 datos = {
                     'status': False,
-                    'message': "Error. Registro no encontrado"
+                    'message': f"{MESSAGE['errorRegistroNone']}"
                 }
             
             return JsonResponse(datos)
-        # except Exception as error:
-        #     print(f"Error de consulta put - {error}")
-        #     datos = {
-        #         'status': False,
-        #         'message': f"Error al editar: {error}",
-        #     }
-        #     return JsonResponse(datos)
+        except IntegrityError as error:
+            print(f"{MESSAGE['errorIntegrity']} - {error}", )
+            if error.args[0]==1062:
+                if "nombre" in error.args[1]:
+                    message = MESSAGE['nombreDuplicate']
+                else:
+                    message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
+                datos = {
+                'status': False,
+                'message': message
+                }
+            else:
+                datos = {
+                'status': False,
+                'message': f"{MESSAGE['errorIntegrity']}: {error}"
+                }
+            return JsonResponse(datos)
+        except Exception as error:
+            print(f"{MESSAGE['errorPut']} - {error}")
+            datos = {
+                'status': False,
+                'message': f"{MESSAGE['errorEdition']}: {error}",
+            }
+            return JsonResponse(datos)
 
     def delete(self, request, id):
         try:
@@ -199,26 +205,26 @@ class Servicios_Views(View):
                 Servicios.objects.filter(id=id).delete()
                 datos = {
                     'status': True,
-                    'message': "Registro Eliminado"
+                    'message': f"{MESSAGE['delete']}"
                 }
             else:
                 datos  = {
                     'status': False,
-                    'message': "Registro no encontrado"
+                    'message': f"{MESSAGE['errorRegistroNone']}"
                 }
             return JsonResponse(datos)
         except models.ProtectedError as error:
-            print(f"Error de proteccion  - {str(error)}")
+            print(f"{MESSAGE['errorProteccion']} - {str(error)}")
             datos = {
                 'status': False,
-                'message': "Error. Item protejido no se puede eliminar"
+                'message': f"{MESSAGE['errorProtect']}"
             }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"Error consulta delete - {error}", )
+            print(f"{MESSAGE['errorDelete']} - {error}", )
             datos = {
                 'status': False,
-                'message': f"Error al eliminar: {error}"
+                'message': f"{MESSAGE['errorEliminar']}: {error}"
             }
             return JsonResponse(datos)
 
@@ -246,34 +252,17 @@ class Servicios_Views(View):
                 servicio = dictfetchall(cursor)
 
                 query = """
-                SELECT 
-                    re.id,
-                    pe.nombres AS nombres,
-                    pe.apellidos AS apellidos
-                FROM 
-                    recreadores AS re
-                LEFT JOIN personas AS pe ON re.persona_id=pe.id
-                INNER JOIN 
-                        servicios_has_recreadores
-                    ON 
-                        re.id = servicios_has_recreadores.recreador_id
-                 
-                WHERE servicios_has_recreadores.servicio_id=%s;
-                """
-                cursor.execute(query, [int(id)])
-                recreadores = dictfetchall(cursor)
-                query = """
                     SELECT 
                         ac.id,
                         ac.nombre
                     FROM
                         actividades AS ac
                     INNER JOIN 
-                        servicios_has_actividades
+                        servicios_actividades
                     ON 
-                        ac.id = servicios_has_actividades.actividad_id
+                        ac.id = servicios_actividades.actividad_id
                     WHERE 
-                        servicios_has_actividades.servicio_id = %s;
+                        servicios_actividades.servicio_id = %s;
                 """
                 cursor.execute(query, [int(id)])
                 actividades = dictfetchall(cursor)
@@ -283,7 +272,7 @@ class Servicios_Views(View):
                         serma.cantidad,
                         ma.nombre AS nombre
                     FROM
-                        servicios_has_materiales AS serma
+                        servicios_materiales AS serma
                     INNER JOIN 
                         materiales AS ma
                     ON 
@@ -294,20 +283,19 @@ class Servicios_Views(View):
                 cursor.execute(query, [int(id)])
                 materiales = dictfetchall(cursor)
 
-                servicio[0]["recreadores"] = recreadores
                 servicio[0]["actividades"] = actividades
                 servicio[0]["materiales"] = materiales
                 servicio[0]['duracion'] = duration(servicio[0]['duracion'])
                 if (len(servicio) > 0):
                     datos = {
                         'status': True,
-                        'message': "Exito",
+                        'message': f"{MESSAGE['exitoGet']}",
                         'data': servicio[0]
                     }
                 else:
                     datos = {
                         'status': False,
-                        'message': "Servicio no encontrado",
+                        'message': f"{MESSAGE['errorRegistroNone']}",
                         'data': None
                     }
             else:
@@ -348,7 +336,7 @@ class Servicios_Views(View):
                 if len(servicios) > 0:
                     datos = {
                         'status': True,
-                        'message': "Exito",
+                        'message': f"{MESSAGE['exitoGet']}",
                         'data': servicios,
                         "pages": int(result[0]['pages']),
                         "total": result[0]['total'],
@@ -356,7 +344,7 @@ class Servicios_Views(View):
                 else:
                     datos = {
                         'status': False,
-                        'message': "Error. No se encontraron registros",
+                        'message': f"{MESSAGE['errorRegistrosNone']}",
                         'data': None,
                         "pages": None,
                         "total": 0
@@ -364,10 +352,10 @@ class Servicios_Views(View):
             
             return JsonResponse(datos)
         except Exception as error:
-            print(f"Error consulta get - {error}")
+            print(f"{MESSAGE['errorGet']} - {error}")
             datos = {
                 'status': False,
-                'message': f"Error de consulta: {error}",
+                'message': f"{MESSAGE['errorConsulta']}: {error}",
                 'data': None,
                 "pages": None,
                 "total":0

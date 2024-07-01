@@ -8,7 +8,8 @@ import json
 from ..funtions.serializador import dictfetchall
 from ..funtions.token import verify_token, new_token
 from datetime import datetime 
-from ..funtions.dollar import PrecioDolar
+from ..message import MESSAGE
+from ..funtions.dollar import consultDollar
 
 class Verify_Token_Views(View):
     @method_decorator(csrf_exempt)
@@ -36,7 +37,7 @@ class Verify_Token_Views(View):
                 cursor.execute(query, [int(verify["info"]["id"])])
                 usuario = dictfetchall(cursor)
                 token = new_token(usuario[0])
-                precioDollar = PrecioDolar(cursor)
+                precioDollar = consultDollar(cursor)
                 datos = {
                     'status': True,
                     'message': "Token valido",
@@ -59,7 +60,7 @@ class Verify_Token_Views(View):
             print("Error", ex)
             datos = {
                 "status": False,
-                'message': "Error. Error de sistema"
+                'message': f"{MESSAGE['errorSystem']}",
             }
             return JsonResponse(datos)
         finally:

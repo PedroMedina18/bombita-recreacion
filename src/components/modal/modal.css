@@ -1,0 +1,129 @@
+@import "transition-style";
+
+.overlay {
+  clip-path: inset(0 0 0 0);
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 500;
+}
+
+.content-modal {
+  width: 1150px;
+  min-height: 100px;
+  max-height: 600px;
+  background-color: rgb(243, 243, 243);
+  border-radius: 5px;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  padding: 20px;
+  transition: 0.3s ease all;
+}
+.icon-menu svg {
+  width: 45px;
+  color: rgb(var(--secundario));
+}
+
+.button-close {
+  background-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: none;
+  border-radius: 50%;
+  transition: 0.3s ease all;
+  border-radius: 50%;
+  padding: 5px;
+}
+.button-close svg {
+  width: 35px;
+  color: rgb(0, 0, 0);
+}
+
+.button-close:hover {
+  background-color: #a7a7a7;
+}
+.body-modal {
+  min-height: 200px;
+  max-height: 450px;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: auto;
+  padding-bottom: 5px;
+}
+.body-modal ::-webkit-scrollbar {
+  background-color: transparent;
+  height: 10px;
+  margin-top: 5px;
+}
+.body-modal ::-webkit-scrollbar-thumb {
+  background-color: rgb(var(--secundario));
+  border-radius: 10px;
+}
+
+.body-modal table tbody tr:hover {
+  cursor: pointer;
+  background-color: rgba(111, 194, 233, 0.5);
+  transition: 0.3s ease all;
+}
+
+tr.tr-select {
+  background-color: rgba(111, 194, 233, 0.5) !important;
+  transition: 0.3s ease all;
+}
+
+@keyframes wipe-in-right {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+[transition-style="in:wipe:right"] {
+  animation: 0.75s ease-in wipe-in-right both;
+}
+
+
+@keyframes wipe-out-left {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    clip-path: inset(0 100% 0 0);
+  }
+}
+
+[transition-style="out:wipe:left"] {
+  animation: 0.75s ease-in wipe-out-left both;
+}
+
+
+@media (max-width: 1100px) {
+  .content-modal {
+    width: 1000px;
+  }
+}
+
+@media (max-width: 992px) {
+  .content-modal {
+    width: 800px;
+  }
+}
+@media (max-width: 768px) {
+  .content-modal {
+    width: 600px;
+  }
+}
+@media (max-width: 576px) {
+  .content-modal {
+    width: 400px;
+  }
+}

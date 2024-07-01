@@ -7,6 +7,7 @@ from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..models import TipoDocumento
 from django.db import IntegrityError, connection, models
+from ..message import MESSAGE
 from ..funtions.token import verify_token
 import json
 
@@ -30,15 +31,31 @@ class Tipo_Documento_Views(View):
             TipoDocumento.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'])
             datos = {
                 "status": True,
-                'message': "Registro de tipo de documento completado"
+                'message': f"{MESSAGE['registerTipoDocumento']}"
             }
             return JsonResponse(datos)
-
+        except IntegrityError as error:
+            print(f"{MESSAGE['errorIntegrity']} - {error}", )
+            if error.args[0]==1062:
+                if "nombre" in error.args[1]:
+                    message = MESSAGE['nombreDuplicate']
+                else:
+                    message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
+                datos = {
+                'status': False,
+                'message': message
+                }
+            else:
+                datos = {
+                'status': False,
+                'message': f"{MESSAGE['errorIntegrity']}: {error}"
+                }
+            return JsonResponse(datos)
         except Exception as error:
-            print(f"Error consulta post - {error}", )
+            print(f"{MESSAGE['errorPost']} - {error}", )
             datos = {
-                "status": False,
-                'message': f"Error al registrar: {error}"
+                'status': False,
+                'message': f"{MESSAGE['errorRegistro']}: {error}"
             }
             return JsonResponse(datos)
 
@@ -61,19 +78,36 @@ class Tipo_Documento_Views(View):
                 tipo_documento.save()
                 datos = {
                     "status": True,
-                    'message': "Exito. Registro editado"
+                    'message': f"{MESSAGE['edition']}"
                 }
             else:
                 datos = {
                     "status": False,
-                    'message': "Error. Registro no encontrado"
+                    'message': f"{MESSAGE['errorRegistroNone']}"
+                }
+            return JsonResponse(datos)
+        except IntegrityError as error:
+            print(f"{MESSAGE['errorIntegrity']} - {error}", )
+            if error.args[0]==1062:
+                if "nombre" in error.args[1]:
+                    message = MESSAGE['nombreDuplicate']
+                else:
+                    message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
+                datos = {
+                'status': False,
+                'message': message
+                }
+            else:
+                datos = {
+                'status': False,
+                'message': f"{MESSAGE['errorIntegrity']}: {error}"
                 }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"Error de consulta put - {error}")
+            print(f"{MESSAGE['errorPut']} - {error}")
             datos = {
-                "status": False,
-                'message': f"Error al editar: {error}",
+                'status': False,
+                'message': f"{MESSAGE['errorEdition']}: {error}",
             }
             return JsonResponse(datos)
 
@@ -91,26 +125,26 @@ class Tipo_Documento_Views(View):
                 TipoDocumento.objects.filter(id=id).delete()
                 datos = {
                     "status": True,
-                    'message': "Registro Eliminado"
+                    'message': f"{MESSAGE['delete']}"
                 }
             else:
                 datos = {
                     "status": False,
-                    'message': "Registro no encontrado"
+                    'message': f"{MESSAGE['errorRegistroNone']}"
                 }
             return JsonResponse(datos)
         except models.ProtectedError as error:
-            print(f"Error de proteccion  - {str(error)}")
+            print(f"{MESSAGE['errorProteccion']} - {str(error)}")
             datos = {
-                "status": False,
-                'message': "Error. Item protejido no se puede eliminar"
+                'status': False,
+                'message': f"{MESSAGE['errorProtect']}"
             }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"Error consulta delete - {error}", )
+            print(f"{MESSAGE['errorDelete']} - {error}", )
             datos = {
-                "status": False,
-                'message': f"Error al eliminar: {error}"
+                'status': False,
+                'message': f"{MESSAGE['errorEliminar']}: {error}"
             }
             return JsonResponse(datos)
 
@@ -134,13 +168,13 @@ class Tipo_Documento_Views(View):
                 if(len(tipo_documento)>0):
                     datos = {
                         "status": True,
-                        'message': "Exito",
+                        'message': f"{MESSAGE['exitoGet']}",
                         "data": tipo_documento[0]
                     }
                 else:
                     datos = {
                         "status": False,
-                        'message': "Tipo de Documento no encontrado",
+                        'message': f"{MESSAGE['errorRegistroNone']}",
                         "data": None
                     }
             else:
@@ -177,7 +211,7 @@ class Tipo_Documento_Views(View):
                 if len(tipo_documentos)>0:
                     datos = {
                         "status": True,
-                        'message': "Exito",
+                        'message': f"{MESSAGE['exitoGet']}",
                         "data": tipo_documentos,
                         "pages": int(result[0]["pages"]),
                         "total":result[0]["total"],
@@ -185,20 +219,20 @@ class Tipo_Documento_Views(View):
                 else:
                     datos = {
                         "status": False,
-                        'message': "Error. No se encontraron registros",
+                        'message': f"{MESSAGE['errorRegistrosNone']}",
                         "data": None,
                         "pages": None,
                         "total":0
                     }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"Error consulta get - {error}")
+            print(f"{MESSAGE['errorGet']} - {error}")
             datos = {
-                "status": False,
-                'message': f"Error de consulta: {error}",
-                "data": None,
-                "pages": None,
-                "total":0
+                'status': False,
+                'message': f"{MESSAGE['errorConsulta']}: {error}",
+                'data': None,
+                'pages': None,
+                'total':0
             }
             return JsonResponse(datos)
         finally:

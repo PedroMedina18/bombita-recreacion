@@ -89,6 +89,7 @@ function Form_Recreadores() {
             } 
             setErrorServer("")
             console.log(respuesta)
+            console.log(respuesta.data.data.info.correo)
             setRecreador({
                 ...recreador,
                 img:respuesta.data.data.info.img_perfil,
@@ -96,11 +97,11 @@ function Form_Recreadores() {
             })
             const keys = Object.keys(respuesta.data.data.info);
             keys.forEach(key => {
-                setValue(key, `${respuesta.data.data.info[`${key}`]}`)
+                setValue(key, respuesta.data.data.info[`${key}`])
             });
-            setValue(`genero`, `${respuesta.data.data.info["genero_id"]}`)
-            setValue(`nivel`, `${respuesta.data.data.info["nivel_id"]}`)
-            setValue(`tipo_documento`, `${respuesta.data.data.info["tipo_documento_id"]}`)
+            setValue(`genero`, respuesta.data.data.info["genero_id"])
+            setValue(`nivel`, respuesta.data.data.info["nivel_id"])
+            setValue(`tipo_documento`, respuesta.data.data.info["tipo_documento_id"])
             
         } catch (error) {
             console.log(error)
@@ -436,7 +437,7 @@ function Form_Recreadores() {
                                                         message: texts.inputsMessage.onlyCharacter11,
                                                     },
                                                     minLength: {
-                                                        value: 5,
+                                                        value: 11,
                                                         message: texts.inputsMessage.onlyCharacter11,
                                                     }
                                                 }}
@@ -493,7 +494,7 @@ function Form_Recreadores() {
                                     </div>
 
                                     <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
-                                        Registrar
+                                        {recreador.id? "Guardar" : "Registrar"}
                                     </ButtonSimple>
                                 </form>
                             </div>

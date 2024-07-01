@@ -2,8 +2,8 @@
 import './login.css'
 import { useForm } from "react-hook-form";
 import { useNavigate, Navigate } from 'react-router-dom';
-import { useState, useContext } from 'react';
-import { AuthContext } from '../../context/AuthContext';
+import { useState } from 'react';
+import { useAuthContext } from '../../context/AuthContext';
 import { login } from "../../utils/API.jsx"
 import { getCookie } from "../../utils/cookie.jsx"
 import { errorAxios } from "../../utils/process.jsx"
@@ -12,7 +12,7 @@ import texts from '../../context/text_es.js';
 import pattern from '../../context/pattern.js';
 
 function Login() {
-  const { saveUser, isAuthenticateds } = useContext(AuthContext)
+  const { saveUser, isAuthenticateds } = useAuthContext()
   const [alert, setAlert] = useState()
   const navigate = useNavigate();
 

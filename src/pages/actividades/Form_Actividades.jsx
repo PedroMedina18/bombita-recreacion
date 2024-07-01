@@ -30,13 +30,14 @@ function Actividades() {
     if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1
       get_materiales()
+      setLoading(false)
       return
     }
   }, [])
 
   useEffect(() => {
     if (options.length) {
-      if (params.id){
+      if (params.id) {
         get_actividades()
       }
     }
@@ -55,7 +56,7 @@ function Actividades() {
       console.log(error)
       setErrorServer(texts.errorMessage.errorSystem)
     } finally {
-      if (!params.id){
+      if (!params.id) {
         setLoading(false)
       }
     }
@@ -63,27 +64,27 @@ function Actividades() {
 
   const get_actividades = async () => {
     try {
-        const respuesta = await actividades.get({paramOne:Number(params.id)})
-        if (respuesta.status !== 200) {
-          setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
-          return
-        }
-        if (respuesta.data.status === false) {
-          setErrorServer(`${respuesta.data.message}`)
-          return
-        } 
-        setErrorServer("")
-        setValue("nombre", respuesta.data.data.nombre)
-        setValue("descripcion", respuesta.data.data.descripcion)
-        setOptionsDefault(coincidences(options, respuesta.data.data.materiales))
-        setSelectOptions(coincidences(options, respuesta.data.data.materiales))
+      const respuesta = await actividades.get({ paramOne: Number(params.id) })
+      if (respuesta.status !== 200) {
+        setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
+        return
+      }
+      if (respuesta.data.status === false) {
+        setErrorServer(`${respuesta.data.message}`)
+        return
+      }
+      setErrorServer("")
+      setValue("nombre", respuesta.data.data.nombre)
+      setValue("descripcion", respuesta.data.data.descripcion)
+      setOptionsDefault(coincidences(options, respuesta.data.data.materiales))
+      setSelectOptions(coincidences(options, respuesta.data.data.materiales))
     } catch (error) {
-        console.log(error)
-        setErrorServer(texts.errorMessage.errorObjet)
+      console.log(error)
+      setErrorServer(texts.errorMessage.errorObjet)
     } finally {
-        setLoading(false)
+      setLoading(false)
     }
-}
+  }
 
 
   //* the useform
@@ -99,7 +100,7 @@ function Actividades() {
   const onSubmit = handleSubmit(
     async (data) => {
       try {
-        const message = params.id? texts.confirmMessage.confirEdit : texts.confirmMessage.confirRegister
+        const message = params.id ? texts.confirmMessage.confirEdit : texts.confirmMessage.confirRegister
         const confirmacion = await alertConfim("Confirmar", message)
         if (confirmacion.isConfirmed) {
           const materiales = selectOptions.map((elements) => { return elements.value })
@@ -109,10 +110,10 @@ function Actividades() {
             materiales: materiales
           }
           alertLoading("Cargando")
-          const res = params.id? await actividades.put(body, Number(params.id)) : await actividades.post(body)
+          const res = params.id ? await actividades.put(body, Number(params.id)) : await actividades.post(body)
           controlResultPost({
             respuesta: res,
-            messageExito: params.id? texts.successMessage.editionActividad : texts.successMessage.registerActividad,
+            messageExito: params.id ? texts.successMessage.editionActividad : texts.successMessage.registerActividad,
             useNavigate: { navigate: navigate, direction: "/actividades" }
           })
         }
@@ -125,8 +126,8 @@ function Actividades() {
     }
   )
   return (
-    <Navbar name={params.id? texts.pages.editActividades.name : texts.pages.registerActividades.name} descripcion={params.id? texts.pages.editActividades.description : texts.pages.registerActividades.description}>
-      <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/actividades") }}> <IconRowLeft/> Regresar</ButtonSimple>
+    <Navbar name={params.id ? texts.pages.editActividades.name : texts.pages.registerActividades.name} descripcion={params.id ? texts.pages.editActividades.description : texts.pages.registerActividades.description}>
+      <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/actividades") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
       {
         loading ?
@@ -177,6 +178,10 @@ function Actividades() {
                   />
                   <InputTextTarea label={texts.label.descripcion} name="descripcion" id="descripcion" form={{ errors, register }}
                     params={{
+                      required: {
+                        value: true,
+                        message: texts.inputsMessage.requiredDesription,
+                      },
                       maxLength: {
                         value: 300,
                         message: texts.inputsMessage.max300,
@@ -191,9 +196,9 @@ function Actividades() {
                     }}
                     placeholder={texts.placeholder.descripcion}
                   />
-                  <MultiSelect id="materiales" name="materiales" label={texts.label.materiales} options={options} placeholder="Materiales" save={setSelectOptions} optionsDefault={optionsDefault}/>
+                  <MultiSelect id="materiales" name="materiales" label={texts.label.materiales} options={options} placeholder="Materiales" save={setSelectOptions} optionsDefault={optionsDefault} />
                   <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
-                    Registrar
+                    {params.id ? "Guardar" : "Registrar"}
                   </ButtonSimple>
                 </form>
               </div>
