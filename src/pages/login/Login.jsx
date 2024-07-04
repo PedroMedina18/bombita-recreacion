@@ -13,6 +13,7 @@ import pattern from '../../context/pattern.js';
 
 function Login() {
   const { saveUser, isAuthenticateds } = useAuthContext()
+  const [buttonLogin, setButton] = useState("Ingresar")
   const [alert, setAlert] = useState()
   const navigate = useNavigate();
 
@@ -27,6 +28,7 @@ function Login() {
   //*funcion del evento submit para iniciar sesion
   const onSubmit = handleSubmit(
     async (data) => {
+      setButton("Espere")
       try {
         document.getElementById("button-login").disabled = true
         const res = await login(data)
@@ -46,6 +48,7 @@ function Login() {
         setAlert(message)
       }
       finally {
+        setButton("Ingresar")
         document.getElementById("button-login").disabled = false
       }
     }
@@ -162,7 +165,7 @@ function Login() {
         <button type="subtmit" className={`button-style-login mt-4 btn-disabled`} id="button-login">
           <span className="transition"></span>
           <span className="gradient"></span>
-          <span className="name">Ingresar</span>
+          <span className="name">{buttonLogin}</span>
         </button>
       </form>
     </main>

@@ -2,9 +2,6 @@ import { getCookie } from "../cookie.jsx"
 import {API} from "../API.jsx"
 import {addOptionalQueryParams} from "../process.jsx"
 
-
-
-
 export default class Petisions{
     constructor(params){
         this.params=params

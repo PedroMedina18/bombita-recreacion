@@ -9,7 +9,7 @@ import texts from "../../context/text_es.js";
 import "./modal.css"
 import "../table/table.css"
 import ErrorSystem from "../errores/ErrorSystem.jsx"
-function ModalSelect({ titulo, columns, object, select, saveSelect, estado, setEstado }) {
+function ModalSelect({ titulo, columns, object, saveSelect, estado, setEstado, select }) {
     const [listOptions, setListOptions] = useState([])
     const [dataTable, setDataTable] = useState({ pages: 0, total: 0 });
     const [dataList, setDataList] = useState([])
@@ -20,6 +20,7 @@ function ModalSelect({ titulo, columns, object, select, saveSelect, estado, setE
     const renderizado = useRef(0);
     const [errorServer, setErrorServer] = useState("");
     const [loading, setLoading] = useState(true);
+    const [dFlex, setDFlex] = useState(false);
 
     useEffect(() => {
         if (renderizado.current === 0) {
@@ -30,7 +31,12 @@ function ModalSelect({ titulo, columns, object, select, saveSelect, estado, setE
                 setData: setDataTable,
                 setLoading: setLoading
             })
+            setTimeout(() => {
+                setDFlex(true)
+            }, 500);
         }
+
+
     }, [])
 
     useEffect(() => {
@@ -61,177 +67,186 @@ function ModalSelect({ titulo, columns, object, select, saveSelect, estado, setE
 
     const selectOptions = (e) => {
         const ID = e.target.dataset.option ? Number(e.target.dataset.option) : Number(e.target.parentNode.dataset.option)
-        const newOptions = [...select]
+        const newOptions = [...listOptions]
         if (newOptions.includes(ID)) {
             const index = newOptions.indexOf(ID);
             newOptions.splice(index, 1)
         } else {
             newOptions.push(ID);
         }
-        saveSelect(newOptions)
+        setListOptions(newOptions)
     }
+
+    const AgregarOptions = () => {
+
+        saveSelect(select.concat(listOptions) )
+        setListOptions([])
+        setEstado(false)
+    }
+    
     return (
         <>
-                <div className='overlay' transition-style={estado ? "in:wipe:right" : "out:wipe:left"} 
-                onClick={(e)=>{
-                    if(e.target.className==="overlay"){
+            <div className={`overlay`} transition-style={estado? "in:wipe:right" : "out:wipe:left"}
+                onClick={(e) => {
+                    if (e.target.className === "overlay") {
                         setEstado(false)
+                        setListOptions([])
                     }
                 }}>
-                    <div className='content-modal'>
-                        <div className='d-flex justify-content-between align-items-center mb-2'>
-                            <div className='icon-menu'>
-                                <IconHamburgue />
-                            </div>
-                            <h3 className='h3 m-0 fw-bold'>{titulo}</h3>
-                            <button className='button-close' onClick={() => { setEstado(false) }}>
-                                <IconX />
-                            </button>
+                <div className='content-modal'>
+                    <div className='d-flex justify-content-between align-items-center mb-2'>
+                        <div className='icon-menu'>
+                            <IconHamburgue />
                         </div>
-                        <div className='body-modal'>
-                            <div className='me-auto d-flex align-items-center w-100 w-md-50 mt-3 mt-md-0 mb-3'>
-                                <ButtonSimple
-                                    type="button"
-                                    onClick={(e) => {
-                                        searFuntion(searchTerm)
-                                    }}
-                                >
-                                    Buscar
-                                </ ButtonSimple>
-                                <input id="table-search"
-                                    className='ms-2 input-table'
-                                    onKeyUp={(e) => {
-                                        setSearchTerm(e.target.value)
-                                    }}
-                                    placeholder={`Buscar`} type="text" />
-                            </div>
-                            {
-                                loading ?
+                        <h3 className='h3 m-0 fw-bold'>{titulo}</h3>
+                        <button className='button-close' onClick={() => { setEstado(false); setListOptions([]) }}>
+                            <IconX />
+                        </button>
+                    </div>
+                    <div className='body-modal'>
+                        <div className='me-auto d-flex align-items-center w-100 w-md-50 mt-3 mt-md-0 mb-3'>
+                            <ButtonSimple
+                                type="button"
+                                onClick={(e) => {
+                                    searFuntion(searchTerm)
+                                }}
+                            >
+                                Buscar
+                            </ ButtonSimple>
+                            <input id="table-search"
+                                className='ms-2 input-table'
+                                onKeyUp={(e) => {
+                                    setSearchTerm(e.target.value)
+                                }}
+                                placeholder={`Buscar`} type="text" />
+                        </div>
+                        {
+                            loading ?
+                                (
+                                    <div className="div-main justify-content-center p-4">
+                                        <LoaderCircle />
+                                    </div>
+                                )
+                                :
+                                errorServer ?
                                     (
                                         <div className="div-main justify-content-center p-4">
-                                            <LoaderCircle />
+                                            <ErrorSystem error={errorServer} />
                                         </div>
                                     )
                                     :
-                                    errorServer ?
-                                        (
-                                            <div className="div-main justify-content-center p-4">
-                                                <ErrorSystem error={errorServer} />
-                                            </div>
-                                        )
-                                        :
-                                        (
+                                    (
 
-                                            <>
+                                        <>
 
-                                                <table className='table-data'>
-                                                    <thead className='table-modal'>
-                                                        <tr>
-                                                            <th scope="col">N°</th>
-                                                            {
-                                                                columns.map((column, index) => (
-                                                                    <th key={`${index}-${column.name}`} scope="col">{column.name}</th>
-                                                                ))
-                                                            }
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody className='table-modal'>
+                                            <table className='table-data'>
+                                                <thead className='table-modal'>
+                                                    <tr>
+                                                        <th scope="col">N°</th>
                                                         {
-                                                            dataList.length === 0 ?
-                                                                <>
-                                                                    <tr>
-                                                                        <td className="py-3"></td>
-                                                                        {
-
-                                                                            columns.map((column, index) => {
-                                                                                return (<td key={`${column.name}-${index}-1`} className="py-3"></td>)
-                                                                            })
-                                                                        }
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td className="py-3"></td>
-                                                                        {
-
-                                                                            columns.map((column, index) => {
-                                                                                return (<td key={`${column.name}-${index}-2`} className="py-3"></td>)
-                                                                            })
-                                                                        }
-                                                                    </tr>
-                                                                    <tr>
-                                                                        <td className="py-3"></td>
-                                                                        {
-
-                                                                            columns.map((column, index) => {
-                                                                                return (<td key={`${column.name}-${index}-3`} className="py-3"></td>)
-                                                                            })
-                                                                        }
-                                                                    </tr>
-                                                                </>
-                                                                :
-                                                                dataList.map((row, index) => (
-                                                                    <tr key={`row-${index}`} className={`${select.includes(row.id) ? "tr-select" : ""}`} data-option={row.id} onClick={(e) => { selectOptions(e) }}>
-                                                                        <td key={`N°-${index}`}>{index + 1}</td>
-                                                                        {
-
-                                                                            columns.map((column, index) => {
-                                                                                if (column.row(row) === true) {
-                                                                                    return (<td key={`${column.row(row)}-${index}`} className='svg-check'><IconCheck /></td>)
-                                                                                }
-                                                                                if (column.row(row) === false) {
-                                                                                    return (<td key={`${column.row(row)}-${index}`} className='svg-x'><IconX /></td>)
-                                                                                }
-                                                                                return (<td key={`${column.row(row)}-${index}`} >{column.row(row)}</td>)
-
-                                                                            })
-                                                                        }
-                                                                    </tr>
-                                                                ))
+                                                            columns.map((column, index) => (
+                                                                <th key={`${index}-${column.name}`} scope="col">{column.name}</th>
+                                                            ))
                                                         }
+                                                    </tr>
+                                                </thead>
+                                                <tbody className='table-modal'>
+                                                    {
+                                                        dataList.length === 0 ?
+                                                            <>
+                                                                <tr>
+                                                                    <td className="py-3"></td>
+                                                                    {
 
-                                                    </tbody>
-                                                </table>
-                                                <div className='d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center w-100 mt-3'>
-                                                    <p className='m-0 mb-3 mb-sm-0 fw-bold fs-6'>{`Mostrando ${totalItems(pages, dataList.length)} de ${dataTable.total}`}</p>
-                                                    <div className='d-flex justify-content-between align-items-center '>
-                                                        <ButtonSimple
-                                                            type="button"
-                                                            className="none-border-radius"
-                                                            disabled={pages === 1 ? true : false}
-                                                        // onClick={(e) => {
-                                                        //     search.function(document.getElementById("table-search").value)
-                                                        // }}
-                                                        >
-                                                            Anterior
-                                                        </ ButtonSimple>
-                                                        <input className='mx-2 input-table page' max={dataTable.pages} min={1} type="number" defaultValue={pages} />
-                                                        <ButtonSimple
-                                                            type="button"
-                                                            className="none-border-radius"
-                                                            disabled={dataTable.pages === pages || dataTable.pages === 0 ? true : false}
-                                                        // onClick={(e) => {
-                                                        //     search.function(document.getElementById("table-search").value)
-                                                        // }}
-                                                        >
-                                                            Siguiente
-                                                        </ ButtonSimple>
-                                                    </div>
+                                                                        columns.map((column, index) => {
+                                                                            return (<td key={`${column.name}-${index}-1`} className="py-3"></td>)
+                                                                        })
+                                                                    }
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="py-3"></td>
+                                                                    {
+
+                                                                        columns.map((column, index) => {
+                                                                            return (<td key={`${column.name}-${index}-2`} className="py-3"></td>)
+                                                                        })
+                                                                    }
+                                                                </tr>
+                                                                <tr>
+                                                                    <td className="py-3"></td>
+                                                                    {
+
+                                                                        columns.map((column, index) => {
+                                                                            return (<td key={`${column.name}-${index}-3`} className="py-3"></td>)
+                                                                        })
+                                                                    }
+                                                                </tr>
+                                                            </>
+                                                            :
+                                                            dataList.map((row, index) => (
+                                                                <tr key={`row-${index}`} className={`${listOptions.includes(row.id) ? "tr-select" : ""}`} data-option={row.id} onClick={(e) => { selectOptions(e) }}>
+                                                                    <td key={`N°-${index}`}>{index + 1}</td>
+                                                                    {
+
+                                                                        columns.map((column, index) => {
+                                                                            if (column.row(row) === true) {
+                                                                                return (<td key={`${column.row(row)}-${index}`} className='svg-check'><IconCheck /></td>)
+                                                                            }
+                                                                            if (column.row(row) === false) {
+                                                                                return (<td key={`${column.row(row)}-${index}`} className='svg-x'><IconX /></td>)
+                                                                            }
+                                                                            return (<td key={`${column.row(row)}-${index}`} >{column.row(row)}</td>)
+
+                                                                        })
+                                                                    }
+                                                                </tr>
+                                                            ))
+                                                    }
+
+                                                </tbody>
+                                            </table>
+                                            <div className='d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center w-100 mt-3'>
+                                                <p className='m-0 mb-3 mb-sm-0 fw-bold fs-6'>{`Mostrando ${totalItems(pages, dataList.length)} de ${dataTable.total}`}</p>
+                                                <div className='d-flex justify-content-between align-items-center '>
+                                                    <ButtonSimple
+                                                        type="button"
+                                                        className="none-border-radius"
+                                                        disabled={pages === 1 ? true : false}
+                                                    // onClick={(e) => {
+                                                    //     search.function(document.getElementById("table-search").value)
+                                                    // }}
+                                                    >
+                                                        Anterior
+                                                    </ ButtonSimple>
+                                                    <input className='mx-2 input-table page' max={dataTable.pages} min={1} type="number" defaultValue={pages} />
+                                                    <ButtonSimple
+                                                        type="button"
+                                                        className="none-border-radius"
+                                                        disabled={dataTable.pages === pages || dataTable.pages === 0 ? true : false}
+                                                    // onClick={(e) => {
+                                                    //     search.function(document.getElementById("table-search").value)
+                                                    // }}
+                                                    >
+                                                        Siguiente
+                                                    </ ButtonSimple>
                                                 </div>
-                                            </>
-                                        )
-                            }
-                        </div>
-                        <div className='d-flex justify-content-end align-items-center mt-2'>
-                            <ButtonSimple className="none-border-radius mx-2" onClick={() => { setEstado(false) }}>
-                                Cerrar
-                            </ButtonSimple>
-                            <ButtonSimple className="none-border-radius mx-2" onClick={() => { setEstado(false) }}>
-                                Agregar
-                            </ButtonSimple>
+                                            </div>
+                                        </>
+                                    )
+                        }
+                    </div>
+                    <div className='d-flex justify-content-end align-items-center mt-2'>
+                        <ButtonSimple className="none-border-radius mx-2" onClick={() => { setEstado(false); setListOptions([]) }}>
+                            Cerrar
+                        </ButtonSimple>
+                        <ButtonSimple className="none-border-radius mx-2" onClick={() => { AgregarOptions() }}>
+                            Agregar
+                        </ButtonSimple>
 
-                        </div>
                     </div>
                 </div>
-            
+            </div>
+
         </>
     )
 }

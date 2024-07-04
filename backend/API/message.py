@@ -9,6 +9,7 @@ MESSAGE={
     "registerSobrecargo":"Registro de sobrecargo completado",
     "registerServicio":"Registro de servicio completado",
     "registerRecreador":"Registro de recreador completado",
+    "registerEvento":"Registro de evento completado",
     "exitoGet":"Exito",
     "edition":"Exito. Registro editado",
     "delete":"Exito. Registro eliminado",
@@ -28,13 +29,16 @@ MESSAGE={
     "errorDuplicate":"Error de campo duplicado",
     "errorDelete":"Error de consulta put",
     "errorProteccion":"Error de protección",
+    "errorProtectEvento":"Evento protejido no se puede eliminar",
     "userPassword": "Usuario o contraseña incorrecta por favor verifique",
     "errorSystem":'Error en el sistema. Intente mas tarde', 
 
     "errorGenero":"Error. Compruebe el genero",
+    "errorCliente":"Error. Compruebe que existe el cliente seleccionado",
     "errorNivel":"Error. Compruebe el nivel",
     "errorTipoDocumento":"Error. Compruebe el tipo de documento",
     "errorCargo":"Error. Compruebe el cargo",
+    "errorRegistroPersona":"Error. Compruebe datos de registro",
     
 
     "nombreDuplicate": "Nombre duplicado. El campo nombre debe ser unico",

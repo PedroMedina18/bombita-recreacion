@@ -71,6 +71,7 @@ const texts={
         registerServicio:"Servicio Registrado",
         registerGenero:"Genero Registrado",
         registerSobrecargo:"Sobrecargo Registrado",
+        registerEvento:"Evento Registrado",
         // -----------------------------------------------------------
         editionUsuario:"Usuario Editado",
         editionNivel:"Nivel Editado",
@@ -297,6 +298,7 @@ const texts={
         buttonRegisterRecreador:"Agregar un nuevo recreador",
         buttonRegisterSobrecargo:"Agregar un nuevo sobrecargo",
         buttonRegisterServicio:"Agregar un nuevo servicio",
+        buttonRegisterEventosuccessMessage:"Agregar un nuevo evento",
     }
 }
 

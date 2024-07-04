@@ -88,8 +88,6 @@ function Form_Recreadores() {
                 return
             } 
             setErrorServer("")
-            console.log(respuesta)
-            console.log(respuesta.data.data.info.correo)
             setRecreador({
                 ...recreador,
                 img:respuesta.data.data.info.img_perfil,

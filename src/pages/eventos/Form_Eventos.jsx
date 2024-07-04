@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { Outlet } from "react-router-dom";
 import { LoaderCircle } from "../../components/loader/Loader";
 import { Toaster } from "sonner";
-import { tipo_documentos, servicios, sobrecargos } from "../../utils/API.jsx";
+import { tipo_documentos, servicios, sobrecargos, clientes } from "../../utils/API.jsx";
 import { verifyOptionsSelect} from "../../utils/actions.jsx"
 import Navbar from "../../components/navbar/Navbar"
 import ErrorSystem from "../../components/errores/ErrorSystem";
@@ -10,7 +10,7 @@ import texts from "../../context/text_es.js";
 import { FormEventContextProvider, useFormEventContext } from "../../context/FormEventContext.jsx";
 
 function Form_Eventos() {
-    const { setTipoDocumentos, setServicios, setSobrecargos } = useFormEventContext()
+    const { setTipoDocumentos, setServicios, setSobrecargos, setClientes } = useFormEventContext()
     const [loading, setLoading] = useState(true)
     const [errorServer, setErrorServer] = useState("")
     const renderizado = useRef(0)
@@ -29,21 +29,19 @@ function Form_Eventos() {
             const get_tipo_documentos = await tipo_documentos.get({})
             const get_servicios = await servicios.get({})
             const get_sobrecargos = await sobrecargos.get({})
+            const get_clientes = await clientes.get({})
             verifyOptionsSelect({
                 respuesta: get_tipo_documentos,
                 setError: setErrorServer,
                 setOptions: setTipoDocumentos
             })
             verifyOptionsSelect({
-                respuesta: get_servicios,
+                respuesta: get_clientes,
                 setError: setErrorServer,
-                setOptions: setServicios
+                setOptions: setClientes
             })
-            verifyOptionsSelect({
-                respuesta: get_sobrecargos,
-                setError: setErrorServer,
-                setOptions: setSobrecargos
-            })
+            setServicios(get_servicios.data.data)
+            setSobrecargos(get_sobrecargos.data.data)
         } catch (error) {
             console.log(error)
             setErrorServer(texts.inputsMessage.errorSystem)

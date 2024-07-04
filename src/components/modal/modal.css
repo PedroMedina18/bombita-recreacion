@@ -1,7 +1,7 @@
 @import "transition-style";
 
 .overlay {
-  clip-path: inset(0 0 0 0);
+  
   width: 100vw;
   height: 100vh;
   position: fixed;
@@ -12,6 +12,7 @@
   justify-content: center;
   align-items: center;
   z-index: 500;
+  clip-path: inset(0 0 0 0);
 }
 
 .content-modal {
@@ -87,9 +88,22 @@ tr.tr-select {
   }
 }
 
+
 [transition-style="in:wipe:right"] {
-  animation: 0.75s ease-in wipe-in-right both;
+  animation: 0.45s ease-in wipe-in-right both;
 }
+
+/* @keyframes wipe-out-stop {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+[transition-style="out:wipe:stop"] {
+  animation: 0.45s ease-in wipe-in-right both;
+} */
 
 
 @keyframes wipe-out-left {
@@ -102,7 +116,7 @@ tr.tr-select {
 }
 
 [transition-style="out:wipe:left"] {
-  animation: 0.75s ease-in wipe-out-left both;
+  animation: 0.45s ease-in wipe-out-left both;
 }
 
 

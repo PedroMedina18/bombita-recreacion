@@ -6,26 +6,31 @@ import { useForm } from "react-hook-form";
 import { toastError } from "../../components/alerts.jsx"
 import { hasLeadingOrTrailingSpace, formatoFechaInput } from "../../utils/process.jsx"
 import { getPersona, habilitarEdicion } from "../../utils/actions.jsx"
+import { Collapse } from "bootstrap";
+import { useFormEventContext } from "../../context/FormEventContext.jsx"
 import Swal from 'sweetalert2';
 import texts from "../../context/text_es.js";
 import pattern from "../../context/pattern.js";
-import { Collapse } from "bootstrap";
-import { useFormEventContext } from "../../context/FormEventContext.jsx"
 
 
 function FormDataEvent() {
-    const { dataTipo_documentos, dataNewUser, setdataNewUser, dataPersona, setPersona, setDataEvent, dataEvent } = useFormEventContext()
+    const { dataTipo_documentos, dataClientes, dataNewUser, setdataNewUser, dataPersona, setPersona, setDataEvent, dataEvent } = useFormEventContext()
     const [disabledInputs, setDisabledInputs] = useState(false)
+    const [isClient, setIsClient] = useState(true)
     const navigate = useNavigate();
     const [debounceTimeout, setDebounceTimeout] = useState(null);
     const [fechaActual] = useState(new Date())
     const renderizado = useRef(0)
 
     useEffect(() => {
+        console.log("bbj")
         const keys = Object.keys(dataEvent);
         keys.forEach(key => {
             setValue(key, `${dataEvent[`${key}`]}`)
         });
+        if(getValues("cliente")){
+            setIsClient(true)
+        }
         collapseElements()
     }, [])
 
@@ -61,11 +66,13 @@ function FormDataEvent() {
     const collapseElements = (domm = null) => {
         const collapseClient = new Collapse("#Cliente", { toggle: false })
         const collapseDataClient = new Collapse("#DataCliente", { toggle: false })
-        const checkDom = domm ? domm.target.checked : getValues("newClient")
+        let checkDom = domm ? domm.target.checked : getValues("newClient")
+        checkDom ==="false"? false : true
         if (checkDom) {
             collapseClient.hide()
             collapseDataClient.show()
         } else {
+            setIsClient(true)
             collapseClient.show()
             collapseDataClient.hide()
         }
@@ -82,7 +89,6 @@ function FormDataEvent() {
             />
             <div className="w-100 d-flex flex-column justify-content-between align-item-center">
                 <InputCheck label={`${texts.label.clienteCheck}`} name="newClient" id="newClient" form={{ errors, register }}
-
                     onClick={(e) => {
                         collapseElements(e)
                     }}
@@ -90,10 +96,11 @@ function FormDataEvent() {
 
                 <div className="collapse show" id="Cliente">
                     <UnitSelect label={`${texts.label.cliente}`} name="cliente" id="cliente" form={{ errors, register }}
-                        options={[]}
+                        options={dataClientes}
                         params={{
                             validate: (value) => {
-                                if (!getValues("newClient")) {
+
+                                if (!(value)  && !getValues("newClient")) {
                                     return texts.inputsMessage.selectCliente
                                 } else {
                                     return true
@@ -125,7 +132,7 @@ function FormDataEvent() {
                             options={dataTipo_documentos}
                             params={{
                                 validate: (value) => {
-                                    if (value === "") {
+                                    if (!(value) && !isClient) {
                                         return texts.inputsMessage.selectTipoDocumento
                                     } else {
                                         return true
@@ -157,7 +164,7 @@ function FormDataEvent() {
                         <InputsGeneral label={texts.label.documento} type="number" name="numero_documento" id="numero_documento" form={{ errors, register }}
                             params={{
                                 required: {
-                                    value: true,
+                                    value: !isClient,
                                     message: texts.inputsMessage.requireDocumento,
                                 },
                                 maxLength: {
@@ -208,7 +215,7 @@ function FormDataEvent() {
                         <InputsGeneral type="text" label={texts.label.namesCliente} name="nombres" id="nombres" form={{ errors, register }}
                             params={{
                                 required: {
-                                    value: true,
+                                    value: !isClient,
                                     message: texts.inputsMessage.requireNames,
                                 },
                                 maxLength: {
@@ -240,7 +247,7 @@ function FormDataEvent() {
                         <InputsGeneral type={"text"} label={`${texts.label.lastNamesCliente}`} name="apellidos" id="apellidos" form={{ errors, register }}
                             params={{
                                 required: {
-                                    value: true,
+                                    value: !isClient,
                                     message: texts.inputsMessage.requireLastName,
                                 },
                                 maxLength: {
@@ -275,7 +282,7 @@ function FormDataEvent() {
                         <InputsGeneral type={"tel"} label={`${texts.label.telPrincipal}`} name="telefono_principal" id="telefono_principal" form={{ errors, register }}
                             params={{
                                 required: {
-                                    value: true,
+                                    value: !isClient,
                                     message: texts.inputsMessage.requireTel,
                                 },
                                 maxLength: {

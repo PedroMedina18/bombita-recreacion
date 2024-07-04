@@ -140,6 +140,10 @@ input[type="number"] {
   align-items: center;
 }
 
+.div-main form{
+  min-height: 60vh;
+}
+
 /* heigh y width */
 .heigh-85 {
   height: 85%;

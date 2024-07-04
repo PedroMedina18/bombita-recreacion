@@ -55,9 +55,20 @@ table.table-data td {
   text-align: center;
   padding: 5px 5px;
   border: 2px solid rgb(92, 92, 92);
-  min-width: 50px;
-  max-width: 150px;
+  max-width: 50px;
+  min-width: max-content;
   word-wrap: break-word;
+}
+table.table-data.border-none th,
+table.table-data.border-none td {
+  border-right: none;
+  border-left: none;
+}
+table.table-data.border-none th{
+  border-top: none;
+}
+tr.fc-none{
+  color: transparent;
 }
 .table-loading th,
 .table-loading td {
