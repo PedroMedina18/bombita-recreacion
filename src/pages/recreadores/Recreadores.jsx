@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { recreadores } from "../../utils/API.jsx"
 import { calcularEdad } from "../../utils/process.jsx"
 import { searchCode, getListItems, deleteItem } from "../../utils/actions.jsx"
-import { formatoNumero } from "../../utils/process.jsx"
+import { formatoId } from "../../utils/process.jsx"
 import Navbar from "../../components/navbar/Navbar"
 import Table from "../../components/table/Table"
 import texts from "../../context/text_es.js";
@@ -37,7 +37,7 @@ function Recreadores() {
     const columns = [
         {
             name: "Codigo",
-            row: (row) => { const codigo = formatoNumero(Number(row.id)); return codigo}
+            row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
         },
         {
             name: "Documento",

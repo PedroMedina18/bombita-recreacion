@@ -217,7 +217,6 @@ class Eventos(models.Model):
     class Meta:
         db_table = "eventos"
 
-
 # *Tabla intermedia entre los sobrecargo y los eventos
 class EventosSobrecargos(models.Model):
     evento = models.ForeignKey(

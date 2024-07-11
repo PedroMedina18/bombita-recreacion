@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
-from ..models import Servicios, ServiciosActividades, Materiales, ServiciosMateriales, Recreadores, Actividades
+from ..models import Servicios, ServiciosActividades, Materiales, ServiciosMateriales, Actividades
 from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
 from ..funtions.time import duration

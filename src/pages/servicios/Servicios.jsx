@@ -3,7 +3,7 @@ import { servicios } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx";
-import {formatoNumero} from "../../utils/process.jsx";
+import {formatoId, normalizeDecimalNumber} from "../../utils/process.jsx";
 import Table from "../../components/table/Table";
 import Navbar from "../../components/navbar/Navbar";
 import texts from "../../context/text_es.js";
@@ -36,7 +36,7 @@ function Servicios() {
   const columns = [
     {
       name: "Codigo",
-      row: (row) => { const codigo = formatoNumero(Number(row.id)); return codigo}
+      row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
   },
     {
       name: "Nombre",
@@ -44,7 +44,7 @@ function Servicios() {
     },
     {
       name: "Precio",
-      row: (row) => { return `${row.precio} $` }
+      row: (row) => { return `${normalizeDecimalNumber(row.precio)} $` }
     },
     {
       name: "Duracion",
@@ -73,6 +73,9 @@ function Servicios() {
         functionGet: getServicios
       })
     },
+    put: (row)=>{
+      navigate(`/edit/servicio/${row.id}`)
+    },
     search: {
       placeholder: texts.registerMessage.searchItem,
       function: (value) => {
@@ -84,9 +87,6 @@ function Servicios() {
           setData: setDataServicios,
         })
       }
-    },
-    put: (row)=>{
-      navigate(`/edit/servicio/${row.id}`)
     },
     register: {
       name: texts.registerMessage.buttonRegisterServicio,

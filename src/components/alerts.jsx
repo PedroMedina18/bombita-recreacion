@@ -1,6 +1,6 @@
 import Swal from 'sweetalert2';
 import { toast } from "sonner";
-import {formatDateWithTime12Hour, formatoNumero} from "../utils/process.jsx"
+import {formatDateWithTime12Hour, formatoId} from "../utils/process.jsx"
 export const alertConfim = async (title, text) => {
     return Swal.fire({
         title: `${title}`,
@@ -48,7 +48,7 @@ export const alertInfo = async (title, data) => {
         color: "black",
         html: `
         <div class='p-2 d-flex flex-column justify-content-start align-items-start'>
-            <p class="m-0 mb-2 text-start"><b>Codigo: </b>${formatoNumero(data.id)}</p>
+            <p class="m-0 mb-2 text-start"><b>Codigo: </b>${formatoId(data.id)}</p>
             <p class="m-0 mb-2 text-start"><b>Descripción: </b>${data.descripcion}</p>
             <p class="m-0 mb-2 text-start"><b>Fecha de Registro: </b>${formatDateWithTime12Hour(data.fecha_registro)}</p>
             <p class="m-0 mb-2 text-start"><b>Fecha de Actualización: </b>${formatDateWithTime12Hour(data.fecha_actualizacion)}</p>
@@ -85,7 +85,7 @@ export const alertCargo = async (title, data) => {
         html: `
         <div class='p-2 d-flex flex-column justify-content-start align-items-start'>
             <img class="mx-auto mb-2" src='${data.img_logo? data.img_logo : user}'/>
-            <p class="m-0 mb-2 text-start"><b>Codigo: </b>${formatoNumero(data.id)}</p>
+            <p class="m-0 mb-2 text-start"><b>Codigo: </b>${formatoId(data.id)}</p>
             <p class="m-0 mb-2 text-start"><b>Descripción: </b>${data.descripcion}</p>
             <p class="m-0 mb-2 text-start"><b>Administrador: </b>
                 <spam>

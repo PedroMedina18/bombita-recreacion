@@ -5,13 +5,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
+from ..funtions.email import emailRegistroEvento
 from ..models import Eventos, EventosSobrecargos, EventosServicios, Clientes, Personas, Servicios, PrecioDolar, Sobrecargos, TipoDocumento
 from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
 from ..message import MESSAGE
+from datetime import datetime
 import json
-
-
 
 class Eventos_Views(View):
     @method_decorator(csrf_exempt)
@@ -77,10 +77,12 @@ class Eventos_Views(View):
                     )
                 cliente = Clientes.objects.create(persona = persona)
             precio_dolar = PrecioDolar.objects.latest('id')
+            if cliente.persona.correo:
+                emailRegistroEvento(cliente.persona.correo)
             evento = Eventos.objects.create(
-                fecha_evento = req["fecha_evento"], 
+                fecha_evento = datetime.fromisoformat(req["fecha_evento"]),
                 direccion = req["direccion"], 
-                numero_personas = req["numero_personas"], 
+                numero_personas = int(req["numero_personas"]), 
                 cliente = cliente,
                 completado = False,
                 precioDolar = precio_dolar
@@ -88,7 +90,7 @@ class Eventos_Views(View):
             servicios = req['servicios']
             for servicio in servicios:
                 getServicio = Servicios.objects.get(id=int(servicio))
-                EventosServicios.objects.create(evento=evento, servicios=getServicio)
+                EventosServicios.objects.create(evento=evento, servicio=getServicio)
             
             sobrecargos = req['sobrecargos']
             for sobrecargo in sobrecargos:
@@ -179,6 +181,7 @@ class Eventos_Views(View):
             if id:
                 query = """
                     SELECT 
+                        eve.id,
                     	eve.fecha_evento,
                         pe.nombres, 
                         pe.apellidos, 
@@ -225,6 +228,7 @@ class Eventos_Views(View):
                 if "page" in request.GET:
                     query = """
                     SELECT 
+                        eve.id,
                     	eve.fecha_evento,
                         pe.nombres, 
                         pe.apellidos, 
@@ -245,6 +249,7 @@ class Eventos_Views(View):
                 elif ("page" in request.GET and "desc" in request.GET and request.GET["desc"] == "true"):
                     query = """
                     SELECT 
+                        eve.id,
                     	eve.fecha_evento,
                         pe.nombres, 
                         pe.apellidos, 
@@ -265,6 +270,7 @@ class Eventos_Views(View):
                 else:
                     query = """
                     SELECT 
+                        eve.id,
                     	eve.fecha_evento,
                         pe.nombres, 
                         pe.apellidos, 
@@ -282,7 +288,7 @@ class Eventos_Views(View):
                     cursor.execute(query)
                     eventos = dictfetchall(cursor)
                 query = """
-                    SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM recreadores;
+                    SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM eventos;
                 """
                 cursor.execute(query)
                 result = dictfetchall(cursor)

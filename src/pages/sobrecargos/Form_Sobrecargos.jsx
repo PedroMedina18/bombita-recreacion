@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useForm } from "react-hook-form";
-import { InputsGeneral, InputTextTarea } from "../../components/input/Inputs.jsx";
+import { InputsGeneral, InputTextTarea, MoneyInput } from "../../components/input/Inputs.jsx";
 import { ButtonSimple } from "../../components/button/Button";
 import { useParams, useNavigate } from "react-router-dom";
 import { sobrecargos } from "../../utils/API.jsx";
@@ -167,8 +167,7 @@ function Form_Niveles() {
                                         }}
                                         placeholder={texts.placeholder.descripcion}
                                     />
-                                    <InputsGeneral
-                                        type={"number"}
+                                    <MoneyInput
                                         label={texts.label.monto}
                                         name="monto"
                                         id="monto"
@@ -186,8 +185,6 @@ function Form_Niveles() {
                                                 }
                                             },
                                         }}
-                                        defaultValue={0}
-                                        placeholder="0"
                                     />
                                     <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
                                         {params.id? "Guardar" : "Registrar"}

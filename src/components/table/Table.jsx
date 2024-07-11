@@ -37,7 +37,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                 {
                     options.register ?
                         (
-                            <div className='w-100 w-md-50 px-2 px-md-4'>
+                            <div className='w-100 w-md-50 pe-2 pe-md-4'>
                                 <ButtonSimple type="button" className={"w-100"} onClick={() => { options.register.function() }}>{options.register.name}</ButtonSimple>
                             </div>
                         )
@@ -47,7 +47,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
 
                 {
                     options.search ?
-                        (<div className='ms-auto d-flex align-items-center w-100 w-md-50 mt-3 mt-md-0'>
+                        (<div className=' d-flex align-items-center w-100 w-md-50 mt-3 mt-md-0'>
                             <ButtonSimple
                                 type="button"
                                 onClick={(e) => {
@@ -76,8 +76,8 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                     ) 
                     :
                     (
-                        <div className='container-table mt-4'>
-                            <table className='table-data'>
+                        <div className='container-table  mt-4'>
+                            <table className='table-data border-table border-none'>
                                 <thead>
                                     <tr>
                                         <th scope="col">N°</th>

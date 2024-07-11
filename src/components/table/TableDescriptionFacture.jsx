@@ -9,7 +9,7 @@ function TableDescriptionFacture({ listaData, listDescripcion, saveListDescripti
         const array = [];
         for (let index = 0; index < 3 - listDescripcion.length; index++) {
             array.push(
-                <tr className="fc-none">
+                <tr key={`${index}_none_${Date.now + (Math.floor(Math.random()) * 100)}`} className="fc-none">
                     <th>none</th>
                     <th>none</th>
                     <th>none</th>
@@ -40,10 +40,10 @@ function TableDescriptionFacture({ listaData, listDescripcion, saveListDescripti
                         const precio = objet.precio ? objet.precio : objet.monto
                         const precioBs = precio * dataUser.dollar.price
                         return (
-                            <tr key={objet.nombre} onDoubleClick={()=>{deleteSelect(index)}}>
+                            <tr key={`${index}_${objet.nombre.toLowerCase().replace(/\s+/g, '')}`} onDoubleClick={()=>{deleteSelect(index)}}>
                                 <th className="text-start">{objet.nombre}</th>
                                 <th>{`${precio} $`}</th>
-                                <th>{`${precioBs} BS.s`}</th>
+                                <th>{`${precioBs.toFixed(2)} BS.s`}</th>
                             </tr>
                         )
                     })

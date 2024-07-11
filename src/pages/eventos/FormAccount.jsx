@@ -4,7 +4,7 @@ import { ButtonSimple } from "../../components/button/Button"
 import { useForm } from "react-hook-form";
 import { toastError, alertConfim, alertLoading } from "../../components/alerts.jsx"
 import { useNavigate } from 'react-router-dom'
-import { formatoNumero, truncateString } from "../../utils/process.jsx"
+import { formatoId, truncateString } from "../../utils/process.jsx"
 import { useFormEventContext } from "../../context/FormEventContext.jsx"
 import ModalSelect from "../../components/modal/ModalSelect.jsx"
 import { sobrecargos, servicios, eventos } from "../../utils/API.jsx"
@@ -16,8 +16,7 @@ import TableDescriptionFacture from "../../components/table/TableDescriptionFact
 function FormAccount() {
     const { getUser } = useAuthContext();
     const [dataUser] = useState(getUser());
-    const { dataServicios, saveDataServicios, saveDataSobrecargos, dataSobrecargos, setSaveDataSobrecargos, setSaveDataServicios, dataEvent } = useFormEventContext()
-    const [submit, setSubmit] = useState(false);
+    const { dataServicios, saveDataServicios, valueCliente, saveDataSobrecargos, dataSobrecargos, setSaveDataSobrecargos, setSaveDataServicios, dataEvent } = useFormEventContext()
     const [estadoSobrecargos, setEstadoSobrecargos] = useState(false);
     const [estadoServicios, setEstadoServicios] = useState(false);
     const navigate = useNavigate();
@@ -43,8 +42,8 @@ function FormAccount() {
                 const confirmacion = await alertConfim("Confirmar", message)
                 if (confirmacion.isConfirmed) {
                     const body = {}
-                    if (dataEvent.id_cliente) {
-                        body.id_cliente = dataEvent.id_cliente
+                    if (valueCliente) {
+                        body.id_cliente = valueCliente.id
                     }
                     if (dataEvent.id_persona) {
                         body.id_persona = dataEvent.id_persona
@@ -61,6 +60,7 @@ function FormAccount() {
                     body.direccion = dataEvent.direccion
                     body.servicios = saveDataServicios
                     body.sobrecargos = saveDataSobrecargos
+                    console.log(body)
                     alertLoading("Cargando")
                     const res = await eventos.post(body)
                     controlResultPost({
@@ -80,7 +80,7 @@ function FormAccount() {
     const columnsServicio = [
         {
             name: "Codigo",
-            row: (row) => { const codigo = formatoNumero(Number(row.id)); return codigo }
+            row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
         },
         {
             name: "Nombre",
@@ -107,7 +107,7 @@ function FormAccount() {
     const columnsSobrecargo = [
         {
             name: "Codigo",
-            row: (row) => { const codigo = formatoNumero(Number(row.id)); return codigo }
+            row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
         },
         {
             name: "Nombre",
@@ -153,7 +153,7 @@ function FormAccount() {
                             saveDataSobrecargos.length ?
                                 (
                                     <>
-                                        <h6 className="m-0 mb-2 fw-bold h4">Sobrecargos</h6>
+                                        <h6 className="m-0 my-2 fw-bold h4">Sobrecargos</h6>
                                         <TableDescriptionFacture listaData={dataSobrecargos} listDescripcion={saveDataSobrecargos} saveListDescription={setSaveDataSobrecargos} />
                                     </>
                                 )

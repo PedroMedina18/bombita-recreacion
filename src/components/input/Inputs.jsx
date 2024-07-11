@@ -1,12 +1,14 @@
 import "./input.css";
 import "../button/button.css"
 import Select from "react-select";
+import { useState } from "react";
+import AsyncSelect from 'react-select/async';
 import perfil from "../../assets/perfil.png"
 import MakeAnimated from "react-select/animated";
 import { IconCircleCheck, IconCircleX, IconUserCircleSolid } from "../Icon";
 
 
-export function InputsGeneral({label, id, type, name, form, placeholder = "", params = {}, flexRow = false, isError = true, className = "", ...props}) {
+export function InputsGeneral({ label, id, type, name, form, placeholder = "", params = {}, flexRow = false, isError = true, ...props }) {
   const { errors, register } = form;
 
   if (flexRow) {
@@ -36,13 +38,13 @@ export function InputsGeneral({label, id, type, name, form, placeholder = "", pa
     );
   } else {
     return (
-      <div className={`w-100 ${errors[name] && isError ? "error" : " "}`}>
+      <div className={`w-100 d-flex flex-column justify-content-center  ${errors[name] && isError ? "error" : " "}`}>
         <label className="formulario-label" htmlFor={id}>
           {label}
         </label>
-        <div className={`formulario-grupo-input ${type === "date" || "datetime-local" ? "date" : ""}`}>
+        <div className={`formulario-grupo-input ${(type === "date" || type === "datetime-local") ? "date" : ""}`}>
           <input
-            className={`formulario-input${type === "date" || "datetime-local" ? "-date" : ""}`}
+            className={`formulario-input${(type === "date" || type === "datetime-local") ? "-date" : ""}`}
             placeholder={placeholder}
             type={type}
             id={id}
@@ -60,14 +62,14 @@ export function InputsGeneral({label, id, type, name, form, placeholder = "", pa
   }
 }
 
-export function InputTextTarea({label, id, name, form, placeholder = "", params = {}, rows = null, ...props}) {
+export function InputTextTarea({ label, id, name, form, placeholder = "", params = {}, rows = null, ...props }) {
   const { errors, register } = form;
   return (
     <div className={`w-100 mb-1 ${errors[name] ? "error" : " "}`}>
       <label className="formulario-label" htmlFor={id}>
         {label}
       </label>
-      <div className="formulario-grupo-input textarea m-0">
+      <div className="formulario-grupo-input textarea ">
         <textarea
           className="formulario-textarea"
           rows={rows ? rows : 4}
@@ -76,7 +78,7 @@ export function InputTextTarea({label, id, name, form, placeholder = "", params 
           {...register(name, params)}
           {...props}
         />
-        <IconCircleX className="bi bi-x-circle-fill" />
+        
       </div>
       <p className="formulario-message-error">
         {errors[name] ? errors[name].message : "error"}
@@ -85,7 +87,7 @@ export function InputTextTarea({label, id, name, form, placeholder = "", params 
   );
 }
 
-export function InputCheck({label, id, name, form, params = {}, isError = true, className = "", ...props }){
+export function InputCheck({ label, id, name, form, params = {}, isError = true, className = "", ...props }) {
   const { errors, register } = form
   return (
     <div
@@ -108,7 +110,7 @@ export function InputCheck({label, id, name, form, params = {}, isError = true, 
 }
 
 
-export function InputDuration({label, id, name, form, params = {}, isError = true, ...props}) {
+export function InputDuration({ label, id, name, form, params = {}, isError = true, ...props }) {
   const { errors, register } = form;
   const hours = [
     { value: 0, label: "00" },
@@ -266,10 +268,10 @@ export function InputDuration({label, id, name, form, params = {}, isError = tru
   );
 }
 
-export function UnitSelect({label, id, name, form, params = {}, options, placeholder = "...", isError = true, ...props}) {
+export function UnitSelect({ label, id, name, form, params = {}, options, placeholder = "...", isError = true, ...props }) {
   const { errors, register } = form;
   return (
-    <div className={`w-100 ${errors[name] && isError ? "error" : " "}`}>
+    <div className={`w-100 d-flex flex-column justify-content-center ${errors[name] && isError ? "error" : " "}`}>
       <label className="formulario-label" htmlFor={id}>
         {label}
       </label>
@@ -300,43 +302,75 @@ export function UnitSelect({label, id, name, form, params = {}, options, placeho
 }
 
 const animatedComponent = MakeAnimated();
-export function MultiSelect({id, label, options, save, placeholder, optionsDefault }) {
+export function MultiSelect({ id, label, options, save, placeholder, optionsDefault }) {
   return (
     <div className="w-100">
       <label className="formulario-label" htmlFor={id}>
         {label}
       </label>
-      <Select
-        id={id}
-        isMulti
-        options={options}
-        components={animatedComponent}
-        closeMenuOnSelect={false}
-        defaultValue={optionsDefault}
-        placeholder={placeholder}
-        styles={{
-          control: (styles) => {
-            return {
-              ...styles,
-              borderColor: "rgb(22, 21, 21)",
-              borderWidth: "1px",
-              borderRadius: "2px",
-            };
-          },
-        }}
-        captureMenuScroll={true}
-        noOptionsMessage={() => {
-          return "Sin Opciones";
-        }}
-        onChange={(selectecOptions) => {
-          save(selectecOptions);
-        }}
-      />
+        <Select
+          id={id}
+          isMulti
+          options={options}
+          components={animatedComponent}
+          closeMenuOnSelect={false}
+          defaultValue={optionsDefault}
+          placeholder={placeholder}
+          styles={{
+            control: (styles) => {
+              return {
+                ...styles,
+                borderColor: "rgb(22, 21, 21)",
+                borderWidth: "1px",
+                borderRadius: "2px",
+              };
+            },
+          }}
+          captureMenuScroll={true}
+          noOptionsMessage={() => {
+            return "Sin Opciones";
+          }}
+          onChange={(selectecOptions) => {
+            save(selectecOptions);
+          }}
+        />
     </div>
   );
 }
 
-export function InputImgPerfil({label, id, name, form, tamaño = "lg", imgPerfil = null }) {
+export function SelectAsync({ id, label, optionsDefault, placeholder, loadOptions, value, setValue, getOptionLabel, getOptionValue }) {
+  const handleOnChange = (e) => {
+    setValue(e)
+  }
+  return (
+    <div>
+      <label className="formulario-label" htmlFor={id}>
+        {label}
+      </label>
+      <AsyncSelect
+        className="hello"
+        cacheOptions
+        defaultOptions={optionsDefault}
+        value={value}
+        loadOptions={loadOptions}
+        onChange={handleOnChange}
+        getOptionLabel={getOptionLabel}
+        getOptionValue={getOptionValue}
+        placeholder={placeholder}
+        id={id}
+        styles={(e) => { cosole.log(e) }}
+        noOptionsMessage={() => {
+          return "Sin Opciones";
+        }}
+        loadingMessage={() => {
+          return "Buscando";
+        }}
+      />
+    </div>
+  )
+}
+
+export function InputImgPerfil({ label, id, name, form, tamaño = "lg", imgPerfil = null }) {
   const { errors, register } = form;
   const img = imgPerfil ? imgPerfil : perfil
 
@@ -387,4 +421,104 @@ export function InputImgPerfil({label, id, name, form, tamaño = "lg", imgPerfil
       </p>
     </div>
   )
+}
+
+export function MoneyInput({ label, id, name, form, params = {}, flexRow = false, isError = true, ...props }) {
+  const [value, setValue] = useState('0,00');
+  const { errors, register } = form;
+  const handleChange = (event) => {
+    const inputValue = event.target.value.replace(/[^\d]/g, ''); // allow only digits
+    let formattedValue = '0.00';
+    let integerPart = '';
+    let decimalPart = '';
+
+    // separate integer and decimal parts
+    if (inputValue.length > 2) {
+      integerPart = inputValue.slice(0, -2);
+      decimalPart = inputValue.slice(-2);
+    } else {
+      decimalPart = inputValue;
+    }
+
+    // format integer part
+    integerPart = integerPart.replace(/^0/, ''); // remove leading zeros
+    if (integerPart === '') {
+      integerPart = '0';
+    }
+
+    // combine integer and decimal parts
+    if (decimalPart) {
+      formattedValue = `${integerPart}.${decimalPart}`;
+    } else {
+      formattedValue = `${integerPart}.00`;
+    }
+
+    // update state and input value
+    setValue(formattedValue);
+
+    // move cursor to the end of the input field
+    const cursorPosition = formattedValue.length;
+    event.target.setSelectionRange(cursorPosition, cursorPosition);
+  }
+
+  const setSelectionRange = (e) => {
+    const texto = e.target.value
+    e.target.setSelectionRange(texto.length, texto.length);
+  }
+
+  if (flexRow) {
+    return (
+      <div className={`w-100 d-flex flex-column ${errors[name] && isError ? "error" : ""}`}>
+        <div className="d-flex justify-content-between align-items-center">
+          <label className="formulario-label w-50" htmlFor={id}>
+            {label}
+          </label>
+          <div className="formulario-grupo-input">
+            <input
+              className="formulario-input "
+              type="text"
+              id={id}
+              value={value}
+              {...register(name, params)}
+              {...props}
+              onChange={handleChange}
+              onFocus={setSelectionRange}
+              onClick={setSelectionRange}
+            />
+            <IconCircleCheck className="bi bi-check-circle-fill" />
+            <IconCircleX className="bi bi-x-circle-fill" />
+          </div>
+        </div>
+        <p className="formulario-message-error mb-2 ms-auto d-inline-block">
+          {errors[name] ? errors[name].message : "error"}
+        </p>
+      </div>
+    );
+  } else {
+    return (
+      <div className={`w-100 ${errors[name] && isError ? "error" : " "}`}>
+        <label className="formulario-label" htmlFor={id}>
+          {label}
+        </label>
+        <div className={`formulario-grupo-input`}>
+          <input
+            className="formulario-input "
+            type="text"
+            id={id}
+            value={value}
+            {...register(name, params)}
+            {...props}
+            onChange={handleChange}
+            onFocus={setSelectionRange}
+            onClick={setSelectionRange}
+          />
+          <IconCircleCheck className="bi bi-check-circle-fill" />
+          <IconCircleX className="bi bi-x-circle-fill" />
+        </div>
+        <p className="formulario-message-error">
+          {errors[name] ? errors[name].message : "error"}
+        </p>
+      </div>
+    );
+  }
 }

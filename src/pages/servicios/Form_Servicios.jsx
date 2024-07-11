@@ -2,12 +2,12 @@ import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Toaster } from "sonner";
 import { useNavigate, useParams } from "react-router-dom";
-import { recreadores, servicios, materiales, actividades, } from "../../utils/API.jsx";
+import { servicios, materiales, actividades, } from "../../utils/API.jsx";
 import { LoaderCircle } from "../../components/loader/Loader";
 import { ButtonSimple } from "../../components/button/Button";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
-import { InputsGeneral, InputTextTarea, InputDuration, MultiSelect } from "../../components/input/Inputs.jsx";
-import { hasLeadingOrTrailingSpace, coincidences } from "../../utils/process.jsx";
+import { InputsGeneral, InputTextTarea, InputDuration, MultiSelect, MoneyInput } from "../../components/input/Inputs.jsx";
+import { hasLeadingOrTrailingSpace, coincidences, normalizeDecimalNumber } from "../../utils/process.jsx";
 import { verifyOptionsSelect, controlResultPost } from "../../utils/actions.jsx"
 import ErrorSystem from "../../components/errores/ErrorSystem";
 import texts from "../../context/text_es.js";
@@ -18,13 +18,10 @@ import { IconRowLeft } from "../../components/Icon"
 function Form_Servicios() {
   const [loading, setLoading] = useState(true);
   const [errorServer, setErrorServer] = useState("");
-  const [dataRecreadores, setDataRecreadores] = useState([]);
   const [dataMateriales, setDataMateriales] = useState([]);
   const [dataActividades, setDataActividades] = useState([]);
-  const [dataRecreadoresDefault, setDataRecreadoresDefault] = useState([]);
   const [dataMaterialesDefault, setDataMaterialesDefault] = useState([]);
   const [dataActividadesDefault, setDataActividadesDefault] = useState([]);
-  const [saveRecreadores, setSaveRecreadores] = useState([]);
   const [saveMateriales, setSaveMateriales] = useState([]);
   const [saveActividades, setSaveActividades] = useState([]);
   const [submit, setSubmit] = useState(false);
@@ -41,24 +38,18 @@ function Form_Servicios() {
   }, []);
 
   useEffect(() => {
-    if (dataMateriales.length && dataActividades.length && dataRecreadores.length) {
+    if (dataMateriales.length && dataActividades.length) {
       if (params.id) {
         get_servicio()
       }
     }
-  }, [dataMateriales, dataActividades, dataRecreadores])
+  }, [dataMateriales, dataActividades])
 
   //* funcion para buscar los permisos en la vase de datos
   const get_data = async () => {
     try {
-      const getRecreadores = await recreadores.get({});
       const getMateriales = await materiales.get({});
       const getActividades = await actividades.get({});
-      verifyOptionsSelect({
-        respuesta: getRecreadores,
-        setError: setErrorServer,
-        setOptions: setDataRecreadores,
-      });
       verifyOptionsSelect({
         respuesta: getMateriales,
         setError: setErrorServer,
@@ -96,15 +87,12 @@ function Form_Servicios() {
         setSelectOptions(coincidences(options, respuesta.data.data.permisos))
       }
       setValue("nombre", respuesta.data.data.nombre)
-      setValue("precio", respuesta.data.data.precio)
-      setValue("numero_recreadores", respuesta.data.data.numero_recreadores)
+      setValue("precio", normalizeDecimalNumber(respuesta.data.data.precio))
       setValue("descripcion", respuesta.data.data.descripcion)
       setValue("duracion-hours", respuesta.data.data.duracion.horas),
-        setValue("duracion-minutes", respuesta.data.data.duracion.minutos),
-        setSaveActividades(coincidences(dataActividades, respuesta.data.data.actividades))
+      setValue("duracion-minutes", respuesta.data.data.duracion.minutos),
+      setSaveActividades(coincidences(dataActividades, respuesta.data.data.actividades))
       setDataActividadesDefault(coincidences(dataActividades, respuesta.data.data.actividades))
-      setSaveRecreadores(coincidences(dataRecreadores, respuesta.data.data.recreadores))
-      setDataRecreadoresDefault(coincidences(dataRecreadores, respuesta.data.data.recreadores))
       setSaveMateriales(coincidences(dataMateriales, respuesta.data.data.materiales))
       setDataMaterialesDefault(coincidences(dataMateriales, respuesta.data.data.materiales))
       respuesta.data.data.materiales.forEach(element => {
@@ -129,7 +117,7 @@ function Form_Servicios() {
 
   const onSubmit = handleSubmit(async (data) => {
     try {
-      if (!saveRecreadores.length || !saveMateriales.length || !saveActividades.length) {
+      if (!saveMateriales.length || !saveActividades.length) {
         return;
       }
       const message = params.id ? texts.confirmMessage.confirEdit : texts.confirmMessage.confirRegister
@@ -137,9 +125,6 @@ function Form_Servicios() {
       if (!confirmacion) {
         return;
       }
-      const recreadores = saveRecreadores.map((elements) => {
-        return elements.value;
-      });
       const actividades = saveActividades.map((elements) => {
         return elements.value;
       });
@@ -158,7 +143,6 @@ function Form_Servicios() {
           horas: Number(data["duracion-hours"]),
           minutos: Number(data["duracion-minutes"]),
         },
-        recreadores: recreadores,
         actividades: actividades,
         materiales: materiales,
       };
@@ -269,8 +253,7 @@ function Form_Servicios() {
                     />
                   </div>
                   <div className="w-md-25 w-100">
-                    <InputsGeneral
-                      type={"number"}
+                    <MoneyInput
                       label={texts.label.precio}
                       name="precio"
                       id="precio"
@@ -281,35 +264,15 @@ function Form_Servicios() {
                           message: texts.inputsMessage.requirePrecio,
                         },
                         validate: (e) => {
-                          if (e <= 0) {
+                          if (e <= "0,00") {
                             return texts.inputsMessage.minPrecio;
                           } else {
                             return true;
                           }
                         },
                       }}
-                      defaultValue={0}
-                      placeholder="0"
                     />
                   </div>
-                </div>
-                <div className="mb-1">
-                  <MultiSelect
-                    name="recreadores-servicio"
-                    label={`${texts.label.recreadoresPermitidos}`}
-                    id="recreadores-servicio"
-                    options={dataRecreadores}
-                    save={setSaveRecreadores}
-                    placeholder={"Recreadores"}
-                    optionsDefault={dataRecreadoresDefault}
-                  />
-                  {Boolean(!saveRecreadores.length && submit) ? (
-                    <span className="message-error visible">
-                      {texts.inputsMessage.selectRecreadores}
-                    </span>
-                  ) : (
-                    <span className="message-error invisible">Sin errores</span>
-                  )}
                 </div>
                 <div className="mb-1">
                   <MultiSelect

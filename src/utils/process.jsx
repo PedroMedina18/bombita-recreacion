@@ -43,7 +43,7 @@ export const errorAxios = async (error) => {
 }
 
 // *Para el formato de numeros utilizados en vez de id
-export const formatoNumero = (numero) => {
+export const formatoId = (numero) => {
   const strNumero = numero.toString();
   const longitud = strNumero.length;
 
@@ -71,6 +71,7 @@ export function formatDateWithTime12Hour(date) {
   };
   return new Intl.DateTimeFormat('es-ES', options).format(fecha);
 }
+
 export function formatoFechaInput(date) {
 
   const year = date.getFullYear();
@@ -106,4 +107,37 @@ export function truncateString(str, maxLength) {
     return str.substring(0, maxLength) + '...';
   }
   return str;
+}
+
+export function normalizeDecimalNumber(number) {
+  // Convertir a string para trabajar con la parte decimal
+  const strNumber = number.toString();
+
+  // Verificar si es un número decimal
+  if (strNumber.includes('.')) {
+    // Separar la parte entera y decimal
+    let [integerPart, decimalPart] = strNumber.split('.');
+
+    // Verificar si la parte decimal tiene 2 dígitos
+    if (decimalPart.length < 2) {
+      // Rellenar con ceros hasta tener 2 dígitos
+      decimalPart += '0'.repeat(2 - decimalPart.length);
+    }
+
+    // Reconstruir el número con la parte decimal normalizada
+    return `${integerPart}.${decimalPart}`;
+  } else {
+    // Si no es un número decimal, convertirlo a decimal y rellenar con 2 ceros
+    return `${strNumber}.00`;
+  }
+}
+
+export function FalseTrue(param){
+  if(param==="false"){
+    return false
+  }
+  if(param==="true"){
+    return true
+  }
+  return param
 }

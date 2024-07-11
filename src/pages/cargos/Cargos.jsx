@@ -3,7 +3,7 @@ import { cargos } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import {deleteItem, searchCode, getListItems} from "../../utils/actions.jsx"
-import { formatoNumero } from "../../utils/process.jsx";
+import { formatoId } from "../../utils/process.jsx";
 import { alertCargo } from "../../components/alerts.jsx";
 import Navbar from "../../components/navbar/Navbar"
 import Table from "../../components/table/Table"
@@ -35,7 +35,7 @@ function Cargos() {
     const columns = [
         {
             name: "Codigo",
-            row: (row) => { const codigo = formatoNumero(Number(row.id)); return codigo}
+            row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
         },
         {
             name: "Nombre",

@@ -185,6 +185,10 @@ function Cargos() {
                                     />
                                     <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
                                         params={{
+                                            required: {
+                                                value: true,
+                                                message: texts.inputsMessage.requiredDesription,
+                                            },
                                             maxLength: {
                                                 value: 300,
                                                 message: texts.inputsMessage.max300
@@ -217,15 +221,22 @@ function Cargos() {
                                     />
                                     {
                                         !watch("administrador") ?
-                                            (<MultiSelect name="permisos" label={`${texts.label.permisos}`} id="permisos" options={options} save={setSelectOptions} optionsDefault={optionsDefault} placeholder={"Permisos"} />)
+                                            (
+                                                <div className={`${Boolean(!selectOptions.length && errors["administrador"])? "error":""}`}>
+
+                                            <MultiSelect name="permisos" label={`${texts.label.permisos}`} id="permisos" options={options} save={setSelectOptions} optionsDefault={optionsDefault} placeholder={"Permisos"} />
+                                                </div>
+                                        )
                                             :
                                             ""
                                     }
+                                    {Boolean(!selectOptions.length && errors["administrador"]) ? <span className="message-error visible">{texts.inputsMessage.selecPermisos}</span> : <span className="message-error invisible">Sin errores</span>}
+
                                     <div className="w-100 mt-2">
                                         <InputImgPerfil name="icono" id="icono" label={`Icono`} form={{ errors, register }} tamaño="sm" imgPerfil={imgLogo}/>
                                     </div>
 
-                                    {Boolean(!selectOptions.length && errors["administrador"]) ? <span className="message-error visible">{texts.inputsMessage.selecPermisos}</span> : <span className="message-error invisible">Sin errores</span>}
+                                    
                                     <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
                                         {params.id? "Guardar" : "Registrar"}
                                     </ButtonSimple>

@@ -171,7 +171,6 @@ function Form_Generos() {
                             </div>
                         )
             }
-
             <Toaster />
         </Navbar>
     )

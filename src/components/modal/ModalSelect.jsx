@@ -20,8 +20,7 @@ function ModalSelect({ titulo, columns, object, saveSelect, estado, setEstado, s
     const renderizado = useRef(0);
     const [errorServer, setErrorServer] = useState("");
     const [loading, setLoading] = useState(true);
-    const [dFlex, setDFlex] = useState(false);
-
+    const [animateState, setAnimateState] = useState("")
     useEffect(() => {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
@@ -31,12 +30,7 @@ function ModalSelect({ titulo, columns, object, saveSelect, estado, setEstado, s
                 setData: setDataTable,
                 setLoading: setLoading
             })
-            setTimeout(() => {
-                setDFlex(true)
-            }, 500);
         }
-
-
     }, [])
 
     useEffect(() => {
@@ -54,6 +48,18 @@ function ModalSelect({ titulo, columns, object, saveSelect, estado, setEstado, s
 
         setDebounceTimeout(timeout);
     }, [searchTerm])
+    useEffect(() => {
+        // Para evitar el sobre renderizado al cargar el componente
+        if (renderizado.current === 1 || renderizado.current === 2 || renderizado.current === 0) {
+            renderizado.current = renderizado.current + 1
+            return
+        }
+        if(estado){
+            setAnimateState("in:wipe:right")
+        }else{
+            setAnimateState("out:wipe:left")
+        }
+    }, [estado])
 
     const searFuntion = (search) => {
         searchCode({
@@ -86,7 +92,7 @@ function ModalSelect({ titulo, columns, object, saveSelect, estado, setEstado, s
     
     return (
         <>
-            <div className={`overlay`} transition-style={estado? "in:wipe:right" : "out:wipe:left"}
+            <div className={`overlay`} transition-style={animateState}
                 onClick={(e) => {
                     if (e.target.className === "overlay") {
                         setEstado(false)
@@ -138,8 +144,8 @@ function ModalSelect({ titulo, columns, object, saveSelect, estado, setEstado, s
                                     (
 
                                         <>
-
-                                            <table className='table-data'>
+                                            <div className='container-table'>
+                                                <table className='table-data border-table border-none'>
                                                 <thead className='table-modal'>
                                                     <tr>
                                                         <th scope="col">N°</th>
@@ -204,7 +210,8 @@ function ModalSelect({ titulo, columns, object, saveSelect, estado, setEstado, s
                                                     }
 
                                                 </tbody>
-                                            </table>
+                                                </table>
+                                            </div>
                                             <div className='d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center w-100 mt-3'>
                                                 <p className='m-0 mb-3 mb-sm-0 fw-bold fs-6'>{`Mostrando ${totalItems(pages, dataList.length)} de ${dataTable.total}`}</p>
                                                 <div className='d-flex justify-content-between align-items-center '>

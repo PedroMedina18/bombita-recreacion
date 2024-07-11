@@ -45,7 +45,7 @@ const texts={
         selectMateriales:"Seleccione los materiales a utilizar",
         selectNivel:"Seleccione un Nivel",
         selecPermisos:"Seleccione los permisos del Cargo",
-        selecPermisos:"Seleccione los servicios que desea",
+        selecServicios:"Seleccione los servicios que desea",
         selectValor:"Seleccione un valor",
         selectCliente:"Seleccione un cliente o cree uno nuevo",
         selectTipoDocumento:"Seleccione un tipo de documento",
@@ -78,6 +78,7 @@ const texts={
         editionTipoDocumento:"Tipo de Documento Editado",
         editionMaterial:"Material Editado",
         editionCargo:"Cargo Editado",
+        editionCliente:"Cliente Editado",
         editionActividad:"Actividad Editado",
         editionRecreador:"Recreador Editado",
         editionServicio:"Servicio Editado",
@@ -244,13 +245,25 @@ const texts={
             name:"Editar un Genero",
             description:"Intruduzca los datos para editar un genero"
         },
+        editCliente:{
+            name:"Editar un Cliente",
+            description:"Intruduzca los datos para editar un cliente"
+        },
         getTipoDocumentos:{
             name:"Lista de Tipos de Documentos",
             description:"Verifique los Tipos de Documentos agregados"
         },
-        getGenero:{
+        getClientes:{
+            name:"Lista de Clientes",
+            description:"Verifique los Clientes agregados"
+        },
+        getGeneros:{
             name:"Lista de Generos",
             description:"Verifique los Generos agregados"
+        },
+        getEventos:{
+            name:"Lista de Eventos",
+            description:"Verifique los Eventos agregados"
         },
         getNiveles:{
             name:"Lista de Niveles",
@@ -298,6 +311,7 @@ const texts={
         buttonRegisterRecreador:"Agregar un nuevo recreador",
         buttonRegisterSobrecargo:"Agregar un nuevo sobrecargo",
         buttonRegisterServicio:"Agregar un nuevo servicio",
+        buttonRegisterEvento:"Agregar un nuevo evento",
         buttonRegisterEventosuccessMessage:"Agregar un nuevo evento",
     }
 }

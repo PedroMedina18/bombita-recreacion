@@ -5,7 +5,7 @@ import { recreadores } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { LoaderCircle } from "../../components/loader/Loader";
 import { verifyOptionsSelect, controlResultPost } from "../../utils/actions.jsx";
-import { hasLeadingOrTrailingSpace, coincidences, formatoNumero } from "../../utils/process.jsx";
+import { hasLeadingOrTrailingSpace, coincidences, formatoId } from "../../utils/process.jsx";
 import { Toaster } from "sonner";
 import ErrorSystem from "../../components/errores/ErrorSystem";
 import Navbar from "../../components/navbar/Navbar";
@@ -78,7 +78,7 @@ function Recreador() {
                 <div className="w-100 flex-column flex-md-row d-flex justify-content-between">
                   <div className="w-100 w-md-50">
                     <strong>Codigo:</strong>
-                    <p className="m-0 mb-1">{formatoNumero(data.id)}</p>
+                    <p className="m-0 mb-1">{formatoId(data.id)}</p>
                   </div>
                   <div className="w-100 w-md-50">
                     <strong>Documento:</strong>

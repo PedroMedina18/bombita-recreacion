@@ -4,7 +4,7 @@ import { sobrecargos } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx"
-import { formatoNumero } from "../../utils/process.jsx"
+import { formatoId } from "../../utils/process.jsx"
 import { alertInfo } from "../../components/alerts.jsx"
 import Navbar from "../../components/navbar/Navbar"
 import Table from "../../components/table/Table"
@@ -37,7 +37,7 @@ function Niveles() {
   const columns = [
     {
       name: "Codigo",
-      row: (row) => { const codigo = formatoNumero(Number(row.id)); return codigo}
+      row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
     },
     {
       name: "Nombre",
@@ -49,7 +49,7 @@ function Niveles() {
     },
     {
         name: "Monto",
-        row: (row) => { return `${row.monto} $` }
+        row: (row) => { return `${normalizeDecimalNumber(row.monto)} $` }
     },
   ]
   const options = {

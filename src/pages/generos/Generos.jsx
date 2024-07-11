@@ -3,7 +3,7 @@ import { Toaster } from "sonner";
 import { generos } from "../../utils/API.jsx";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx";
-import { formatoNumero } from "../../utils/process.jsx";
+import { formatoId } from "../../utils/process.jsx";
 import { alertInfo } from "../../components/alerts.jsx";
 import Navbar from "../../components/navbar/Navbar";
 import Table from "../../components/table/Table";
@@ -36,7 +36,7 @@ function Generos() {
     const columns = [
         {
             name: "Codigo",
-            row: (row) => { const codigo = formatoNumero(Number(row.id)); return codigo}
+            row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
         },
         {
             name: "Nombre",
@@ -86,7 +86,7 @@ function Generos() {
     }
 
     return (
-        <Navbar name={`${texts.pages.getGenero.name}`} descripcion={`${texts.pages.getGenero.description}`}>
+        <Navbar name={`${texts.pages.getGeneros.name}`} descripcion={`${texts.pages.getGeneros.description}`}>
 
             <Table
                 columns={columns}

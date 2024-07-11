@@ -35,11 +35,7 @@ function Form_Eventos() {
                 setError: setErrorServer,
                 setOptions: setTipoDocumentos
             })
-            verifyOptionsSelect({
-                respuesta: get_clientes,
-                setError: setErrorServer,
-                setOptions: setClientes
-            })
+            setClientes(get_clientes.data.data)
             setServicios(get_servicios.data.data)
             setSobrecargos(get_sobrecargos.data.data)
         } catch (error) {

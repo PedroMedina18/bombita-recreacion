@@ -3,6 +3,8 @@ import Login from './pages/login/Login';
 import Error404 from './pages/Error404';
 import Inicio from './pages/Inicio';
 import Cargos from "./pages/cargos/Cargos";
+import Clientes from "./pages/clientes/Clientes";
+import Form_Clientes from "./pages/clientes/Form_Clientes";
 import Form_Cargos from "./pages/cargos/Form_Cargos"
 import Tipo_Documento from "./pages/tipoDocumento/Tipo_Documento";
 import Form_Tipo_Documento from "./pages/tipoDocumento/Form_Tipo_Documento";
@@ -23,7 +25,7 @@ import Servicios from "./pages/servicios/Servicios";
 import Sobrecargos from "./pages/sobrecargos/Sobrecargos";
 import Form_Sobrecargos from "./pages/sobrecargos/Form_Sobrecargos";
 import Form_Servicios from "./pages/servicios/Form_Servicios";
-import Form_Eventos from "./pages/eventos/Form_Eventos";
+import Eventos from "./pages/eventos/Eventos";
 import FormDataEvent from "./pages/eventos/FormDataEvent";
 import FormAccount from "./pages/eventos/FormAccount";
 import {FormEventContextProvider} from "./context/FormEventContext.jsx";
@@ -39,6 +41,7 @@ function App() {
             <Route path="/register/cargo" element={<Form_Cargos />} />
             <Route path="/edit/cargo/:id" element={<Form_Cargos />} />
             <Route path="/usuarios" element={<Usuarios />} />
+            <Route path="/eventos" element={<Eventos />} />
             <Route path="/register/eventos/" element={<FormEventContextProvider />} >
               <Route path="" element={<FormDataEvent />} />
               <Route path="account" element={<FormAccount />} />
@@ -69,6 +72,8 @@ function App() {
             <Route path="/servicios" element={<Servicios />} />
             <Route path="/register/servicio" element={<Form_Servicios />} />
             <Route path="/edit/servicio/:id" element={<Form_Servicios />} />
+            <Route path="/clientes" element={<Clientes />} />
+            <Route path="/edit/cliente/:numero_documento" element={<Form_Clientes />} />
           </Route>
           <Route path="*" element={<Error404 />} />
         </Routes>

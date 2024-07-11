@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { InputsGeneral, UnitSelect, InputTextTarea, InputCheck } from "../../components/input/Inputs.jsx"
+import { InputsGeneral, UnitSelect, InputTextTarea, InputCheck, SelectAsync } from "../../components/input/Inputs.jsx"
 import { ButtonSimple } from "../../components/button/Button"
 import { useNavigate } from 'react-router-dom'
 import { useForm } from "react-hook-form";
+import { clientes } from "../../utils/API.jsx";
 import { toastError } from "../../components/alerts.jsx"
-import { hasLeadingOrTrailingSpace, formatoFechaInput } from "../../utils/process.jsx"
+import { hasLeadingOrTrailingSpace, formatoFechaInput, FalseTrue } from "../../utils/process.jsx"
 import { getPersona, habilitarEdicion } from "../../utils/actions.jsx"
 import { Collapse } from "bootstrap";
 import { useFormEventContext } from "../../context/FormEventContext.jsx"
@@ -14,23 +15,25 @@ import pattern from "../../context/pattern.js";
 
 
 function FormDataEvent() {
-    const { dataTipo_documentos, dataClientes, dataNewUser, setdataNewUser, dataPersona, setPersona, setDataEvent, dataEvent } = useFormEventContext()
+    const { dataTipo_documentos, dataClientes, dataNewUser, valueCliente, setValueCliente, setdataNewUser, dataPersona, setPersona, setDataEvent, dataEvent } = useFormEventContext()
     const [disabledInputs, setDisabledInputs] = useState(false)
     const [isClient, setIsClient] = useState(true)
     const navigate = useNavigate();
-    const [debounceTimeout, setDebounceTimeout] = useState(null);
+    const [debounceTimeoutPersona, setDebounceTimeoutPersona] = useState(null);
+    const [debounceTimeoutCliente, setDebounceTimeoutCliente] = useState(null);
+    const [submit, setSubmit] = useState(false);
     const [fechaActual] = useState(new Date())
     const renderizado = useRef(0)
 
     useEffect(() => {
-        console.log("bbj")
         const keys = Object.keys(dataEvent);
         keys.forEach(key => {
             setValue(key, `${dataEvent[`${key}`]}`)
         });
-        if(getValues("cliente")){
+        if (valueCliente) {
             setIsClient(true)
         }
+        
         collapseElements()
     }, [])
 
@@ -44,11 +47,13 @@ function FormDataEvent() {
         getValues,
 
     } = useForm();
-    
+
     // *Funcion para registrar
     const onSubmit = handleSubmit(
         async (data) => {
-            console.log(data)
+            if(!valueCliente && !getValues("newClient")){
+                return
+            }
             try {
                 setDataEvent({
                     ...dataEvent,
@@ -66,9 +71,10 @@ function FormDataEvent() {
     const collapseElements = (domm = null) => {
         const collapseClient = new Collapse("#Cliente", { toggle: false })
         const collapseDataClient = new Collapse("#DataCliente", { toggle: false })
-        let checkDom = domm ? domm.target.checked : getValues("newClient")
-        checkDom ==="false"? false : true
-        if (checkDom) {
+        const checkDom = domm ? domm.target.checked : getValues("newClient")
+        if (FalseTrue(checkDom)) {
+            setIsClient(false)
+            setValueCliente(null)
             collapseClient.hide()
             collapseDataClient.show()
         } else {
@@ -77,7 +83,29 @@ function FormDataEvent() {
             collapseDataClient.hide()
         }
     }
+    const loadOptionsCliente = (inputValue, callback) => {
+        if (debounceTimeoutCliente) {
+            clearTimeout(debounceTimeoutCliente);
+        }
 
+        const timeout = setTimeout(async () => {
+            try {
+                const respuesta = await clientes.get({ paramOne: inputValue })
+                if (respuesta.status !== 200) {
+                    callback([])
+                }
+                if (respuesta.data.status === false) {
+                    callback([])
+                }
+                callback(respuesta.data.data)
+            }
+            catch {
+                callback([])
+            }
+        }, 800);
+
+        setDebounceTimeoutCliente(timeout);
+    }
     return (
         <form className="w-100 d-flex flex-column"
             onSubmit={onSubmit}
@@ -88,26 +116,34 @@ function FormDataEvent() {
                 }
             />
             <div className="w-100 d-flex flex-column justify-content-between align-item-center">
-                <InputCheck label={`${texts.label.clienteCheck}`} name="newClient" id="newClient" form={{ errors, register }}
+                <InputCheck label={`${texts.label.clienteCheck}`} name="newClient" id="newClient" form={{ errors, register }} checked={!isClient}
                     onClick={(e) => {
                         collapseElements(e)
                     }}
                 />
 
-                <div className="collapse show" id="Cliente">
-                    <UnitSelect label={`${texts.label.cliente}`} name="cliente" id="cliente" form={{ errors, register }}
-                        options={dataClientes}
-                        params={{
-                            validate: (value) => {
+                <div className={`collapse show`} id="Cliente">
+                    <div className={`w-100 ${Boolean(!valueCliente && submit && !getValues("newClient")) ? "error" : ""}`}>
+                        <SelectAsync
+                            id="cliente"
+                            label={`${texts.label.cliente}`}
+                            placeholder={`Buscar Clientes`}
+                            optionsDefault={dataClientes}
+                            getOptionLabel={(e) => { return `${e.nombres} ${e.apellidos} ${e.tipo_documento}-${e.numero_documento}`}}
+                            getOptionValue={(e) => { return e.id}}
+                            value={valueCliente}
+                            setValue={setValueCliente}
+                            loadOptions={loadOptionsCliente}
+                        />
+                        {Boolean(!valueCliente && submit && !getValues("newClient")) ? (
+                            <span className="message-error visible">
+                                {texts.inputsMessage.selectCliente}
+                            </span>
+                        ) : (
+                            <span className="message-error invisible">Sin errores</span>
+                        )}
+                    </div>
 
-                                if (!(value)  && !getValues("newClient")) {
-                                    return texts.inputsMessage.selectCliente
-                                } else {
-                                    return true
-                                }
-                            }
-                        }}
-                    />
                 </div>
             </div>
 
@@ -127,7 +163,7 @@ function FormDataEvent() {
                 />
 
                 <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
-                    <div className="w-md-25  w-100 pe-0 pe-md-3">
+                    <div className="w-md-25  w-100 pe-0 pe-md-3 d-flex align-item-center">
                         <UnitSelect label={texts.label.tipoDocuemnto} name="tipo_documento" id="tipo_documento" form={{ errors, register }}
                             options={dataTipo_documentos}
                             params={{
@@ -160,7 +196,7 @@ function FormDataEvent() {
 
                     {/* Sección de cliente */}
 
-                    <div className="w-100 w-md-75 ps-0 ps-md-3 ">
+                    <div className="w-100 w-md-75 ps-0 ps-md-3 d-flex align-item-center">
                         <InputsGeneral label={texts.label.documento} type="number" name="numero_documento" id="numero_documento" form={{ errors, register }}
                             params={{
                                 required: {
@@ -182,8 +218,8 @@ function FormDataEvent() {
                                         ...dataNewUser,
                                         numero_documento: e.target.value
                                     })
-                                    if (debounceTimeout) {
-                                        clearTimeout(debounceTimeout);
+                                    if (debounceTimeoutPersona) {
+                                        clearTimeout(debounceTimeoutPersona);
                                     }
                                     const timeout = setTimeout(() => {
                                         getPersona({
@@ -193,7 +229,7 @@ function FormDataEvent() {
                                             setDisabledInputs
                                         })
                                     }, 900);
-                                    setDebounceTimeout(timeout);
+                                    setDebounceTimeoutPersona(timeout);
                                 }
                             }
                             onBlur={(e) => {
@@ -406,7 +442,10 @@ function FormDataEvent() {
                     />
                 </div>
             </div>
-            <ButtonSimple type="submit" className="mx-auto w-50 mt-3" onClick={()=>{console.log(errors)}}>
+            <ButtonSimple type="submit" className="mx-auto w-50 mt-3"
+                onClick={(e) => {
+                    setSubmit(true);
+                }}>
                 Registrar
             </ButtonSimple>
         </form>

@@ -1,7 +1,6 @@
 @import "transition-style";
 
 .overlay {
-  
   width: 100vw;
   height: 100vh;
   position: fixed;
@@ -12,7 +11,7 @@
   justify-content: center;
   align-items: center;
   z-index: 500;
-  clip-path: inset(0 0 0 0);
+  clip-path: inset(0 100% 0 0);
 }
 
 .content-modal {
@@ -54,16 +53,15 @@
   min-height: 200px;
   max-height: 450px;
   width: 100%;
-  overflow-x: auto;
   overflow-y: auto;
   padding-bottom: 5px;
 }
-.body-modal ::-webkit-scrollbar {
+.body-modal::-webkit-scrollbar {
+  width: 10px;
   background-color: transparent;
-  height: 10px;
-  margin-top: 5px;
 }
-.body-modal ::-webkit-scrollbar-thumb {
+
+.body-modal::-webkit-scrollbar-thumb {
   background-color: rgb(var(--secundario));
   border-radius: 10px;
 }
@@ -93,17 +91,7 @@ tr.tr-select {
   animation: 0.45s ease-in wipe-in-right both;
 }
 
-/* @keyframes wipe-out-stop {
-  from {
-    clip-path: inset(0 0 0 0);
-  }
-  to {
-    clip-path: inset(0 0 0 0);
-  }
-}
-[transition-style="out:wipe:stop"] {
-  animation: 0.45s ease-in wipe-in-right both;
-} */
+
 
 
 @keyframes wipe-out-left {
@@ -138,6 +126,6 @@ tr.tr-select {
 }
 @media (max-width: 576px) {
   .content-modal {
-    width: 400px;
+    width: 450px;
   }
 }

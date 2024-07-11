@@ -45,20 +45,26 @@ table.table-data,
 .table-loading {
   width: 100%;
   border-collapse: collapse;
+  border:2px solid rgb(92, 92, 92); 
   table-layout: auto;
+}
+
+table.table-data.border-table{
+  border:2px solid rgb(92, 92, 92); 
 }
 .table-loading {
   border: 2px solid rgb(92, 92, 92);
 }
+
 table.table-data th,
 table.table-data td {
   text-align: center;
-  padding: 5px 5px;
+  padding: 10px 5px;
   border: 2px solid rgb(92, 92, 92);
-  max-width: 50px;
   min-width: max-content;
   word-wrap: break-word;
 }
+
 table.table-data.border-none th,
 table.table-data.border-none td {
   border-right: none;
@@ -123,6 +129,18 @@ table svg.eliminate:hover {
   }
   table.table-data td,
   table.table-data th {
-    padding: 5px 6px;
+    padding: 10px 6px;
+  }
+}
+
+@media (min-width: 992px) {
+  table.table-data th{
+    max-width: 100px;
+  }
+}
+
+@media (min-width: 576px) {
+  table.table-data th{
+    max-width: 150px;
   }
 }

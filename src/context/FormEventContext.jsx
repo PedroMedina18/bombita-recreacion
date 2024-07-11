@@ -11,6 +11,7 @@ export function FormEventContextProvider() {
     const [dataTipo_documentos, setTipoDocumentos] = useState([])
     const [dataServicios, setServicios] = useState([])
     const [dataSobrecargos, setSobrecargos] = useState([])
+    const [valueCliente, setValueCliente] = useState(null)
     const [dataClientes, setClientes] = useState([])
     const [saveDataServicios, setSaveDataServicios] = useState([])
     const [saveDataSobrecargos, setSaveDataSobrecargos] = useState([])
@@ -29,6 +30,8 @@ export function FormEventContextProvider() {
         dataPersona, 
         dataEvent, 
         dataClientes, 
+        valueCliente, 
+        setValueCliente,
         setClientes,
         setDataEvent,
         setPersona,

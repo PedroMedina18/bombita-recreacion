@@ -38,3 +38,5 @@ export const materiales=new Petisions("materiales");
 export const tipo_documentos=new Petisions("tipo_documentos");
 
 export const servicios=new Petisions("servicios");
+
+export const respaldo=new Petisions("respaldo");
