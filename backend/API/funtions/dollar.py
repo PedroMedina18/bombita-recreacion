@@ -19,6 +19,8 @@ def consultDollar(cursor):
     # Obtener la fecha y hora actuales del servidor
     fecha_hora_actual = datetime.datetime.now()
 
+    print(fecha_hora_actual)
+
     # si el registro es del mismo dia pero superior a las 12:00PM se devuelve el mismo registro
     if ultimo_registro and ultimo_registro[2] >= fecha_hora_actual.replace(hour=12, minute=0, second=0):
         dollar={
@@ -43,7 +45,7 @@ def registroDollar():
     dollar = requests.get('https://pydolarvenezuela-api.vercel.app/api/v1/dollar?page=bcv', timeout=2.00)
     data=dollar.json()
     precioDollarBCV=data["monitors"]["usd"]["price"]
-    PrecioDolar.objects.create(precio=precioDollarBCV)
+    PrecioDolar.objects.create(precio=precioDollarBCV, fecha_registro=datetime.datetime.now())
     dollar={
             "price":precioDollarBCV,
             "fecha":datetime.datetime.now()

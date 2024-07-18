@@ -28,7 +28,7 @@ function FormDataEvent() {
     useEffect(() => {
         const keys = Object.keys(dataEvent);
         keys.forEach(key => {
-            setValue(key, `${dataEvent[`${key}`]}`)
+            setValue(key, dataEvent[`${key}`])
         });
         if (valueCliente) {
             setIsClient(true)

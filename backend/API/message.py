@@ -2,6 +2,7 @@
 MESSAGE={
     "registerActividad":"Registro de actividad completado",
     "registerCargo":"Registro de cargo completado",
+    "registerMetodoPago":"Registro de metodo de pago completado",
     "registerGenero":"Registro de genero completado",
     "registerMaterial":"Registro de material completado",
     "registerNivel":"Registro de nivel completado",
@@ -10,6 +11,7 @@ MESSAGE={
     "registerServicio":"Registro de servicio completado",
     "registerRecreador":"Registro de recreador completado",
     "registerEvento":"Registro de evento completado",
+    "registerPago":"Registro de pago completado",
     "exitoGet":"Exito",
     "edition":"Exito. Registro editado",
     "delete":"Exito. Registro eliminado",
@@ -27,6 +29,7 @@ MESSAGE={
     "errorPut":"Error de consulta put",
     "errorIntegrity":"Error de integridad",
     "errorDuplicate":"Error de campo duplicado",
+    "errorPago":"No existen ningun pago a registrar",
     "errorDelete":"Error de consulta put",
     "errorProteccion":"Error de protección",
     "errorProtectEvento":"Evento protejido no se puede eliminar",
@@ -42,6 +45,7 @@ MESSAGE={
     
 
     "nombreDuplicate": "Nombre duplicado. El campo nombre debe ser unico",
+    "tipoPago": "Tipo de Pago no valido",
     "correoDuplicate": "Correo duplicado. El campo correo debe ser unico",
     "documentoDuplicate": "Número de Documento duplicado. El campo numero de documento debe ser unico",
     "telefonoPrincipalDuplicate": "Teléfono duplicado. El campo teléfono principal debe ser unico",

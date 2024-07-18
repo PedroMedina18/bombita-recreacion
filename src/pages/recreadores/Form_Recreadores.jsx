@@ -165,7 +165,7 @@ function Form_Recreadores() {
     )
 
     return (
-        <Navbar name={`${recreador.id? texts.pages.editRecreadores.name : texts.pages.registerRecreadores.name}`} descripcion={`${recreador.id? texts.pages.editRecreadores.description : texts.pages.registerRecreadores.description}`}>
+        <Navbar name={`${recreador.id? texts.pages.editRecreador.name : texts.pages.registerRecreadores.name}`} descripcion={`${recreador.id? texts.pages.editRecreadores.description : texts.pages.registerRecreadores.description}`}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/recreadores") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
             {

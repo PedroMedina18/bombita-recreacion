@@ -147,6 +147,9 @@ function Navbar({ children, name, descripcion, dollar=false }) {
                             <span>Configuración</span>
                         </a>
                         <ul id="configuracion" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                        <li className="sidebar-item">
+                                <Link to="/dolar" className="sidebar-link">Dolar</Link>
+                            </li>
                             <li className="sidebar-item">
                                 <Link to="/cargos" className="sidebar-link">Cargos</Link>
                             </li>
@@ -155,6 +158,9 @@ function Navbar({ children, name, descripcion, dollar=false }) {
                             </li>
                             <li className="sidebar-item">
                                 <Link to="/generos" className="sidebar-link">Generos</Link>
+                            </li>
+                            <li className="sidebar-item">
+                                <Link to="/metodos_pago" className="sidebar-link">Metodos de Pago</Link>
                             </li>
                         </ul>
                     </li>

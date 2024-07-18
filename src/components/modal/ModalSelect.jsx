@@ -49,14 +49,17 @@ function ModalSelect({ titulo, columns, object, saveSelect, estado, setEstado, s
         setDebounceTimeout(timeout);
     }, [searchTerm])
     useEffect(() => {
+        const body = document.querySelector("body")
         // Para evitar el sobre renderizado al cargar el componente
         if (renderizado.current === 1 || renderizado.current === 2 || renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             return
         }
         if(estado){
+            body.setAttribute('style', 'overflow: hidden')
             setAnimateState("in:wipe:right")
         }else{
+            body.setAttribute('style', 'overflow: auto')
             setAnimateState("out:wipe:left")
         }
     }, [estado])

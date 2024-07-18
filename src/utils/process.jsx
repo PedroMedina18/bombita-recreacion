@@ -62,7 +62,7 @@ export const formatoId = (numero) => {
 export function formatDateWithTime12Hour(date) {
   const fecha = new Date(date);
   const options = {
-    day: 'numeric',
+    day: '2-digit',
     month: 'long',
     year: 'numeric',
     hour: '2-digit',

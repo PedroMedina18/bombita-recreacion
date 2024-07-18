@@ -2,52 +2,27 @@
 
 Aspectos de organizacion de codigo 
 
------NOTA----
-
-ESTO NO SON TAREAS OBLIGATORIAS PERO SE AGRADECE YO DEL FUTURO MIRA QUE SI NO VA A SER UN 
-ARROZ CON MANGO  '_'
---- RECUERDA TENER UNA COPIA DE LA BASE DE DATOS PARA NO TENER QUE SUFRIR LUEGO
---- PON TAMBIEN APARTE LA CARTA ESCTRUTURADA Y EL DIAGRAMA ENTIDAD REALCION
-
-
+-----NOTAS----
 --- No SE TE OLVIDE COMENTAR EL CODIGO ESTO ES IMPORTANTE
 --- ORGANIZA TODOS LOS ICONOS EN ASSETS ESTAN DESORGANIZADOS Y ESPARCIDOS
 --- COMENTA LAS FUNCIONES DE LAS PAGINAS
 --- MANEJA MEJOR LOS ERRORES EN EL BAKECND Y LAS CONSULTAS
 --- REVISA LOS COLORES 
 --- MEJORA EL PUTO LOGIN
---- REVISA EL CSS
+
+
 
 
 TAREAS DE LOS MODULOS
-
-
 IMPORTANTES
 
+
+------
 --*Hacer la Pagina 404
-
--* COMPLETA LOS CRUD DE LAS PAGINAS:
--- USUARIO
--- EVENTOS
--- MATERIALES
--- ACTIVIDADES
---SERVICIOS
--- NIVELES RECREADORES
--- CARGOS
--- TIPOS DE DOCUMENTOS
-
--* Recuerda la permisologia tienes que investigar y acomodar antes de seguir avanzando
--* Recuerda la parte de verificacion del dolar
-
-
-no tan importantes pero TIENES QUE HACERLO CARAJO
-
--*ACOMODA EL DISEÑO DEL LOGIN
--* MEJORA LA PARTE ALTA DEL DISEÑO
-
-
-
-
-29/05/2024
-
---*Tarea especial busca un efecto pavito para el hover del boton del menu
+--PARA AHORRAR CODIGO Y SIMPLICAR POSIBLES EDICIONES COMPRUEBA CUALES INTERFACES TANTO DE BACKEND COMO DE FRONTEND QUE SEAN "IGUALES" COLOCA UNA UNIVERSAL Y BUSCA LAS VARIABLES PARA NO TENER QUE REPETIR
+--Corrovolar los documentos de identidad estos pueden ser igual siempre y cuando no sehan del mismo tipo
+--Colocar la seccion de informacion al dar hover creo se llama togle
+-Recuerda la permisologia tienes que investigar y acomodar antes de seguir avanzando
+-gESTION DE RECREADORES
+-GESTION DE PAGOS
+-GESTION DE EVENTOS

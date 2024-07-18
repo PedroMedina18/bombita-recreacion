@@ -72,6 +72,7 @@ const texts={
         registerGenero:"Genero Registrado",
         registerSobrecargo:"Sobrecargo Registrado",
         registerEvento:"Evento Registrado",
+        registerMetodoPago:"Metodo de Pago Registrado",
         // -----------------------------------------------------------
         editionUsuario:"Usuario Editado",
         editionNivel:"Nivel Editado",
@@ -84,6 +85,7 @@ const texts={
         editionServicio:"Servicio Editado",
         editionGenero:"Genero Editado",
         editionSobrecargo:"Sobrecargo Editado",
+        editionMetodoPago:"Metodo de Pago Editado",
     },
 
     confirmMessage:{
@@ -156,6 +158,7 @@ const texts={
         nameActividad:"Nombre de la Actividad",
         nameCargo:"Nombre del Cargo",
         nameGenero:"Nombre del Genero",
+        nameMetodoPago:"Nombre del Metodo de Pago",
         nameMaterial:"Nombre del Material",
         nameNivel:"Nombre de la Nivel",
         nameSobrecargos:"Nombre de la Sobrecargos",
@@ -209,19 +212,27 @@ const texts={
             name:"Registrar un Nuevo Recreador",
             description:"Intruduzca los datos para agregar un nuevo recreador al sistema"
         },
-        editRecreadores:{
+        registerMetodoPago:{
+            name:"Registrar un Nuevo Metodo de Pago",
+            description:"Intruduzca los datos para agregar un nuevo metodo de pago al sistema"
+        },
+        editRecreador:{
             name:"Editar un Recreador",
             description:"Intruduzca los datos para editar un recreador en el sistema"
         },
-        editActividades:{
+        editActividad:{
             name:"Editar una Actividad",
             description:"Intruduzca los datos para editar una Actividad"
         },
-        editCargos:{
+        editMetodoPago:{
+            name:"Editar un Metodo de Pago",
+            description:"Intruduzca los datos para editar un Metodo de Pago"
+        },
+        editCargo:{
             name:"Editar un Cargo",
             description:"Intruduzca los datos para editar un cargo"
         },
-        editNiveles:{
+        editNivel:{
             name:"Editar un  Nivel",
             description:"Intruduzca los datos para editar un nivel"
         },
@@ -293,6 +304,14 @@ const texts={
             name:"Lista de Servicios",
             description:"Verifique los servicios agregados"
         },
+        getMetodosPago:{
+            name:"Lista de los metodos de pago",
+            description:"Verifique los metodos de pagos agregados"
+        },
+        getDolar:{
+            name:"Lista de Precios del Dolar BCV",
+            description:"Verifique los registros agregados"
+        },
         recreador:{
             name:"Información del Recreador",
             description:"Toda la información del recreador"
@@ -310,6 +329,7 @@ const texts={
         buttonRegisterActividad:"Agregar una nueva actividad",
         buttonRegisterRecreador:"Agregar un nuevo recreador",
         buttonRegisterSobrecargo:"Agregar un nuevo sobrecargo",
+        buttonRegisterMetodoPago:"Agregar un nuevo metodo de pago",
         buttonRegisterServicio:"Agregar un nuevo servicio",
         buttonRegisterEvento:"Agregar un nuevo evento",
         buttonRegisterEventosuccessMessage:"Agregar un nuevo evento",

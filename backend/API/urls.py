@@ -1,23 +1,5 @@
 from django.urls import path
-from .views.cargos import Cargos_Views
-from .views.login import Login
-from .views.permisos import Permisos_Views
-from .views.tipo_documento import Tipo_Documento_Views
-from .views.permisos import Permisos_Views
-from .views.personas import Persona_Views
-from .views.usuarios import Usuario_Views
-from .views.materiales import Materiales_Views
-from .views.actividades import Actividades_Views
-from .views.recreadores import Recreadores_Views
-from .views.niveles import Nivel_Views
-from .views.sobrecargos import Sobrecargo_Views
-from .views.verify_token import Verify_Token_Views
-from .views.servicios import Servicios_Views
-from .views.generos import Genero_Views
-from .views.eventos import Eventos_Views
-from .views.clientes import Clientes_Views
-from .views.respaldo import Respaldo
-# from .views.dollar import Dollar_View
+from .views.view import Metodos_Pagos_Views, Actividades_Views, Cargos_Views, Clientes_Views, Dollar_View, Eventos_Views, Genero_Views, Login, Materiales_Views, Nivel_Views, Permisos_Views, Persona_Views, Recreadores_Views, Respaldo, Servicios_Views, Sobrecargo_Views, Tipo_Documento_Views, Usuario_Views, Verify_Token_Views
 
 urlpatterns=[
     path('cargos/', Cargos_Views.as_view(), name='cargos'),
@@ -26,6 +8,7 @@ urlpatterns=[
     path('tipo_documentos/', Tipo_Documento_Views.as_view(), name='tipo_documentos'),
     path('tipo_documentos/<int:id>/', Tipo_Documento_Views.as_view(), name='tipo_documento'),
     path('niveles/', Nivel_Views.as_view(), name='niveles'),
+    path('dolar/', Dollar_View.as_view(), name='doalr'),
     path('niveles/<int:id>/', Nivel_Views.as_view(), name='nivel'),
     path('generos/', Genero_Views.as_view(), name='generos'),
     path('generos/<int:id>/', Genero_Views.as_view(), name='genero'),
@@ -35,6 +18,8 @@ urlpatterns=[
     path('actividades/<int:id>/', Actividades_Views.as_view(), name='actividad'),
     path('materiales/', Materiales_Views.as_view(), name='materiales'),
     path('materiales/<int:id>/', Materiales_Views.as_view(), name='material'),
+    path('metodos_pago/', Metodos_Pagos_Views.as_view(), name='metodos_pago'),
+    path('metodos_pago/<int:id>/', Metodos_Pagos_Views.as_view(), name='metodo_pago'),
     path('servicios/', Servicios_Views.as_view(), name='servicios'),
     path('servicios/<int:id>/', Servicios_Views.as_view(), name='servicio'),
     path('personas/<int:tipo_documento>/<int:documento>/', Persona_Views.as_view(), name='personas'),

@@ -6,7 +6,7 @@ from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..funtions.email import emailRegistroEvento
-from ..models import Eventos, EventosSobrecargos, EventosServicios, Clientes, Personas, Servicios, PrecioDolar, Sobrecargos, TipoDocumento
+from ..models import Eventos, EventosSobrecargos, EventosServicios, Clientes, Personas, Servicios, Sobrecargos, TipoDocumento
 from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
 from ..message import MESSAGE
@@ -76,7 +76,6 @@ class Eventos_Views(View):
                         tipo_documento = tipo_documento
                     )
                 cliente = Clientes.objects.create(persona = persona)
-            precio_dolar = PrecioDolar.objects.latest('id')
             if cliente.persona.correo:
                 emailRegistroEvento(cliente.persona.correo)
             evento = Eventos.objects.create(
@@ -85,7 +84,6 @@ class Eventos_Views(View):
                 numero_personas = int(req["numero_personas"]), 
                 cliente = cliente,
                 completado = False,
-                precioDolar = precio_dolar
             )
             servicios = req['servicios']
             for servicio in servicios:
@@ -136,7 +134,8 @@ class Eventos_Views(View):
                 return JsonResponse(datos)
             evento = list(Eventos.objects.filter(id=id).values())
             if len(evento) > 0:
-                if (not evento[0].completado):
+                evento=evento[0]
+                if (not evento['completado'] and not evento['anticipo'] and not evento['pagado']):
                     Eventos.objects.filter(id=id).delete()
                     datos = {
                         'status': True,
@@ -183,10 +182,10 @@ class Eventos_Views(View):
                     SELECT 
                         eve.id,
                     	eve.fecha_evento,
-                        pe.nombres, 
-                        pe.apellidos, 
+                        per.nombres, 
+                        per.apellidos, 
                         tipo.nombre AS tipo_documento, 
-                        pe.numero_documento,
+                        per.numero_documento,
                         eve.numero_personas,
                         eve.direccion,
                         eve.completado,
@@ -194,18 +193,44 @@ class Eventos_Views(View):
                         eve.fecha_actualizacion
                     FROM eventos AS eve
                     LEFT JOIN clientes AS cli ON eve.cliente_id=cli.id
-                    LEFT JOIN personas AS per ON cli.persona_id=per.id
-                    LEFT JOIN tipo_documentos AS tipo ON pe.tipo_documento_id=tipo.id
-                    WHERE pe.numero_documento LIKE %s ;
+                    INNER JOIN personas AS per ON cli.persona_id=per.id
+                    LEFT JOIN tipo_documentos AS tipo ON per.tipo_documento_id=tipo.id
+                    WHERE eve.id LIKE %s ;
                     """
                 cursor.execute(query, [id])
-
                 evento = dictfetchall(cursor)
                 if info == "true" and len(evento) > 0:
+                    evento = evento[0]
+                    query = """
+                    SELECT 
+                        ser.nombre,
+                        ser.descripcion,
+                        ser.precio
+                    FROM servicios_eventos AS seve
+                    INNER JOIN servicios AS ser ON seve.servicio_id=ser.id
+                    WHERE seve.evento_id=%s;
+                    """
+                    cursor.execute(query, [int(evento['id'])])
+                    servicios = dictfetchall(cursor)
+                    query = """
+                    SELECT 
+                        so.nombre,
+                        so.descripcion,
+                        so.monto
+                    FROM sobrecargos_eventos AS sove
+                    INNER JOIN sobrecargos AS so ON sove.sobrecargo_id=so.id
+                    WHERE sove.evento_id=%s;
+                    """
+                    cursor.execute(query, [int(evento['id'])])
+                    sobrecargo = dictfetchall(cursor)
                     datos = {
                         "status": True,
                         "message": f"{MESSAGE['exitoGet']}",
-                        "data": {"info": evento[0]},
+                        "data": {
+                            "info": evento,
+                            "servicios": servicios,
+                            "sobrecargo": sobrecargo,
+                        }
                     }
 
                 elif info == "false" and len(evento) > 0:
@@ -230,17 +255,17 @@ class Eventos_Views(View):
                     SELECT 
                         eve.id,
                     	eve.fecha_evento,
-                        pe.nombres, 
-                        pe.apellidos, 
+                        per.nombres, 
+                        per.apellidos, 
                         tipo.nombre AS tipo_documento, 
-                        pe.numero_documento,
+                        per.numero_documento,
                         eve.numero_personas,
                         eve.fecha_registro,
                         eve.completado
                     FROM eventos AS eve
                     LEFT JOIN clientes AS cli ON eve.cliente_id=cli.id
-                    LEFT JOIN personas AS pe ON cli.persona_id=pe.id
-                    LEFT JOIN tipo_documentos AS tipo ON pe.tipo_documento_id=tipo.id
+                    LEFT JOIN personas AS per ON cli.persona_id=per.id
+                    LEFT JOIN tipo_documentos AS tipo ON per.tipo_documento_id=tipo.id
                     ORDER BY eve.id ASC LIMIT %s, %s;
                     """
                     cursor.execute(query, [indiceInicial(int(request.GET["page"])),indiceFinal(int(request.GET["page"])),],)
@@ -251,17 +276,17 @@ class Eventos_Views(View):
                     SELECT 
                         eve.id,
                     	eve.fecha_evento,
-                        pe.nombres, 
-                        pe.apellidos, 
+                        per.nombres, 
+                        per.apellidos, 
                         tipo.nombre AS tipo_documento, 
-                        pe.numero_documento,
+                        per.numero_documento,
                         eve.numero_personas,
                         eve.fecha_registro,
                         eve.completado
                     FROM eventos AS eve
                     LEFT JOIN clientes AS cli ON eve.cliente_id=cli.id
-                    LEFT JOIN personas AS pe ON cli.persona_id=pe.id
-                    LEFT JOIN tipo_documentos AS tipo ON pe.tipo_documento_id=tipo.id
+                    LEFT JOIN personas AS per ON cli.persona_id=per.id
+                    LEFT JOIN tipo_documentos AS tipo ON per.tipo_documento_id=tipo.id
                     ORDER BY eve.id DESC LIMIT %s, %s;
                     """
                     cursor.execute(query,[indiceInicial(int(request.GET["page"])), indiceFinal(int(request.GET["page"]))],)
@@ -272,17 +297,17 @@ class Eventos_Views(View):
                     SELECT 
                         eve.id,
                     	eve.fecha_evento,
-                        pe.nombres, 
-                        pe.apellidos, 
+                        per.nombres, 
+                        per.apellidos, 
                         tipo.nombre AS tipo_documento, 
-                        pe.numero_documento,
+                        per.numero_documento,
                         eve.numero_personas,
                         eve.fecha_registro,
                         eve.completado
                     FROM eventos AS eve
                     LEFT JOIN clientes AS cli ON eve.cliente_id=cli.id
-                    LEFT JOIN personas AS pe ON cli.persona_id=pe.id
-                    LEFT JOIN tipo_documentos AS tipo ON pe.tipo_documento_id=tipo.id
+                    LEFT JOIN personas AS per ON cli.persona_id=per.id
+                    LEFT JOIN tipo_documentos AS tipo ON per.tipo_documento_id=tipo.id
                     ORDER BY eve.id LIMIT 25;
                     """
                     cursor.execute(query)

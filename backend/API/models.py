@@ -47,9 +47,9 @@ class TipoDocumento(models.Model):
 class Personas(models.Model):
     nombres = models.CharField(max_length = 200)
     apellidos = models.CharField(max_length = 200)
-    numero_documento = models.BigIntegerField(unique = True)
+    numero_documento = models.BigIntegerField()
     telefono_principal = models.BigIntegerField(unique = True)
-    telefono_secundario = models.BigIntegerField()
+    telefono_secundario = models.BigIntegerField(blank=True, null=True, default=None)
     correo = models.EmailField(
         max_length = 100, null = True, blank = True, unique = True)
     tipo_documento = models.ForeignKey(
@@ -210,9 +210,10 @@ class Eventos(models.Model):
     numero_personas = models.IntegerField()
     cliente = models.ForeignKey(Clientes, on_delete = models.PROTECT, related_name = "eventos", db_column = "cliente_id")
     completado = models.BooleanField()
+    anticipo = models.BooleanField(default=False)
+    pagado = models.BooleanField(default=False)
     fecha_registro = models.DateTimeField(auto_now_add = True)
     fecha_actualizacion = models.DateTimeField(auto_now = True)
-    precioDolar = models.ForeignKey(PrecioDolar, on_delete = models.PROTECT, related_name = "eventos", db_column = "precio_dolar_id")
 
     class Meta:
         db_table = "eventos"
@@ -235,3 +236,24 @@ class EventosServicios(models.Model):
 
     class Meta:
         db_table = "servicios_eventos"
+
+class MetodosPago(models.Model):
+    nombre = models.CharField(max_length = 100, unique = True)
+    descripcion = models.CharField(max_length = 300)
+    referencia = models.BooleanField(default=False)
+    capture = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "metodos_pago"
+
+class Pagos(models.Model):
+    evento = models.ForeignKey(Eventos, on_delete = models.PROTECT, related_name = "pago", db_column = "evento_id")
+    metodoPago = models.ForeignKey(MetodosPago, on_delete = models.PROTECT, related_name = "evento", db_column = "metodo_pago_id")
+    tipo = models.BooleanField(default=False)
+    monto = models.FloatField()
+    precioDolar = models.ForeignKey(PrecioDolar, default=1, on_delete = models.PROTECT, related_name = "pago", db_column = "precio_dolar_id")
+    referencia = models.BigIntegerField(blank=True, null=True, default=None)
+    capture = models.FileField(upload_to = "capture_pago", null = True, blank = True)
+
+    class Meta:
+        db_table = "pagos"

@@ -17,6 +17,8 @@ import Form_Actividades from "./pages/actividades/Form_Actividades";
 import Recreadores from "./pages/recreadores/Recreadores"
 import Form_Recreadores from "./pages/recreadores/Form_Recreadores";
 import Recreador from "./pages/recreadores/Recreador";
+import Metodos_Pago from "./pages/metodos_pago/Metodos_Pago";
+import Form_Metodos_Pago from "./pages/metodos_pago/Form_Metodos_Pago";
 import Niveles from "./pages/niveles/Niveles";
 import Form_Niveles from "./pages/niveles/Form_Niveles";
 import Materiales from "./pages/materiales/Materiales";
@@ -26,6 +28,7 @@ import Sobrecargos from "./pages/sobrecargos/Sobrecargos";
 import Form_Sobrecargos from "./pages/sobrecargos/Form_Sobrecargos";
 import Form_Servicios from "./pages/servicios/Form_Servicios";
 import Eventos from "./pages/eventos/Eventos";
+import Dolar from "./pages/dolar/Dolar.jsx";
 import FormDataEvent from "./pages/eventos/FormDataEvent";
 import FormAccount from "./pages/eventos/FormAccount";
 import {FormEventContextProvider} from "./context/FormEventContext.jsx";
@@ -68,12 +71,16 @@ function App() {
             <Route path="/recreadores" element={<Recreadores />} />
             <Route path="/register/recreador" element={<Form_Recreadores />} />
             <Route path="/edit/recreador/:numero_documento" element={<Form_Recreadores />} />
-            <Route path="/inicio" element={<Inicio />} />
             <Route path="/servicios" element={<Servicios />} />
             <Route path="/register/servicio" element={<Form_Servicios />} />
             <Route path="/edit/servicio/:id" element={<Form_Servicios />} />
+            <Route path="/metodos_pago" element={<Metodos_Pago />} />
+            <Route path="/register/metodos_pago" element={<Form_Metodos_Pago />} />
+            <Route path="/edit/metodos_pago/:id" element={<Form_Metodos_Pago />} />
             <Route path="/clientes" element={<Clientes />} />
             <Route path="/edit/cliente/:numero_documento" element={<Form_Clientes />} />
+            <Route path="/dolar" element={<Dolar />} />
+            <Route path="/inicio" element={<Inicio />} />
           </Route>
           <Route path="*" element={<Error404 />} />
         </Routes>

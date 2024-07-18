@@ -40,3 +40,7 @@ export const tipo_documentos=new Petisions("tipo_documentos");
 export const servicios=new Petisions("servicios");
 
 export const respaldo=new Petisions("respaldo");
+
+export const metodoPago=new Petisions("metodos_pago");
+
+export const dolar=new Petisions("dolar");

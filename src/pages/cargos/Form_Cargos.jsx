@@ -62,7 +62,7 @@ function Cargos() {
             }
         }
     }
-
+    
     const get_cargos = async () => {
         try {
             const respuesta = await cargos.get({paramOne:Number(params.id)})
@@ -133,7 +133,7 @@ function Cargos() {
     )
 
     return (
-        <Navbar  name={params.id? texts.pages.editCargos.name : texts.pages.registerCargos.name} descripcion={params.id? texts.pages.editCargos.description : texts.pages.registerCargos.description}>
+        <Navbar  name={params.id? texts.pages.editCargo.name : texts.pages.registerCargos.name} descripcion={params.id? texts.pages.editCargos.description : texts.pages.registerCargos.description}>
             <ButtonSimple type="button" className="mb-2" onClick={()=>{navigate("/cargos")}}> <IconRowLeft/> Regresar</ButtonSimple>
             {
                 loading ?

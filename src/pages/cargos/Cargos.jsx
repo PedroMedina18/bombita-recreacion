@@ -79,7 +79,7 @@ function Cargos() {
         get:(row)=>{
             alertCargo(
               row.nombre, 
-              row
+              row.id
             )
         },
         register: {

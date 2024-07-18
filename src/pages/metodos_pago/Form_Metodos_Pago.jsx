@@ -1,41 +1,42 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react'
 import { useForm } from "react-hook-form";
-import { InputsGeneral, InputTextTarea } from "../../components/input/Inputs.jsx";
+import { useNavigate, useParams } from 'react-router-dom';
+import { InputsGeneral, InputTextTarea, InputCheck } from "../../components/input/Inputs.jsx";
 import { ButtonSimple } from "../../components/button/Button";
-import { useParams, useNavigate } from "react-router-dom";
-import { niveles } from "../../utils/API.jsx";
+import { metodoPago } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
-import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
 import { Toaster } from "sonner";
+import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
 import { controlResultPost } from "../../utils/actions.jsx";
 import { LoaderCircle } from "../../components/loader/Loader.jsx";
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import Navbar from "../../components/navbar/Navbar";
-import texts from "../../context/text_es.js";
 import Swal from 'sweetalert2';
+import texts from "../../context/text_es.js";
 import pattern from "../../context/pattern.js";
 import { IconRowLeft } from "../../components/Icon";
 
-function Form_Niveles() {
+function Form_Metodo_Pago() {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
     const params = useParams();
-    const [loading, setLoading] = useState(true)
-    const renderizado = useRef(0)
-    const [errorServer, setErrorServer] = useState("")
+    const renderizado = useRef(0);
+    const [errorServer, setErrorServer] = useState("");
 
     useEffect(() => {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             if (params.id) {
-                get_nivel()
+                get_metodosPago()
             }
+            setLoading(false)
             return
         }
     }, [])
 
-    const get_nivel = async () => {
+    const get_metodosPago = async () => {
         try {
-            const respuesta = await niveles.get(Number(params.id))
+            const respuesta = await metodoPago.get({ paramOne: Number(params.id) })
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
                 return
@@ -47,7 +48,7 @@ function Form_Niveles() {
             setErrorServer("")
             const keys = Object.keys(respuesta.data.data);
             keys.forEach(key => {
-                setValue(key, `${respuesta.data.data[`${key}`]}`)
+                setValue(key, respuesta.data.data[`${key}`])
             });
 
         } catch (error) {
@@ -58,6 +59,7 @@ function Form_Niveles() {
         }
     }
 
+
     // *the useform
     const {
         register,
@@ -65,7 +67,7 @@ function Form_Niveles() {
         formState: { errors },
         setValue,
         watch
-    } = useForm()
+    } = useForm();
 
     // *Funcion para registrar
     const onSubmit = handleSubmit(
@@ -77,15 +79,18 @@ function Form_Niveles() {
                     const body = {
                         nombre: data.nombre,
                         descripcion: data.descripcion,
+                        referencia: data.referencia,
+                        capture: data.capture
                     }
                     alertLoading("Cargando")
-                    const res = params.id ? await niveles.put(body, Number(params.id)) : await niveles.post(body)
+                    const res = params.id ? await metodoPago.put(body, Number(params.id)) : await metodoPago.post(body)
                     controlResultPost({
                         respuesta: res,
-                        messageExito: params.id ? texts.successMessage.editionNivel : texts.successMessage.registerMaterial,
-                        useNavigate: { navigate: navigate, direction: "/niveles" }
+                        messageExito: params.id ? texts.successMessage.editionMetodoPago : texts.successMessage.registerMetodoPago,
+                        useNavigate: { navigate: navigate, direction: "/metodos_pago" }
                     })
                 }
+
             } catch (error) {
                 console.log(error)
                 Swal.close()
@@ -93,9 +98,10 @@ function Form_Niveles() {
             }
         }
     )
+
     return (
-        <Navbar name={`${params.id ? texts.pages.editNivel.name : texts.pages.registerNiveles.name}`} descripcion={`${params.id ? texts.pages.editNiveles.description : texts.pages.registerNiveles.description}`}>
-            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/niveles") }}><IconRowLeft /> Regresar</ButtonSimple>
+        <Navbar name={params.id ? texts.pages.editMetodoPago.name : texts.pages.registerMetodoPago.name} descripcion={params.id ? texts.pages.editMetodoPago.description : texts.pages.registerMetodoPago.description}>
+            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/metodos_pago") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
 
             {
@@ -116,6 +122,7 @@ function Form_Niveles() {
                         (
                             <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
                                 <form className="w-100 d-flex flex-column"
+
                                     onSubmit={onSubmit}>
                                     <InputsGeneral type={"text"} label={`${texts.label.nombre}`} name="nombre" id="nombre" form={{ errors, register }}
                                         params={{
@@ -125,11 +132,7 @@ function Form_Niveles() {
                                             },
                                             maxLength: {
                                                 value: 100,
-                                                message: texts.inputsMessage.max100
-                                            },
-                                            minLength: {
-                                                value: 5,
-                                                message: texts.inputsMessage.min5
+                                                message: texts.inputsMessage.max100,
                                             },
                                             pattern: {
                                                 value: pattern.textWithNumber,
@@ -143,17 +146,20 @@ function Form_Niveles() {
                                                 }
                                             }
                                         }}
-                                        placeholder={texts.placeholder.nameNivel}
+                                        placeholder={texts.placeholder.nameMetodoPago}
                                     />
+                                    <span className='fw-light m-0'>Seleccione que Aspectos desea registrar</span>
+                                    <InputCheck label={"Referencia"} id={"referencia"} name={"referencia"} form={{ errors, register }}/>
+                                    <InputCheck label={"Capture"} id={"capture"} name={"capture"} form={{ errors, register }}/>
                                     <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
                                         params={{
-                                            required: {
-                                                value: true,
-                                                message: texts.inputsMessage.requiredDesription,
-                                            },
                                             maxLength: {
                                                 value: 300,
                                                 message: texts.inputsMessage.max300
+                                            },
+                                            required: {
+                                                value: true,
+                                                message: texts.inputsMessage.requiredDesription,
                                             },
                                             validate: (value) => {
                                                 if (hasLeadingOrTrailingSpace(value)) {
@@ -172,9 +178,10 @@ function Form_Niveles() {
                             </div>
                         )
             }
+
             <Toaster />
         </Navbar>
     )
 }
 
-export default Form_Niveles
+export default Form_Metodo_Pago
