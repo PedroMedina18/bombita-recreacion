@@ -93,6 +93,7 @@ const texts={
         confirRegister:"Por favor confirmar la solicitud de Registro",
         confirEdit:"Confirmar la Solicitud de Edición",
         confirCloset:"Desea cerrar sesión",
+        inactividad:"No se ha detectado ninguna actividad por un periodo prolongado de tiempo el sistema cerrara sesión por seguridad"
     },
 
     errorMessage:{
@@ -316,6 +317,9 @@ const texts={
             name:"Información del Recreador",
             description:"Toda la información del recreador"
         },
+        pagos:{
+            name:"Registrar Pagos de Eventos",
+        },
     },
 
     registerMessage:{
@@ -333,6 +337,7 @@ const texts={
         buttonRegisterServicio:"Agregar un nuevo servicio",
         buttonRegisterEvento:"Agregar un nuevo evento",
         buttonRegisterEventosuccessMessage:"Agregar un nuevo evento",
+        buttonInactividad:"Extender sesión"
     }
 }
 

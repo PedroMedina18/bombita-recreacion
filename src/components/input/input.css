@@ -20,17 +20,25 @@
   padding: 0 40px 0 10px;
   transition: 0.3s ease all;
 }
+
+.text-right{
+  text-align: right;
+}
+
 .formulario-input-date {
   padding: 0 10px 0 10px;
 }
+
 .formulario-input.select {
   padding: 0 50px 0 10px;
 }
+
 .formulario-textarea {
   height: max-content;
   line-height: 25px;
   padding: 5px 40px 5px 10px;
 }
+
 .formulario-input:focus,
 .formulario-textarea:focus,
 .formulario-input-date:focus {
@@ -143,4 +151,14 @@
 
 .error .css-13cymwt-control{
   border-color: rgb(var(--error)) !important;
+}
+.container-icon-file{
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.container-icon-file svg{
+  width: 50px;
 }

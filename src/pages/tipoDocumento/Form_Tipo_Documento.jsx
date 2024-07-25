@@ -36,7 +36,7 @@ function Form_Tipo_Documento() {
 
     const get_tipoDocumento = async () => {
         try {
-            const respuesta = await tipo_documentos.get({ paramOne: Number(params.id) })
+            const respuesta = await tipo_documentos.get({ subDominio:[Number(params.id)] })
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
                 return

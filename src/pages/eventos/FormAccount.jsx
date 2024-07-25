@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { MultiSelect } from "../../components/input/Inputs.jsx"
 import { ButtonSimple } from "../../components/button/Button"
 import { useForm } from "react-hook-form";
 import { toastError, alertConfim, alertLoading } from "../../components/alerts.jsx"
@@ -15,7 +14,7 @@ import texts from "../../context/text_es.js";
 import TableDescriptionFacture from "../../components/table/TableDescriptionFacture.jsx"
 function FormAccount() {
     const { getUser } = useAuthContext();
-    const [dataUser] = useState(getUser());
+    const [dolar] = useState(getUser().dollar.price);
     const { dataServicios, saveDataServicios, valueCliente, saveDataSobrecargos, dataSobrecargos, setSaveDataSobrecargos, setSaveDataServicios, dataEvent } = useFormEventContext()
     const [estadoSobrecargos, setEstadoSobrecargos] = useState(false);
     const [estadoServicios, setEstadoServicios] = useState(false);
@@ -132,8 +131,8 @@ function FormAccount() {
     }
     return (
         <>
-            <ModalSelect titulo={"Escoja los servicios"} estado={estadoServicios} setEstado={setEstadoServicios} object={servicios} columns={columnsServicio} saveSelect={setSaveDataServicios} select={saveDataServicios} />
-            <ModalSelect titulo={"Escoja los sobrecargo"} estado={estadoSobrecargos} setEstado={setEstadoSobrecargos} object={sobrecargos} columns={columnsSobrecargo} saveSelect={setSaveDataSobrecargos} select={saveDataSobrecargos} />
+            <ModalSelect titulo={"Escoja los servicios"} state={[estadoServicios, setEstadoServicios]} object={servicios} columns={columnsServicio} saveSelect={setSaveDataServicios} select={saveDataServicios} />
+            <ModalSelect titulo={"Escoja los sobrecargo"} state={[estadoSobrecargos, setEstadoSobrecargos]} object={sobrecargos} columns={columnsSobrecargo} saveSelect={setSaveDataSobrecargos} select={saveDataSobrecargos} />
 
             <form className="w-100 d-flex flex-column justify-content-between" onSubmit={onSubmit}>
                 <div className="w-100 d-flex justify-content-between align-item-center">
@@ -166,7 +165,7 @@ function FormAccount() {
                         <div className="d-flex justify-content-between mt-2">
                             <p className="m-0 mb-1 fw-bold h5 w-100">Servicios</p>
                             <p className="m-0 mb-1 fw-bold h5 w-100 text-center">{`${sumarPrecios(dataServicios, saveDataServicios)} $`}</p>
-                            <p className="m-0 mb-1 fw-bold h5 w-100 text-center">{`${(sumarPrecios(dataServicios, saveDataServicios) * dataUser.dollar.price).toFixed(2)} BS.s`}</p>
+                            <p className="m-0 mb-1 fw-bold h5 w-100 text-center">{`${(sumarPrecios(dataServicios, saveDataServicios) * dolar).toFixed(2)} BS.s`}</p>
                         </div>
                         {
                             saveDataSobrecargos.length ?
@@ -175,7 +174,7 @@ function FormAccount() {
                                         <div className="d-flex justify-content-between">
                                             <p className="m-0 mb-1 fw-bold h5 w-100">Sobrecargos</p>
                                             <p className="m-0 mb-1 fw-bold h5 w-100 text-center">{`${sumarPrecios(dataSobrecargos, saveDataSobrecargos)} $`}</p>
-                                            <p className="m-0 mb-1 fw-bold h5 w-100 text-center">{`${(sumarPrecios(dataSobrecargos, saveDataSobrecargos) * dataUser.dollar.price).toFixed(2)} BS.s`}</p>
+                                            <p className="m-0 mb-1 fw-bold h5 w-100 text-center">{`${(sumarPrecios(dataSobrecargos, saveDataSobrecargos) * dolar).toFixed(2)} BS.s`}</p>
                                         </div>
                                     </>
                                 )
@@ -186,7 +185,7 @@ function FormAccount() {
                         <div className="d-flex justify-content-between">
                             <p className="m-0 fw-bold h3 w-100">Total</p>
                             <p className="m-0 fw-bold h3 w-100 text-center">{`${sumarPrecios(dataServicios, saveDataServicios) + sumarPrecios(dataSobrecargos, saveDataSobrecargos)} $`}</p>
-                            <p className="m-0 fw-bold h3 w-100 text-center">{`${((sumarPrecios(dataServicios, saveDataServicios) + sumarPrecios(dataSobrecargos, saveDataSobrecargos)) * dataUser.dollar.price).toFixed(2)} BS.s`}</p>
+                            <p className="m-0 fw-bold h3 w-100 text-center">{`${((sumarPrecios(dataServicios, saveDataServicios) + sumarPrecios(dataSobrecargos, saveDataSobrecargos)) * dolar).toFixed(2)} BS.s`}</p>
                         </div>
                     </div>
                 </div>

@@ -1,37 +1,16 @@
 import { getCookie } from "../cookie.jsx"
-import {API} from "../API.jsx"
-import {addOptionalQueryParams} from "../process.jsx"
+import { API } from "../API.jsx"
+import { addOptionalQueryParams, addOptionalSubDomains } from "../process.jsx"
 
-export default class Petisions{
-    constructor(params){
-        this.params=params
+export default class Petisions {
+    constructor(dominio) {
+        this.dominio = dominio
     }
 
-    async get({paramOne=null, paramTwo=null, params=null}){
-        
+    async get({ subDominio = [], params = null } = {}) {
         const token = getCookie("token")
-        let url
-        if(paramTwo && paramOne){
-            url = `${this.params}/${paramOne}/${paramTwo}/`
-            url = addOptionalQueryParams(url, params)
-            return API.get(url, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                }
-            })
-        }
-        if(paramOne){
-            url = `${this.params}/${paramOne}/`
-            url = addOptionalQueryParams(url, params)
-            return API.get(url, {
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                }
-            })
-        }
-        url = `${this.params}/`
+        let url = `${this.dominio}/`
+        url = addOptionalSubDomains(url, subDominio)
         url = addOptionalQueryParams(url, params)
         return API.get(url, {
             headers: {
@@ -41,9 +20,9 @@ export default class Petisions{
         })
     }
 
-    async post(data){
+    async post(data) {
         const token = getCookie("token")
-        return API.post(`${this.params}/`, {
+        return API.post(`${this.dominio}/`, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`
@@ -52,33 +31,33 @@ export default class Petisions{
         })
     }
 
-    async postData(data){
+    async postData(data) {
         const token = getCookie("token")
-        return API.request(`${this.params}/`, {
+        return API.request(`${this.dominio}/`, {
             method: 'POST',
             headers: {
                 "Content-Type": "multipart/form-data",
                 "Authorization": `Bearer ${token}`
             },
-            data:data
+            data: data
         })
     }
 
-    async putData(data, code){
+    async putData(data, code) {
         const token = getCookie("token")
-        return API.request(`${this.params}/${code}/?_method=PUT`, {
+        return API.request(`${this.dominio}/${code}/?_method=PUT`, {
             method: 'POST',
             headers: {
                 "Content-Type": "multipart/form-data",
                 "Authorization": `Bearer ${token}`
             },
-            data:data
+            data: data
         })
     }
 
-    async put(data, code){
+    async put(data, code) {
         const token = getCookie("token")
-        return API.put(`${this.params}/${code}/`, {
+        return API.put(`${this.dominio}/${code}/`, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`
@@ -87,9 +66,9 @@ export default class Petisions{
         })
     }
 
-    async delete(code){
+    async delete(code) {
         const token = getCookie("token")
-        return API.delete(`${this.params}/${code}/`, {
+        return API.delete(`${this.dominio}/${code}/`, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`

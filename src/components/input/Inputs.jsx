@@ -78,7 +78,7 @@ export function InputTextTarea({ label, id, name, form, placeholder = "", params
           {...register(name, params)}
           {...props}
         />
-        
+
       </div>
       <p className="formulario-message-error">
         {errors[name] ? errors[name].message : "error"}
@@ -308,32 +308,32 @@ export function MultiSelect({ id, label, options, save, placeholder, optionsDefa
       <label className="formulario-label" htmlFor={id}>
         {label}
       </label>
-        <Select
-          id={id}
-          isMulti
-          options={options}
-          components={animatedComponent}
-          closeMenuOnSelect={false}
-          defaultValue={optionsDefault}
-          placeholder={placeholder}
-          styles={{
-            control: (styles) => {
-              return {
-                ...styles,
-                borderColor: "rgb(22, 21, 21)",
-                borderWidth: "1px",
-                borderRadius: "2px",
-              };
-            },
-          }}
-          captureMenuScroll={true}
-          noOptionsMessage={() => {
-            return "Sin Opciones";
-          }}
-          onChange={(selectecOptions) => {
-            save(selectecOptions);
-          }}
-        />
+      <Select
+        id={id}
+        isMulti
+        options={options}
+        components={animatedComponent}
+        closeMenuOnSelect={false}
+        defaultValue={optionsDefault}
+        placeholder={placeholder}
+        styles={{
+          control: (styles) => {
+            return {
+              ...styles,
+              borderColor: "rgb(22, 21, 21)",
+              borderWidth: "1px",
+              borderRadius: "2px",
+            };
+          },
+        }}
+        captureMenuScroll={true}
+        noOptionsMessage={() => {
+          return "Sin Opciones";
+        }}
+        onChange={(selectecOptions) => {
+          save(selectecOptions);
+        }}
+      />
     </div>
   );
 }
@@ -423,6 +423,57 @@ export function InputImgPerfil({ label, id, name, form, tamaño = "lg", imgPerfi
   )
 }
 
+export function InputFile({ label, id, name, form }) {
+  const { errors, register } = form;
+  const [img, setImage] = useState({state:false, nombre:"Sin imagen"})
+
+  const cambio_imagen = (e) => {
+    if (e.target.files[0]) {
+      setImage({
+        ...img,
+        state:true,
+        nombre:e.target.files[0].name
+      })
+    } else {
+      setImage({
+        ...img,
+        state:false,
+        nombre:"Sin imagen"
+      })
+    }
+  }
+
+  return (
+    <div className={`w-100 d-flex flex-column align-items-center justify-content-center ${errors[name] && isError ? "error" : " "}`}>
+      {
+        <div className="container-icon-file">
+          {
+            img.state ?
+              (
+                <IconCircleCheck />
+              ) :
+              (
+                <IconCircleX />
+              )
+          }
+          <p className="m-0 fs-7 fw-bold mb-1">{img.nombre}</p>
+        </div>
+      }
+      <label className="button-initial cursor-pointer" htmlFor={name}>
+        {label}
+      </label>
+      <input type="file" className="d-none" id={id} name={name} accept=".jpg, .jpeg, .png" multiple={false}
+        {...register(name)}
+        onChange={(e) => { cambio_imagen(e) }}
+      />
+
+      <p className="formulario-message-error">
+        {errors[name] ? errors[name].message : "error"}
+      </p>
+    </div>
+  )
+}
+
 export function MoneyInput({ label, id, name, form, params = {}, flexRow = false, isError = true, ...props }) {
   const [value, setValue] = useState('0,00');
   const { errors, register } = form;
@@ -475,7 +526,7 @@ export function MoneyInput({ label, id, name, form, params = {}, flexRow = false
           </label>
           <div className="formulario-grupo-input">
             <input
-              className="formulario-input "
+              className="formulario-input text-right"
               type="text"
               id={id}
               value={value}
@@ -502,7 +553,7 @@ export function MoneyInput({ label, id, name, form, params = {}, flexRow = false
         </label>
         <div className={`formulario-grupo-input`}>
           <input
-            className="formulario-input "
+            className="formulario-input text-right"
             type="text"
             id={id}
             value={value}

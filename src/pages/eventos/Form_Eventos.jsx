@@ -26,10 +26,10 @@ function Form_Eventos() {
     // *funcion para buscar los tipos de documentos y los cargos
     const getData = async () => {
         try {
-            const get_tipo_documentos = await tipo_documentos.get({})
-            const get_servicios = await servicios.get({})
-            const get_sobrecargos = await sobrecargos.get({})
-            const get_clientes = await clientes.get({})
+            const get_tipo_documentos = await tipo_documentos.get()
+            const get_servicios = await servicios.get()
+            const get_sobrecargos = await sobrecargos.get()
+            const get_clientes = await clientes.get()
             verifyOptionsSelect({
                 respuesta: get_tipo_documentos,
                 setError: setErrorServer,

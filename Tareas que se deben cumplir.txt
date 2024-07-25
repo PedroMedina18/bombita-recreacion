@@ -24,5 +24,6 @@ IMPORTANTES
 --Colocar la seccion de informacion al dar hover creo se llama togle
 -Recuerda la permisologia tienes que investigar y acomodar antes de seguir avanzando
 -gESTION DE RECREADORES
+Gestion de Usuarios
 -GESTION DE PAGOS
 -GESTION DE EVENTOS

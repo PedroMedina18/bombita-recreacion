@@ -222,17 +222,37 @@ class Eventos_Views(View):
                     WHERE sove.evento_id=%s;
                     """
                     cursor.execute(query, [int(evento['id'])])
-                    sobrecargo = dictfetchall(cursor)
+                    sobrecargos = dictfetchall(cursor)
+
+                    query = """
+                    SELECT 
+                        pa.id,
+                        pa.tipo,
+                        pa.monto, 
+                        pa.referencia,
+                        pa.capture,
+                        me.id AS metodo_pago_id,
+                        me.nombre AS metodo_pago,
+                        pre.id AS precio_dolar_id,
+                        pre.precio AS precio_dolar
+                    FROM pagos AS pa
+                    INNER JOIN metodos_pago AS me ON pa.metodo_pago_id=me.id
+                    LEFT JOIN precio_dolar AS pre ON pa.precio_dolar_id=pre.id
+                    WHERE pa.evento_id=%s;
+                    """
+                    cursor.execute(query, [int(evento['id'])])
+                    pagos = dictfetchall(cursor)
+
                     datos = {
                         "status": True,
                         "message": f"{MESSAGE['exitoGet']}",
                         "data": {
                             "info": evento,
                             "servicios": servicios,
-                            "sobrecargo": sobrecargo,
+                            "sobrecargos": sobrecargos,
+                            "pagos": pagos,
                         }
                     }
-
                 elif info == "false" and len(evento) > 0:
                     datos = {
                         "status": True,

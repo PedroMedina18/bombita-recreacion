@@ -43,9 +43,9 @@ function Form_Recreadores() {
     // *Funcion para buscar los niveles y tipos de documentos
     const get_data = async () => {
         try {
-            const get_niveles = await niveles.get({})
-            const get_tipo_documentos = await tipo_documentos.get({})
-            const get_generos = await generos.get({})
+            const get_niveles = await niveles.get()
+            const get_tipo_documentos = await tipo_documentos.get()
+            const get_generos = await generos.get()
             verifyOptionsSelect({
                 respuesta: get_niveles,
                 setError: setErrorServer,
@@ -78,7 +78,7 @@ function Form_Recreadores() {
 
     const get_recreador = async () => {
         try {
-            const respuesta = await recreadores.get({paramOne:Number(params.numero_documento), params:{"_info":"true"} })
+            const respuesta = await recreadores.get({subDominio:[Number(params.numero_documento)], params:{"_info":"true"}})
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
                 return
@@ -165,7 +165,7 @@ function Form_Recreadores() {
     )
 
     return (
-        <Navbar name={`${recreador.id? texts.pages.editRecreador.name : texts.pages.registerRecreadores.name}`} descripcion={`${recreador.id? texts.pages.editRecreadores.description : texts.pages.registerRecreadores.description}`}>
+        <Navbar name={`${recreador.id? texts.pages.editRecreador.name : texts.pages.registerRecreadores.name}`} descripcion={`${recreador.id? texts.pages.editRecreador.description : texts.pages.registerRecreadores.description}`}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/recreadores") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
             {

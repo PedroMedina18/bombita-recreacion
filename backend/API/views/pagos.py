@@ -12,7 +12,7 @@ import json
 
 
 # CRUD COMPLETO DE LA TABLA DE metodos_pago
-class Metodos_Pagos_Views(View):
+class Pagos_Views(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)

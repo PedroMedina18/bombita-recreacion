@@ -77,6 +77,9 @@ function Eventos() {
                 })
             }
         },
+        money: (row)=>{
+            navigate(`/pago_evento/${row.id}`)
+        },
         register: {
             name: texts.registerMessage.buttonRegisterEvento,
             function: () => {

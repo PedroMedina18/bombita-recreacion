@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { useState } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
 import { alertConfim } from '../alerts.jsx'
+import { formatDateWithTime12Hour } from '../../utils/process.jsx'
 import texts from "../../context/text_es"
 import {
     IconHamburgue,
@@ -21,10 +22,9 @@ import {
 
 } from "../../components/Icon.jsx"
 
-function Navbar({ children, name, descripcion, dollar=false }) {
+function Navbar({ children, name = null, descripcion = null, dollar = true }) {
     const { getUser, closeSession } = useAuthContext();
     const [dataUser] = useState(getUser());
-    const startDate = new Date(dataUser.fecha);
     const navigate = useNavigate();
 
     return (
@@ -69,7 +69,7 @@ function Navbar({ children, name, descripcion, dollar=false }) {
                             <span>Eventos</span>
                         </a>
                         <ul id="eventos" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                        <li className="sidebar-item">
+                            <li className="sidebar-item">
                                 <Link to="/eventos" className="sidebar-link">Lista de Eventos</Link>
                             </li>
                             <li className="sidebar-item">
@@ -147,7 +147,7 @@ function Navbar({ children, name, descripcion, dollar=false }) {
                             <span>Configuración</span>
                         </a>
                         <ul id="configuracion" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                        <li className="sidebar-item">
+                            <li className="sidebar-item">
                                 <Link to="/dolar" className="sidebar-link">Dolar</Link>
                             </li>
                             <li className="sidebar-item">
@@ -166,7 +166,7 @@ function Navbar({ children, name, descripcion, dollar=false }) {
                     </li>
 
                     <li className="sidebar-item"
-                        onClick={async() => {
+                        onClick={async () => {
                             const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirCloset)
                             if (confirmacion.isConfirmed) {
                                 closeSession()
@@ -202,23 +202,31 @@ function Navbar({ children, name, descripcion, dollar=false }) {
                 <section className="main" id="main-top">
                     <div className="d-flex flex-column-reverse flex-md-row justify-content-between align-items-start align-items-md-center">
                         <div className="d-flex flex-column">
-                            <h1 className="fs-4 fw-bold m-0 pb-1">{name}</h1>
-                            <p className="m-0 fw-light fs-6 colo">{descripcion}</p>
+                            {
+                                name &&
+                                <h1 className="fs-4 fw-bold m-0 pb-1">{name}</h1>
+                            }
+                            {
+                                descripcion &&
+                                <p className="m-0  fs-6 colo">{descripcion}</p>
+                            }
                         </div>
-                        <div className="d-flex flex-column">
-                            <h1 className="fs-5 fw-bold m-0 pb-1">Precio del Dolar $</h1>
-                            <p className="m-0 fs-6 colo">{`${dataUser.dollar.price} Bs.S`}</p>
-                            
-                        </div>
-                        <span className="fw-normal fs-6 mb-2 mb-md-0 text-dark">Inicio de sesión {startDate.getDate() < 10 ? `0${startDate.getDate()}` : startDate.getDate()}-{(startDate.getMonth() + 1) < 10 ? `0${startDate.getMonth() + 1}` : startDate.getMonth() + 1}-{startDate.getFullYear()} a las {startDate.getHours() < 10 ? `0${startDate.getHours()}` : startDate.getHours()}:{startDate.getMinutes() < 10 ? `0${startDate.getMinutes()}` : startDate.getMinutes()}:{startDate.getSeconds() < 10 ? `0${startDate.getSeconds()}` : startDate.getSeconds()}</span>
+                        {
+                            dollar &&
+                            <div className="d-flex flex-column">
+                                <h1 className="fs-5 fw-bold m-0 pb-1">Precio del Dolar $</h1>
+                                <p className="m-0 fs-6 ">{`${dataUser.dollar.price} Bs.S`}</p>
+                            </div>
+                        }
+                        <span className="fw-bold fs-7 mb-2 mb-md-0 text-dark">Inicio de sesión {formatDateWithTime12Hour(dataUser.fecha)}</span>
                     </div>
 
-                    <hr className="invisible my-2"/>
+                    <hr className="invisible my-2" />
 
                     {children}
                 </section>
             </section>
-            
+
         </main>
     )
 }

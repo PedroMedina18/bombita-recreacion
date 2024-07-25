@@ -23,6 +23,11 @@
   background: linear-gradient(180deg, rgba(194,101,122,0.835171568627451) 0%, rgba(195,20,50,1) 100%);
 }
 
+.bacerror{
+  background: rgb(238,174,174);
+background: radial-gradient(circle, rgba(238,174,174,1) 0%, rgba(226,148,233,1) 100%);
+}
+
 /* modificaciondesl input number */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
@@ -162,6 +167,13 @@ body::-webkit-scrollbar-thumb {
 
 .heigh-100 {
   height: 100vh;
+}
+
+.fs-7 {
+  font-size: 12px;
+}
+.fs-8 {
+  font-size: 8px;
 }
 
 @media (min-width: 992px) {

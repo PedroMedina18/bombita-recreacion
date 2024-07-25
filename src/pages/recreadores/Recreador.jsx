@@ -31,7 +31,7 @@ function Recreador() {
 
   const get_data = async () => {
     try {
-      const respuesta = await recreadores.get({paramOne:Number(params.numero_documento), params:{"_info":"true"}})
+      const respuesta = await recreadores.get({subDominio:[Number(params.numero_documento)], params:{"_info":"true"}})
       if (respuesta.status !== 200) {
         setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
         return

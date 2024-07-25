@@ -3,14 +3,14 @@ import { useState, useEffect, useRef } from 'react'
 import { ButtonSimple } from "../button/Button.jsx"
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
 import 'react-loading-skeleton/dist/skeleton.css'
-import {IconCheck, IconX, IconTrash, IconEdit, IconDetail} from "../Icon"
+import { IconCheck, IconX, IconTrash, IconEdit, IconDetail, IconMoney } from "../Icon"
 
 function Table({ columns, rows, totalPages, totalElements = 0, options = null, loading = true }) {
     const [pages, setPages] = useState(1)
     const [debounceTimeout, setDebounceTimeout] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const renderizado = useRef(0)
-
+    const option = Boolean(options.delete || options.put || options.get || options.money)
     useEffect(() => {
         // Para evitar el sobre renderizado al cargar el componente
         if (renderizado.current === 0 || renderizado.current === 1) {
@@ -73,7 +73,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                 loading ?
                     (
                         skeletonTable()
-                    ) 
+                    )
                     :
                     (
                         <div className='container-table  mt-4'>
@@ -87,17 +87,15 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                             ))
                                         }
                                         {
-                                            (options.delete || options.put || options.get)?
-                                                <th scope="col">Opciones</th>
-                                                :
-                                                ("")
+                                            option &&
+                                            <th scope="col">Opciones</th>
                                         }
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {
                                         rows.length === 0 ?
-                                            <>  
+                                            <>
                                                 <tr>
                                                     <td className="py-3"></td>
                                                     {
@@ -107,10 +105,8 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                                         })
                                                     }
                                                     {
-                                                        options.delete || options.put || options.get ?
-                                                            (<td className="py-3"></td>)
-                                                            :
-                                                            ("")
+                                                        option &&
+                                                        <td className="py-3"></td>
                                                     }
                                                 </tr>
                                                 <tr>
@@ -122,10 +118,8 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                                         })
                                                     }
                                                     {
-                                                        options.delete || options.put || options.get ?
-                                                            (<td className="py-3"></td>)
-                                                            :
-                                                            ("")
+                                                        option &&
+                                                        <td className="py-3"></td>
                                                     }
                                                 </tr>
                                                 <tr>
@@ -137,61 +131,57 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                                         })
                                                     }
                                                     {
-                                                        options.delete || options.put || options.get ?
-                                                            (<td className="py-3"></td>)
-                                                            :
-                                                            ("")
+                                                        option &&
+                                                        <td className="py-3"></td>
                                                     }
                                                 </tr>
                                             </>
                                             :
                                             rows.map((row, index) => (
                                                 <tr key={`row-${index}`}>
-                                                    <td key={`N°-${index}`}>{index+1}</td>
+                                                    <td key={`N°-${index}`}>{index + 1}</td>
                                                     {
                                                         columns.map((column, index) => {
                                                             if (column.row(row) === true) {
-                                                                return (<td key={`${column.row(row)}-${index}`} className='svg-check'><IconCheck/></td>)
+                                                                return (<td key={`${column.row(row)}-${index}`} className='svg-check'><IconCheck /></td>)
                                                             }
                                                             if (column.row(row) === false) {
-                                                                return (<td key={`${column.row(row)}-${index}`} className='svg-x'><IconX/></td>)
+                                                                return (<td key={`${column.row(row)}-${index}`} className='svg-x'><IconX /></td>)
                                                             }
                                                             return (<td key={`${column.row(row)}-${index}`} >{column.row(row)}</td>)
 
                                                         })
                                                     }
                                                     {
-                                                        options.delete || options.put || options.get ?
-                                                            (<td >
+                                                        option &&
+                                                            <td >
                                                                 <div className='d-flex justify-content-around'>
-
                                                                     {
                                                                         options.get ?
-                                                                            (<IconDetail onClick={() => { options.get(row) }} className='cursor-pointer eliminate'/>)
+                                                                            (<IconDetail onClick={() => { options.get(row) }} className='cursor-pointer get' />)
                                                                             :
                                                                             ("")
                                                                     }
                                                                     {
                                                                         options.delete ?
-                                                                            (<IconTrash onClick={() => { options.delete(row) }} className='cursor-pointer eliminate'/>)
+                                                                            (<IconTrash onClick={() => { options.delete(row) }} className='cursor-pointer eliminate' />)
                                                                             :
                                                                             ("")
                                                                     }
                                                                     {
                                                                         options.put ?
-                                                                            (<IconEdit onClick={() => { options.put(row) }} className='cursor-pointer edit'/>)
+                                                                            (<IconEdit onClick={() => { options.put(row) }} className='cursor-pointer edit' />)
                                                                             :
                                                                             ("")
                                                                     }
-                                                                    
+                                                                    {
+                                                                        options.money ?
+                                                                            (<IconMoney onClick={() => { options.money(row) }} className='cursor-pointer money' />)
+                                                                            :
+                                                                            ("")
+                                                                    }
                                                                 </div>
-                                                            </td>)
-                                                            :
-                                                            (
-                                                                <td>
-
-                                                                </td>
-                                                            )
+                                                            </td>
                                                     }
                                                 </tr>
                                             ))

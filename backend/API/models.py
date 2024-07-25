@@ -242,6 +242,8 @@ class MetodosPago(models.Model):
     descripcion = models.CharField(max_length = 300)
     referencia = models.BooleanField(default=False)
     capture = models.BooleanField(default=False)
+    divisa = models.BooleanField(default=False)
+
 
     class Meta:
         db_table = "metodos_pago"

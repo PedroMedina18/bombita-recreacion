@@ -2,6 +2,7 @@ import Swal from 'sweetalert2';
 import { toast } from "sonner";
 import { formatDateWithTime12Hour, formatoId } from "../utils/process.jsx"
 import { cargos } from "../utils/API.jsx"
+
 export const alertConfim = async (title, text) => {
     return Swal.fire({
         title: `${title}`,
@@ -150,8 +151,6 @@ export const alertCargo = async (title, id) => {
     })
 }
 
-
-
 export const alertLoading = async (message) => {
     return Swal.fire({
         title: `${message}`,
@@ -186,3 +185,27 @@ export const toastError = (mensage) => {
     })
 }
 
+export const alertInactividad = async (title, text, titleButton, callback)=>{
+    return Swal.fire({
+        title: `${title}`,
+        text: `${text}`,
+        color: "black",
+        timer: 5 * 60 * 1000,
+        timerProgressBar: true,
+        customClass: {
+            title: "h2 fw-bold text-black",
+
+            confirmButton: "px-5 py-3 mx-3 fs-6 fw-bold",
+        },
+        icon:"warning",
+        confirmButtonText: `${titleButton}`,
+        confirmButtonColor: "rgb(var(--principal))",
+        width: "70%",
+        allowOutsideClick: false,
+        
+    }).then((result) => {
+          if (result.isDismissed) {
+            callback()
+          }
+    });
+}

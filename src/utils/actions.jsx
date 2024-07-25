@@ -38,7 +38,7 @@ export const verifyOptionsSelect = ({ respuesta, setError, setOptions }) => {
 export const getPersona = async ({ dataNewUser, setPersona, setValue, setDisabledInputs }) => {
     try {
         if (dataNewUser.tipo_documento && dataNewUser.numero_documento && dataNewUser.numero_documento.length >= 8) {
-            const respuesta = await personas.get({paramOne:dataNewUser.tipo_documento, paramTwo:dataNewUser.numero_documento})
+            const respuesta = await personas.get( {subDominio:[dataNewUser.tipo_documento, dataNewUser.numero_documento]})
             if (respuesta.status === 200 && respuesta.data.status === true) {
                 setPersona({
                     ...respuesta.data.data
@@ -59,7 +59,7 @@ export const getPersona = async ({ dataNewUser, setPersona, setValue, setDisable
 export const getRecreador = async ({ dataNewUser, setPersona, setValue, setDisabledInputs }) => {
     try {
         if (dataNewUser.tipo_documento && dataNewUser.numero_documento && dataNewUser.numero_documento.length >= 8) {
-            const respuesta = await personas.get({paramOne:dataNewUser.tipo_documento, paramTwo:dataNewUser.numero_documento})
+            const respuesta = await personas.get({subDominio:[dataNewUser.tipo_documento, dataNewUser.numero_documento]})
             if (respuesta.status === 200 && respuesta.data.status === true) {
                 setPersona({
                     ...respuesta.data.data
@@ -109,7 +109,7 @@ export const deleteItem = async ({ row, objet, functionGet }) => {
 export const searchCode = async ({ value, object, setList,  setLoading, setData}) => {
     try {
         setLoading(true)
-        const result = await object.get({paramOne:value})
+        const result = value? await object.get({subDominio:[value]}) : await object.get()
         if (result.status === 200) {
             if (result.data.status === true) {
                 if (!Array.isArray(result.data.data)) {
@@ -141,7 +141,7 @@ export const searchCode = async ({ value, object, setList,  setLoading, setData}
 // *funcion para buscar lista de elementos en la API
 export const getListItems = async ({ object, setList, setData, setLoading }) => {
     try {
-        const result = await object.get({})
+        const result = await object.get()
         if (result.status === 200) {
             if (result.data.status === true) {
                 setList(result.data.data)

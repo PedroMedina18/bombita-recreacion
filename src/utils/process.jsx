@@ -102,6 +102,16 @@ export function addOptionalQueryParams(url, queryParams) {
   return url;
 }
 
+export function addOptionalSubDomains(baseUrl, subDominios) {
+  let url = baseUrl
+  if (subDominios.length) {
+    for(const subDomain of subDominios){
+      url += `${subDomain}/`;
+    }
+  }
+  return url;
+}
+
 export function truncateString(str, maxLength) {
   if (str.length > maxLength) {
     return str.substring(0, maxLength) + '...';

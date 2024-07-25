@@ -90,7 +90,7 @@ function FormDataEvent() {
 
         const timeout = setTimeout(async () => {
             try {
-                const respuesta = await clientes.get({ paramOne: inputValue })
+                const respuesta = await clientes.get({subDominio:[inputValue]})
                 if (respuesta.status !== 200) {
                     callback([])
                 }

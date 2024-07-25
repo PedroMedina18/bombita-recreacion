@@ -36,7 +36,7 @@ function Form_Materiales() {
 
     const get_materiales = async () => {
         try {
-            const respuesta = await materiales.get({ paramOne: Number(params.id) })
+            const respuesta = await materiales.get({subDominio:[Number(params.id)]})
             console.log(respuesta)
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)

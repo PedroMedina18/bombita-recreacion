@@ -30,7 +30,8 @@ class Metodos_Pagos_Views(View):
                 return JsonResponse(datos)
             referencia = req['referencia'] if 'referencia' in req else False
             capture = req['capture'] if 'capture' in req else False
-            MetodosPago.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'], referencia=referencia, capture=capture)
+            divisa = req['divisa'] if 'divisa' in req else False
+            MetodosPago.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'], divisa=divisa, referencia=referencia, capture=capture)
             datos = {
                 "status": True,
                 'message': f"{MESSAGE['registerMetodoPago']}"
@@ -76,11 +77,13 @@ class Metodos_Pagos_Views(View):
             if len(metodo_pago) > 0:
                 referencia = req['referencia'] if 'referencia' in req else False
                 capture = req['capture'] if 'capture' in req else False
+                divisa = req['divisa'] if 'divisa' in req else False
                 metodo_pago = MetodosPago.objects.get(id=id)
                 metodo_pago.nombre = req['nombre']
                 metodo_pago.descripcion = req['descripcion']
                 metodo_pago.referencia = referencia
                 metodo_pago.capture = capture
+                metodo_pago.divisa = divisa
                 metodo_pago.save()
                 datos = {
                     "status": True,

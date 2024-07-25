@@ -48,8 +48,8 @@ function Form_Servicios() {
   //* funcion para buscar los permisos en la vase de datos
   const get_data = async () => {
     try {
-      const getMateriales = await materiales.get({});
-      const getActividades = await actividades.get({});
+      const getMateriales = await materiales.get();
+      const getActividades = await actividades.get();
       verifyOptionsSelect({
         respuesta: getMateriales,
         setError: setErrorServer,
@@ -72,7 +72,7 @@ function Form_Servicios() {
 
   const get_servicio = async () => {
     try {
-      const respuesta = await servicios.get({ paramOne: Number(params.id) })
+      const respuesta = await servicios.get({ subDominio:[Number(params.id)] })
       if (respuesta.status !== 200) {
         setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
         return

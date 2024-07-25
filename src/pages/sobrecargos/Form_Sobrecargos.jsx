@@ -36,7 +36,7 @@ function Form_Niveles() {
 
     const get_sobrecargo = async () => {
         try {
-            const respuesta = await sobrecargos.get(Number(params.id))
+            const respuesta = await sobrecargos.get({subDominio:[Number(params.id)]})
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
                 return

@@ -24,7 +24,6 @@ function Login() {
     formState: { errors },
   } = useForm();
 
-
   //*funcion del evento submit para iniciar sesion
   const onSubmit = handleSubmit(
     async (data) => {

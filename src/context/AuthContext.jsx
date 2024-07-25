@@ -2,7 +2,6 @@ import { useEffect, useState, createContext, useContext } from 'react'
 import { verify_token } from "../utils/API.jsx"
 import { getCookie } from "../utils/cookie.jsx"
 import { LoaderRule } from "../components/loader/Loader.jsx"
-
 const AuthContext = createContext();
 
 export const useAuthContext=()=>{

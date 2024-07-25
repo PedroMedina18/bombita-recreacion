@@ -47,7 +47,7 @@ function Cargos() {
     // *funcion para buscar los permisos en la base de datos
     const get_Permisos = async () => {
         try {
-            const res = await permisos.get({})
+            const res = await permisos.get()
             verifyOptionsSelect({
                 respuesta:res,
                 setError:setErrorServer,
@@ -65,7 +65,7 @@ function Cargos() {
     
     const get_cargos = async () => {
         try {
-            const respuesta = await cargos.get({paramOne:Number(params.id)})
+            const respuesta = await cargos.get({subDominio:[Number(params.id)]})
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
                 return

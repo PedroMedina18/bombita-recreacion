@@ -1,5 +1,5 @@
 from django.urls import path
-from .views.view import Metodos_Pagos_Views, Actividades_Views, Cargos_Views, Clientes_Views, Dollar_View, Eventos_Views, Genero_Views, Login, Materiales_Views, Nivel_Views, Permisos_Views, Persona_Views, Recreadores_Views, Respaldo, Servicios_Views, Sobrecargo_Views, Tipo_Documento_Views, Usuario_Views, Verify_Token_Views
+from .views.view import Metodos_Pagos_Views, Actividades_Views, Cargos_Views, Clientes_Views, Dollar_View, Eventos_Views, Genero_Views, Login, Materiales_Views, Nivel_Views, Permisos_Views, Persona_Views, Recreadores_Views, Respaldo, Servicios_Views, Sobrecargo_Views, Tipo_Documento_Views, Usuario_Views, Verify_Token_Views, Pagos_Views
 
 urlpatterns=[
     path('cargos/', Cargos_Views.as_view(), name='cargos'),
@@ -32,5 +32,6 @@ urlpatterns=[
     path('clientes/<str:identificador>/', Clientes_Views.as_view(), name='cliente'),
     path('login/', Login.as_view(), name='login'),
     path('verify/', Verify_Token_Views.as_view(), name='verify'),
+    path('pagos/', Pagos_Views.as_view(), name='pagos'),
     path('respaldo/', Respaldo.as_view(), name='resldo'),
 ]

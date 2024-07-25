@@ -36,7 +36,7 @@ function Form_Metodo_Pago() {
 
     const get_metodosPago = async () => {
         try {
-            const respuesta = await metodoPago.get({ paramOne: Number(params.id) })
+            const respuesta = await metodoPago.get({subDominio:[Number(params.id)]})
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
                 return
@@ -80,7 +80,8 @@ function Form_Metodo_Pago() {
                         nombre: data.nombre,
                         descripcion: data.descripcion,
                         referencia: data.referencia,
-                        capture: data.capture
+                        capture: data.capture,
+                        divisa: data.divisa
                     }
                     alertLoading("Cargando")
                     const res = params.id ? await metodoPago.put(body, Number(params.id)) : await metodoPago.post(body)
@@ -102,8 +103,6 @@ function Form_Metodo_Pago() {
     return (
         <Navbar name={params.id ? texts.pages.editMetodoPago.name : texts.pages.registerMetodoPago.name} descripcion={params.id ? texts.pages.editMetodoPago.description : texts.pages.registerMetodoPago.description}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/metodos_pago") }}> <IconRowLeft /> Regresar</ButtonSimple>
-
-
             {
                 loading ?
                     (
@@ -151,6 +150,7 @@ function Form_Metodo_Pago() {
                                     <span className='fw-light m-0'>Seleccione que Aspectos desea registrar</span>
                                     <InputCheck label={"Referencia"} id={"referencia"} name={"referencia"} form={{ errors, register }}/>
                                     <InputCheck label={"Capture"} id={"capture"} name={"capture"} form={{ errors, register }}/>
+                                    <InputCheck label={"Monto en Divisa"} id={"divisa"} name={"divisa"} form={{ errors, register }}/>
                                     <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
                                         params={{
                                             maxLength: {

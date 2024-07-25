@@ -15,7 +15,7 @@
 }
 
 .content-modal {
-  width: 1150px;
+  width: 1250px;
   min-height: 100px;
   max-height: 600px;
   background-color: rgb(243, 243, 243);
@@ -23,6 +23,17 @@
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
   padding: 20px;
   transition: 0.3s ease all;
+  overflow: hidden;
+}
+
+.width-lg{
+  width: 1150px;
+}
+.width-xx-lg{
+  width: 1300px;
+}
+.width-md{
+  width: 800px
 }
 .icon-menu svg {
   width: 45px;

@@ -35,7 +35,7 @@ function Form_Niveles() {
 
     const get_nivel = async () => {
         try {
-            const respuesta = await niveles.get(Number(params.id))
+            const respuesta = await niveles.get({subDominio:[Number(params.id)]})
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
                 return
@@ -94,7 +94,7 @@ function Form_Niveles() {
         }
     )
     return (
-        <Navbar name={`${params.id ? texts.pages.editNivel.name : texts.pages.registerNiveles.name}`} descripcion={`${params.id ? texts.pages.editNiveles.description : texts.pages.registerNiveles.description}`}>
+        <Navbar name={`${params.id ? texts.pages.editNivel.name : texts.pages.registerNiveles.name}`} descripcion={`${params.id ? texts.pages.editNivel.description : texts.pages.registerNiveles.description}`}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/niveles") }}><IconRowLeft /> Regresar</ButtonSimple>
 
 

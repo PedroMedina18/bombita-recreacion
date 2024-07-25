@@ -37,7 +37,7 @@ function Form_Clientes() {
     // *Funcion para buscar los niveles y tipos de documentos
     const get_data = async () => {
         try {
-            const get_tipo_documentos = await tipo_documentos.get({})
+            const get_tipo_documentos = await tipo_documentos.get()
             verifyOptionsSelect({
                 respuesta: get_tipo_documentos,
                 setError: setErrorServer,
@@ -60,7 +60,7 @@ function Form_Clientes() {
 
     const get_cliente = async () => {
         try {
-            const respuesta = await clientes.get({ paramOne: Number(params.numero_documento), params: { "_info": "true" } })
+            const respuesta = await clientes.get({subDominio:[Number(params.numero_documento)], params: { "_info": "true" }})
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
                 return

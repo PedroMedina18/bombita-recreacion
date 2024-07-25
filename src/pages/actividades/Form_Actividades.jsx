@@ -46,7 +46,7 @@ function Actividades() {
   //* funcion para buscar los permisos en la vase de datos
   const get_materiales = async () => {
     try {
-      const res = await materiales.get({})
+      const res = await materiales.get()
       verifyOptionsSelect({
         respuesta: res,
         setError: setErrorServer,
@@ -64,7 +64,7 @@ function Actividades() {
 
   const get_actividades = async () => {
     try {
-      const respuesta = await actividades.get({ paramOne: Number(params.id) })
+      const respuesta = await actividades.get({subDominio:[Number(params.id)]})
       if (respuesta.status !== 200) {
         setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
         return

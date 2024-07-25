@@ -9,38 +9,40 @@ export const login = async (data) => {
     return API.post("login/", data)
 }
 
-export const usuarios=new Petisions("usuarios");
+export const usuarios = new Petisions("usuarios");
 
-export const recreadores=new Petisions("recreadores");
+export const recreadores = new Petisions("recreadores");
 
-export const actividades=new Petisions("actividades");
+export const actividades = new Petisions("actividades");
 
-export const verify_token=new Petisions("verify");
+export const verify_token = new Petisions("verify");
 
-export const permisos=new Petisions("permisos");
+export const permisos = new Petisions("permisos");
 
-export const personas=new Petisions("personas");
+export const personas = new Petisions("personas");
 
-export const cargos=new Petisions("cargos");
+export const cargos = new Petisions("cargos");
 
-export const niveles=new Petisions("niveles");
+export const niveles = new Petisions("niveles");
 
-export const generos=new Petisions("generos");
+export const generos = new Petisions("generos");
 
-export const eventos=new Petisions("eventos");
+export const eventos = new Petisions("eventos");
 
-export const clientes=new Petisions("clientes");
+export const clientes = new Petisions("clientes");
 
-export const sobrecargos=new Petisions("sobrecargos");
+export const sobrecargos = new Petisions("sobrecargos");
 
-export const materiales=new Petisions("materiales");
+export const materiales = new Petisions("materiales");
 
-export const tipo_documentos=new Petisions("tipo_documentos");
+export const tipo_documentos = new Petisions("tipo_documentos");
 
-export const servicios=new Petisions("servicios");
+export const servicios = new Petisions("servicios");
 
-export const respaldo=new Petisions("respaldo");
+export const pagos = new Petisions("pagos");
 
-export const metodoPago=new Petisions("metodos_pago");
+export const respaldo = new Petisions("respaldo");
 
-export const dolar=new Petisions("dolar");
+export const metodoPago = new Petisions("metodos_pago");
+
+export const dolar = new Petisions("dolar");

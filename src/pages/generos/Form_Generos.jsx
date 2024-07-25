@@ -36,7 +36,7 @@ function Form_Generos() {
 
     const get_genero = async () => {
         try {
-            const respuesta = await generos.get({ paramOne: Number(params.id) })
+            const respuesta = await generos.get({ subDominio:[Number(params.id)] })
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
                 return

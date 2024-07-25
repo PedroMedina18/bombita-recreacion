@@ -1,37 +1,25 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Login from './pages/login/Login';
-import Error404 from './pages/Error404';
-import Inicio from './pages/Inicio';
-import Cargos from "./pages/cargos/Cargos";
-import Clientes from "./pages/clientes/Clientes";
-import Form_Clientes from "./pages/clientes/Form_Clientes";
-import Form_Cargos from "./pages/cargos/Form_Cargos"
-import Tipo_Documento from "./pages/tipoDocumento/Tipo_Documento";
-import Form_Tipo_Documento from "./pages/tipoDocumento/Form_Tipo_Documento";
-import Generos from "./pages/generos/Generos";
-import Form_Generos from "./pages/generos/Form_Generos";
 import ProtectedRouter from "./components/protected/ProtectedRouter";
-import Usuarios from "./pages/usuarios/Usuarios";
-import Actividades from "./pages/actividades/Actividades";
-import Form_Actividades from "./pages/actividades/Form_Actividades";
-import Recreadores from "./pages/recreadores/Recreadores"
-import Form_Recreadores from "./pages/recreadores/Form_Recreadores";
-import Recreador from "./pages/recreadores/Recreador";
-import Metodos_Pago from "./pages/metodos_pago/Metodos_Pago";
-import Form_Metodos_Pago from "./pages/metodos_pago/Form_Metodos_Pago";
-import Niveles from "./pages/niveles/Niveles";
-import Form_Niveles from "./pages/niveles/Form_Niveles";
-import Materiales from "./pages/materiales/Materiales";
-import Form_Materiales from "./pages/materiales/Form_Materiales";
-import Servicios from "./pages/servicios/Servicios";
-import Sobrecargos from "./pages/sobrecargos/Sobrecargos";
-import Form_Sobrecargos from "./pages/sobrecargos/Form_Sobrecargos";
-import Form_Servicios from "./pages/servicios/Form_Servicios";
-import Eventos from "./pages/eventos/Eventos";
-import Dolar from "./pages/dolar/Dolar.jsx";
-import FormDataEvent from "./pages/eventos/FormDataEvent";
-import FormAccount from "./pages/eventos/FormAccount";
-import {FormEventContextProvider} from "./context/FormEventContext.jsx";
+import { FormEventContextProvider } from "./context/FormEventContext.jsx";
+import {
+  Login, Error404,
+  Inicio, Cargos,
+  Clientes, Form_Clientes,
+  Form_Cargos, Tipo_Documento,
+  Form_Tipo_Documento, Generos,
+  Form_Generos, Pagos,
+  Usuarios, Actividades,
+  Form_Actividades, Recreadores,
+  Form_Recreadores, Recreador,
+  Metodos_Pago, Form_Metodos_Pago,
+  Niveles, Form_Niveles,
+  Materiales, Form_Materiales,
+  Servicios, Sobrecargos,
+  Form_Sobrecargos, Form_Servicios,
+  Eventos, Dolar,
+  FormDataEvent, FormAccount,
+} from "./pages/Pages.jsx"
+
 
 function App() {
   return (
@@ -80,6 +68,7 @@ function App() {
             <Route path="/clientes" element={<Clientes />} />
             <Route path="/edit/cliente/:numero_documento" element={<Form_Clientes />} />
             <Route path="/dolar" element={<Dolar />} />
+            <Route path="/pago_evento/:id_evento" element={<Pagos />} />
             <Route path="/inicio" element={<Inicio />} />
           </Route>
           <Route path="*" element={<Error404 />} />

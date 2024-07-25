@@ -18,3 +18,4 @@ from .eventos import Eventos_Views
 from .clientes import Clientes_Views
 from .respaldo import Respaldo
 from .dollar import Dollar_View
+from .pagos import Pagos_Views
