@@ -87,19 +87,21 @@ export function InputTextTarea({ label, id, name, form, placeholder = "", params
   );
 }
 
-export function InputCheck({ label, id, name, form, params = {}, isError = true, className = "", ...props }) {
+export function InputCheckRadio({ label, id, name, form, params = {}, isError = true, className="", type = "", ...props }) {
   const { errors, register } = form
+  const typeInput= type === "radio" ? "radio" : "checkbox"
   return (
     <div
-      className={`w-100 d-flex check ${errors[name] && isError ? "error" : " "
+      className={`w-max-content d-flex check ${errors[name] && isError ? "error" : " "
         } ${className}`}
     >
       <input
         className="form-check-input"
-        type="checkbox"
+        type={typeInput}
         id={id}
         name={name}
         {...register(name, params)}
+        
         {...props}
       />
       <label className="formulario-label ms-4 " htmlFor={id}>
@@ -423,11 +425,12 @@ export function InputImgPerfil({ label, id, name, form, tamaño = "lg", imgPerfi
   )
 }
 
-export function InputFile({ label, id, name, form }) {
+export function InputFile({ label, id, name, form, onChange = ()=>{}, }) {
   const { errors, register } = form;
   const [img, setImage] = useState({state:false, nombre:"Sin imagen"})
 
   const cambio_imagen = (e) => {
+    onChange(e)
     if (e.target.files[0]) {
       setImage({
         ...img,
@@ -474,10 +477,11 @@ export function InputFile({ label, id, name, form }) {
   )
 }
 
-export function MoneyInput({ label, id, name, form, params = {}, flexRow = false, isError = true, ...props }) {
-  const [value, setValue] = useState('0,00');
+export function MoneyInput({ label, id, name, form, params = {}, flexRow = false, isError = true, onChange = ()=>{}, ...props }) {
+  const [value, setValue] = useState('0.00');
   const { errors, register } = form;
   const handleChange = (event) => {
+    onChange(event)
     const inputValue = event.target.value.replace(/[^\d]/g, ''); // allow only digits
     let formattedValue = '0.00';
     let integerPart = '';

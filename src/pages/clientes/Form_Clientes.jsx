@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { InputsGeneral, UnitSelect, InputCheck, InputImgPerfil } from "../../components/input/Inputs.jsx"
+import { InputsGeneral, UnitSelect } from "../../components/input/Inputs.jsx"
 import { ButtonSimple } from "../../components/button/Button"
 import { useForm } from "react-hook-form";
 import { LoaderCircle } from "../../components/loader/Loader";
@@ -7,8 +7,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import { tipo_documentos, clientes } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
-import { hasLeadingOrTrailingSpace, calcularEdad } from "../../utils/process.jsx";
-import { habilitarEdicion, verifyOptionsSelect, getPersona, controlResultPost } from "../../utils/actions.jsx"
+import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
+import { verifyOptionsSelect, getPersona, controlResultPost } from "../../utils/actions.jsx"
 import ErrorSystem from "../../components/errores/ErrorSystem";
 import texts from "../../context/text_es.js";
 import Navbar from "../../components/navbar/Navbar"

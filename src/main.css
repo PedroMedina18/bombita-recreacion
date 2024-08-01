@@ -175,6 +175,9 @@ body::-webkit-scrollbar-thumb {
 .fs-8 {
   font-size: 8px;
 }
+.w-max-contetn{
+  width: max-content;
+}
 
 @media (min-width: 992px) {
   .w-lg-25 {

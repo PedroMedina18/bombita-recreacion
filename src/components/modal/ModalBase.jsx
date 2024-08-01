@@ -4,7 +4,7 @@ import "./modal.css"
 import { ButtonSimple } from "../button/Button.jsx"
 
 
-function ModalBase({ children, titulo, state, optionsSucces, opcionsDelete, styles={}}) {
+function ModalBase({ children, titulo, state, optionsSucces, opcionsDelete, disabledTrue=false, styles={}}) {
     const [animateState, setAnimateState] = useState("")
     const [estado, setEstado] = state
     const renderizado = useRef(0);
@@ -50,13 +50,12 @@ function ModalBase({ children, titulo, state, optionsSucces, opcionsDelete, styl
                     {children}
                 </div>
                 <div className='d-flex justify-content-end align-items-center mt-2'>
-                    <ButtonSimple className="none-border-radius mx-2" onClick={() => { setEstado(false); callbackSucces() }}>
+                    <ButtonSimple className="none-border-radius mx-2" onClick={() => { setEstado(false); callbackSucces() }} disabled={disabledTrue}> 
                         {nombreSucces}
                     </ButtonSimple>
                     <ButtonSimple className="none-border-radius mx-2" onClick={() => { setEstado(false); callbackDelete() }}>
                         {nombreDelete}
                     </ButtonSimple>
-
                 </div>
             </div>
         </div>

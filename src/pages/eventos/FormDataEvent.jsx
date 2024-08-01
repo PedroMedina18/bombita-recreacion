@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { InputsGeneral, UnitSelect, InputTextTarea, InputCheck, SelectAsync } from "../../components/input/Inputs.jsx"
+import { InputsGeneral, UnitSelect, InputTextTarea, InputCheckRadio, SelectAsync } from "../../components/input/Inputs.jsx"
 import { ButtonSimple } from "../../components/button/Button"
 import { useNavigate } from 'react-router-dom'
 import { useForm } from "react-hook-form";
@@ -116,7 +116,7 @@ function FormDataEvent() {
                 }
             />
             <div className="w-100 d-flex flex-column justify-content-between align-item-center">
-                <InputCheck label={`${texts.label.clienteCheck}`} name="newClient" id="newClient" form={{ errors, register }} checked={!isClient}
+                <InputCheckRadio label={`${texts.label.clienteCheck}`} name="newClient" id="newClient" form={{ errors, register }} checked={!isClient}
                     onClick={(e) => {
                         collapseElements(e)
                     }}
@@ -149,7 +149,7 @@ function FormDataEvent() {
 
             <div className="collapse" id="DataCliente">
 
-                <InputCheck label={`${texts.label.dataPersonaCheck}`} name="persona" id="persona" form={{ errors, register }} className={`${!disabledInputs ? "d-none" : ""}`} checked={disabledInputs}
+                <InputCheckRadio label={`${texts.label.dataPersonaCheck}`} name="persona" id="persona" form={{ errors, register }} className={`${!disabledInputs ? "d-none" : ""}`} checked={disabledInputs}
                     onClick={
                         (e) => {
                             setDisabledInputs(!disabledInputs)

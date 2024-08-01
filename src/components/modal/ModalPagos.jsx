@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { searchCode, getListItems } from "../../utils/actions.jsx";
 import { ButtonSimple } from "../button/Button.jsx"
-import { InputsGeneral, MoneyInput,InputFile } from "../input/Inputs.jsx"
+import { InputsGeneral, MoneyInput, InputFile } from "../input/Inputs.jsx"
 import { useForm } from "react-hook-form";
 import { totalItems } from "../table/Table.jsx"
 import { LoaderCircle } from "../loader/Loader.jsx"
@@ -9,19 +9,32 @@ import { formatoId } from "../../utils/process.jsx"
 import { metodoPago } from "../../utils/API.jsx"
 import texts from "../../context/text_es.js"
 import ErrorSystem from "../errores/ErrorSystem.jsx"
+import { useAuthContext } from "../../context/AuthContext.jsx"
 import "./modal.css"
 import "../table/table.css"
 import ModalBase from "./ModalBase.jsx"
+import { toastError } from "../alerts.jsx"
+import { useHotkeys } from 'react-hotkeys-hook'
 
-function ModalPagos({ titulo, state }) {
-    const [Option, setOption] = useState(null)
+function ModalPagos({ titulo, state, saveDataState, dataEvento }) {
+    const [option, setOption] = useState(null)
     const [dataList, setDataList] = useState([])
+    const { getUser } = useAuthContext();
+    const [dolar] = useState(getUser().dollar.price);
     const renderizado = useRef(0);
     const [estado, setEstado] = state
+    const [pagoData, setPagoData] = saveDataState
     const [errorServer, setErrorServer] = useState("");
     const [loading, setLoading] = useState(true);
     const formulario = useRef(null)
+    const [dataForm, setDataForm] = useState({ monto: null, referencia: null, img: null })
+    const [count, setCount] = useState(0)
+    useHotkeys('t', () => {})
 
+    useEffect(() => {
+        console.log(count)
+    }, [count])
+    
     useEffect(() => {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
@@ -57,14 +70,13 @@ function ModalPagos({ titulo, state }) {
         reset,
         setValue,
         setError
-    } = useForm();
+    } = useForm({ mode: "onChange" });
 
-    
 
     const selectOptions = (e) => {
         reset()
         const ID = e.target.dataset.option ? Number(e.target.dataset.option) : Number(e.target.parentNode.dataset.option)
-        const metodo_pago = dataList.filter((e)=>{ return e.id === ID})
+        const metodo_pago = dataList.filter((e) => { return e.id === ID })
         setOption(metodo_pago[0])
     }
 
@@ -80,17 +92,80 @@ function ModalPagos({ titulo, state }) {
 
     ]
 
-    const ativateSubmit=()=>{
+    const ativateSubmit = () => {
         formulario.current.requestSubmit()
     }
-    const onSubmit=handleSubmit(
-        async(data)=>{
-        console.log("ghgh")
-        console.log(data)
-    })
+
+    const butonDisabled = () => {
+        if (!option) {
+            return true
+        }
+        let referencia = true
+        let capture = true
+        let monto = false
+        if (option.referencia) {
+            referencia = Boolean(dataForm.referencia) ? true : false
+        }
+        if (option.capture) {
+            capture = Boolean(dataForm.capture) ? true : false
+        }
+        if (dataForm.monto && dataForm.monto !== '0.0') {
+            monto = true
+        }
+        if (monto && referencia && capture) {
+            return false
+        } else {
+            return true
+        }
+    }
+
+    const onSubmit = handleSubmit(
+        async (data) => {
+            if(Number(data.monto) <=0){
+                return
+            }
+            const totalACancelar = dataEvento.TipoPago? dataEvento.totalEvento : dataEvento.anticipoEvento
+            const totalCancelado = totalACancelar - dataEvento.totalPagado
+            let monto
+            if (!Boolean(option.divisa)) {
+                monto = (Number(data.monto) / dolar).toFixed(2)
+            } else {
+                monto = Number(data.monto)
+            }
+            const objetData = { monto: Number(monto), metodo_pago: option.nombre }
+            if (data.referencia) {
+                objetData.referencia = data.referencia
+            }
+            if (option.capture) {
+                objetData.capture = dataForm.img
+            }
+            if (monto > totalCancelado) {
+                toastError("El monto presentado supera al total del pago")
+            } else {
+                const metodoPagoRepeat = pagoData.filter((e) => {
+                    return (e.metodo_pago === objetData.metodo_pago && !objetData.referencia && !option.capture)
+                })
+                if (metodoPagoRepeat.length) {
+                    const metodosPago = pagoData.map((e) => {
+                        if (e.metodo_pago === objetData.metodo_pago) {
+                            e.monto = e.monto + objetData.monto
+                            return e
+                        }else{
+                            return e
+                        }
+                    })
+                    setPagoData(metodosPago)
+                } else {
+                    setPagoData([...pagoData, objetData])
+                }
+            }
+            setOption(null)
+            setEstado(false)
+        }
+    )
 
     return (
-        <ModalBase titulo={titulo} state={[estado, setEstado]} optionsSucces={["Agregar", () => {ativateSubmit()}]} opcionsDelete={["Cerrar", () => {reset(); setOption(null) }]}>
+        <ModalBase titulo={titulo} state={[estado, setEstado]} optionsSucces={["Agregar", () => { ativateSubmit() }]} opcionsDelete={["Cerrar", () => { reset(); setOption(null) }]} disabledTrue={butonDisabled()}>
             {
                 loading ?
                     (
@@ -176,39 +251,61 @@ function ModalPagos({ titulo, state }) {
                                 </div>
                                 <div className='w-50 px-5'>
                                     {
-                                        Option &&
-                                        <form encType="multiport/form-data" className='d-flex flex-column' id="formPago" ref={formulario}  onSubmit={onSubmit}>
-                                            <MoneyInput id="monto" label={`Monto en ${Option.divisa? "Divisa" : "Bs"}`} name="monto" form={{ errors, register }} 
-                                            params={{
-                                                required: {
-                                                    value: true,
-                                                    message: texts.inputsMessage.requirePrecio,
-                                                },
-                                                validate: (e) => {
-                                                    if (e <= "0,00") {
-                                                        return texts.inputsMessage.minPrecio;
-                                                    } else {
-                                                        return true;
-                                                    }
-                                                },
-                                            }} />
-                                            {
-                                                Boolean(Option.referencia)&&
-                                                <InputsGeneral id="referencia" label="Número de Referencia" type="number" placeholder='Número de Referencia' name="referencia" form={{ errors, register }} 
+                                        option &&
+                                        <form encType="multiport/form-data" className='d-flex flex-column' id="formPago" ref={formulario} onSubmit={onSubmit}>
+                                            <MoneyInput id="monto" label={`Monto en ${option.divisa ? "Divisa" : "Bs"}`} name="monto" form={{ errors, register }}
                                                 params={{
-                                                    min: {
-                                                        value: 0,
-                                                        message: texts.inputsMessage.min0
+                                                    required: {
+                                                        value: true,
+                                                        message: "Se requiere un monto",
                                                     },
-                                                    minLength: {
-                                                        value: 4,
-                                                        message: "Se espera minimo 4 Digitos"
+                                                    validate: (e) => {
+                                                        if (e <= "0.00") {
+                                                            return "Se requiere un monto";
+                                                        } else {
+                                                            return true;
+                                                        }
                                                     },
-                                                }}/>
+                                                }}
+                                                onChange={(e) => {
+                                                    setDataForm({
+                                                        ...dataForm,
+                                                        monto: e.target.value
+                                                    })
+                                                }}
+                                            />
+                                            {
+                                                Boolean(option.referencia) &&
+                                                <InputsGeneral id="referencia" label="Número de Referencia" type="number" placeholder='Número de Referencia' name="referencia" form={{ errors, register }}
+                                                    params={{
+                                                        min: {
+                                                            value: 0,
+                                                            message: texts.inputsMessage.min0
+                                                        },
+                                                        minLength: {
+                                                            value: 4,
+                                                            message: "Se espera minimo 4 Digitos"
+                                                        },
+                                                    }}
+                                                    onChange={(e) => {
+                                                        setDataForm({
+                                                            ...dataForm,
+                                                            referencia: e.target.value
+                                                        })
+                                                    }}
+                                                />
+
                                             }
                                             {
-                                                Boolean(Option.capture)&&
-                                                <InputFile id="capture" label="Agregar Imagen"  name="capture" form={{ errors, register }}/>
+                                                Boolean(option.capture) &&
+                                                <InputFile id="capture" label="Agregar Imagen" name="capture" form={{ errors, register }}
+                                                    onChange={(e) => {
+                                                        setDataForm({
+                                                            ...dataForm,
+                                                            capture: e.target.files[0] ? e.target.files[0] : null
+                                                        })
+                                                    }}
+                                                />
                                             }
                                         </form>
                                     }

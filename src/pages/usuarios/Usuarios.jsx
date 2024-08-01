@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { InputsGeneral, UnitSelect, InputCheck } from "../../components/input/Inputs.jsx"
+import { InputsGeneral, UnitSelect, InputCheckRadio } from "../../components/input/Inputs.jsx"
 import { ButtonSimple } from "../../components/button/Button"
 import { LoaderCircle } from "../../components/loader/Loader";
 import { useNavigate } from 'react-router-dom'
@@ -137,7 +137,7 @@ function Usuarios() {
                                         ...register("id_persona")
                                         }
                                     />
-                                    <InputCheck label={`${texts.label.dataPersonaCheck}`} name="persona" id="persona" form={{ errors, register }} className={`${!disabledInputs ? "d-none" : ""}`} checked={disabledInputs}
+                                    <InputCheckRadio label={`${texts.label.dataPersonaCheck}`} name="persona" id="persona" form={{ errors, register }} className={`${!disabledInputs ? "d-none" : ""}`} checked={disabledInputs}
                                         onClick={
                                             (e) => {
                                                 setDisabledInputs(!disabledInputs)

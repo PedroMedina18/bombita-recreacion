@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from 'react-router-dom';
-import { InputsGeneral, InputTextTarea, InputCheck } from "../../components/input/Inputs.jsx";
+import { InputsGeneral, InputTextTarea, InputCheckRadio } from "../../components/input/Inputs.jsx";
 import { ButtonSimple } from "../../components/button/Button";
 import { metodoPago } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
@@ -148,9 +148,9 @@ function Form_Metodo_Pago() {
                                         placeholder={texts.placeholder.nameMetodoPago}
                                     />
                                     <span className='fw-light m-0'>Seleccione que Aspectos desea registrar</span>
-                                    <InputCheck label={"Referencia"} id={"referencia"} name={"referencia"} form={{ errors, register }}/>
-                                    <InputCheck label={"Capture"} id={"capture"} name={"capture"} form={{ errors, register }}/>
-                                    <InputCheck label={"Monto en Divisa"} id={"divisa"} name={"divisa"} form={{ errors, register }}/>
+                                    <InputCheckRadio label={"Referencia"} id={"referencia"} name={"referencia"} form={{ errors, register }}/>
+                                    <InputCheckRadio label={"Capture"} id={"capture"} name={"capture"} form={{ errors, register }}/>
+                                    <InputCheckRadio label={"Monto en Divisa"} id={"divisa"} name={"divisa"} form={{ errors, register }}/>
                                     <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
                                         params={{
                                             maxLength: {

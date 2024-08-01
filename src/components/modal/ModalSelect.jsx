@@ -69,6 +69,7 @@ function ModalSelect({ titulo, columns, object, saveSelect, state, select }) {
         }
         setListOptions(newOptions)
     }
+
     const AgregarOptions = () => {
         saveSelect(select.concat(listOptions))
         setListOptions([])
@@ -76,7 +77,7 @@ function ModalSelect({ titulo, columns, object, saveSelect, state, select }) {
     }
     
     return (
-        <ModalBase titulo={titulo} state={[estado, setEstado]} optionsSucces={["Agregar", AgregarOptions]} opcionsDelete={["Cerrar", ()=>{setListOptions([])}]}>
+        <ModalBase titulo={titulo} state={[estado, setEstado]} optionsSucces={["Agregar", AgregarOptions]} opcionsDelete={["Cerrar", ()=>{setListOptions([])}]} disabledTrue={Boolean(listOptions.length)? false : true}>
             <>
                 <div className='me-auto d-flex align-items-center w-100 w-md-50 mt-3 mt-md-0 mb-3'>
                     <ButtonSimple

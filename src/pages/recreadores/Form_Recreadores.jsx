@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { InputsGeneral, UnitSelect, InputCheck, InputImgPerfil } from "../../components/input/Inputs.jsx"
+import { InputsGeneral, UnitSelect, InputCheckRadio, InputImgPerfil } from "../../components/input/Inputs.jsx"
 import { ButtonSimple } from "../../components/button/Button"
 import { useForm } from "react-hook-form";
 import { LoaderCircle } from "../../components/loader/Loader";
@@ -195,7 +195,7 @@ function Form_Recreadores() {
                                         }
                                     />
                                     
-                                    <InputCheck label={`${texts.label.dataPersonaCheck}`} name="persona" id="persona" form={{ errors, register }} className={`${!disabledInputs ? "d-none" : ""}`} checked={disabledInputs}
+                                    <InputCheckRadio label={`${texts.label.dataPersonaCheck}`} name="persona" id="persona" form={{ errors, register }} className={`${!disabledInputs ? "d-none" : ""}`} checked={disabledInputs}
                                         onClick={
                                             (e) => {
                                                 setDisabledInputs(!disabledInputs)

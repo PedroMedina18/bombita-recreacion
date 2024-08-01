@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from 'react-router-dom';
-import { InputsGeneral, InputTextTarea, InputCheck } from "../../components/input/Inputs.jsx";
+import { InputsGeneral, InputTextTarea, InputCheckRadio } from "../../components/input/Inputs.jsx";
 import { LineDescription } from "../../components/otros/LineDescription.jsx";
 import { ButtonSimple } from "../../components/button/Button";
 import { metodoPago, eventos, pagos } from "../../utils/API.jsx";
@@ -24,11 +24,14 @@ function Pagos() {
   const { getUser } = useAuthContext();
   const [dolar] = useState(getUser().dollar.price);
   const [dataEvento, setEvento] = useState({})
+  const [dataPago, setDataPago] = useState([])
   const [stateMetodosPago, setStateMetodosPago] = useState(false)
   const params = useParams();
   const [loading, setLoading] = useState(true)
   const renderizado = useRef(0)
+  const [TipoPago, setTipoPago] = useState(true)
   const [errorServer, setErrorServer] = useState("")
+
   useEffect(() => {
     if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1
@@ -36,6 +39,17 @@ function Pagos() {
       return
     }
   }, [])
+
+  useEffect(() => {
+    const totalPagado = dataPago.reduce((accumulator, current) => {
+      return accumulator + current.monto
+    }, 0)
+
+    setEvento({
+      ...dataEvento,
+      totalPagado: totalPagado
+    })
+  }, [dataPago])
 
   const get_pagos = async () => {
     try {
@@ -56,6 +70,9 @@ function Pagos() {
         ...evento.data.data,
         totalServicios: totalServicios,
         totalSobrecargos: totalSobrecargos,
+        totalEvento: totalServicios + totalSobrecargos,
+        anticipoEvento: (totalServicios + totalSobrecargos) / 2,
+        totalPagado: 0
       })
 
     } catch (error) {
@@ -75,10 +92,30 @@ function Pagos() {
     watch
   } = useForm()
 
+  const deleteSelect = (index) => {
+    const array = [...dataPago];
+    array.splice(index, 1)
+    setDataPago(array)
+  }
+
+  const isTotal = () => {
+    const totalEvento = dataEvento.totalEvento ? dataEvento.totalEvento : 0
+    const totalPagado = dataEvento.totalPagado ? dataEvento.totalPagado : 0
+    const anticipoEvento = dataEvento.anticipoEvento ? dataEvento.anticipoEvento : 0
+    if (TipoPago) {
+      const cancelado = totalPagado < totalEvento
+      return !cancelado
+    } else {
+      const cancelado = totalPagado < anticipoEvento
+      return !cancelado
+    }
+  }
+
   return (
     <Navbar name={texts.pages.pagos.name}>
-      <ModalPagos state={[stateMetodosPago, setStateMetodosPago]} titulo="Agregar pago" />
+      <ModalPagos dataEvento={{ ...dataEvento, TipoPago }} state={[stateMetodosPago, setStateMetodosPago]} titulo="Agregar pago" saveDataState={[dataPago, setDataPago]} />
       <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/eventos") }}><IconRowLeft /> Regresar</ButtonSimple>
+
       {
         loading ?
           (
@@ -121,12 +158,15 @@ function Pagos() {
                 <div className='w-100 my-2'>
                   <hr />
                   <div className='w-100 d-flex'>
-
-                    <ButtonSimple onClick={() => { setStateMetodosPago(true) }} className="my-2 ms-auto">
+                    <div className='w-50 d-flex justify-content-start'>
+                      <InputCheckRadio className='me-2' form={{ errors, register }} id="radio_total" label={"Pago Total"} name="tipo_pago" type='radio' checked={TipoPago} value="total" onClick={() => { setTipoPago(true) }} />
+                      <InputCheckRadio className='ms-2' form={{ errors, register }} id="radio_anticipo" label={"Pago Anticipado"} name="tipo_pago" type='radio' checked={!TipoPago} value="anticipo" onClick={() => { setTipoPago(false) }} />
+                    </div>
+                    <ButtonSimple disabled={isTotal()} onClick={() => { setStateMetodosPago(true) }} className="my-2 ms-auto">
                       Metodos de Pago
                     </ButtonSimple>
                   </div>
-                  <p className='h5 fw-bold'>Descripcion del evento</p>
+                  <p className='h4 fw-bold'>Descripcion del evento</p>
                   {
                     dataEvento.servicios.map((e, index) => (
                       <LineDescription nombre={e.nombre} dolar={dolar} precio={e.precio} key={`sobrecargos_${index}`} />
@@ -143,11 +183,33 @@ function Pagos() {
                     Boolean(dataEvento.totalSobrecargos) &&
                     <LineDescription nombre={"Sobrecargos"} dolar={dolar} precio={dataEvento.totalSobrecargos} />
                   }
-                  <LineDescription nombre={"Total"} dolar={dolar} precio={dataEvento.totalSobrecargos + dataEvento.totalServicios} fs={5} />
+                  <LineDescription nombre={"Total"} dolar={dolar} precio={dataEvento.totalEvento} fs={5} />
+                  <LineDescription nombre={"Monto a Cancelar"} dolar={dolar} precio={TipoPago ? dataEvento.totalEvento : dataEvento.anticipoEvento} fs={5} />
+                  {
+                    Boolean(dataPago.length) &&
+                    <>
+                    <hr />
+                    <p className='h4 m-0 fw-bold'>Metodo de Pago</p>
+                    </>
+                  }
+                  {
+                    dataPago.map((e, index) => (
+                      <LineDescription nombre={e.metodo_pago} dolar={dolar} precio={e.monto} onDoubleClick={() => { deleteSelect(index) }} key={`debito${index}`} />
+                    ))
+                  }
+                  {
+                    Boolean(dataPago.length) &&
+                    <>
+                    <hr />
+                      <LineDescription nombre={"Total Debitado"} dolar={dolar} precio={dataEvento.totalPagado} fs={5} />
+                      <LineDescription nombre={"Monto Faltante"} dolar={dolar} precio={TipoPago ? (dataEvento.totalEvento - dataEvento.totalPagado) : (dataEvento.anticipoEvento - dataEvento.totalPagado)} fs={5} />
+                    </>
+                  }
                 </div>
               </div>
             )
       }
+      <Toaster />
     </Navbar>
   )
 }
