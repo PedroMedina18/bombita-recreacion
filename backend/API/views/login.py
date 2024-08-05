@@ -77,10 +77,11 @@ class Login(View):
                     #     permisos=dictfetchall(cursor)
                     # token=new_token(usuario[0], [permiso['id'] for permiso in permisos], False)
                     precioDollar=consultDollar(cursor)
+                    
                     token=new_token(usuario[0])
                     response={
                         'status':True,
-                        'message': MESSAGE["Acceso"],
+                        'message': MESSAGE['Acceso'],
                         'token':token['token'], 
                         'data':{
                             'id':usuario[0]['id'],
@@ -94,7 +95,7 @@ class Login(View):
                 else:
                     response={
                         'status':False, 
-                        'message': MESSAGE["userPassword"],
+                        'message': MESSAGE['userPassword'],
                         'token':None, 
                         'data':None
                     }
@@ -102,7 +103,7 @@ class Login(View):
             else:
                 response={
                     'status':False, 
-                    'message': MESSAGE["userPassword"],
+                    'message': MESSAGE['userPassword'],
                     'token':None, 
                     'data':None
                 }
@@ -111,7 +112,7 @@ class Login(View):
             print("Error", ex)
             datos = {
                 'status':False,
-                'message': MESSAGE["errorSystem"],
+                'message': MESSAGE['errorSystem'],
                 'token':None, 
                 'data':None}
             return JsonResponse(datos)

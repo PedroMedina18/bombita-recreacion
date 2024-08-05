@@ -1,6 +1,6 @@
 import { useReducer, createContext, useContext, useState } from 'react'
 import { verify_token } from "../utils/API.jsx"
-import Form_Eventos from "../pages/eventos/Form_Eventos.jsx"
+import Form_Eventos from "../pages/eventos/FormEventos.jsx"
 const FormEventContext = createContext();
 
 export const useFormEventContext=()=>{

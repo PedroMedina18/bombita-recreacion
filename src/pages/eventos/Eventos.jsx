@@ -30,7 +30,6 @@ function Eventos() {
             setList: setEventos,
             setData: setDataEventos,
             setLoading: setTableLoaing,
-            
         })
     }
 
@@ -56,6 +55,20 @@ function Eventos() {
             row: (row) => { return `${row.numero_personas}` }
         },
         {
+            name: "Anticipo",
+            row: (row) => {  
+                const value = row.anticipo ? true : false
+                return value 
+            }
+        },
+        {
+            name: "Pago Total",
+            row: (row) => {  
+                const value = row.total ? true : false
+                return value 
+            }
+        },
+        {
             name: "Estado",
             row: (row) => {  
                 const value = row.estado ? true : false
@@ -78,7 +91,7 @@ function Eventos() {
             }
         },
         money: (row)=>{
-            navigate(`/pago_evento/${row.id}`)
+            navigate(`/eventos/pagos/${row.id}/`)
         },
         register: {
             name: texts.registerMessage.buttonRegisterEvento,
@@ -90,7 +103,6 @@ function Eventos() {
     
     return (
         <Navbar name={texts.pages.getEventos.name} descripcion={texts.pages.getEventos.description}>
-
             <Table
                 columns={columns}
                 rows={listEventos}

@@ -1,43 +1,41 @@
 import { useState, useEffect, useRef } from 'react';
 import { useForm } from "react-hook-form";
 import { InputsGeneral, InputTextTarea } from "../../components/input/Inputs.jsx";
-import { ButtonSimple } from "../../components/button/Button";
-import { useNavigate, useParams } from 'react-router-dom';
-import { LoaderCircle } from "../../components/loader/Loader.jsx";
-import { materiales } from "../../utils/API.jsx";
+import { ButtonSimple } from "../../components/button/Button.jsx";
+import { useParams, useNavigate } from "react-router-dom";
+import { niveles } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
-import { controlResultPost } from "../../utils/actions.jsx";
 import { Toaster } from "sonner";
+import { controlResultPost } from "../../utils/actions.jsx";
+import { LoaderCircle } from "../../components/loader/Loader.jsx";
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
-import Navbar from "../../components/navbar/Navbar";
-import Swal from 'sweetalert2';
+import Navbar from "../../components/navbar/Navbar.jsx";
 import texts from "../../context/text_es.js";
+import Swal from 'sweetalert2';
 import pattern from "../../context/pattern.js";
-import { IconRowLeft } from "../../components/Icon";
+import { IconRowLeft } from "../../components/Icon.jsx";
 
-function Form_Materiales() {
+function FormNiveles() {
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
     const params = useParams();
-    const renderizado = useRef(0);
+    const [loading, setLoading] = useState(true)
+    const renderizado = useRef(0)
     const [errorServer, setErrorServer] = useState("")
 
     useEffect(() => {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             if (params.id) {
-                get_materiales()
+                get_nivel()
             }
-            setLoading(false)
             return
         }
     }, [])
 
-    const get_materiales = async () => {
+    const get_nivel = async () => {
         try {
-            const respuesta = await materiales.get({subDominio:[Number(params.id)]})
-            console.log(respuesta)
+            const respuesta = await niveles.get({subDominio:[Number(params.id)]})
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
                 return
@@ -78,27 +76,27 @@ function Form_Materiales() {
                 if (confirmacion.isConfirmed) {
                     const body = {
                         nombre: data.nombre,
-                        total: Number(data.total),
                         descripcion: data.descripcion,
                     }
                     alertLoading("Cargando")
-                    const res = params.id ? await materiales.put(body, Number(params.id)) : await materiales.post(body)
+                    const res = params.id ? await niveles.put(body, Number(params.id)) : await niveles.post(body)
                     controlResultPost({
                         respuesta: res,
-                        messageExito: params.id ? texts.successMessage.editionMaterial : texts.successMessage.registerMaterial,
-                        useNavigate: { navigate: navigate, direction: "/materiales" }
+                        messageExito: params.id ? texts.successMessage.editionNivel : texts.successMessage.registerMaterial,
+                        useNavigate: { navigate: navigate, direction: "/niveles/" }
                     })
                 }
             } catch (error) {
                 console.log(error)
                 Swal.close()
-                toastError(texts.errorMessage.errorConexion,)
+                toastError(texts.errorMessage.errorConexion)
             }
         }
     )
     return (
-        <Navbar name={params.id ? texts.pages.editMaterial.name : texts.pages.registerMaterial.name} descripcion={params.id ? texts.pages.editMaterial.description : texts.pages.registerMaterial.description}>
-            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/materiales") }}> <IconRowLeft /> Regresar</ButtonSimple>
+        <Navbar name={`${params.id ? texts.pages.editNivel.name : texts.pages.registerNiveles.name}`} descripcion={`${params.id ? texts.pages.editNivel.description : texts.pages.registerNiveles.description}`}>
+            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/niveles/") }}><IconRowLeft /> Regresar</ButtonSimple>
+
 
             {
                 loading ?
@@ -119,11 +117,11 @@ function Form_Materiales() {
                             <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
                                 <form className="w-100 d-flex flex-column"
                                     onSubmit={onSubmit}>
-                                    <InputsGeneral type={"text"} label={texts.label.nombre} name="nombre" id="nombre" form={{ errors, register }}
+                                    <InputsGeneral type={"text"} label={`${texts.label.nombre}`} name="nombre" id="nombre" form={{ errors, register }}
                                         params={{
                                             required: {
                                                 value: true,
-                                                message: texts.inputsMessage.requireName
+                                                message: texts.inputsMessage.requireName,
                                             },
                                             maxLength: {
                                                 value: 100,
@@ -145,21 +143,7 @@ function Form_Materiales() {
                                                 }
                                             }
                                         }}
-                                        placeholder={texts.placeholder.nameMaterial}
-                                    />
-                                    <InputsGeneral type={"number"} label={`${texts.label.cantidadTotal}`} name="total" id="total" form={{ errors, register }}
-                                        defaultValue={0}
-                                        params={{
-                                            min: {
-                                                value: 0,
-                                                message: texts.inputsMessage.min0
-                                            },
-                                            step: {
-                                                value: 1,
-                                                message: texts.inputsMessage.step1
-                                            }
-                                        }}
-                                        placeholder="0"
+                                        placeholder={texts.placeholder.nameNivel}
                                     />
                                     <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
                                         params={{
@@ -179,19 +163,18 @@ function Form_Materiales() {
                                                 }
                                             }
                                         }}
-                                        placeholder={texts.placeholder.descrpcion}
+                                        placeholder={texts.placeholder.descripcion}
                                     />
                                     <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
-                                        {params.id ? "Guardar" : "Registrar"}
+                                        {params.id? "Guardar" : "Registrar"}
                                     </ButtonSimple>
                                 </form>
                             </div>
                         )
             }
-
             <Toaster />
         </Navbar>
     )
 }
 
-export default Form_Materiales
+export default FormNiveles

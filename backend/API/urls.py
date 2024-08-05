@@ -1,5 +1,5 @@
 from django.urls import path
-from .views.view import Metodos_Pagos_Views, Actividades_Views, Cargos_Views, Clientes_Views, Dollar_View, Eventos_Views, Genero_Views, Login, Materiales_Views, Nivel_Views, Permisos_Views, Persona_Views, Recreadores_Views, Respaldo, Servicios_Views, Sobrecargo_Views, Tipo_Documento_Views, Usuario_Views, Verify_Token_Views, Pagos_Views
+from .views.view import Metodos_Pagos_Views, Actividades_Views, Cargos_Views, Clientes_Views, Dollar_View, Eventos_Views, Genero_Views, Login, Eventos_Recreadores_Servicios_View, Materiales_Views, Nivel_Views, Permisos_Views, Persona_Views, Recreadores_Views, Respaldo, Servicios_Views, Sobrecargo_Views, Tipo_Documento_Views, Usuario_Views, Verify_Token_Views, Pagos_Views
 
 urlpatterns=[
     path('cargos/', Cargos_Views.as_view(), name='cargos'),
@@ -26,12 +26,14 @@ urlpatterns=[
     path('usuarios/', Usuario_Views.as_view(), name='usuarios'),
     path('recreadores/', Recreadores_Views.as_view(), name='recreadores'),
     path('recreadores/<str:identificador>/', Recreadores_Views.as_view(), name='recreadores'),
+    path('eventos/pagos/', Pagos_Views.as_view(), name='pagos'),
+    path('eventos/recreadores/', Eventos_Recreadores_Servicios_View.as_view(), name='recreadores_eventos'),
+    path('eventos/recreadores/<int:id>/', Eventos_Recreadores_Servicios_View.as_view(), name='recreadores_evento'),
     path('eventos/', Eventos_Views.as_view(), name='eventos'),
     path('eventos/<int:id>/', Eventos_Views.as_view(), name='evento'),
     path('clientes/', Clientes_Views.as_view(), name='clientes'),
     path('clientes/<str:identificador>/', Clientes_Views.as_view(), name='cliente'),
     path('login/', Login.as_view(), name='login'),
     path('verify/', Verify_Token_Views.as_view(), name='verify'),
-    path('pagos/', Pagos_Views.as_view(), name='pagos'),
-    path('respaldo/', Respaldo.as_view(), name='resldo'),
+    path('respaldo/', Respaldo.as_view(), name='respaldo'),
 ]

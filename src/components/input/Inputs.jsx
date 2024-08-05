@@ -478,8 +478,9 @@ export function InputFile({ label, id, name, form, onChange = ()=>{}, }) {
 }
 
 export function MoneyInput({ label, id, name, form, params = {}, flexRow = false, isError = true, onChange = ()=>{}, ...props }) {
-  const [value, setValue] = useState('0.00');
-  const { errors, register } = form;
+  const [value, setValueMoney] = useState('0.00');
+  const { errors, register, setValue } = form;
+  
   const handleChange = (event) => {
     onChange(event)
     const inputValue = event.target.value.replace(/[^\d]/g, ''); // allow only digits
@@ -509,7 +510,7 @@ export function MoneyInput({ label, id, name, form, params = {}, flexRow = false
     }
 
     // update state and input value
-    setValue(formattedValue);
+    setValue(`${name}` ,formattedValue);
 
     // move cursor to the end of the input field
     const cursorPosition = formattedValue.length;
@@ -533,7 +534,7 @@ export function MoneyInput({ label, id, name, form, params = {}, flexRow = false
               className="formulario-input text-right"
               type="text"
               id={id}
-              value={value}
+              defaultValue={'0.00'}
               {...register(name, params)}
               {...props}
               onChange={handleChange}
@@ -560,7 +561,7 @@ export function MoneyInput({ label, id, name, form, params = {}, flexRow = false
             className="formulario-input text-right"
             type="text"
             id={id}
-            value={value}
+            defaultValue={'0.00'}
             {...register(name, params)}
             {...props}
             onChange={handleChange}

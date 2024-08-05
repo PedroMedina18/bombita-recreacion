@@ -1,22 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
 import { useForm } from "react-hook-form";
-import { InputsGeneral, InputTextTarea, MoneyInput } from "../../components/input/Inputs.jsx";
-import { ButtonSimple } from "../../components/button/Button";
-import { useParams, useNavigate } from "react-router-dom";
-import { sobrecargos } from "../../utils/API.jsx";
-import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
-import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
-import { Toaster } from "sonner";
-import { controlResultPost } from "../../utils/actions.jsx";
+import { useNavigate, useParams } from 'react-router-dom'
+import { InputsGeneral, InputTextTarea } from "../../components/input/Inputs.jsx";
+import { ButtonSimple } from "../../components/button/Button.jsx";
 import { LoaderCircle } from "../../components/loader/Loader.jsx";
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
-import Navbar from "../../components/navbar/Navbar";
-import texts from "../../context/text_es.js";
+import { generos } from "../../utils/API.jsx";
+import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
+import { Toaster } from "sonner";
+import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
+import { controlResultPost } from "../../utils/actions.jsx";
+import Navbar from "../../components/navbar/Navbar.jsx";
 import Swal from 'sweetalert2';
+import texts from "../../context/text_es.js";
 import pattern from "../../context/pattern.js";
-import { IconRowLeft } from "../../components/Icon";
+import { IconRowLeft } from "../../components/Icon.jsx";
 
-function Form_Niveles() {
+function FormGeneros() {
     const navigate = useNavigate();
     const params = useParams();
     const [loading, setLoading] = useState(true)
@@ -27,16 +27,16 @@ function Form_Niveles() {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             if (params.id) {
-                get_sobrecargo()
+                get_genero()
             }
             setLoading(false)
             return
         }
     }, [])
 
-    const get_sobrecargo = async () => {
+    const get_genero = async () => {
         try {
-            const respuesta = await sobrecargos.get({subDominio:[Number(params.id)]})
+            const respuesta = await generos.get({ subDominio:[Number(params.id)] })
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
                 return
@@ -66,7 +66,7 @@ function Form_Niveles() {
         formState: { errors },
         setValue,
         watch
-    } = useForm()
+    } = useForm();
 
     // *Funcion para registrar
     const onSubmit = handleSubmit(
@@ -78,16 +78,17 @@ function Form_Niveles() {
                     const body = {
                         nombre: data.nombre,
                         descripcion: data.descripcion,
-                        monto: parseFloat(data.monto),
                     }
                     alertLoading("Cargando")
-                    const res = params.id ? await sobrecargos.put(body, Number(params.id)) : await sobrecargos.post(body)
+                    console.log(params.id)
+                    const res = params.id ? await generos.put(body, Number(params.id)) : await generos.post(body)
                     controlResultPost({
                         respuesta: res,
-                        messageExito: params.id ? texts.successMessage.editionSobrecargo : texts.successMessage.registerSobrecargo,
-                        useNavigate: { navigate: navigate, direction: "/sobrecargos" }
+                        messageExito: params.id ? texts.successMessage.editionGenero : texts.successMessage.registerGenero,
+                        useNavigate: { navigate: navigate, direction: "/generos/" }
                     })
                 }
+
             } catch (error) {
                 console.log(error)
                 Swal.close()
@@ -95,9 +96,10 @@ function Form_Niveles() {
             }
         }
     )
+
     return (
-        <Navbar name={`${params.id ? texts.pages.editSobrecargo.name : texts.pages.registerSobrecargos.name}`} descripcion={`${params.id ? texts.pages.editSobrecargo.description : texts.pages.registerSobrecargos.description}`}>
-            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/sobrecargos") }}><IconRowLeft /> Regresar</ButtonSimple>
+        <Navbar name={params.id ? texts.pages.editGenero.name : texts.pages.registerGenero.name} descripcion={params.id ? texts.pages.editGenero.description : texts.pages.registerGenero.description}>
+            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/generos/") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
             {
                 loading ?
@@ -115,7 +117,6 @@ function Form_Niveles() {
                         )
                         :
                         (
-
                             <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
                                 <form className="w-100 d-flex flex-column"
                                     onSubmit={onSubmit}>
@@ -127,11 +128,7 @@ function Form_Niveles() {
                                             },
                                             maxLength: {
                                                 value: 100,
-                                                message: texts.inputsMessage.max100
-                                            },
-                                            minLength: {
-                                                value: 5,
-                                                message: texts.inputsMessage.min5
+                                                message: texts.inputsMessage.max100,
                                             },
                                             pattern: {
                                                 value: pattern.textWithNumber,
@@ -145,7 +142,7 @@ function Form_Niveles() {
                                                 }
                                             }
                                         }}
-                                        placeholder={texts.placeholder.nameSobrecargos}
+                                        placeholder={texts.placeholder.nameGenero}
                                     />
                                     <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
                                         params={{
@@ -167,36 +164,16 @@ function Form_Niveles() {
                                         }}
                                         placeholder={texts.placeholder.descripcion}
                                     />
-                                    <MoneyInput
-                                        label={texts.label.monto}
-                                        name="monto"
-                                        id="monto"
-                                        form={{ errors, register }}
-                                        params={{
-                                            required: {
-                                                value: true,
-                                                message: texts.inputsMessage.requireMonto,
-                                            },
-                                            validate: (e) => {
-                                                if (e <= 0) {
-                                                    return texts.inputsMessage.minMonto;
-                                                } else {
-                                                    return true;
-                                                }
-                                            },
-                                        }}
-                                    />
                                     <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
-                                        {params.id? "Guardar" : "Registrar"}
+                                        {params.id ? "Guardar" : "Registrar"}
                                     </ButtonSimple>
                                 </form>
                             </div>
                         )
             }
             <Toaster />
-
         </Navbar>
     )
 }
 
-export default Form_Niveles
+export default FormGeneros

@@ -39,8 +39,6 @@ export const tipo_documentos = new Petisions("tipo_documentos");
 
 export const servicios = new Petisions("servicios");
 
-export const pagos = new Petisions("pagos");
-
 export const respaldo = new Petisions("respaldo");
 
 export const metodoPago = new Petisions("metodos_pago");

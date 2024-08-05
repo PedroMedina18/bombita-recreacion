@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ButtonSimple } from "../../components/button/Button"
 import { useForm } from "react-hook-form";
 import { toastError, alertConfim, alertLoading } from "../../components/alerts.jsx"
@@ -12,6 +12,7 @@ import { useAuthContext } from "../../context/AuthContext.jsx"
 import Swal from 'sweetalert2';
 import texts from "../../context/text_es.js";
 import TableDescriptionFacture from "../../components/table/TableDescriptionFacture.jsx"
+
 function FormAccount() {
     const { getUser } = useAuthContext();
     const [dolar] = useState(getUser().dollar.price);
@@ -65,7 +66,7 @@ function FormAccount() {
                     controlResultPost({
                         respuesta: res,
                         messageExito: texts.successMessage.registerEvento,
-                        useNavigate: { navigate: navigate, direction: "/inicio" }
+                        useNavigate: { navigate: navigate, direction: "/inicio/" }
                     })
 
                 }
@@ -191,7 +192,7 @@ function FormAccount() {
                 </div>
 
                 <div className="w-100 d-flex">
-                    <ButtonSimple type="button" onClick={(e) => { navigate("/register/eventos") }} className="w-100 mx-5 mt-3">
+                    <ButtonSimple type="button" onClick={(e) => { navigate("/register/eventos/") }} className="w-100 mx-5 mt-3">
                         Regresar
                     </ButtonSimple>
 

@@ -20,7 +20,7 @@ class Verify_Token_Views(View):
         try:
             verify = verify_token(request.headers)
             cursor=connection.cursor()
-            if verify["status"]:
+            if verify['status']:
                 query="""
                 SELECT 
                     user.id, 
@@ -34,32 +34,32 @@ class Verify_Token_Views(View):
                 LEFT JOIN cargos ca ON user.cargo_id = ca.id
                 WHERE user.id=%s;
                 """
-                cursor.execute(query, [int(verify["info"]["id"])])
+                cursor.execute(query, [int(verify['info']['id'])])
                 usuario = dictfetchall(cursor)
                 token = new_token(usuario[0])
                 precioDollar = consultDollar(cursor)
                 datos = {
                     'status': True,
-                    'message': "Token valido",
-                    "token": token["token"],
+                    'message': 'Token valido',
+                    'token': token['token'],
                     'data':{
-                        "id":usuario[0]["id"],
-                        "nombre":usuario[0]["nombre"],
-                        "cargo":usuario[0]["cargo"],
-                        "inicio_sesion":datetime.now(),
-                        "dollar":precioDollar
+                        'id':usuario[0]['id'],
+                        'nombre':usuario[0]['nombre'],
+                        'cargo':usuario[0]['cargo'],
+                        'inicio_sesion':datetime.now(),
+                        'dollar':precioDollar
                     } 
                 }
             else:
                 datos = {
                     'status': False,
-                    'message': verify["message"]
+                    'message': verify['message']
                 }
             return JsonResponse(datos)
         except Exception as ex:
-            print("Error", ex)
+            print('Error', ex)
             datos = {
-                "status": False,
+                'status': False,
                 'message': f"{MESSAGE['errorSystem']}",
             }
             return JsonResponse(datos)

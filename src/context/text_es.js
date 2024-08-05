@@ -1,6 +1,7 @@
 import { servicios } from "../utils/API"
 
 const texts={
+
     inputsMessage:{
         confirmPassword:"Por favor confirmar la contraseña",
         errorPassword:"Las contraseña no Coinciden",
@@ -15,6 +16,7 @@ const texts={
         min8:"Minimo 8 caracteres",
         min7:"Minimo 7 caracteres",
         min5:"Minimo 5 caracteres",
+        min4:"Minimo 4 caracteres",
         min0:"Minimo 0",
         min1:"Minimo 1",
         minRecreador:"Minimo un recreador",
@@ -56,6 +58,7 @@ const texts={
         invalidPassword:"Usuario invalido",
         invalidNombres:"Nombres invalidos",
         invalidLastNames:"Apellidos invalidos",
+        invalidMonto:"Monto invalido",
         noneSpace:"Sin espacios al inicio o al final",
         onlyCharacter11:"Solo se admiten 11 caracteres",
     },
@@ -93,6 +96,7 @@ const texts={
         confirRegister:"Por favor confirmar la solicitud de Registro",
         confirEdit:"Confirmar la Solicitud de Edición",
         confirCloset:"Desea cerrar sesión",
+        confirPago:"Desea registrar este pago",
         inactividad:"No se ha detectado ninguna actividad por un periodo prolongado de tiempo el sistema cerrara sesión por seguridad"
     },
 
@@ -102,7 +106,10 @@ const texts={
         errorSystem:`Error de Sistema. Por favor intente mas tarde`,
         errorConexion:"Error de conexion. Por favor intente mas tarde",
         errorRequest:"No se ha obtenido una respuesta. Por favor vuelva a intentar",
-        errorResponse:"Error de consulta"
+        errorResponse:"Error de consulta",
+        errorMonto:"El monto presentado supera el monto a cancelar",
+        errorNotPago:"No se a añadido ninguna forma de pago",
+        errorNotTotal:"No se a compleato el monto a cancelar",
     },
 
     label:{
@@ -165,7 +172,6 @@ const texts={
         nameSobrecargos:"Nombre de la Sobrecargos",
         nameServicio:"Nombre del Servicio",
         nameTipoDocumento:"Nombre del Tipo de Documento",
-
     },
 
     pages:{
@@ -319,6 +325,10 @@ const texts={
         },
         pagos:{
             name:"Registrar Pagos de Eventos",
+        },
+        recreadores_eventos:{
+            name:"Recreadores del Evento",
+            description:"Recreadores Asignados al Evento"
         },
     },
 

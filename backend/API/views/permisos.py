@@ -12,35 +12,35 @@ class Permisos_Views(View):
         try:
             cursor = connection.cursor()
             verify=verify_token(request.headers)
-            if(not verify["status"]):
+            if(not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"],
-                    "data": None
+                    'status': False,
+                    'message': verify['message'],
+                    'data': None
                 }
                 return JsonResponse(datos)
-            query = "SELECT * FROM permisos ORDER BY id ASC;"
+            query = 'SELECT * FROM permisos ORDER BY id ASC;'
             cursor.execute(query)
             permisos = dictfetchall(cursor)
             if len(permisos) > 0:
                 datos = {
-                    "status": True,
-                    'message': "Exito",
-                    "data": permisos
+                    'status': True,
+                    'message': 'Exito',
+                    'data': permisos
                 }
             else:
                 datos = {
-                    "status": False,
-                    'message': "Error. Permisos no encontrados",
-                    "data": None
+                    'status': False,
+                    'message': 'Error. Permisos no encontrados',
+                    'data': None
                 }
             return JsonResponse(datos)
         except Exception as ex:
-            print("Error", ex)
+            print('Error', ex)
             datos = {
-                "status": False,
-                'message': "Error. Error de sistema",
-                "data": None
+                'status': False,
+                'message': 'Error. Error de sistema',
+                'data': None
             }
             return JsonResponse(datos)
         finally:

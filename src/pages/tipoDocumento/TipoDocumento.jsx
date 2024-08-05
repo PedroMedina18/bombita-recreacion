@@ -1,17 +1,17 @@
 import { useEffect, useState, useRef } from "react"
 import { Toaster } from "sonner";
-import { metodoPago } from "../../utils/API.jsx";
+import { tipo_documentos } from "../../utils/API.jsx";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx";
 import { formatoId } from "../../utils/process.jsx"
 import { alertInfo } from "../../components/alerts.jsx"
-import Navbar from "../../components/navbar/Navbar";
-import Table from "../../components/table/Table";
+import Navbar from "../../components/navbar/Navbar.jsx";
+import Table from "../../components/table/Table.jsx";
 import texts from "../../context/text_es.js";
 
-function Metodos_Pago() {
-    const [listMetodos_Pagos, setMetodos_Pagos] = useState([])
-    const [dataMetodos_Pagos, setDataMetodos_Pagos] = useState({ pages: 0, total: 0 })
+function TipoDocumento() {
+    const [listTipo_Documentos, setTipo_Documentos] = useState([])
+    const [dataTipo_Documentos, setDataTipo_Documentos] = useState({ pages: 0, total: 0 })
     const [tableLoading, setTableLoaing] = useState(true)
     const renderizado = useRef(0)
 
@@ -19,16 +19,16 @@ function Metodos_Pago() {
     useEffect(() => {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
-            getMetodos_Pagos()
+            getTipo_Documentos()
             return
         }
     }, [])
 
-    const getMetodos_Pagos = () => {
+    const getTipo_Documentos = () => {
         getListItems({
-            object: metodoPago,
-            setList: setMetodos_Pagos,
-            setData: setDataMetodos_Pagos,
+            object: tipo_documentos,
+            setList: setTipo_Documentos,
+            setData: setDataTipo_Documentos,
             setLoading: setTableLoaing
         })
     }
@@ -43,14 +43,6 @@ function Metodos_Pago() {
             row: (row) => { return row.nombre }
         },
         {
-            name: "Referencia",
-            row: (row) => { return row.referencia? true : false }
-        },
-        {
-            name: "Capture",
-            row: (row) => { return row.capture? true : false }
-        },
-        {
             name: "Descripcion",
             row: (row) => { return row.descripcion }
         },
@@ -60,8 +52,8 @@ function Metodos_Pago() {
         delete: (row) => {
             deleteItem({
                 row: row,
-                objet: metodoPago,
-                functionGet: getMetodos_Pagos
+                objet: tipo_documentos,
+                functionGet: getTipo_Documentos
             })
         },
         search: {
@@ -69,15 +61,15 @@ function Metodos_Pago() {
             function: (value) => {
                 searchCode({
                     value: value,
-                    object: metodoPago,
-                    setList: setMetodos_Pagos,
-                    setData: setDataMetodos_Pagos,
+                    object: tipo_documentos,
+                    setList: setTipo_Documentos,
+                    setData: setDataTipo_Documentos,
                     setLoading: setTableLoaing
                 })
             }
         },
         put: (row)=>{
-            navigate(`/edit/Metodos_Pago/${row.id}`)
+            navigate(`/edit/tipo_documento/${row.id}/`)
         },
         get:(row)=>{
             alertInfo(
@@ -86,21 +78,21 @@ function Metodos_Pago() {
             )
         },
         register: {
-            name: texts.registerMessage.buttonRegisterMetodoPago,
+            name: texts.registerMessage.buttonRegisterTipoDocumento,
             function: () => {
-                navigate("/register/Metodos_Pago")
+                navigate("/register/tipo_documento/")
             }
         }
     }
 
     return (
-        <Navbar name={`${texts.pages.getMetodosPago.name}`} descripcion={`${texts.pages.getMetodosPago.description}`}>
+        <Navbar name={`${texts.pages.getTipoDocumentos.name}`} descripcion={`${texts.pages.getTipoDocumentos.description}`}>
 
             <Table
                 columns={columns}
-                rows={listMetodos_Pagos}
-                totalElements={dataMetodos_Pagos.total}
-                totalPages={dataMetodos_Pagos.pages}
+                rows={listTipo_Documentos}
+                totalElements={dataTipo_Documentos.total}
+                totalPages={dataTipo_Documentos.pages}
                 options={options}
                 loading={tableLoading}
             />
@@ -109,4 +101,4 @@ function Metodos_Pago() {
     )
 }
 
-export default Metodos_Pago
+export default TipoDocumento

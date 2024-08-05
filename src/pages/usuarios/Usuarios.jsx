@@ -95,7 +95,7 @@ function Usuarios() {
                         respuesta:res,
                         useNavigate:{
                             navigate,
-                            direction:"/inicio"
+                            direction:"/inicio/"
                         },
                         messageExito:texts.successMessage.usuario,
                     })

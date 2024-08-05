@@ -80,12 +80,12 @@ function Materiales() {
             }
         },
         put: (row)=>{
-            navigate(`/edit/material/${row.id}`)
+            navigate(`/edit/material/${row.id}/`)
         },
         register: {
             name: texts.registerMessage.buttonRegisterMaterial,
             function: () => {
-                navigate("/register/material")
+                navigate("/register/material/")
             }
         }
     }

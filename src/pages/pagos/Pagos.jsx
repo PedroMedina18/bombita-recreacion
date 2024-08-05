@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from 'react-router-dom';
-import { InputsGeneral, InputTextTarea, InputCheckRadio } from "../../components/input/Inputs.jsx";
+import { InputCheckRadio } from "../../components/input/Inputs.jsx";
 import { LineDescription } from "../../components/otros/LineDescription.jsx";
 import { ButtonSimple } from "../../components/button/Button";
-import { metodoPago, eventos, pagos } from "../../utils/API.jsx";
+import { eventos } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { Toaster } from "sonner";
 import { formatoId, formatDateWithTime12Hour } from "../../utils/process.jsx";
@@ -23,14 +23,14 @@ function Pagos() {
   const navigate = useNavigate();
   const { getUser } = useAuthContext();
   const [dolar] = useState(getUser().dollar.price);
-  const [dataEvento, setEvento] = useState({})
-  const [dataPago, setDataPago] = useState([])
-  const [stateMetodosPago, setStateMetodosPago] = useState(false)
+  const [dataEvento, setEvento] = useState({});
+  const [dataPago, setDataPago] = useState([]);
+  const [stateMetodosPago, setStateMetodosPago] = useState(false);
+  const [tipoPago, setTipoPago] = useState(true);
   const params = useParams();
-  const [loading, setLoading] = useState(true)
-  const renderizado = useRef(0)
-  const [TipoPago, setTipoPago] = useState(true)
-  const [errorServer, setErrorServer] = useState("")
+  const [loading, setLoading] = useState(true);
+  const [errorServer, setErrorServer] = useState("");
+  const renderizado = useRef(0);
 
   useEffect(() => {
     if (renderizado.current === 0) {
@@ -102,7 +102,7 @@ function Pagos() {
     const totalEvento = dataEvento.totalEvento ? dataEvento.totalEvento : 0
     const totalPagado = dataEvento.totalPagado ? dataEvento.totalPagado : 0
     const anticipoEvento = dataEvento.anticipoEvento ? dataEvento.anticipoEvento : 0
-    if (TipoPago) {
+    if (tipoPago) {
       const cancelado = totalPagado < totalEvento
       return !cancelado
     } else {
@@ -110,11 +110,48 @@ function Pagos() {
       return !cancelado
     }
   }
+  const onSubmit = async() => {
+    try {
+      if(!dataPago.length){
+        toastError(texts.errorMessage.errorNotPago)
+        return
+      }
+      const totalCancelado = tipoPago ? (dataEvento.totalEvento - dataEvento.totalPagado) : (dataEvento.anticipoEvento - dataEvento.totalPagado)
+      if(Number(totalCancelado) > 0) {
+        toastError(texts.errorMessage.errorNotTotal)
+        return
+      }
+      const message = texts.confirmMessage.confirPago
+      const confirmacion = await alertConfim("Confirmar", message)
+      if (confirmacion.isConfirmed) {
+        const Form = new FormData()
+        Form.append('tipo_registro', tipoPago)
+        Form.append('evento', Number(dataEvento.info.id))
+        Form.append('pagos', JSON.stringify(dataPago))
+        dataPago.forEach((e, index)=>{
+          if(e.capture){
+            Form.append(`capture_${Number(dataEvento.info.id)}_${e.metodo_pago}_${index}`, e.capture)
+          }
+        })
+        alertLoading("Cargando")
+        const respuesta = await eventos.postData(Form, {subDominio : ["pagos"]})
+        controlResultPost({
+          respuesta: respuesta,
+          messageExito: "listo",
+          useNavigate: { navigate: navigate, direction: "/inicio/" }
+        })
+      }
+    } catch (error) {
+      console.log(error)
+      Swal.close()
+      toastError(texts.errorMessage.errorConexion)
+    }
+  }
 
   return (
     <Navbar name={texts.pages.pagos.name}>
-      <ModalPagos dataEvento={{ ...dataEvento, TipoPago }} state={[stateMetodosPago, setStateMetodosPago]} titulo="Agregar pago" saveDataState={[dataPago, setDataPago]} />
-      <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/eventos") }}><IconRowLeft /> Regresar</ButtonSimple>
+      <ModalPagos dataEvento={{ ...dataEvento, tipoPago }} state={[stateMetodosPago, setStateMetodosPago]} titulo="Agregar pago" saveDataState={[dataPago, setDataPago]} />
+      <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/eventos/") }}><IconRowLeft /> Regresar</ButtonSimple>
 
       {
         loading ?
@@ -159,10 +196,10 @@ function Pagos() {
                   <hr />
                   <div className='w-100 d-flex'>
                     <div className='w-50 d-flex justify-content-start'>
-                      <InputCheckRadio className='me-2' form={{ errors, register }} id="radio_total" label={"Pago Total"} name="tipo_pago" type='radio' checked={TipoPago} value="total" onClick={() => { setTipoPago(true) }} />
-                      <InputCheckRadio className='ms-2' form={{ errors, register }} id="radio_anticipo" label={"Pago Anticipado"} name="tipo_pago" type='radio' checked={!TipoPago} value="anticipo" onClick={() => { setTipoPago(false) }} />
+                      <InputCheckRadio className='me-2' form={{ errors, register }} id="radio_total" label={"Pago Total"} name="tipo_pago" type='radio' checked={tipoPago} value="total" onClick={() => { setTipoPago(true) }} />
+                      <InputCheckRadio className='ms-2' form={{ errors, register }} id="radio_anticipo" label={"Pago Anticipado"} name="tipo_pago" type='radio' checked={!tipoPago} value="anticipo" onClick={() => { setTipoPago(false) }} />
                     </div>
-                    <ButtonSimple disabled={isTotal()} onClick={() => { setStateMetodosPago(true) }} className="my-2 ms-auto">
+                    <ButtonSimple disabled={isTotal()} onClick={() => { setStateMetodosPago(!stateMetodosPago) }} className="my-2 ms-auto">
                       Metodos de Pago
                     </ButtonSimple>
                   </div>
@@ -184,27 +221,32 @@ function Pagos() {
                     <LineDescription nombre={"Sobrecargos"} dolar={dolar} precio={dataEvento.totalSobrecargos} />
                   }
                   <LineDescription nombre={"Total"} dolar={dolar} precio={dataEvento.totalEvento} fs={5} />
-                  <LineDescription nombre={"Monto a Cancelar"} dolar={dolar} precio={TipoPago ? dataEvento.totalEvento : dataEvento.anticipoEvento} fs={5} />
+                  <LineDescription nombre={"Monto a Cancelar"} dolar={dolar} precio={tipoPago ? dataEvento.totalEvento : dataEvento.anticipoEvento} fs={5} />
                   {
                     Boolean(dataPago.length) &&
                     <>
-                    <hr />
-                    <p className='h4 m-0 fw-bold'>Metodo de Pago</p>
+                      <hr />
+                      <p className='h4 m-0 fw-bold mb-2'>Metodo de Pago</p>
                     </>
                   }
                   {
                     dataPago.map((e, index) => (
-                      <LineDescription nombre={e.metodo_pago} dolar={dolar} precio={e.monto} onDoubleClick={() => { deleteSelect(index) }} key={`debito${index}`} />
+                      <LineDescription nombre={e.nombre} dolar={dolar} precio={e.monto} onDoubleClick={() => { deleteSelect(index) }} key={`debito${index}`} />
                     ))
                   }
                   {
                     Boolean(dataPago.length) &&
                     <>
-                    <hr />
+                      <hr />
                       <LineDescription nombre={"Total Debitado"} dolar={dolar} precio={dataEvento.totalPagado} fs={5} />
-                      <LineDescription nombre={"Monto Faltante"} dolar={dolar} precio={TipoPago ? (dataEvento.totalEvento - dataEvento.totalPagado) : (dataEvento.anticipoEvento - dataEvento.totalPagado)} fs={5} />
+                      <LineDescription nombre={"Monto Faltante"} dolar={dolar} precio={tipoPago ? (dataEvento.totalEvento - dataEvento.totalPagado) : (dataEvento.anticipoEvento - dataEvento.totalPagado)} fs={5} />
                     </>
                   }
+                </div>
+                <div className='w-100 d-flex'>
+                  <ButtonSimple className="mt-4 mx-auto w-50" onClick={onSubmit}>
+                    Registrar
+                  </ButtonSimple>
                 </div>
               </div>
             )

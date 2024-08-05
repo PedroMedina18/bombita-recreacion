@@ -51,7 +51,7 @@ function Recreador() {
 
   return (
     <Navbar name={texts.pages.recreador.name} descripcion={texts.pages.recreador.description}>
-      <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/recreadores") }}> <IconRowLeft /> Regresar</ButtonSimple>
+      <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/recreadores/") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
       {
         loading ?

@@ -3,19 +3,19 @@ import { useForm } from "react-hook-form";
 import { Toaster } from "sonner";
 import { useNavigate, useParams } from "react-router-dom";
 import { servicios, materiales, actividades, } from "../../utils/API.jsx";
-import { LoaderCircle } from "../../components/loader/Loader";
-import { ButtonSimple } from "../../components/button/Button";
+import { LoaderCircle } from "../../components/loader/Loader.jsx";
+import { ButtonSimple } from "../../components/button/Button.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { InputsGeneral, InputTextTarea, InputDuration, MultiSelect, MoneyInput } from "../../components/input/Inputs.jsx";
 import { hasLeadingOrTrailingSpace, coincidences, normalizeDecimalNumber } from "../../utils/process.jsx";
 import { verifyOptionsSelect, controlResultPost } from "../../utils/actions.jsx"
-import ErrorSystem from "../../components/errores/ErrorSystem";
+import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import texts from "../../context/text_es.js";
-import Navbar from "../../components/navbar/Navbar";
+import Navbar from "../../components/navbar/Navbar.jsx";
 import Swal from "sweetalert2";
-import { IconRowLeft } from "../../components/Icon"
+import { IconRowLeft } from "../../components/Icon.jsx"
 
-function Form_Servicios() {
+function FormServicios() {
   const [loading, setLoading] = useState(true);
   const [errorServer, setErrorServer] = useState("");
   const [dataMateriales, setDataMateriales] = useState([]);
@@ -152,7 +152,7 @@ function Form_Servicios() {
         respuesta: res,
 
         messageExito: params.id ? texts.successMessage.editionServicio : texts.successMessage.registerServicio,
-        useNavigate: { navigate: navigate, direction: "/servicios" },
+        useNavigate: { navigate: navigate, direction: "/servicios/" },
       });
     } catch {
       console.log(error);
@@ -165,7 +165,7 @@ function Form_Servicios() {
     <Navbar name={params.id ? texts.pages.editServicio.name : texts.pages.registerServicio.name} descripcion={params.id ? texts.pages.editServicio.description : texts.pages.registerServicio.description}>
       <ButtonSimple type="button" className="mb-3"
         onClick={() => {
-          navigate("/servicios");
+          navigate("/servicios/");
         }}
       >
         <IconRowLeft />
@@ -358,4 +358,4 @@ function Form_Servicios() {
   );
 }
 
-export default Form_Servicios;
+export default FormServicios;

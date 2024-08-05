@@ -3,20 +3,20 @@ import { useForm } from "react-hook-form";
 import { Toaster } from "sonner";
 import { useNavigate, useParams } from 'react-router-dom';
 import { permisos, cargos } from "../../utils/API.jsx";
-import { LoaderCircle } from "../../components/loader/Loader";
-import { ButtonSimple } from "../../components/button/Button";
+import { LoaderCircle } from "../../components/loader/Loader.jsx";
+import { ButtonSimple } from "../../components/button/Button.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { InputsGeneral, InputTextTarea, InputCheckRadio, MultiSelect, InputImgPerfil } from "../../components/input/Inputs.jsx";
 import { verifyOptionsSelect, controlResultPost } from "../../utils/actions.jsx";
 import { hasLeadingOrTrailingSpace, coincidences } from "../../utils/process.jsx";
-import ErrorSystem from "../../components/errores/ErrorSystem";
-import Navbar from "../../components/navbar/Navbar";
+import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
+import Navbar from "../../components/navbar/Navbar.jsx";
 import Swal from 'sweetalert2';
 import texts from "../../context/text_es.js";
 import pattern from "../../context/pattern.js";
-import { IconRowLeft } from "../../components/Icon";
+import { IconRowLeft } from "../../components/Icon.jsx";
 
-function Cargos() {
+function FormCargos() {
     const [loading, setLoading] = useState(true);
     const [errorServer, setErrorServer] = useState("");
     const [options, setOptions] = useState([]);
@@ -121,7 +121,7 @@ function Cargos() {
                     controlResultPost({
                         respuesta:res, 
                         messageExito:params.id? texts.successMessage.editionCargo : texts.successMessage.registerCargo, 
-                        useNavigate:{navigate:navigate, direction:"/cargos"}
+                        useNavigate:{navigate:navigate, direction:"/cargos/"}
                     })
                 }
             } catch (error) {
@@ -133,8 +133,8 @@ function Cargos() {
     )
 
     return (
-        <Navbar  name={params.id? texts.pages.editCargo.name : texts.pages.registerCargos.name} descripcion={params.id? texts.pages.editCargos.description : texts.pages.registerCargos.description}>
-            <ButtonSimple type="button" className="mb-2" onClick={()=>{navigate("/cargos")}}> <IconRowLeft/> Regresar</ButtonSimple>
+        <Navbar  name={params.id? texts.pages.editCargo.name : texts.pages.registerCargos.name} descripcion={params.id? texts.pages.editCargo.description : texts.pages.registerCargos.description}>
+            <ButtonSimple type="button" className="mb-2" onClick={()=>{navigate("/cargos/")}}> <IconRowLeft/> Regresar</ButtonSimple>
             {
                 loading ?
                     (
@@ -249,4 +249,4 @@ function Cargos() {
     )
 }
 
-export default Cargos
+export default FormCargos

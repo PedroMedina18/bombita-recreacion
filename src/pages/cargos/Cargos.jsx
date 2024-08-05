@@ -62,7 +62,7 @@ function Cargos() {
             })
         },
         put: (row)=>{
-            navigate(`/edit/cargo/${row.id}`)
+            navigate(`/edit/cargo/${row.id}/`)
         },
         search: {
             placeholder: texts.registerMessage.searchItem,
@@ -85,7 +85,7 @@ function Cargos() {
         register: {
             name: texts.registerMessage.buttonRegisterCargo,
             function: () => {
-                navigate("/register/cargo")
+                navigate("/register/cargo/")
             }
         }
     }

@@ -17,24 +17,39 @@ import { toastError } from "../alerts.jsx"
 import { useHotkeys } from 'react-hotkeys-hook'
 
 function ModalPagos({ titulo, state, saveDataState, dataEvento }) {
-    const [option, setOption] = useState(null)
-    const [dataList, setDataList] = useState([])
-    const { getUser } = useAuthContext();
-    const [dolar] = useState(getUser().dollar.price);
-    const renderizado = useRef(0);
     const [estado, setEstado] = state
     const [pagoData, setPagoData] = saveDataState
+    const [option, setOption] = useState(null)
+    const { getUser } = useAuthContext();
+    const [dataList, setDataList] = useState([])
+    const [dolar] = useState(getUser().dollar.price);
+    const renderizado = useRef(0);
     const [errorServer, setErrorServer] = useState("");
     const [loading, setLoading] = useState(true);
+    const [tecleKey, setTecleKey] = useState(0);
     const formulario = useRef(null)
-    const [dataForm, setDataForm] = useState({ monto: null, referencia: null, img: null })
-    const [count, setCount] = useState(0)
-    useHotkeys('t', () => {})
+    const [dataForm, setDataForm] = useState({ monto: null, referencia: null, capture: null })
+
+    useHotkeys('t', () => {
+        setTecleKey(tecleKey + 1)
+    })
 
     useEffect(() => {
-        console.log(count)
-    }, [count])
-    
+        if (tecleKey >= 3) {
+            setTecleKey(0)
+            const totalACancelar = dataEvento.tipoPago ? dataEvento.totalEvento : dataEvento.anticipoEvento
+            const totalFaltante = Number(totalACancelar) - Number(dataEvento.totalPagado)
+            if (estado && option) {
+                if (!Boolean(option.divisa)) {
+                    const montoBs = (totalFaltante * dolar).toFixed(2)
+                    setValue("monto", montoBs)
+                } else {
+                    setValue("monto", totalFaltante.toFixed(2))
+                }
+            }
+        }
+    }, [tecleKey])
+
     useEffect(() => {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
@@ -62,17 +77,6 @@ function ModalPagos({ titulo, state, saveDataState, dataEvento }) {
         }
     }
 
-    // *the useform
-    const {
-        register,
-        handleSubmit,
-        formState: { errors },
-        reset,
-        setValue,
-        setError
-    } = useForm({ mode: "onChange" });
-
-
     const selectOptions = (e) => {
         reset()
         const ID = e.target.dataset.option ? Number(e.target.dataset.option) : Number(e.target.parentNode.dataset.option)
@@ -80,23 +84,7 @@ function ModalPagos({ titulo, state, saveDataState, dataEvento }) {
         setOption(metodo_pago[0])
     }
 
-    const columns = [
-        {
-            name: "Codigo",
-            row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
-        },
-        {
-            name: "Nombre",
-            row: (row) => { return row.nombre }
-        }
-
-    ]
-
-    const ativateSubmit = () => {
-        formulario.current.requestSubmit()
-    }
-
-    const butonDisabled = () => {
+    const disabledTrue = () => {
         if (!option) {
             return true
         }
@@ -109,7 +97,7 @@ function ModalPagos({ titulo, state, saveDataState, dataEvento }) {
         if (option.capture) {
             capture = Boolean(dataForm.capture) ? true : false
         }
-        if (dataForm.monto && dataForm.monto !== '0.0') {
+        if (watch("monto") && !(Number(watch("monto")) <= 0)) {
             monto = true
         }
         if (monto && referencia && capture) {
@@ -119,12 +107,27 @@ function ModalPagos({ titulo, state, saveDataState, dataEvento }) {
         }
     }
 
+    // *the useform
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        reset,
+        setValue,
+        watch,
+        setError
+    } = useForm({ mode: "onChange" });
+
+    const ativateSubmit = () => {
+        formulario.current.requestSubmit()
+    }
+
     const onSubmit = handleSubmit(
         async (data) => {
-            if(Number(data.monto) <=0){
+            if (Number(data.monto) <= 0) {
                 return
             }
-            const totalACancelar = dataEvento.TipoPago? dataEvento.totalEvento : dataEvento.anticipoEvento
+            const totalACancelar = dataEvento.tipoPago ? dataEvento.totalEvento : dataEvento.anticipoEvento
             const totalCancelado = totalACancelar - dataEvento.totalPagado
             let monto
             if (!Boolean(option.divisa)) {
@@ -132,15 +135,15 @@ function ModalPagos({ titulo, state, saveDataState, dataEvento }) {
             } else {
                 monto = Number(data.monto)
             }
-            const objetData = { monto: Number(monto), metodo_pago: option.nombre }
+            const objetData = { monto: Number(monto), metodo_pago: option.id, nombre: option.nombre }
             if (data.referencia) {
                 objetData.referencia = data.referencia
             }
             if (option.capture) {
-                objetData.capture = dataForm.img
+                objetData.capture = dataForm.capture
             }
             if (monto > totalCancelado) {
-                toastError("El monto presentado supera al total del pago")
+                toastError(texts.errorMessage.errorMonto)
             } else {
                 const metodoPagoRepeat = pagoData.filter((e) => {
                     return (e.metodo_pago === objetData.metodo_pago && !objetData.referencia && !option.capture)
@@ -150,7 +153,7 @@ function ModalPagos({ titulo, state, saveDataState, dataEvento }) {
                         if (e.metodo_pago === objetData.metodo_pago) {
                             e.monto = e.monto + objetData.monto
                             return e
-                        }else{
+                        } else {
                             return e
                         }
                     })
@@ -159,13 +162,26 @@ function ModalPagos({ titulo, state, saveDataState, dataEvento }) {
                     setPagoData([...pagoData, objetData])
                 }
             }
+            reset()
             setOption(null)
             setEstado(false)
+            setDataForm({ monto: null, referencia: null, capture: null })
         }
     )
 
+    const columns = [
+        {
+            name: "Codigo",
+            row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
+        },
+        {
+            name: "Nombre",
+            row: (row) => { return row.nombre }
+        }
+    ]
+
     return (
-        <ModalBase titulo={titulo} state={[estado, setEstado]} optionsSucces={["Agregar", () => { ativateSubmit() }]} opcionsDelete={["Cerrar", () => { reset(); setOption(null) }]} disabledTrue={butonDisabled()}>
+        <ModalBase titulo={titulo} state={[estado, setEstado]} optionsSucces={["Agregar", () => { ativateSubmit() }]} opcionsDelete={["Cerrar", () => { reset(); setOption(null); setDataForm({ monto: null, referencia: null, capture: null }) }]} disabledTrue={disabledTrue()}>
             {
                 loading ?
                     (
@@ -253,15 +269,15 @@ function ModalPagos({ titulo, state, saveDataState, dataEvento }) {
                                     {
                                         option &&
                                         <form encType="multiport/form-data" className='d-flex flex-column' id="formPago" ref={formulario} onSubmit={onSubmit}>
-                                            <MoneyInput id="monto" label={`Monto en ${option.divisa ? "Divisa" : "Bs"}`} name="monto" form={{ errors, register }}
+                                            <MoneyInput id="monto" label={`Monto en ${option.divisa ? "Divisa" : "Bs"}`} name="monto" form={{ errors, register, setValue }}
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: "Se requiere un monto",
+                                                        message: texts.inputsMessage.requireMonto,
                                                     },
                                                     validate: (e) => {
-                                                        if (e <= "0.00") {
-                                                            return "Se requiere un monto";
+                                                        if (Number(e) == 0.0) {
+                                                            return texts.inputsMessage.invalidMonto;
                                                         } else {
                                                             return true;
                                                         }
@@ -270,7 +286,7 @@ function ModalPagos({ titulo, state, saveDataState, dataEvento }) {
                                                 onChange={(e) => {
                                                     setDataForm({
                                                         ...dataForm,
-                                                        monto: e.target.value
+                                                        monto: Number(e.target.value)
                                                     })
                                                 }}
                                             />
@@ -284,7 +300,7 @@ function ModalPagos({ titulo, state, saveDataState, dataEvento }) {
                                                         },
                                                         minLength: {
                                                             value: 4,
-                                                            message: "Se espera minimo 4 Digitos"
+                                                            message: texts.inputsMessage.min4
                                                         },
                                                     }}
                                                     onChange={(e) => {
@@ -294,7 +310,6 @@ function ModalPagos({ titulo, state, saveDataState, dataEvento }) {
                                                         })
                                                     }}
                                                 />
-
                                             }
                                             {
                                                 Boolean(option.capture) &&

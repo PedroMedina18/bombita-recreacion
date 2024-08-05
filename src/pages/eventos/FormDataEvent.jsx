@@ -59,7 +59,7 @@ function FormDataEvent() {
                     ...dataEvent,
                     ...data
                 })
-                navigate("/register/eventos/account")
+                navigate("/register/eventos/account/")
             } catch (error) {
                 Swal.close()
                 toastError(texts.errorMessage.errorConexion)

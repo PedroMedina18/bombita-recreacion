@@ -20,12 +20,12 @@ class Metodos_Pagos_Views(View):
     def post(self, request):
         try:
             req = json.loads(request.body)
-            verify = verify_token(req["headers"])
-            req = req["body"]
-            if (not verify["status"]):
+            verify = verify_token(req['headers'])
+            req = req['body']
+            if (not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"],
+                    'status': False,
+                    'message': verify['message'],
                 }
                 return JsonResponse(datos)
             referencia = req['referencia'] if 'referencia' in req else False
@@ -33,14 +33,14 @@ class Metodos_Pagos_Views(View):
             divisa = req['divisa'] if 'divisa' in req else False
             MetodosPago.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'], divisa=divisa, referencia=referencia, capture=capture)
             datos = {
-                "status": True,
+                'status': True,
                 'message': f"{MESSAGE['registerMetodoPago']}"
             }
             return JsonResponse(datos)
         except IntegrityError as error:
             print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
-                if "nombre" in error.args[1]:
+                if 'nombre' in error.args[1]:
                     message = MESSAGE['nombreDuplicate']
                 else:
                     message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
@@ -65,12 +65,12 @@ class Metodos_Pagos_Views(View):
     def put(self, request, id):
         try:
             req = json.loads(request.body)
-            verify = verify_token(req["headers"])
-            req = req["body"]
-            if(not verify["status"]):
+            verify = verify_token(req['headers'])
+            req = req['body']
+            if(not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"]
+                    'status': False,
+                    'message': verify['message']
                 }
                 return JsonResponse(datos)
             metodo_pago = list(MetodosPago.objects.filter(id=id).values())
@@ -86,22 +86,22 @@ class Metodos_Pagos_Views(View):
                 metodo_pago.divisa = divisa
                 metodo_pago.save()
                 datos = {
-                    "status": True,
+                    'status': True,
                     'message': f"{MESSAGE['edition']}"
                 }
             else:
                 datos = {
-                    "status": False,
+                    'status': False,
                     'message': f"{MESSAGE['errorRegistroNone']}"
                 }
             return JsonResponse(datos)
         except IntegrityError as error:
             print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
-                if "nombre" in error.args[1]:
+                if 'nombre' in error.args[1]:
                     message = MESSAGE['nombreDuplicate']
                 else:
-                    message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
+                    message = f"{MESSAGE['errorDuplicate']}: {error.args[1]}"
                 datos = {
                 'status': False,
                 'message': message
@@ -123,22 +123,22 @@ class Metodos_Pagos_Views(View):
     def delete(self, request, id):
         try:
             verify=verify_token(request.headers)
-            if(not verify["status"]):
+            if(not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"]
+                    'status': False,
+                    'message': verify['message']
                 }
                 return JsonResponse(datos)
             metodo_pago = list(MetodosPago.objects.filter(id=id).values())
             if len(metodo_pago) > 0:
                 MetodosPago.objects.filter(id=id).delete()
                 datos = {
-                    "status": True,
+                    'status': True,
                     'message': f"{MESSAGE['delete']}"
                 }
             else:
                 datos = {
-                    "status": False,
+                    'status': False,
                     'message': f"{MESSAGE['errorRegistroNone']}"
                 }
             return JsonResponse(datos)
@@ -161,11 +161,11 @@ class Metodos_Pagos_Views(View):
         try:
             cursor = connection.cursor()
             verify=verify_token(request.headers)
-            if(not verify["status"]):
+            if(not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"],
-                    "data": None
+                    'status': False,
+                    'message': verify['message'],
+                    'data': None
                 }
                 return JsonResponse(datos)
             if (id > 0):
@@ -176,34 +176,34 @@ class Metodos_Pagos_Views(View):
                 tipo_documento = dictfetchall(cursor)
                 if(len(tipo_documento)>0):
                     datos = {
-                        "status": True,
+                        'status': True,
                         'message': f"{MESSAGE['exitoGet']}",
-                        "data": tipo_documento[0]
+                        'data': tipo_documento[0]
                     }
                 else:
                     datos = {
-                        "status": False,
+                        'status': False,
                         'message': f"{MESSAGE['errorRegistroNone']}",
-                        "data": None
+                        'data': None
                     }
             else:
-                if("all" in request.GET and request.GET["all"]=="true"):
+                if('all' in request.GET and request.GET['all']=='true'):
                     query = """
                     SELECT * FROM metodos_pago ORDER BY id ASC;
                     """
                     cursor.execute(query)
                     metodos_pago = dictfetchall(cursor)
-                elif("page" in request.GET ):
+                elif('page' in request.GET ):
                     query = """
                     SELECT * FROM metodos_pago ORDER BY id ASC id LIMIT %s, %s;
                     """
-                    cursor.execute(query, [indiceInicial(int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
+                    cursor.execute(query, [indiceInicial(int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                     metodos_pago = dictfetchall(cursor)
-                elif("page" in request.GET and "desc" in request.GET and request.GET["desc"]=="true"):
+                elif('page' in request.GET and 'desc' in request.GET and request.GET['desc']=='true'):
                     query = """
                     SELECT * FROM metodos_pago ORDER BY id DESC LIMIT %s, %s;
                     """
-                    cursor.execute(query, [indiceInicial(int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
+                    cursor.execute(query, [indiceInicial(int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                     metodos_pago = dictfetchall(cursor)
                 else:
                     query = """
@@ -219,19 +219,19 @@ class Metodos_Pagos_Views(View):
                 result = dictfetchall(cursor)
                 if len(metodos_pago)>0:
                     datos = {
-                        "status": True,
+                        'status': True,
                         'message': f"{MESSAGE['exitoGet']}",
-                        "data": metodos_pago,
-                        "pages": int(result[0]["pages"]),
-                        "total":result[0]["total"],
+                        'data': metodos_pago,
+                        'pages': int(result[0]['pages']),
+                        'total':result[0]['total'],
                     }
                 else:
                     datos = {
-                        "status": False,
+                        'status': False,
                         'message': f"{MESSAGE['errorRegistrosNone']}",
-                        "data": None,
-                        "pages": None,
-                        "total":0
+                        'data': None,
+                        'pages': None,
+                        'total':0
                     }
             return JsonResponse(datos)
         except Exception as error:

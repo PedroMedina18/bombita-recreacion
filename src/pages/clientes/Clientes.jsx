@@ -4,7 +4,6 @@ import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { searchCode, getListItems } from "../../utils/actions.jsx";
 import { formatoId } from "../../utils/process.jsx";
-import { alertInfo } from "../../components/alerts.jsx";
 import Navbar from "../../components/navbar/Navbar";
 import Table from "../../components/table/Table";
 import texts from "../../context/text_es.js";
@@ -75,7 +74,7 @@ function Clientes() {
             }
         },
         put: (row)=>{
-            navigate(`/edit/cliente/${row.numero_documento}`)
+            navigate(`/edit/cliente/${row.numero_documento}/`)
         }
     }
     

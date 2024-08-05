@@ -4,6 +4,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from ..funtions.serializador import dictfetchall
+from ..funtions.email import emailRegistroPago
 from ..models import MetodosPago, Eventos, Pagos, PrecioDolar
 from django.db import IntegrityError, connection, models
 from ..message import MESSAGE
@@ -21,43 +22,49 @@ class Pagos_Views(View):
         try:
             req = request.POST
             imgs = request.FILES
-            verify = verify_token(req["headers"])
-            if (not verify["status"]):
+            verify = verify_token(request.headers)
+            if (not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"],
+                    'status': False,
+                    'message': verify['message'],
                 }
                 return JsonResponse(datos)
 
-            if req["tipo"].lower() == "total":
-                tipo=False
-            elif req["tipo"].lower() == "anticipo":
-                tipo=True
+            if req['tipo_registro'].lower() == 'true':
+                tipo = True
+            elif req['tipo_registro'].lower() == 'false':
+                tipo = False
             else:
                 datos = {
-                    "status": False,
-                    'message': MESSAGE["tipoPago"],
+                    'status': False,
+                    'message': MESSAGE['tipoPago'],
                 }
                 return JsonResponse(datos)
-            
-            if (req["pagos"]==[]):
+            pagos = json.loads(req['pagos'])
+            if (pagos == []):
                 datos = {
-                    "status": False,
+                    'status': False,
                     'message': MESSAGE['errorPago'],
                 }
                 return JsonResponse(datos)
             precio_dolar = PrecioDolar.objects.latest('id')
-            for pago in req["pagos"]:
-                evento = Eventos.objects.get(id = int(pago["evento"]))
-                metodo_pago = MetodosPago.objects.get(id = int(pago["metodo_pago"]))
-                pagoEvento = Pagos.objects.create(tipo=tipo, evento = evento, metodoPago = metodo_pago, monto = pago['monto'], precioDolar = precio_dolar)
+            evento = Eventos.objects.get(id = int(req['evento']))
+            for indice, pago in enumerate(pagos):
+                metodo_pago = MetodosPago.objects.get(id = int(pago['metodo_pago']))
+                pagoEvento = Pagos.objects.create(tipo = tipo, evento = evento, metodoPago = metodo_pago, monto = float(pago['monto']), precioDolar = precio_dolar)
 
-                if "referencia" in pago:
-                    pagoEvento.referencia = int(pago["referencia"])
+                if 'referencia' in pago:
+                    pagoEvento.referencia = int(pago['referencia'])
                     pagoEvento.save()
-                if f"capture_{int(pago['evento'])}_{int(pago['metodo_pago'])}" in imgs:
-                    pagoEvento.capture = imgs[f"capture_{int(pago['evento'])}_{int(pago['metodo_pago'])}"]
+                if f"capture_{int(req['evento'])}_{int(pago['metodo_pago'])}_{indice}" in imgs:
+                    pagoEvento.capture = imgs[f"capture_{int(req['evento'])}_{int(pago['metodo_pago'])}_{indice}"]
                     pagoEvento.save()
+            if pagos:
+                evento.total = True
+            else:
+                evento.anticipo = True
+            evento.save()
+            emailRegistroPago(evento.cliente.persona.correo)
             datos = {
                 'status': True,
                 'message': f"{MESSAGE['registerPago']}"
@@ -66,7 +73,7 @@ class Pagos_Views(View):
 
         except IntegrityError as error:
             print(f"{MESSAGE['errorIntegrity']} - {error}", )
-            if error.args[0]==1062:
+            if error.args[0] == 1062:
                 message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
                 datos = {
                 'status': False,

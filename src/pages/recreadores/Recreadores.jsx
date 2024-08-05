@@ -91,14 +91,14 @@ function Recreadores() {
         register: {
             name: texts.registerMessage.buttonRegisterRecreador,
             function: () => {
-                navigate("/register/recreador")
+                navigate("/register/recreador/")
             }
         },
         put: (row)=>{
-            navigate(`/edit/recreador/${row.numero_documento}`)
+            navigate(`/edit/recreador/${row.numero_documento}/`)
         },
         get: (row)=>{
-            navigate(`/recreador/${row.numero_documento}`)
+            navigate(`/recreador/${row.numero_documento}/`)
         },
         delete: (row) => {
             deleteItem({

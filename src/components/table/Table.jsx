@@ -11,6 +11,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
     const [searchTerm, setSearchTerm] = useState('');
     const renderizado = useRef(0)
     const option = Boolean(options.delete || options.put || options.get || options.money)
+    
     useEffect(() => {
         // Para evitar el sobre renderizado al cargar el componente
         if (renderizado.current === 0 || renderizado.current === 1) {
@@ -26,8 +27,6 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
 
         setDebounceTimeout(timeout);
     }, [searchTerm])
-
-
 
     return (
         <div className='div-main justify-content-between p-2 p-md-3 p-lg-4'>

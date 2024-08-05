@@ -1,15 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { Outlet } from "react-router-dom";
-import { LoaderCircle } from "../../components/loader/Loader";
+import { LoaderCircle } from "../../components/loader/Loader.jsx";
 import { Toaster } from "sonner";
 import { tipo_documentos, servicios, sobrecargos, clientes } from "../../utils/API.jsx";
 import { verifyOptionsSelect} from "../../utils/actions.jsx"
-import Navbar from "../../components/navbar/Navbar"
-import ErrorSystem from "../../components/errores/ErrorSystem";
+import Navbar from "../../components/navbar/Navbar.jsx"
+import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import texts from "../../context/text_es.js";
-import { FormEventContextProvider, useFormEventContext } from "../../context/FormEventContext.jsx";
+import { useFormEventContext } from "../../context/FormEventContext.jsx";
 
-function Form_Eventos() {
+function FormEventos() {
     const { setTipoDocumentos, setServicios, setSobrecargos, setClientes } = useFormEventContext()
     const [loading, setLoading] = useState(true)
     const [errorServer, setErrorServer] = useState("")
@@ -76,4 +76,4 @@ function Form_Eventos() {
     )
 }
 
-export default Form_Eventos
+export default FormEventos

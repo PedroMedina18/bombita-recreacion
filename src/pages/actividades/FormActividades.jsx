@@ -1,22 +1,22 @@
 import { useState, useEffect, useRef } from "react";
 import { InputsGeneral, InputTextTarea, MultiSelect } from "../../components/input/Inputs.jsx";
-import { ButtonSimple } from "../../components/button/Button";
+import { ButtonSimple } from "../../components/button/Button.jsx";
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from 'react-router-dom';
 import { actividades, materiales } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
-import { LoaderCircle } from "../../components/loader/Loader";
+import { LoaderCircle } from "../../components/loader/Loader.jsx";
 import { verifyOptionsSelect, controlResultPost } from "../../utils/actions.jsx";
 import { hasLeadingOrTrailingSpace, coincidences } from "../../utils/process.jsx";
 import { Toaster } from "sonner";
-import ErrorSystem from "../../components/errores/ErrorSystem";
+import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import Swal from 'sweetalert2';
-import Navbar from "../../components/navbar/Navbar";
+import Navbar from "../../components/navbar/Navbar.jsx";
 import texts from "../../context/text_es.js";
 import pattern from "../../context/pattern.js";
-import { IconRowLeft } from "../../components/Icon";
+import { IconRowLeft } from "../../components/Icon.jsx";
 
-function Actividades() {
+function FormActividades() {
   const [errorServer, setErrorServer] = useState("");
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -114,7 +114,7 @@ function Actividades() {
           controlResultPost({
             respuesta: res,
             messageExito: params.id ? texts.successMessage.editionActividad : texts.successMessage.registerActividad,
-            useNavigate: { navigate: navigate, direction: "/actividades" }
+            useNavigate: { navigate: navigate, direction: "/actividades/" }
           })
         }
 
@@ -127,7 +127,7 @@ function Actividades() {
   )
   return (
     <Navbar name={params.id ? texts.pages.editActividad.name : texts.pages.registerActividades.name} descripcion={params.id ? texts.pages.editActividades.description : texts.pages.registerActividades.description}>
-      <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/actividades") }}> <IconRowLeft /> Regresar</ButtonSimple>
+      <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/actividades/") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
       {
         loading ?
@@ -209,4 +209,4 @@ function Actividades() {
   )
 }
 
-export default Actividades
+export default FormActividades

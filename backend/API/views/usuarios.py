@@ -20,72 +20,72 @@ class Usuario_Views(View):
     def post(self, request):
         try:
             jd = json.loads(request.body)
-            verify = verify_token(jd["headers"])
-            jd = jd["body"]
-            if (not verify["status"]):
+            verify = verify_token(jd['headers'])
+            jd = jd['body']
+            if (not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"],
+                    'status': False,
+                    'message': verify['message'],
                 }
                 return JsonResponse(datos)
 
             # Comprobar si se esta registrando un nuevo recreador con los datos de una persona existente
-            if("id_persona" in jd):
-                persona = list(Personas.objects.filter(id=jd["id_persona"]).values())
+            if('id_persona' in jd):
+                persona = list(Personas.objects.filter(id=jd['id_persona']).values())
                 if(len(persona)>0):
-                    persona = Personas.objects.get(id=jd["id_persona"])
+                    persona = Personas.objects.get(id=jd['id_persona'])
                 else:
                     datos = {
-                        "status": False,
+                        'status': False,
                         'message': "Error. Compruebe id de la persona"
                     }
                     return JsonResponse(datos)
                     
             else:
-                tipo_documento = list(TipoDocumento.objects.filter(id=jd["tipo_documento"]).values())
+                tipo_documento = list(TipoDocumento.objects.filter(id=jd['tipo_documento']).values())
                 if(len(tipo_documento)>0):
-                    tipo_documento = TipoDocumento.objects.get(id=jd["tipo_documento"])
+                    tipo_documento = TipoDocumento.objects.get(id=jd['tipo_documento'])
                 else:
                     datos = {
-                        "status": False,
-                        'message': "Error. Compruebe id del tipo de documento"
+                        'status': False,
+                        'message': 'Error. Compruebe id del tipo de documento'
                     }
                     return JsonResponse(datos)
                 persona = Personas.objects.create(
                     nombres=jd['nombres'].title(), 
                     apellidos=jd['apellidos'].title(), 
-                    numero_documento=jd["numero_documento"],
-                    telefono_principal=jd["telefono_principal"],
-                    telefono_secundario=jd["telefono_secundario"],
-                    correo=jd["correo"],
+                    numero_documento=jd['numero_documento'],
+                    telefono_principal=jd['telefono_principal'],
+                    telefono_secundario=jd['telefono_secundario'],
+                    correo=jd['correo'],
                     tipo_documento=tipo_documento
                 )
-            contraseña=encriptado_constraseña(jd["contraseña"])
-            cargo = list(Cargos.objects.filter(id=jd["cargo"]).values())
+            contraseña=encriptado_constraseña(jd['contraseña'])
+            cargo = list(Cargos.objects.filter(id=jd['cargo']).values())
             if(len(cargo)>0):
-                cargo = Cargos.objects.get(id=jd["cargo"])
+                cargo = Cargos.objects.get(id=jd['cargo'])
             else:
                 datos = {
-                    "status": False,
-                    'message': "Error. Compruebe id del cargo"
+                    'status': False,
+                    'message': 'Error. Compruebe id del cargo'
                 }
                 return JsonResponse(datos)
             Usuarios.objects.create(
                 persona=persona,
-                usuario=jd["usuario"],
+                usuario=jd['usuario'],
                 contraseña=contraseña,
                 cargo=cargo
             )
             datos = {
-                "status": True,
-                'message': "Registro Completado"
+                'status': True,
+                'message': 'Registro Completado'
             }
             return JsonResponse(datos)
         except Exception as ex:
-            print("Error", ex)
+            print('Error', ex)
             datos = {
-                "status": False,
-                'message': "Error. Compruebe Datos"
+                'status': False,
+                'message': 'Error. Compruebe Datos'
             }
             return JsonResponse(datos)
     
@@ -96,49 +96,49 @@ class Usuario_Views(View):
             if len(usuario) > 0:
                 usuario = Usuarios.objects.get(id=id)
                 persona = Permisos.objects.get(id=usuario.persona)
-                tipo_documento = list(TipoDocumento.objects.filter(id=jd["tipo_documento"]).values())
+                tipo_documento = list(TipoDocumento.objects.filter(id=jd['tipo_documento']).values())
                 if(len(tipo_documento)>0):
-                    tipo_documento = TipoDocumento.objects.get(id=jd["tipo_documento"])
+                    tipo_documento = TipoDocumento.objects.get(id=jd['tipo_documento'])
                 else:
                     datos = {
-                        "status": False,
-                        'message': "Error. Compruebe id del tipo de documento"
+                        'status': False,
+                        'message': 'Error. Compruebe id del tipo de documento'
                     }
                     return JsonResponse(datos)
-                cargo = list(Cargos.objects.filter(id=jd["cargo"]).values())
+                cargo = list(Cargos.objects.filter(id=jd['cargo']).values())
                 if(len(cargo)>0):
-                    cargo = Cargos.objects.get(id=jd["cargo"])
+                    cargo = Cargos.objects.get(id=jd['cargo'])
                 else:
                     datos = {
-                        "status": False,
-                        'message': "Error. Compruebe id del cargo"
+                        'status': False,
+                        'message': 'Error. Compruebe id del cargo'
                     }
                     return JsonResponse(datos)
                 persona.nombres=jd['nombres'].title()
                 persona.apellidos=jd['apellidos'].title(),
-                persona.numero_documento=jd["numero_documento"]
-                persona.telefono_principal=jd["telefono_principal"]
-                persona.telefono_secundario=jd["telefono_secundario"]
-                persona.correo=jd["correo"]
+                persona.numero_documento=jd['numero_documento']
+                persona.telefono_principal=jd['telefono_principal']
+                persona.telefono_secundario=jd['telefono_secundario']
+                persona.correo=jd['correo']
                 persona.tipo_documento=tipo_documento
-                usuario.usuario=jd["usuario"]
+                usuario.usuario=jd['usuario']
                 usuario.cargo=cargo
                 persona.save()
                 usuario.save()
                 datos = {
-                    "status": True,
-                    'message': "Exito. Registro editado"
+                    'status': True,
+                    'message': 'Exito. Registro editado'
                 }
             else:
                 datos = {
-                    "status": False,
-                    'message': "Error. Registro no encontrado"
+                    'status': False,
+                    'message': 'Error. Registro no encontrado'
                 }
             return JsonResponse(datos)
         except Exception as ex:
-            print("Error", ex)
+            print('Error', ex)
             datos = {
-                "status": False,
-                'message': "Error. Error de sistema",
+                'status': False,
+                'message': 'Error. Error de sistema',
             }
             return JsonResponse(datos)

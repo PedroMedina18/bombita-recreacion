@@ -4,20 +4,21 @@ import { FormEventContextProvider } from "./context/FormEventContext.jsx";
 import {
   Login, Error404,
   Inicio, Cargos,
-  Clientes, Form_Clientes,
-  Form_Cargos, Tipo_Documento,
-  Form_Tipo_Documento, Generos,
-  Form_Generos, Pagos,
+  Clientes, FormClientes,
+  FormCargos, TipoDocumento,
+  FormTipoDocumento, Generos,
+  FormGeneros, Pagos,
   Usuarios, Actividades,
-  Form_Actividades, Recreadores,
-  Form_Recreadores, Recreador,
-  Metodos_Pago, Form_Metodos_Pago,
-  Niveles, Form_Niveles,
-  Materiales, Form_Materiales,
+  FormActividades, Recreadores,
+  FormRecreadores, Recreador,
+  MetodosPago, FormMetodosPago,
+  Niveles, FormNiveles,
+  Materiales, FormMateriales,
   Servicios, Sobrecargos,
-  Form_Sobrecargos, Form_Servicios,
+  FormSobrecargos, FormServicios,
   Eventos, Dolar,
   FormDataEvent, FormAccount,
+  EventosRecreadores
 } from "./pages/Pages.jsx"
 
 
@@ -28,48 +29,50 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route element={<ProtectedRouter />}>
-            <Route path="/cargos" element={<Cargos />} />
-            <Route path="/register/cargo" element={<Form_Cargos />} />
-            <Route path="/edit/cargo/:id" element={<Form_Cargos />} />
-            <Route path="/usuarios" element={<Usuarios />} />
-            <Route path="/eventos" element={<Eventos />} />
+            <Route path="/cargos/" element={<Cargos />} />
+            <Route path="/register/cargo/" element={<FormCargos />} />
+            <Route path="/edit/cargo/:id/" element={<FormCargos />} />
+            <Route path="/usuarios/" element={<Usuarios />} />
+            <Route path="/eventos/" element={<Eventos />} />
+            <Route path="/eventos/recreadores/:id_evento/" element={<EventosRecreadores />} />
+            <Route path="/eventos/pagos/:id_evento/" element={<Pagos />} />
+            {/* <Route path="/eventos/:id_evento/" element={<Inicio />} /> */}
             <Route path="/register/eventos/" element={<FormEventContextProvider />} >
               <Route path="" element={<FormDataEvent />} />
-              <Route path="account" element={<FormAccount />} />
+              <Route path="account/" element={<FormAccount />} />
             </Route>
-            <Route path="/actividades" element={<Actividades />} />
-            <Route path="/register/actividad" element={<Form_Actividades />} />
-            <Route path="/edit/actividad/:id" element={<Form_Actividades />} />
-            <Route path="/niveles" element={<Niveles />} />
-            <Route path="/register/nivel" element={<Form_Niveles />} />
-            <Route path="/edit/nivel/:id" element={<Form_Niveles />} />
-            <Route path="/sobrecargos" element={<Sobrecargos />} />
-            <Route path="/register/sobrecargo" element={<Form_Sobrecargos />} />
-            <Route path="/edit/sobrecargo/:id" element={<Form_Sobrecargos />} />
-            <Route path="/materiales" element={<Materiales />} />
-            <Route path="/register/material" element={<Form_Materiales />} />
-            <Route path="/edit/material/:id" element={<Form_Materiales />} />
-            <Route path="/tipo_documentos" element={<Tipo_Documento />} />
-            <Route path="/register/tipo_documento" element={<Form_Tipo_Documento />} />
-            <Route path="/edit/tipo_documento/:id" element={<Form_Tipo_Documento />} />
-            <Route path="/generos" element={<Generos />} />
-            <Route path="/register/genero" element={<Form_Generos />} />
-            <Route path="/edit/genero/:id" element={<Form_Generos />} />
-            <Route path="/recreador/:numero_documento" element={<Recreador />} />
-            <Route path="/recreadores" element={<Recreadores />} />
-            <Route path="/register/recreador" element={<Form_Recreadores />} />
-            <Route path="/edit/recreador/:numero_documento" element={<Form_Recreadores />} />
-            <Route path="/servicios" element={<Servicios />} />
-            <Route path="/register/servicio" element={<Form_Servicios />} />
-            <Route path="/edit/servicio/:id" element={<Form_Servicios />} />
-            <Route path="/metodos_pago" element={<Metodos_Pago />} />
-            <Route path="/register/metodos_pago" element={<Form_Metodos_Pago />} />
-            <Route path="/edit/metodos_pago/:id" element={<Form_Metodos_Pago />} />
-            <Route path="/clientes" element={<Clientes />} />
-            <Route path="/edit/cliente/:numero_documento" element={<Form_Clientes />} />
-            <Route path="/dolar" element={<Dolar />} />
-            <Route path="/pago_evento/:id_evento" element={<Pagos />} />
-            <Route path="/inicio" element={<Inicio />} />
+            <Route path="/actividades/" element={<Actividades />} />
+            <Route path="/register/actividad/" element={<FormActividades />} />
+            <Route path="/edit/actividad/:id/" element={<FormActividades />} />
+            <Route path="/niveles/" element={<Niveles />} />
+            <Route path="/register/nivel/" element={<FormNiveles />} />
+            <Route path="/edit/nivel/:id/" element={<FormNiveles />} />
+            <Route path="/sobrecargos/" element={<Sobrecargos />} />
+            <Route path="/register/sobrecargo/" element={<FormSobrecargos />} />
+            <Route path="/edit/sobrecargo/:id/" element={<FormSobrecargos />} />
+            <Route path="/materiales/" element={<Materiales />} />
+            <Route path="/register/material/" element={<FormMateriales />} />
+            <Route path="/edit/material/:id/" element={<FormMateriales />} />
+            <Route path="/tipo_documentos/" element={<TipoDocumento />} />
+            <Route path="/register/tipo_documento/" element={<FormTipoDocumento />} />
+            <Route path="/edit/tipo_documento/:id/" element={<FormTipoDocumento />} />
+            <Route path="/generos/" element={<Generos />} />
+            <Route path="/register/genero/" element={<FormGeneros />} />
+            <Route path="/edit/genero/:id/" element={<FormGeneros />} />
+            <Route path="/recreador/:numero_documento/" element={<Recreador />} />
+            <Route path="/recreadores/" element={<Recreadores />} />
+            <Route path="/register/recreador/" element={<FormRecreadores />} />
+            <Route path="/edit/recreador/:numero_documento/" element={<FormRecreadores />} />
+            <Route path="/servicios/" element={<Servicios />} />
+            <Route path="/register/servicio/" element={<FormServicios />} />
+            <Route path="/edit/servicio/:id/" element={<FormServicios />} />
+            <Route path="/metodos_pago/" element={<MetodosPago />} />
+            <Route path="/register/metodos_pago/" element={<FormMetodosPago />} />
+            <Route path="/edit/metodos_pago/:id/" element={<FormMetodosPago />} />
+            <Route path="/clientes/" element={<Clientes />} />
+            <Route path="/edit/cliente/:numero_documento/" element={<FormClientes />} />
+            <Route path="/dolar/" element={<Dolar />} />
+            <Route path="/inicio/" element={<Inicio />} />
           </Route>
           <Route path="*" element={<Error404 />} />
         </Routes>

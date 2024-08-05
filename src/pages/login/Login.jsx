@@ -37,7 +37,7 @@ function Login() {
         }
         if (res.data.status && res.data.token) {
           saveUser(res.data.data, res.data.token)
-          navigate("/inicio")
+          navigate("/inicio/")
           setAlert("")
         } else {
           setAlert(res.data.message)
@@ -55,7 +55,7 @@ function Login() {
 
   // *verificacion por si ya esta logeado el usuario
   if (isAuthenticateds && getCookie("token")) {
-    <Navigate to="/inicio" />
+    <Navigate to="/inicio/" />
   }
 
   return (
@@ -154,7 +154,7 @@ function Login() {
             (
               <div className='alert-login'>
                 <IconWarnig />
-                <p>{alert}</p>
+                <p className='ms-2 '>{alert}</p>
               </div>
             )
             :

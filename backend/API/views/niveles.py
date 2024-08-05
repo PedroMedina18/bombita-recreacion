@@ -38,7 +38,7 @@ class Nivel_Views(View):
         except IntegrityError as error:
             print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
-                if "nombre" in error.args[1]:
+                if 'nombre' in error.args[1]:
                     message = MESSAGE['nombreDuplicate']
                 else:
                     message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
@@ -64,7 +64,7 @@ class Nivel_Views(View):
         try:
             req = json.loads(request.body)
             verify = verify_token(req['headers'])
-            req = req["body"]
+            req = req['body']
             if(not verify['status']):
                 datos = {
                     'status': False,
@@ -90,7 +90,7 @@ class Nivel_Views(View):
         except IntegrityError as error:
             print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
-                if "nombre" in error.args[1]:
+                if 'nombre' in error.args[1]:
                     message = MESSAGE['nombreDuplicate']
                 else:
                     message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
@@ -179,23 +179,23 @@ class Nivel_Views(View):
                         'data': None
                     }
             else:
-                if("all" in request.GET and request.GET["all"]=="true"):
+                if('all' in request.GET and request.GET['all']=='true'):
                     query = """
                     SELECT * FROM niveles ORDER BY id ASC;
                     """
                     cursor.execute(query)
                     niveles = dictfetchall(cursor)
-                elif("page" in request.GET ):
+                elif('page' in request.GET ):
                     query = """
                     SELECT * FROM niveles ORDER BY id ASC id LIMIT %s, %s;
                     """
-                    cursor.execute(query, [indiceInicial(int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
+                    cursor.execute(query, [indiceInicial(int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                     niveles = dictfetchall(cursor)
-                elif("page" in request.GET and "desc" in request.GET and request.GET["desc"]=="true"):
+                elif('page' in request.GET and "desc" in request.GET and request.GET["desc"]=='true'):
                     query = """
                     SELECT * FROM niveles ORDER BY id DESC LIMIT %s, %s;
                     """
-                    cursor.execute(query, [indiceInicial(int(request.GET["page"])), indiceFinal(int(request.GET["page"]))])
+                    cursor.execute(query, [indiceInicial(int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                     niveles = dictfetchall(cursor)
                 else:
                     query = """
@@ -214,8 +214,8 @@ class Nivel_Views(View):
                         'status': True,
                         'message': f"{MESSAGE['exitoGet']}",
                         'data': niveles,
-                        'pages': int(result[0]["pages"]),
-                        'total': result[0]["total"],
+                        'pages': int(result[0]['pages']),
+                        'total': result[0]['total'],
                     }
                 else:
                     datos = {

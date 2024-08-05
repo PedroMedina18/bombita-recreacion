@@ -25,7 +25,7 @@ class Cargos_Views(View):
         try:
             req = request.POST
             imgs = request.FILES
-            method = request.GET.get("_method", "POST")
+            method = request.GET.get('_method', 'POST')
             verify = verify_token(request.headers)
             if (not verify['status']):
                 datos = {
@@ -35,7 +35,7 @@ class Cargos_Views(View):
                 return JsonResponse(datos)
             
             # info:AQUI SE BUSCA IDENTIFICAR SI SE TRATA DE REALIZAR UNA METICION 'PUT'
-            if method=="PUT":
+            if method=='PUT':
                 
                 cargos = list(Cargos.objects.filter(id=id).values())
                 cursor = connection.cursor()
@@ -44,7 +44,7 @@ class Cargos_Views(View):
                     cargo.nombre = req['nombre']
                     cargo.descripcion = req['descripcion']
                     cargo.administrador = returnBoolean(req['administrador'])
-                    if "img" in imgs:
+                    if 'img' in imgs:
                         cargo.img=imgs['img']
                     cargo.save()
                     if (returnBoolean(req['administrador'])):
@@ -95,7 +95,7 @@ class Cargos_Views(View):
                     nombre = req['nombre'].title(), 
                     descripcion = req['descripcion'], 
                     administrador = returnBoolean(req['administrador']), 
-                    img=imgs['img'] if "img" in imgs else None,
+                    img=imgs['img'] if 'img' in imgs else None,
                 )
             
                 if (not returnBoolean(req['administrador'])):
@@ -113,7 +113,7 @@ class Cargos_Views(View):
         except IntegrityError as error:
             print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
-                if "nombre" in error.args[1]:
+                if 'nombre' in error.args[1]:
                     message = MESSAGE['nombreDuplicate']
                 else:
                     message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
@@ -128,7 +128,7 @@ class Cargos_Views(View):
                 }
             return JsonResponse(datos)
         except Exception as error:
-            if method=="PUT":
+            if method=='PUT':
                 print(f"{MESSAGE['errorPut']} - {error}")
                 datos = {
                     'status': False,
@@ -200,7 +200,7 @@ class Cargos_Views(View):
                 """
                 cursor.execute(query, [int(id)])
                 cargo = dictfetchall(cursor)
-                cargo[0]["img"]=f"{config('URL')}media/{cargo[0]['img']}" if cargo[0]['img'] else None
+                cargo[0]['img']=f"{config('URL')}media/{cargo[0]['img']}" if cargo[0]['img'] else None
                 if(len(cargo)>0):
                     if (not cargo[0]['administrador']):
                         query = """
@@ -232,7 +232,7 @@ class Cargos_Views(View):
                         'data': None,
                     }
             else:
-                if ("all" in request.GET and request.GET['all'] == "true"):
+                if ('all' in request.GET and request.GET['all'] == 'true'):
                     query = """
                     SELECT * FROM cargos ORDER BY id ASC;
                     """
@@ -245,7 +245,7 @@ class Cargos_Views(View):
                     cursor.execute(query, [indiceInicial(
                         int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                     cargos = dictfetchall(cursor)
-                elif ("page" in request.GET and "desc" in request.GET and request.GET['desc'] == "true"):
+                elif ('page' in request.GET and 'desc' in request.GET and request.GET['desc'] == 'true'):
                     query = """
                     SELECT * FROM cargos ORDER BY id DESC LIMIT %s, %s;
                     """

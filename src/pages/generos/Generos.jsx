@@ -69,7 +69,7 @@ function Generos() {
             }
         },
         put: (row)=>{
-            navigate(`/edit/genero/${row.id}`)
+            navigate(`/edit/genero/${row.id}/`)
         },
         get:(row)=>{
             alertInfo(
@@ -80,7 +80,7 @@ function Generos() {
         register: {
             name: texts.registerMessage.buttonRegisterGenero,
             function: () => {
-                navigate("/register/genero")
+                navigate("/register/genero/")
             }
         }
     }

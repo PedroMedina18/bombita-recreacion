@@ -1,22 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
 import { useForm } from "react-hook-form";
-import { InputsGeneral, InputTextTarea } from "../../components/input/Inputs.jsx";
-import { ButtonSimple } from "../../components/button/Button";
+import { InputsGeneral, InputTextTarea, MoneyInput } from "../../components/input/Inputs.jsx";
+import { ButtonSimple } from "../../components/button/Button.jsx";
 import { useParams, useNavigate } from "react-router-dom";
-import { niveles } from "../../utils/API.jsx";
+import { sobrecargos } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
 import { Toaster } from "sonner";
 import { controlResultPost } from "../../utils/actions.jsx";
 import { LoaderCircle } from "../../components/loader/Loader.jsx";
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
-import Navbar from "../../components/navbar/Navbar";
+import Navbar from "../../components/navbar/Navbar.jsx";
 import texts from "../../context/text_es.js";
 import Swal from 'sweetalert2';
 import pattern from "../../context/pattern.js";
-import { IconRowLeft } from "../../components/Icon";
+import { IconRowLeft } from "../../components/Icon.jsx";
 
-function Form_Niveles() {
+function FormSobrecargos() {
     const navigate = useNavigate();
     const params = useParams();
     const [loading, setLoading] = useState(true)
@@ -27,15 +27,16 @@ function Form_Niveles() {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             if (params.id) {
-                get_nivel()
+                get_sobrecargo()
             }
+            setLoading(false)
             return
         }
     }, [])
 
-    const get_nivel = async () => {
+    const get_sobrecargo = async () => {
         try {
-            const respuesta = await niveles.get({subDominio:[Number(params.id)]})
+            const respuesta = await sobrecargos.get({subDominio:[Number(params.id)]})
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
                 return
@@ -49,7 +50,7 @@ function Form_Niveles() {
             keys.forEach(key => {
                 setValue(key, `${respuesta.data.data[`${key}`]}`)
             });
-
+            setValue("monto", `${Number(respuesta.data.data.monto).toFixed(2)}`)
         } catch (error) {
             console.log(error)
             setErrorServer(texts.errorMessage.errorObjet)
@@ -77,13 +78,14 @@ function Form_Niveles() {
                     const body = {
                         nombre: data.nombre,
                         descripcion: data.descripcion,
+                        monto: parseFloat(data.monto),
                     }
                     alertLoading("Cargando")
-                    const res = params.id ? await niveles.put(body, Number(params.id)) : await niveles.post(body)
+                    const res = params.id ? await sobrecargos.put(body, Number(params.id)) : await sobrecargos.post(body)
                     controlResultPost({
                         respuesta: res,
-                        messageExito: params.id ? texts.successMessage.editionNivel : texts.successMessage.registerMaterial,
-                        useNavigate: { navigate: navigate, direction: "/niveles" }
+                        messageExito: params.id ? texts.successMessage.editionSobrecargo : texts.successMessage.registerSobrecargo,
+                        useNavigate: { navigate: navigate, direction: "/sobrecargos/" }
                     })
                 }
             } catch (error) {
@@ -94,9 +96,8 @@ function Form_Niveles() {
         }
     )
     return (
-        <Navbar name={`${params.id ? texts.pages.editNivel.name : texts.pages.registerNiveles.name}`} descripcion={`${params.id ? texts.pages.editNivel.description : texts.pages.registerNiveles.description}`}>
-            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/niveles") }}><IconRowLeft /> Regresar</ButtonSimple>
-
+        <Navbar name={`${params.id ? texts.pages.editSobrecargo.name : texts.pages.registerSobrecargos.name}`} descripcion={`${params.id ? texts.pages.editSobrecargo.description : texts.pages.registerSobrecargos.description}`}>
+            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/sobrecargos/") }}><IconRowLeft /> Regresar</ButtonSimple>
 
             {
                 loading ?
@@ -114,6 +115,7 @@ function Form_Niveles() {
                         )
                         :
                         (
+
                             <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
                                 <form className="w-100 d-flex flex-column"
                                     onSubmit={onSubmit}>
@@ -143,7 +145,7 @@ function Form_Niveles() {
                                                 }
                                             }
                                         }}
-                                        placeholder={texts.placeholder.nameNivel}
+                                        placeholder={texts.placeholder.nameSobrecargos}
                                     />
                                     <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
                                         params={{
@@ -165,6 +167,25 @@ function Form_Niveles() {
                                         }}
                                         placeholder={texts.placeholder.descripcion}
                                     />
+                                    <MoneyInput
+                                        label={texts.label.monto}
+                                        name="monto"
+                                        id="monto"
+                                        form={{ errors, register }}
+                                        params={{
+                                            required: {
+                                                value: true,
+                                                message: texts.inputsMessage.requireMonto,
+                                            },
+                                            validate: (e) => {
+                                                if (e <= 0) {
+                                                    return texts.inputsMessage.minMonto;
+                                                } else {
+                                                    return true;
+                                                }
+                                            },
+                                        }}
+                                    />
                                     <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
                                         {params.id? "Guardar" : "Registrar"}
                                     </ButtonSimple>
@@ -173,8 +194,9 @@ function Form_Niveles() {
                         )
             }
             <Toaster />
+
         </Navbar>
     )
 }
 
-export default Form_Niveles
+export default FormSobrecargos

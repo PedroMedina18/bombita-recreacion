@@ -5,4 +5,4 @@ def duration(total_time):
     minutes = int(total_seconds / 60) % 60
     hours = int(total_seconds / 3600)
 
-    return {"horas":hours, "minutos":minutes}
+    return {'horas':hours, 'minutos':minutes}

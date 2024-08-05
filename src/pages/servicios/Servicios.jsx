@@ -74,7 +74,7 @@ function Servicios() {
       })
     },
     put: (row)=>{
-      navigate(`/edit/servicio/${row.id}`)
+      navigate(`/edit/servicio/${row.id}/`)
     },
     search: {
       placeholder: texts.registerMessage.searchItem,
@@ -91,7 +91,7 @@ function Servicios() {
     register: {
       name: texts.registerMessage.buttonRegisterServicio,
       function: () => {
-        navigate("/register/servicio")
+        navigate("/register/servicio/")
       }
     }
   }

@@ -44,7 +44,7 @@ class Actividades_Views(View):
         except IntegrityError as error:
             print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
-                if "nombre" in error.args[1]:
+                if 'nombre' in error.args[1]:
                     message = MESSAGE['nombreDuplicate']
                 else:
                     message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
@@ -89,18 +89,18 @@ class Actividades_Views(View):
                     SELECT ma.id FROM
                         materiales AS ma
                     INNER JOIN 
-                        materiales_has_actividades
+                        materiales_actividades
                     ON 
-                        ma.id = materiales_has_actividades.material_id
+                        ma.id = materiales_actividades.material_id
                     WHERE 
-                        materiales_has_actividades.actividad_id = %s;
+                        materiales_actividades.actividad_id = %s;
                 """
                 cursor.execute(query, [int(id)])
                 materiales = dictfetchall(cursor)
                 editorOpciones(
-                    items = materiales,
+                    registros = materiales,
                     id = id,
-                    listTabla = req['materiales'],
+                    list_new_registros = req['materiales'],
                     tablaIntermedia = MaterialesActividad,
                     itemGet = actividad,
                     tablaAgregar = Materiales,
@@ -123,7 +123,7 @@ class Actividades_Views(View):
         except IntegrityError as error:
             print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
-                if "nombre" in error.args[1]:
+                if 'nombre' in error.args[1]:
                     message = MESSAGE['nombreDuplicate']
                 else:
                     message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
@@ -211,11 +211,11 @@ class Actividades_Views(View):
                         FROM 
                             materiales AS m
                         INNER JOIN 
-                            materiales_has_actividades 
+                            materiales_actividades 
                         ON 
-                            m.id = materiales_has_actividades.material_id
+                            m.id = materiales_actividades.material_id
                         WHERE 
-                            materiales_has_actividades.actividad_id = %s;
+                            materiales_actividades.actividad_id = %s;
                         """
                     cursor.execute(query, [int(id)])
                     materiales = dictfetchall(cursor)
@@ -232,19 +232,19 @@ class Actividades_Views(View):
                         'data': None
                     }
             else:
-                if("all" in request.GET and request.GET['all']=="true"):
+                if('all' in request.GET and request.GET['all']=='true'):
                     query = """
                     SELECT * FROM actividades ORDER BY id ASC;
                     """
                     cursor.execute(query)
                     activiades = dictfetchall(cursor)
-                elif("page" in request.GET ):
+                elif('page' in request.GET ):
                     query = """
                     SELECT * FROM actividades ORDER BY id ASC id LIMIT %s, %s;
                     """
                     cursor.execute(query, [indiceInicial(int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                     activiades = dictfetchall(cursor)
-                elif("page" in request.GET and "desc" in request.GET and request.GET['desc']=="true"):
+                elif('page' in request.GET and 'desc' in request.GET and request.GET['desc']=='true'):
                     query = """
                     SELECT * FROM actividades ORDER BY id DESC LIMIT %s, %s;
                     """

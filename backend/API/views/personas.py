@@ -10,11 +10,11 @@ class Persona_Views(View):
         try:
             cursor = connection.cursor()
             verify=verify_token(request.headers)
-            if(not verify["status"]):
+            if(not verify['status']):
                 datos = {
-                    "status": False,
-                    'message': verify["message"],
-                    "data": None
+                    'status': False,
+                    'message': verify['message'],
+                    'data': None
                 }
                 return JsonResponse(datos)
             if(tipo_documento>0 and documento>0):
@@ -36,32 +36,32 @@ class Persona_Views(View):
                 """
             else:
                 datos = {
-                    "status": False,
+                    'status': False,
                     'message': "Error. Persona no encontrada",
-                    "data": None
+                    'data': None
                 }
                 return JsonResponse(datos)
             cursor.execute(query, [int(documento), int(tipo_documento)])
             persona = dictfetchall(cursor)
             if len(persona) > 0:
                 datos = {
-                    "status": True,
-                    'message': "Exito",
-                    "data": persona[0]
+                    'status': True,
+                    'message': 'Exito',
+                    'data': persona[0]
                 }
             else:
                 datos = {
-                    "status": False,
-                    'message': "Error. Persona no encontrada",
-                    "data": None
+                    'status': False,
+                    'message': 'Error. Persona no encontrada',
+                    'data': None
                 }
             return JsonResponse(datos)
         except Exception as ex:
             print("Error", ex)
             datos = {
-                "status": False,
-                'message': "Error. Error de sistema",
-                "data": None
+                'status': False,
+                'message': 'Error. Error de sistema',
+                'data': None
             }
             return JsonResponse(datos)
         finally:

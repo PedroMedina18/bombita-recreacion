@@ -4,7 +4,7 @@ import { sobrecargos } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx"
-import { formatoId } from "../../utils/process.jsx"
+import { formatoId, normalizeDecimalNumber } from "../../utils/process.jsx"
 import { alertInfo } from "../../components/alerts.jsx"
 import Navbar from "../../components/navbar/Navbar"
 import Table from "../../components/table/Table"
@@ -61,7 +61,7 @@ function Niveles() {
       })
     },
     put: (row)=>{
-            navigate(`/edit/sobrecargo/${row.id}`)
+            navigate(`/edit/sobrecargo/${row.id}/`)
         },
     get:(row)=>{
       alertInfo(
@@ -84,7 +84,7 @@ function Niveles() {
     register: {
       name: texts.registerMessage.buttonRegisterSobrecargo,
       function: () => {
-        navigate("/register/sobrecargo")
+        navigate("/register/sobrecargo/")
       }
     }
   }

@@ -20,9 +20,12 @@ export default class Petisions {
         })
     }
 
-    async post(data) {
+    async post(data, { subDominio = [], params = null} = {}) {
         const token = getCookie("token")
-        return API.post(`${this.dominio}/`, {
+        let url = `${this.dominio}/`
+        url = addOptionalSubDomains(url, subDominio)
+        url = addOptionalQueryParams(url, params)
+        return API.post(url, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`
@@ -31,9 +34,12 @@ export default class Petisions {
         })
     }
 
-    async postData(data) {
+    async postData(data, { subDominio = [], params = null} = {}) {
         const token = getCookie("token")
-        return API.request(`${this.dominio}/`, {
+        let url = `${this.dominio}/`
+        url = addOptionalSubDomains(url, subDominio)
+        url = addOptionalQueryParams(url, params)
+        return API.request(url, {
             method: 'POST',
             headers: {
                 "Content-Type": "multipart/form-data",

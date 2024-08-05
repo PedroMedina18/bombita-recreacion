@@ -49,14 +49,14 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
                 <ul className="sidebar-nav">
 
                     <li className="sidebar-item">
-                        <Link to="/inicio" className="sidebar-link">
+                        <Link to="/inicio/" className="sidebar-link">
                             <IconHome />
                             <span>Inicio</span>
                         </Link>
                     </li>
 
                     <li className="sidebar-item">
-                        <Link to="/usuarios" className="sidebar-link">
+                        <Link to="/usuarios/" className="sidebar-link">
                             <IconUser />
                             <span>Usuarios</span>
                         </Link>
@@ -70,10 +70,10 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
                         </a>
                         <ul id="eventos" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li className="sidebar-item">
-                                <Link to="/eventos" className="sidebar-link">Lista de Eventos</Link>
+                                <Link to="/eventos/" className="sidebar-link">Lista de Eventos</Link>
                             </li>
                             <li className="sidebar-item">
-                                <Link to="/register/eventos" className="sidebar-link">Agregar un Evento</Link>
+                                <Link to="/register/eventos/" className="sidebar-link">Agregar un Evento</Link>
                             </li>
                         </ul>
                     </li>
@@ -86,13 +86,13 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
                         </a>
                         <ul id="servicios" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li className="sidebar-item">
-                                <Link to="/actividades" className="sidebar-link">Actividades</Link>
+                                <Link to="/actividades/" className="sidebar-link">Actividades</Link>
                             </li>
                             <li className="sidebar-item">
-                                <Link to="/servicios" className="sidebar-link">Servicios</Link>
+                                <Link to="/servicios/" className="sidebar-link">Servicios</Link>
                             </li>
                             <li className="sidebar-item">
-                                <Link to="/sobrecargos" className="sidebar-link">Sobrecargos</Link>
+                                <Link to="/sobrecargos/" className="sidebar-link">Sobrecargos</Link>
                             </li>
                         </ul>
                     </li>
@@ -105,7 +105,7 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
                         </a>
                         <ul id="inventario" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li className="sidebar-item">
-                                <Link to="/materiales" className="sidebar-link">Materiales</Link>
+                                <Link to="/materiales/" className="sidebar-link">Materiales</Link>
                             </li>
                         </ul>
                     </li>
@@ -118,16 +118,16 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
                         </a>
                         <ul id="recreadores" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li className="sidebar-item">
-                                <Link to="/niveles" className="sidebar-link">Niveles</Link>
+                                <Link to="/niveles/" className="sidebar-link">Niveles</Link>
                             </li>
                             <li className="sidebar-item">
-                                <Link to="/recreadores" className="sidebar-link">Recreadores</Link>
+                                <Link to="/recreadores/" className="sidebar-link">Recreadores</Link>
                             </li>
                         </ul>
                     </li>
 
                     <li className="sidebar-item">
-                        <Link to="/clientes" className="sidebar-link">
+                        <Link to="/clientes/" className="sidebar-link">
                             <IconClient />
                             <span>Clientes</span>
                         </Link>
@@ -148,19 +148,19 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
                         </a>
                         <ul id="configuracion" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li className="sidebar-item">
-                                <Link to="/dolar" className="sidebar-link">Dolar</Link>
+                                <Link to="/dolar/" className="sidebar-link">Dolar</Link>
                             </li>
                             <li className="sidebar-item">
-                                <Link to="/cargos" className="sidebar-link">Cargos</Link>
+                                <Link to="/cargos/" className="sidebar-link">Cargos</Link>
                             </li>
                             <li className="sidebar-item">
-                                <Link to="/tipo_documentos" className="sidebar-link">Tipo Documento</Link>
+                                <Link to="/tipo_documentos/" className="sidebar-link">Tipo Documento</Link>
                             </li>
                             <li className="sidebar-item">
-                                <Link to="/generos" className="sidebar-link">Generos</Link>
+                                <Link to="/generos/" className="sidebar-link">Generos</Link>
                             </li>
                             <li className="sidebar-item">
-                                <Link to="/metodos_pago" className="sidebar-link">Metodos de Pago</Link>
+                                <Link to="/metodos_pago/" className="sidebar-link">Metodos de Pago</Link>
                             </li>
                         </ul>
                     </li>

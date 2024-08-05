@@ -53,7 +53,7 @@ class Servicios_Views(View):
         except IntegrityError as error:
             print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
-                if "nombre" in error.args[1]:
+                if 'nombre' in error.args[1]:
                     message = MESSAGE['nombreDuplicate']
                 else:
                     message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
@@ -115,9 +115,9 @@ class Servicios_Views(View):
                 cursor.execute(query, [int(id)])
                 listActidades = dictfetchall(cursor)
                 editorOpciones(
-                    items=listActidades,
+                    registros=listActidades,
                     id=id,
-                    listTabla=actividades,
+                    list_new_registros=actividades,
                     tablaIntermedia=ServiciosActividades,
                     itemGet=servicio,
                     tablaAgregar=Actividades,
@@ -141,19 +141,19 @@ class Servicios_Views(View):
                 """
                 cursor.execute(query, [int(id)])
                 listMateriales = dictfetchall(cursor)
-                material_items = [{"material":item["id"], "cantidad":item["cantidad"]} for item in listMateriales]
+                material_items = [{'material':item['id'], 'cantidad':item['cantidad']} for item in listMateriales]
                 editar = [objetMaterial for objetMaterial in materiales if objetMaterial  in material_items]
                 for item in editar:
-                    material=ServiciosMateriales.objects.get(servicio=int(id), material=item["material"])
-                    material.cantidad = item["cantidad"]
+                    material=ServiciosMateriales.objects.get(servicio=int(id), material=item['material'])
+                    material.cantidad = item['cantidad']
                     material.save()
                 eliminar = [objetMaterial for objetMaterial in material_items if objetMaterial not in materiales]
                 for item in eliminar:
-                    ServiciosMateriales.objects.filter(servicio=int(id), material=item["material"]).delete()
+                    ServiciosMateriales.objects.filter(servicio=int(id), material=item['material']).delete()
                 agregar = [objetMaterial for objetMaterial in materiales if objetMaterial not in material_items]
                 for item in agregar:
-                    newMaterial = Materiales.objects.get(id=int(item["material"]))
-                    ServiciosMateriales.objects.create(servicio=servicio, material=newMaterial, cantidad=int(item["cantidad"]))
+                    newMaterial = Materiales.objects.get(id=int(item['material']))
+                    ServiciosMateriales.objects.create(servicio=servicio, material=newMaterial, cantidad=int(item['cantidad']))
 
                 datos = {
                     'status': True,
@@ -169,7 +169,7 @@ class Servicios_Views(View):
         except IntegrityError as error:
             print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
-                if "nombre" in error.args[1]:
+                if 'nombre' in error.args[1]:
                     message = MESSAGE['nombreDuplicate']
                 else:
                     message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
@@ -283,8 +283,8 @@ class Servicios_Views(View):
                 cursor.execute(query, [int(id)])
                 materiales = dictfetchall(cursor)
 
-                servicio[0]["actividades"] = actividades
-                servicio[0]["materiales"] = materiales
+                servicio[0]['actividades'] = actividades
+                servicio[0]['materiales'] = materiales
                 servicio[0]['duracion'] = duration(servicio[0]['duracion'])
                 if (len(servicio) > 0):
                     datos = {
@@ -299,20 +299,20 @@ class Servicios_Views(View):
                         'data': None
                     }
             else:
-                if ("all" in request.GET and request.GET['all'] == "true"):
+                if ('all' in request.GET and request.GET['all'] == 'true'):
                     query = """
                     SELECT * FROM servicios ORDER BY id ASC;
                     """
                     cursor.execute(query)
                     servicios = dictfetchall(cursor)
-                elif ("page" in request.GET):
+                elif ('page' in request.GET):
                     query = """
                     SELECT * FROM servicios ORDER BY id ASC id LIMIT %s, %s;
                     """
                     cursor.execute(query, [indiceInicial(
                         int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                     servicios = dictfetchall(cursor)
-                elif ("page" in request.GET and "desc" in request.GET and request.GET['desc'] == "true"):
+                elif ('page' in request.GET and "desc" in request.GET and request.GET['desc'] == 'true'):
                     query = """
                     SELECT * FROM servicios ORDER BY id DESC LIMIT %s, %s;
                     """
@@ -338,16 +338,16 @@ class Servicios_Views(View):
                         'status': True,
                         'message': f"{MESSAGE['exitoGet']}",
                         'data': servicios,
-                        "pages": int(result[0]['pages']),
-                        "total": result[0]['total'],
+                        'pages': int(result[0]['pages']),
+                        'total': result[0]['total'],
                     }
                 else:
                     datos = {
                         'status': False,
                         'message': f"{MESSAGE['errorRegistrosNone']}",
                         'data': None,
-                        "pages": None,
-                        "total": 0
+                        'pages': None,
+                        'total': 0
                     }
             
             return JsonResponse(datos)
@@ -357,8 +357,8 @@ class Servicios_Views(View):
                 'status': False,
                 'message': f"{MESSAGE['errorConsulta']}: {error}",
                 'data': None,
-                "pages": None,
-                "total":0
+                'pages': None,
+                'total':0
             }
             return JsonResponse(datos)
         finally:

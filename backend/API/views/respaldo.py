@@ -17,7 +17,7 @@ class Respaldo(View):
         
         respaldo()
         datos = {
-            "status": True,
-            'message': "Respaldo Completado"
+            'status': True,
+            'message': 'Respaldo Completado'
         }
         return JsonResponse(datos)

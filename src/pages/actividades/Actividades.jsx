@@ -67,7 +67,7 @@ function Actividades() {
       }
     },
     put: (row)=>{
-      navigate(`/edit/actividad/${row.id}`)
+      navigate(`/edit/actividad/${row.id}/`)
     },
     get:(row)=>{
       alertInfo(
@@ -78,7 +78,7 @@ function Actividades() {
     register: {
       name: texts.registerMessage.buttonRegisterActividad,
       function: () => {
-        navigate("/register/actividad")
+        navigate("/register/actividad/")
       }
     }
   }

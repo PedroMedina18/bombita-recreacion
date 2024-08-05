@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from "react"
-import { useForm } from "react-hook-form";
 import { niveles } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
@@ -57,7 +56,7 @@ function Niveles() {
       })
     },
     put: (row)=>{
-            navigate(`/edit/nivel/${row.id}`)
+            navigate(`/edit/nivel/${row.id}/`)
         },
     get:(row)=>{
       alertInfo(
@@ -80,7 +79,7 @@ function Niveles() {
     register: {
       name: texts.registerMessage.buttonRegisterNivel,
       function: () => {
-        navigate("/register/nivel")
+        navigate("/register/nivel/")
       }
     }
   }

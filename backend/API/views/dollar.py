@@ -30,19 +30,19 @@ class Dollar_View(View):
                 }
                 return JsonResponse(datos)
             
-            if("all" in request.GET and request.GET['all']=="true"):
+            if('all' in request.GET and request.GET['all']=='true'):
                 query = """
                 SELECT * FROM precio_dolar ORDER BY fecha_registro DESC;
                 """
                 cursor.execute(query)
                 materiales = dictfetchall(cursor)
-            elif("page" in request.GET ):
+            elif('page' in request.GET ):
                 query = """
                 SELECT * FROM precio_dolar ORDER BY fecha_registro ASC LIMIT %s, %s;
                 """
                 cursor.execute(query, [indiceInicial(int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                 materiales = dictfetchall(cursor)
-            elif("page" in request.GET and "desc" in request.GET and request.GET['desc']=="true"):
+            elif('page' in request.GET and "desc" in request.GET and request.GET['desc']=='true'):
                 query = """
                 SELECT * FROM precio_dolar ORDER BY fecha_registro DESC LIMIT %s, %s;
                 """
@@ -65,16 +65,16 @@ class Dollar_View(View):
                     'status': True,
                     'message': f"{MESSAGE['exitoGet']}",
                     'data': materiales,
-                    "pages": int(result[0]['pages']),
-                    "total":result[0]['total'],
+                    'pages': int(result[0]['pages']),
+                    'total':result[0]['total'],
                 }
             else:
                 datos = {
                     'status': False,
                     'message': f"{MESSAGE['errorRegistrosNone']}",
                     'data': None,
-                    "pages": None,
-                    "total":0
+                    'pages': None,
+                    'total':0
                 }
             return JsonResponse(datos)
         except Exception as error:

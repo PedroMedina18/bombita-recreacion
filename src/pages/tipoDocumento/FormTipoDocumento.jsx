@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from 'react-router-dom';
 import { InputsGeneral, InputTextTarea } from "../../components/input/Inputs.jsx";
-import { ButtonSimple } from "../../components/button/Button";
+import { ButtonSimple } from "../../components/button/Button.jsx";
 import { tipo_documentos } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { Toaster } from "sonner";
@@ -10,13 +10,13 @@ import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
 import { controlResultPost } from "../../utils/actions.jsx";
 import { LoaderCircle } from "../../components/loader/Loader.jsx";
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
-import Navbar from "../../components/navbar/Navbar";
+import Navbar from "../../components/navbar/Navbar.jsx";
 import Swal from 'sweetalert2';
 import texts from "../../context/text_es.js";
 import pattern from "../../context/pattern.js";
-import { IconRowLeft } from "../../components/Icon";
+import { IconRowLeft } from "../../components/Icon.jsx";
 
-function Form_Tipo_Documento() {
+function FormTipoDocumento() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const params = useParams();
@@ -85,7 +85,7 @@ function Form_Tipo_Documento() {
                     controlResultPost({
                         respuesta: res,
                         messageExito: params.id ? texts.successMessage.editionTipoDocumento : texts.successMessage.registerTipoDocumento,
-                        useNavigate: { navigate: navigate, direction: "/tipo_documentos" }
+                        useNavigate: { navigate: navigate, direction: "/tipo_documentos/" }
                     })
                 }
 
@@ -99,7 +99,7 @@ function Form_Tipo_Documento() {
 
     return (
         <Navbar name={params.id ? texts.pages.editTipoDocumento.name : texts.pages.registerTipoDocumento.name} descripcion={params.id ? texts.pages.editTipoDocumento.description : texts.pages.registerTipoDocumento.description}>
-            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/tipo_documentos") }}> <IconRowLeft /> Regresar</ButtonSimple>
+            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/tipo_documentos/") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
 
             {
@@ -179,4 +179,4 @@ function Form_Tipo_Documento() {
     )
 }
 
-export default Form_Tipo_Documento
+export default FormTipoDocumento
