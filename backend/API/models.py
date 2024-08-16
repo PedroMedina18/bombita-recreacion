@@ -41,7 +41,7 @@ class TipoDocumento(models.Model):
     fecha_actualizacion = models.DateTimeField(auto_now = True)
 
     class Meta:
-        db_table = 'tipo_documentos'
+        db_table = 'tipos_documentos'
 
 # *Tabla base de las personas o entidades
 class Personas(models.Model):
@@ -227,6 +227,8 @@ class MetodosPago(models.Model):
     referencia = models.BooleanField(default=False)
     capture = models.BooleanField(default=False)
     divisa = models.BooleanField(default=False)
+    fecha_registro = models.DateTimeField(auto_now_add = True)
+    fecha_actualizacion = models.DateTimeField(auto_now = True)
 
     class Meta:
         db_table = 'metodos_pago'
@@ -253,7 +255,15 @@ class EventosRecreadoresServicios(models.Model):
 
 
 
-        # necesito una consulta sql un poco dificil veras ten go una tabla eventos, una de servicios y otra de recreadores, y dos intermedias eventosXservicios y eventosXrecreadores, y como ultimo dato la tabla servicios tiene un campo de personal que es un numero. La consulta consiste en que necesito verificar : 1 - cuanto personal se necesita por servicio al ser un numero ya se tiene medido pero pueden haber mas de un servicio por evento por lo que hay que sumarlos 2 - ahora lo que necesito consultar es si en la tabla eventosXrecreadores ya se asignaron el numero de personal que se necesita
+# necesito una consulta sql un poco dificil veras ten go una tabla eventos, una de servicios y otra de 
+# recreadores, y dos intermedias eventosXservicios y eventosXrecreadores, y como ultimo dato la tabla 
+# servicios tiene un campo de personal que es un numero. La consulta consiste en que necesito 
+# verificar : 1 - cuanto personal se necesita por servicio al ser un numero ya se tiene medido pero 
+# pueden haber mas de un servicio por evento por lo que hay que sumarlos 2 - ahora lo que necesito 
+# consultar es si en la tabla eventosXrecreadores ya se asignaron el numero de personal que se necesita
+
+
+
 
 # SELECT 
 #   e.id_evento,

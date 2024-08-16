@@ -5,11 +5,13 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
+from ..funtions.time import duration
 from ..funtions.identificador import determinar_valor, edit_str, normalize_id_list
 from ..models import Eventos, Servicios, EventosRecreadoresServicios, Recreadores
 from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
 from ..message import MESSAGE
+from decouple import config
 import json
 
 
@@ -45,11 +47,13 @@ class Eventos_Recreadores_Servicios_View(View):
 
             cursor.execute(query, [id])
             servicios = dictfetchall(cursor)
+            servicios = [{**servicio, "recreadores":[], 'duracion' : duration(servicio['duracion'])} for servicio in servicios]
             query = """
                 SELECT
                     reve.id,
                     re.id AS recreador_id,
                     pe.nombres, 
+                    re.fecha_nacimiento,
                     pe.apellidos, 
                     ni.nombre AS nivel,
                     ge.nombre AS genero,
@@ -67,16 +71,19 @@ class Eventos_Recreadores_Servicios_View(View):
 
             cursor.execute(query, [id])
             recreadores = dictfetchall(cursor)
-
+            isRecreadores = True if len(recreadores) != 0 else False 
             for recreador in recreadores:
+                recreador["img"] = (
+                    f"{config('URL')}media/{recreador['img']}"
+                    if recreador['img']
+                    else None
+                )
                 servicio_id = recreador['servicio_id']
                 for servicio in servicios:
                     if servicio['id'] == servicio_id:
-                        if 'recreadores' not in servicio:
-                            servicio['recreadores'] = []
                         servicio['recreadores'].append(recreador)
                         break
-            data = {'evento': id, 'servicios': servicios}
+            data = {'evento': id, 'servicios': servicios, "recreadores" : isRecreadores}
             datos = {
                 'status': True,
                 'message': f"{MESSAGE['exitoGet']}",
@@ -110,7 +117,7 @@ class Eventos_Recreadores_Servicios_View(View):
                 }
                 return JsonResponse(datos)
 
-            evento = list(Eventos.objects.filter(id=int(req["evento"])).values())
+            evento = list(Eventos.objects.filter(id = int(req["evento"])).values())
             if len(evento) > 0:
                 evento = Eventos.objects.get(id = int(req["evento"]))
             else:
@@ -132,7 +139,7 @@ class Eventos_Recreadores_Servicios_View(View):
             cursor.execute(query, [int(req["evento"])])
             resultados = dictfetchall(cursor)
             
-            recreadores_id= [recreador.id for recreador in req["recreadores"]]
+            recreadores_id= [recreador["id"] for recreador in req["recreadores"]]
             if len(recreadores_id) != len(set(recreadores_id)):
                 datos = {
                     'status': False,
@@ -167,7 +174,7 @@ class Eventos_Recreadores_Servicios_View(View):
             cursor.close()
             connection.close()
 
-    def put(sel, request):
+    def put(sel, request, id_evento):
         try:
             req = json.loads(request.body)
             verify = verify_token(req['headers'])
@@ -181,14 +188,14 @@ class Eventos_Recreadores_Servicios_View(View):
                 }
                 return JsonResponse(datos)
 
-            evento = list(Eventos.objects.filter(id=int(req["evento"])).values())
+            evento = list(Eventos.objects.filter(id=id_evento).values())
             if len(evento) > 0:
-                evento = Eventos.objects.get(id = int(req["evento"]))
+                evento = Eventos.objects.get(id = id_evento)
             else:
                 datos = {'status': False, 'message': MESSAGE['errorEvento']}
                 return JsonResponse(datos)
 
-            recreadores_id= [recreador.id for recreador in req["recreadores"]]
+            recreadores_id= [recreador["id"] for recreador in req["recreadores"]]
             if len(recreadores_id) != len(set(recreadores_id)):
                 datos = {
                     'status': False,
@@ -205,7 +212,7 @@ class Eventos_Recreadores_Servicios_View(View):
                 WHERE 
                     es.evento_id = %s
             """
-            cursor.execute(query, [int(req["evento"])])
+            cursor.execute(query, [id_evento])
             recreadores_registrados = dictfetchall(cursor)
             recreadores_nuevos = req["recreadores"]
             recreador_eliminar = [recreador_registrado for recreador_registrado in recreadores_registrados if not any(recreador_nuevo.id == recreador_registrado.id and recreador_nuevo.servicio == recreador_registrado.servicio for recreador_nuevo in recreadores_nuevos)]

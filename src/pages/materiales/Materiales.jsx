@@ -69,7 +69,7 @@ function Materiales() {
         },
         search: {
             placeholder: texts.registerMessage.searchItem,
-            function: (value) => {
+            function: (value, filtros = null) => {
                 searchCode({
                     value: value,
                     object: materiales,

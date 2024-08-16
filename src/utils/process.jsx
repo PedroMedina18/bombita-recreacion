@@ -72,6 +72,16 @@ export function formatDateWithTime12Hour(date) {
   return new Intl.DateTimeFormat('es-ES', options).format(fecha);
 }
 
+export function fechaFormat(fecha=null){
+  let date 
+  if(fecha){
+    date = new Date(fecha)
+  }else{
+    date = new Date()
+  }
+  return `${date.getFullYear()}-${(date.getMonth() + 1) < 10 ? `0${date.getMonth() + 1}` : `${date.getMonth() + 1}`}-${date.getDate() < 10 ? `0${date.getDate()}` : date.getDate()}`
+}
+
 export function formatoFechaInput(date) {
 
   const year = date.getFullYear();
@@ -92,7 +102,7 @@ export function coincidences(options, optionDefault) {
 }
 
 export function addOptionalQueryParams(url, queryParams) {
-  if (queryParams) {
+  if (queryParams && queryParams!={}) {
     const params = new URLSearchParams();
     Object.keys(queryParams).forEach(key => {
       params.append(key, queryParams[key]);

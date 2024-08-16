@@ -7,21 +7,23 @@ import { niveles } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
 import { Toaster } from "sonner";
-import { controlResultPost } from "../../utils/actions.jsx";
+import { controlErrors, controlResultPost } from "../../utils/actions.jsx";
 import { LoaderCircle } from "../../components/loader/Loader.jsx";
+import { IconRowLeft } from "../../components/Icon.jsx";
+import { useAuthContext } from '../../context/AuthContext.jsx';
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import Navbar from "../../components/navbar/Navbar.jsx";
 import texts from "../../context/text_es.js";
 import Swal from 'sweetalert2';
 import pattern from "../../context/pattern.js";
-import { IconRowLeft } from "../../components/Icon.jsx";
 
 function FormNiveles() {
     const navigate = useNavigate();
     const params = useParams();
     const [loading, setLoading] = useState(true)
-    const renderizado = useRef(0)
+    const {getOption} = useAuthContext()
     const [errorServer, setErrorServer] = useState("")
+    const renderizado = useRef(0)
 
     useEffect(() => {
         if (renderizado.current === 0) {
@@ -29,6 +31,7 @@ function FormNiveles() {
             if (params.id) {
                 get_nivel()
             }
+            setLoading(false)
             return
         }
     }, [])
@@ -36,18 +39,13 @@ function FormNiveles() {
     const get_nivel = async () => {
         try {
             const respuesta = await niveles.get({subDominio:[Number(params.id)]})
-            if (respuesta.status !== 200) {
-                setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
-                return
-            }
-            if (respuesta.data.status === false) {
-                setErrorServer(`${respuesta.data.message}`)
-                return
-            }
+            const errors = controlErrors({respuesta: respuesta, constrolError:setErrorServer})
+            if(errors) return
             setErrorServer("")
-            const keys = Object.keys(respuesta.data.data);
+            const data = respuesta.data.data
+            const keys = Object.keys(data);
             keys.forEach(key => {
-                setValue(key, `${respuesta.data.data[`${key}`]}`)
+                setValue(key, `${data[`${key}`]}`)
             });
 
         } catch (error) {
@@ -79,11 +77,12 @@ function FormNiveles() {
                         descripcion: data.descripcion,
                     }
                     alertLoading("Cargando")
-                    const res = params.id ? await niveles.put(body, Number(params.id)) : await niveles.post(body)
+                    const res = params.id ? await niveles.put(body, { subDominio:[Number(params.id)]}) : await niveles.post(body)
                     controlResultPost({
                         respuesta: res,
                         messageExito: params.id ? texts.successMessage.editionNivel : texts.successMessage.registerMaterial,
-                        useNavigate: { navigate: navigate, direction: "/niveles/" }
+                        useNavigate: { navigate: navigate, direction: "/niveles/" },
+                        callbak:()=>{getOption("nivel")}
                     })
                 }
             } catch (error) {

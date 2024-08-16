@@ -76,6 +76,7 @@ const texts={
         registerSobrecargo:"Sobrecargo Registrado",
         registerEvento:"Evento Registrado",
         registerMetodoPago:"Metodo de Pago Registrado",
+        registerEventoRecreadores:"Recreadores Asignados",
         // -----------------------------------------------------------
         editionUsuario:"Usuario Editado",
         editionNivel:"Nivel Editado",
@@ -89,6 +90,7 @@ const texts={
         editionGenero:"Genero Editado",
         editionSobrecargo:"Sobrecargo Editado",
         editionMetodoPago:"Metodo de Pago Editado",
+        editionEventoRecreadores:"Recreadores Actualizados",
     },
 
     confirmMessage:{
@@ -142,6 +144,8 @@ const texts={
         namesUser:"Nombres del Usuario",
         namesCliente:"Nombres del Cliente",
         recreadores:"Número de Recreadores",
+        recreador:"Recreador",
+        recreadoresPermitidos:"Recreadores Permitidos",
         recreadoresPermitidos:"Recreadores Permitidos",
         lastNamesUser:"Apellidos del Usuario",
         lastNamesCliente:"Apellidos del Cliente",
@@ -162,6 +166,8 @@ const texts={
         numeroDocumento:"0.000.000",
         nombreElement:"Nombre del Elemento",
         direccion:"Dirección exacta del evento",
+        buscarClientes:"Buscar Clientes",
+        buscarRecreadores:"Buscar Recreadores",
         numeroPersonas:"Numero aproximado de asistentes al evento",
         nameActividad:"Nombre de la Actividad",
         nameCargo:"Nombre del Cargo",
@@ -179,7 +185,7 @@ const texts={
             name:"Registrar un Servicio",
             description:"Complete el formulario para registrar un nuevo Servicio"
         },
-        registerUsuairo:{
+        registerUsuario:{
             name:"Registrar un Nuevo Usuario",
             description:"Intruduzca los datos para agregar un nuevo usuario al sistema"
         },
@@ -314,6 +320,10 @@ const texts={
         getMetodosPago:{
             name:"Lista de los metodos de pago",
             description:"Verifique los metodos de pagos agregados"
+        },
+        getUsuarios:{
+            name:"Lista de Usuario",
+            description:"Verifique los usuarios agregados"
         },
         getDolar:{
             name:"Lista de Precios del Dolar BCV",

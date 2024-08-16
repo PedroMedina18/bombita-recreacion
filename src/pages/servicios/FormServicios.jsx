@@ -2,24 +2,26 @@ import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { Toaster } from "sonner";
 import { useNavigate, useParams } from "react-router-dom";
-import { servicios, materiales, actividades, } from "../../utils/API.jsx";
+import { servicios } from "../../utils/API.jsx";
 import { LoaderCircle } from "../../components/loader/Loader.jsx";
 import { ButtonSimple } from "../../components/button/Button.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { InputsGeneral, InputTextTarea, InputDuration, MultiSelect, MoneyInput } from "../../components/input/Inputs.jsx";
 import { hasLeadingOrTrailingSpace, coincidences, normalizeDecimalNumber } from "../../utils/process.jsx";
-import { verifyOptionsSelect, controlResultPost } from "../../utils/actions.jsx"
+import { verifyOptionsSelect, controlResultPost, controlErrors } from "../../utils/actions.jsx";
+import { useAuthContext } from '../../context/AuthContext.jsx';
+import { IconRowLeft } from "../../components/Icon.jsx"
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import texts from "../../context/text_es.js";
 import Navbar from "../../components/navbar/Navbar.jsx";
 import Swal from "sweetalert2";
-import { IconRowLeft } from "../../components/Icon.jsx"
 
 function FormServicios() {
+  const { dataOptions } = useAuthContext()
   const [loading, setLoading] = useState(true);
   const [errorServer, setErrorServer] = useState("");
-  const [dataMateriales, setDataMateriales] = useState([]);
-  const [dataActividades, setDataActividades] = useState([]);
+  const [materiales] = useState(dataOptions().materiales);
+  const [actividades] = useState(dataOptions().actividades);
   const [dataMaterialesDefault, setDataMaterialesDefault] = useState([]);
   const [dataActividadesDefault, setDataActividadesDefault] = useState([]);
   const [saveMateriales, setSaveMateriales] = useState([]);
@@ -32,70 +34,32 @@ function FormServicios() {
   useEffect(() => {
     if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1
-      get_data()
+      if (params.id) {
+        get_servicio()
+      }
+      setLoading(false)
       return
     }
   }, []);
 
-  useEffect(() => {
-    if (dataMateriales.length && dataActividades.length) {
-      if (params.id) {
-        get_servicio()
-      }
-    }
-  }, [dataMateriales, dataActividades])
-
-  //* funcion para buscar los permisos en la vase de datos
-  const get_data = async () => {
-    try {
-      const getMateriales = await materiales.get();
-      const getActividades = await actividades.get();
-      verifyOptionsSelect({
-        respuesta: getMateriales,
-        setError: setErrorServer,
-        setOptions: setDataMateriales,
-      });
-      verifyOptionsSelect({
-        respuesta: getActividades,
-        setError: setErrorServer,
-        setOptions: setDataActividades,
-      });
-    } catch (error) {
-      console.log(error);
-      setErrorServer(texts.errorMessage.errorSystem);
-    } finally {
-      if (!params.id) {
-        setLoading(false)
-      }
-    }
-  };
 
   const get_servicio = async () => {
     try {
-      const respuesta = await servicios.get({ subDominio:[Number(params.id)] })
-      if (respuesta.status !== 200) {
-        setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
-        return
-      }
-      if (respuesta.data.status === false) {
-        setErrorServer(`${respuesta.data.message}`)
-        return
-      }
+      const respuesta = await servicios.get({ subDominio: [Number(params.id)] })
+      const errors = controlErrors({respuesta: respuesta, constrolError:setErrorServer})
+      if(errors) return
+      const data = respuesta.data.data
       setErrorServer("")
-      if (respuesta.data.data.permisos) {
-        setOptionsDefault(coincidences(options, respuesta.data.data.permisos))
-        setSelectOptions(coincidences(options, respuesta.data.data.permisos))
-      }
-      setValue("nombre", respuesta.data.data.nombre)
-      setValue("precio", normalizeDecimalNumber(respuesta.data.data.precio))
-      setValue("descripcion", respuesta.data.data.descripcion)
-      setValue("duracion-hours", respuesta.data.data.duracion.horas),
-      setValue("duracion-minutes", respuesta.data.data.duracion.minutos),
-      setSaveActividades(coincidences(dataActividades, respuesta.data.data.actividades))
-      setDataActividadesDefault(coincidences(dataActividades, respuesta.data.data.actividades))
-      setSaveMateriales(coincidences(dataMateriales, respuesta.data.data.materiales))
-      setDataMaterialesDefault(coincidences(dataMateriales, respuesta.data.data.materiales))
-      respuesta.data.data.materiales.forEach(element => {
+      setValue("nombre", data.nombre)
+      setValue("precio", normalizeDecimalNumber(data.precio))
+      setValue("descripcion", data.descripcion)
+      setValue("duracion-hours", data.duracion.horas),
+      setValue("duracion-minutes", data.duracion.minutos),
+      setSaveActividades(coincidences(actividades, data.actividades))
+      setDataActividadesDefault(coincidences(actividades, data.actividades))
+      setSaveMateriales(coincidences(materiales, data.materiales))
+      setDataMaterialesDefault(coincidences(materiales, data.materiales))
+      data.materiales.forEach(element => {
         setValue(`${element.nombre}`, element.cantidad)
       });
     } catch (error) {
@@ -125,10 +89,10 @@ function FormServicios() {
       if (!confirmacion) {
         return;
       }
-      const actividades = saveActividades.map((elements) => {
+      const optionsActividades = saveActividades.map((elements) => {
         return elements.value;
       });
-      const materiales = saveMateriales.map((elements) => {
+      const optionsMateriales = saveMateriales.map((elements) => {
         return {
           material: elements.value,
           cantidad: data[`${elements.label}`],
@@ -143,14 +107,13 @@ function FormServicios() {
           horas: Number(data["duracion-hours"]),
           minutos: Number(data["duracion-minutes"]),
         },
-        actividades: actividades,
-        materiales: materiales,
+        actividades: optionsActividades,
+        materiales: optionsMateriales,
       };
       alertLoading("Cargando")
-      const res = params.id ? await servicios.put(body, Number(params.id)) : await servicios.post(body);
+      const res = params.id ? await servicios.put(body, { subDominio: [Number(params.id)] }) : await servicios.post(body);
       controlResultPost({
         respuesta: res,
-
         messageExito: params.id ? texts.successMessage.editionServicio : texts.successMessage.registerServicio,
         useNavigate: { navigate: navigate, direction: "/servicios/" },
       });
@@ -279,7 +242,7 @@ function FormServicios() {
                     name="actividades"
                     label={`${texts.label.actividades}`}
                     id="actividades"
-                    options={dataActividades}
+                    options={actividades}
                     save={setSaveActividades}
                     placeholder={"Activiades que se realizan"}
                     optionsDefault={dataActividadesDefault}
@@ -293,7 +256,7 @@ function FormServicios() {
                   )}
                 </div>
                 <div className="mb-1">
-                  <MultiSelect name="materiales" label={`${texts.label.materiales}`} id="materiales" options={dataMateriales} save={setSaveMateriales} placeholder={"Materiales que se necesitan"} optionsDefault={dataMaterialesDefault} />
+                  <MultiSelect name="materiales" label={`${texts.label.materiales}`} id="materiales" options={materiales} save={setSaveMateriales} placeholder={"Materiales que se necesitan"} optionsDefault={dataMaterialesDefault} />
                   {Boolean(!saveMateriales.length && submit) ? (
                     <span className="message-error visible">
                       {texts.inputsMessage.selectMateriales}

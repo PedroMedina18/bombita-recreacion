@@ -52,6 +52,7 @@ function Niveles() {
         row: (row) => { return `${normalizeDecimalNumber(row.monto)} $` }
     },
   ]
+  
   const options = {
     delete: (row) => {
       deleteItem({

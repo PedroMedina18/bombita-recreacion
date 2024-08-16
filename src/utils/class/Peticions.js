@@ -49,9 +49,14 @@ export default class Petisions {
         })
     }
 
-    async putData(data, code) {
+    async putData(data, { subDominio = [], params = null} = {}) {
         const token = getCookie("token")
-        return API.request(`${this.dominio}/${code}/?_method=PUT`, {
+        let url = `${this.dominio}/`
+        if(typeof(params)==="object"){
+            url = addOptionalQueryParams(url, {...params, _method:"PUT"})
+        }
+        url = addOptionalSubDomains(url, subDominio)
+        return API.request(url, {
             method: 'POST',
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -61,9 +66,12 @@ export default class Petisions {
         })
     }
 
-    async put(data, code) {
+    async put(data,{ subDominio = [], params = null} = {}) {
         const token = getCookie("token")
-        return API.put(`${this.dominio}/${code}/`, {
+        let url = `${this.dominio}/`
+        url = addOptionalSubDomains(url, subDominio)
+        url = addOptionalQueryParams(url, params)
+        return API.put(url, {
             headers: {
                 "Content-Type": "application/json",
                 Authorization: `Bearer ${token}`

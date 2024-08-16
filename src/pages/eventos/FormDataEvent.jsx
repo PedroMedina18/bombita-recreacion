@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { InputsGeneral, UnitSelect, InputTextTarea, InputCheckRadio, SelectAsync } from "../../components/input/Inputs.jsx"
 import { ButtonSimple } from "../../components/button/Button"
+import { useAuthContext } from '../../context/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom'
 import { useForm } from "react-hook-form";
 import { clientes } from "../../utils/API.jsx";
@@ -15,15 +16,16 @@ import pattern from "../../context/pattern.js";
 
 
 function FormDataEvent() {
-    const { dataTipo_documentos, dataClientes, dataNewUser, valueCliente, setValueCliente, setdataNewUser, dataPersona, setPersona, setDataEvent, dataEvent } = useFormEventContext()
+    const { dataClientes, dataNewUser, valueCliente, setValueCliente, setdataNewUser, dataPersona, setPersona, setDataEvent, dataEvent } = useFormEventContext()
     const [disabledInputs, setDisabledInputs] = useState(false)
+    const { dataOptions } = useAuthContext()
+    const [tipos_documentos] = useState(dataOptions().tipos_documentos)
     const [isClient, setIsClient] = useState(true)
     const navigate = useNavigate();
     const [debounceTimeoutPersona, setDebounceTimeoutPersona] = useState(null);
     const [debounceTimeoutCliente, setDebounceTimeoutCliente] = useState(null);
     const [submit, setSubmit] = useState(false);
     const [fechaActual] = useState(new Date())
-    const renderizado = useRef(0)
 
     useEffect(() => {
         const keys = Object.keys(dataEvent);
@@ -83,6 +85,7 @@ function FormDataEvent() {
             collapseDataClient.hide()
         }
     }
+    
     const loadOptionsCliente = (inputValue, callback) => {
         if (debounceTimeoutCliente) {
             clearTimeout(debounceTimeoutCliente);
@@ -106,6 +109,7 @@ function FormDataEvent() {
 
         setDebounceTimeoutCliente(timeout);
     }
+    
     return (
         <form className="w-100 d-flex flex-column"
             onSubmit={onSubmit}
@@ -127,7 +131,7 @@ function FormDataEvent() {
                         <SelectAsync
                             id="cliente"
                             label={`${texts.label.cliente}`}
-                            placeholder={`Buscar Clientes`}
+                            placeholder={`${texts.placeholder.buscarClientes}`}
                             optionsDefault={dataClientes}
                             getOptionLabel={(e) => { return `${e.nombres} ${e.apellidos} ${e.tipo_documento}-${e.numero_documento}`}}
                             getOptionValue={(e) => { return e.id}}
@@ -165,7 +169,7 @@ function FormDataEvent() {
                 <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                     <div className="w-md-25  w-100 pe-0 pe-md-3 d-flex align-item-center">
                         <UnitSelect label={texts.label.tipoDocuemnto} name="tipo_documento" id="tipo_documento" form={{ errors, register }}
-                            options={dataTipo_documentos}
+                            options={tipos_documentos}
                             params={{
                                 validate: (value) => {
                                     if (!(value) && !isClient) {

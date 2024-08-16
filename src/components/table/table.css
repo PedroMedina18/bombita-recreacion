@@ -31,7 +31,7 @@ button[disabled]:hover {
   overflow-x: auto;
   padding-bottom: 5px;
 }
-.table-overflow-y{
+.table-overflow-y {
   max-height: 500px;
   overflow-y: auto;
 }
@@ -50,12 +50,12 @@ table.table-data,
 .table-loading {
   width: 100%;
   border-collapse: collapse;
-  border:2px solid rgb(92, 92, 92); 
+  border: 2px solid rgb(92, 92, 92);
   table-layout: auto;
 }
 
-table.table-data.border-table{
-  border:2px solid rgb(92, 92, 92); 
+table.table-data.border-table {
+  border: 2px solid rgb(92, 92, 92);
 }
 .table-loading {
   border: 2px solid rgb(92, 92, 92);
@@ -75,10 +75,10 @@ table.table-data.border-none td {
   border-right: none;
   border-left: none;
 }
-table.table-data.border-none th{
+table.table-data.border-none th {
   border-top: none;
 }
-tr.fc-none{
+tr.fc-none {
   color: transparent;
 }
 .table-loading th,
@@ -100,7 +100,6 @@ tbody tr td {
   font-size: 14px;
   font-weight: normal;
 }
-
 
 table td:first-child {
   font-weight: bold;
@@ -132,6 +131,40 @@ table svg.money:hover {
   filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.5));
 }
 
+.row-collapse[data-bs-toggle="collapse"]::after {
+  border: solid;
+  border-width: 0 0.30rem 0.30rem 0;
+  content: "";
+  display: inline-block;
+  padding: 5px;
+  right: 1.5rem;
+  top: 0.5rem;
+  position: absolute;
+  transition: all 0.2s ease-out;
+}
+
+.row-collapse[data-bs-toggle="collapse"][aria-expanded="true"]::after {
+  transform: rotate(45deg);
+}
+
+.row-collapse[data-bs-toggle="collapse"][aria-expanded="false"]::after {
+  transform: rotate(-45deg);
+}
+
+.button-hover{
+  background-color: transparent;
+}
+
+.button-hover:hover{
+  background-color: rgba(var(--secundario), 0.9);
+  color: hsl(0, 0%, 100%);
+}
+
+.button-hover[aria-expanded="true"]{
+  background-color: rgba(var(--secundario), 0.9);
+  color: hsl(0, 0%, 100%);
+}
+
 @media (max-width: 768px) {
   table.table-data {
     min-width: max-content;
@@ -143,13 +176,13 @@ table svg.money:hover {
 }
 
 @media (min-width: 992px) {
-  table.table-data th{
+  table.table-data th {
     max-width: 100px;
   }
 }
 
 @media (min-width: 576px) {
-  table.table-data th{
+  table.table-data th {
     max-width: 150px;
   }
 }

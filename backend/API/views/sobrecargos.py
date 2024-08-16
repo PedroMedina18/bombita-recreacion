@@ -3,16 +3,17 @@ from django.http.response import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
+from django.db import IntegrityError, connection, models
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..models import Sobrecargos
-from django.db import IntegrityError, connection, models
+from ..funtions.filtros import order, filtrosWhere, typeOrder
 from ..funtions.token import verify_token
 from ..message import MESSAGE
 import json
 
 # CRUD COMPLETO DE LA TABLA DE nivel
-class Sobrecargo_Views(View):
+class Sobrecargos_Views(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -179,29 +180,25 @@ class Sobrecargo_Views(View):
                         'data': None
                     }
             else:
-                if("all" in request.GET and request.GET["all"]=='true'):
-                    query = """
-                    SELECT * FROM sobrecargos ORDER BY id ASC;
-                    """
+                page = request.GET.get('page', 1)
+                inicio = indiceInicial(int(page))
+                final = indiceFinal(int(page))
+                all = request.GET.get('all', False)
+                orderType = order(request)
+
+                typeOrdenBy = "nombre" if typeOrder(request) else "id"
+
+                where = []
+                where = filtrosWhere(where)
+                query = "SELECT {} FROM sobrecargos ORDER BY {} {} {};"
+
+                if(all == "true"):
+                    query = "SELECT id, nombre FROM sobrecargos ORDER BY {} {};".format(typeOrdenBy, orderType)
                     cursor.execute(query)
-                    sobrecargos = dictfetchall(cursor)
-                elif('page' in request.GET ):
-                    query = """
-                    SELECT * FROM sobrecargos ORDER BY id ASC id LIMIT %s, %s;
-                    """
-                    cursor.execute(query, [indiceInicial(int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
-                    sobrecargos = dictfetchall(cursor)
-                elif('page' in request.GET and 'desc' in request.GET and request.GET['desc']=='true'):
-                    query = """
-                    SELECT * FROM sobrecargos ORDER BY id DESC LIMIT %s, %s;
-                    """
-                    cursor.execute(query, [indiceInicial(int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                     sobrecargos = dictfetchall(cursor)
                 else:
-                    query = """
-                    SELECT * FROM sobrecargos ORDER BY id LIMIT 25;
-                    """
-                    cursor.execute(query)
+                    query = "SELECT * FROM sobrecargos ORDER BY {} {} LIMIT %s, %s;".format(typeOrdenBy, orderType)
+                    cursor.execute(query, [inicio, final])
                     sobrecargos = dictfetchall(cursor)
 
                 query="""
@@ -209,13 +206,13 @@ class Sobrecargo_Views(View):
                 """
                 cursor.execute(query)
                 result = dictfetchall(cursor)
-                if len(sobrecargos) > 0:
+                if len(sobrecargos)>0:
                     datos = {
                         'status': True,
                         'message': f"{MESSAGE['exitoGet']}",
                         'data': sobrecargos,
                         'pages': int(result[0]['pages']),
-                        'total': result[0]["total"],
+                        'total':result[0]['total'],
                     }
                 else:
                     datos = {
@@ -223,9 +220,10 @@ class Sobrecargo_Views(View):
                         'message': f"{MESSAGE['errorRegistrosNone']}",
                         'data': None,
                         'pages': None,
-                        'total': 0
+                        'total':0
                     }
             return JsonResponse(datos)
+        
         except Exception as error:
             print(f"{MESSAGE['errorGet']} - {error}")
             datos = {

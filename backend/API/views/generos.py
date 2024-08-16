@@ -3,16 +3,17 @@ from django.http.response import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
+from django.db import IntegrityError, connection, models
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..models import Generos
-from django.db import IntegrityError, connection, models
 from ..message import MESSAGE
+from ..funtions.filtros import order, filtrosWhere, typeOrder
 from ..funtions.token import verify_token
 import json
 
 # CRUD COMPLETO DE LA TABLA DE GENEROS
-class Genero_Views(View):
+class Generos_Views(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -178,29 +179,25 @@ class Genero_Views(View):
                         'data': None
                     }
             else:
-                if("all" in request.GET and request.GET['all']=='true'):
-                    query = """
-                    SELECT * FROM generos ORDER BY id ASC;
-                    """
+                page = request.GET.get('page', 1)
+                inicio = indiceInicial(int(page))
+                final = indiceFinal(int(page))
+                all = request.GET.get('all', False)
+                orderType = order(request)
+
+                typeOrdenBy = "nombre" if typeOrder(request) else "id"
+
+                where = []
+                where = filtrosWhere(where)
+                query = "SELECT {} FROM generos ORDER BY {} {} {};"
+
+                if(all == "true"):
+                    query = "SELECT id, nombre FROM generos ORDER BY {} {};".format(typeOrdenBy, orderType)
                     cursor.execute(query)
-                    generos = dictfetchall(cursor)
-                elif('page' in request.GET ):
-                    query = """
-                    SELECT * FROM generos ORDER BY id ASC id LIMIT %s, %s;
-                    """
-                    cursor.execute(query, [indiceInicial(int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
-                    generos = dictfetchall(cursor)
-                elif('page' in request.GET and "desc" in request.GET and request.GET['desc']=='true'):
-                    query = """
-                    SELECT * FROM generos ORDER BY id DESC LIMIT %s, %s;
-                    """
-                    cursor.execute(query, [indiceInicial(int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                     generos = dictfetchall(cursor)
                 else:
-                    query = """
-                    SELECT * FROM generos ORDER BY id LIMIT 25;
-                    """
-                    cursor.execute(query)
+                    query = "SELECT * FROM generos ORDER BY {} {} LIMIT %s, %s;".format(typeOrdenBy, orderType)
+                    cursor.execute(query, [inicio, final])
                     generos = dictfetchall(cursor)
 
                 query="""

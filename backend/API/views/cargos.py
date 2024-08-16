@@ -3,14 +3,15 @@ from django.http.response import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
+from django.db import IntegrityError, connection, models
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..models import Cargos, Privilegios, Permisos
 from ..funtions.token import verify_token
 from ..funtions.editorOpciones import editorOpciones
 from ..funtions.identificador import returnBoolean, normalize_id_list
-from django.db import IntegrityError, connection, models
 from ..message import MESSAGE
+from ..funtions.filtros import order, filtrosWhere, typeOrder
 from decouple import config
 import json
 
@@ -232,34 +233,28 @@ class Cargos_Views(View):
                         'data': None,
                     }
             else:
-                if ('all' in request.GET and request.GET['all'] == 'true'):
-                    query = """
-                    SELECT * FROM cargos ORDER BY id ASC;
-                    """
+                page = request.GET.get('page', 1)
+                inicio = indiceInicial(int(page))
+                final = indiceFinal(int(page))
+                all = request.GET.get('all', False)
+                orderType = order(request)
+
+                typeOrdenBy = "nombre" if typeOrder(request) else "id"
+
+                where = []
+                where = filtrosWhere(where)
+                query = "SELECT {} FROM cargos ORDER BY {} {} {}"
+
+                if(all == "true"):
+                    query = "SELECT id, nombre FROM cargos ORDER BY {} {};".format(typeOrdenBy, orderType)
                     cursor.execute(query)
-                    cargos = dictfetchall(cursor)
-                elif ("page" in request.GET):
-                    query = """
-                    SELECT * FROM cargos ORDER BY id ASC LIMIT %s, %s;
-                    """
-                    cursor.execute(query, [indiceInicial(
-                        int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
-                    cargos = dictfetchall(cursor)
-                elif ('page' in request.GET and 'desc' in request.GET and request.GET['desc'] == 'true'):
-                    query = """
-                    SELECT * FROM cargos ORDER BY id DESC LIMIT %s, %s;
-                    """
-                    cursor.execute(query, [indiceInicial(
-                        int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                     cargos = dictfetchall(cursor)
                 else:
-                    query = """
-                    SELECT * FROM cargos ORDER BY id LIMIT 25;
-                    """
-                    cursor.execute(query)
+                    query = "SELECT * FROM cargos ORDER BY {} {} LIMIT %s, %s;".format(typeOrdenBy, orderType)
+                    cursor.execute(query, [inicio, final])
                     cargos = dictfetchall(cursor)
 
-                query = """
+                query="""
                     SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM cargos;
                 """
                 cursor.execute(query)
@@ -281,7 +276,6 @@ class Cargos_Views(View):
                         'pages': None,
                         'total':0
                     }
-            
             return JsonResponse(datos)
     
         except Exception as error:

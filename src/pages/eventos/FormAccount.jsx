@@ -14,7 +14,7 @@ import texts from "../../context/text_es.js";
 import TableDescriptionFacture from "../../components/table/TableDescriptionFacture.jsx"
 
 function FormAccount() {
-    const { getUser } = useAuthContext();
+    const { getUser, dataOptions } = useAuthContext();
     const [dolar] = useState(getUser().dollar.price);
     const { dataServicios, saveDataServicios, valueCliente, saveDataSobrecargos, dataSobrecargos, setSaveDataSobrecargos, setSaveDataServicios, dataEvent } = useFormEventContext()
     const [estadoSobrecargos, setEstadoSobrecargos] = useState(false);
@@ -77,6 +77,7 @@ function FormAccount() {
             }
         }
     )
+
     const columnsServicio = [
         {
             name: "Codigo",
@@ -104,6 +105,7 @@ function FormAccount() {
             row: (row) => { return `${row.numero_recreadores}` }
         }
     ]
+
     const columnsSobrecargo = [
         {
             name: "Codigo",
@@ -118,6 +120,7 @@ function FormAccount() {
             row: (row) => { return `${row.monto} $` }
         },
     ]
+
     function sumarPrecios(listData, listSelect) {
         let suma = 0;
         listSelect.forEach(id => {
@@ -130,6 +133,7 @@ function FormAccount() {
         });
         return suma;
     }
+    
     return (
         <>
             <ModalSelect titulo={"Escoja los servicios"} state={[estadoServicios, setEstadoServicios]} object={servicios} columns={columnsServicio} saveSelect={setSaveDataServicios} select={saveDataServicios} />

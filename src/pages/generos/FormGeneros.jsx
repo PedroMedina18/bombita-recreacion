@@ -1,26 +1,28 @@
 import { useState, useEffect, useRef } from 'react';
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from 'react-router-dom'
+import { useAuthContext } from '../../context/AuthContext.jsx';
 import { InputsGeneral, InputTextTarea } from "../../components/input/Inputs.jsx";
 import { ButtonSimple } from "../../components/button/Button.jsx";
 import { LoaderCircle } from "../../components/loader/Loader.jsx";
-import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import { generos } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { Toaster } from "sonner";
 import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
-import { controlResultPost } from "../../utils/actions.jsx";
+import { controlErrors, controlResultPost } from "../../utils/actions.jsx";
+import { IconRowLeft } from "../../components/Icon.jsx";
 import Navbar from "../../components/navbar/Navbar.jsx";
+import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import Swal from 'sweetalert2';
 import texts from "../../context/text_es.js";
 import pattern from "../../context/pattern.js";
-import { IconRowLeft } from "../../components/Icon.jsx";
 
 function FormGeneros() {
     const navigate = useNavigate();
     const params = useParams();
-    const [loading, setLoading] = useState(true)
     const renderizado = useRef(0)
+    const {getOption} = useAuthContext()
+    const [loading, setLoading] = useState(true)
     const [errorServer, setErrorServer] = useState("")
 
     useEffect(() => {
@@ -37,18 +39,13 @@ function FormGeneros() {
     const get_genero = async () => {
         try {
             const respuesta = await generos.get({ subDominio:[Number(params.id)] })
-            if (respuesta.status !== 200) {
-                setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
-                return
-            }
-            if (respuesta.data.status === false) {
-                setErrorServer(`${respuesta.data.message}`)
-                return
-            }
+            const errors = controlErrors({respuesta:respuesta, constrolError:setErrorServer})
+            if(errors) return
             setErrorServer("")
-            const keys = Object.keys(respuesta.data.data);
+            const data = respuesta.data.data
+            const keys = Object.keys(data);
             keys.forEach(key => {
-                setValue(key, `${respuesta.data.data[`${key}`]}`)
+                setValue(key, `${data[`${key}`]}`)
             });
 
         } catch (error) {
@@ -81,11 +78,12 @@ function FormGeneros() {
                     }
                     alertLoading("Cargando")
                     console.log(params.id)
-                    const res = params.id ? await generos.put(body, Number(params.id)) : await generos.post(body)
+                    const res = params.id ? await generos.put(body, { subDominio:[Number(params.id)]}) : await generos.post(body)
                     controlResultPost({
                         respuesta: res,
                         messageExito: params.id ? texts.successMessage.editionGenero : texts.successMessage.registerGenero,
-                        useNavigate: { navigate: navigate, direction: "/generos/" }
+                        useNavigate: { navigate: navigate, direction: "/generos/" },
+                        callbak:()=>{getOption("genero")}
                     })
                 }
 

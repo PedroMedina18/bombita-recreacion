@@ -3,7 +3,9 @@ import { useState, useEffect } from 'react';
 import { useAuthContext } from '../context/AuthContext.jsx';
 import useInactivity from '../context/useInactivity.jsx';
 import { ButtonSimple } from "../components/button/Button.jsx"
+import { Toaster } from "sonner";
 import { respaldo } from "../utils/API.jsx"
+
 function Inicio() {
   const { getUser } = useAuthContext();
   const [dataUser] = useState(getUser());
@@ -17,6 +19,7 @@ function Inicio() {
           Realizar Respaldo
         </ButtonSimple>
       </div>
+      <Toaster />
     </Navbar>
   )
 }

@@ -8,7 +8,7 @@ import MakeAnimated from "react-select/animated";
 import { IconCircleCheck, IconCircleX, IconUserCircleSolid } from "../Icon";
 
 
-export function InputsGeneral({ label, id, type, name, form, placeholder = "", params = {}, flexRow = false, isError = true, ...props }) {
+export function InputsGeneral({ label, id, type, name, form, placeholder = "", params = {}, flexRow = false, isError = true, needErrors = true, ...props }) {
   const { errors, register } = form;
 
   if (flexRow) {
@@ -20,7 +20,7 @@ export function InputsGeneral({ label, id, type, name, form, placeholder = "", p
           </label>
           <div className="formulario-grupo-input">
             <input
-              className="formulario-input "
+              className={`formulario-input${(type === "date" || type === "datetime-local") ? "-date" : ""} ${needErrors && "pe-2"}`}
               type={type}
               id={id}
               placeholder={placeholder}
@@ -31,9 +31,12 @@ export function InputsGeneral({ label, id, type, name, form, placeholder = "", p
             <IconCircleX className="bi bi-x-circle-fill" />
           </div>
         </div>
-        <p className="formulario-message-error mb-2 ms-auto d-inline-block">
-          {errors[name] ? errors[name].message : "error"}
-        </p>
+        {
+          isError &&
+          <p className="formulario-message-error mb-2 ms-auto d-inline-block">
+            {errors[name] ? errors[name].message : "error"}
+          </p>
+        }
       </div>
     );
   } else {
@@ -42,21 +45,29 @@ export function InputsGeneral({ label, id, type, name, form, placeholder = "", p
         <label className="formulario-label" htmlFor={id}>
           {label}
         </label>
-        <div className={`formulario-grupo-input ${(type === "date" || type === "datetime-local") ? "date" : ""}`}>
+        <div className={`formulario-grupo-input ${(type === "date" || type === "datetime-local") ? "date" : ""} `}>
           <input
-            className={`formulario-input${(type === "date" || type === "datetime-local") ? "-date" : ""}`}
+            className={`formulario-input${(type === "date" || type === "datetime-local") ? "-date" : ""} ${needErrors && "pe-2"}`}
             placeholder={placeholder}
             type={type}
             id={id}
             {...register(name, params)}
             {...props}
           />
-          <IconCircleCheck className="bi bi-check-circle-fill" />
-          <IconCircleX className="bi bi-x-circle-fill" />
+          {
+            needErrors &&
+            <>
+              <IconCircleCheck className="bi bi-check-circle-fill" />
+              <IconCircleX className="bi bi-x-circle-fill" />
+            </>
+          }
         </div>
-        <p className="formulario-message-error">
-          {errors[name] ? errors[name].message : "error"}
-        </p>
+        {
+          needErrors &&
+          <p className="formulario-message-error">
+            {errors[name] ? errors[name].message : "error"}
+          </p>
+        }
       </div>
     );
   }
@@ -87,9 +98,9 @@ export function InputTextTarea({ label, id, name, form, placeholder = "", params
   );
 }
 
-export function InputCheckRadio({ label, id, name, form, params = {}, isError = true, className="", type = "", ...props }) {
+export function InputCheckRadio({ label, id, name, form, params = {}, isError = true, className = "", type = "", ...props }) {
   const { errors, register } = form
-  const typeInput= type === "radio" ? "radio" : "checkbox"
+  const typeInput = type === "radio" ? "radio" : "checkbox"
   return (
     <div
       className={`w-max-content d-flex check ${errors[name] && isError ? "error" : " "
@@ -101,7 +112,7 @@ export function InputCheckRadio({ label, id, name, form, params = {}, isError = 
         id={id}
         name={name}
         {...register(name, params)}
-        
+
         {...props}
       />
       <label className="formulario-label ms-4 " htmlFor={id}>
@@ -270,7 +281,7 @@ export function InputDuration({ label, id, name, form, params = {}, isError = tr
   );
 }
 
-export function UnitSelect({ label, id, name, form, params = {}, options, placeholder = "...", isError = true, ...props }) {
+export function UnitSelect({ label, id, name, form, params = {}, options, placeholder = "...", isError = true, needErrors = true, ...props }) {
   const { errors, register } = form;
   return (
     <div className={`w-100 d-flex flex-column justify-content-center ${errors[name] && isError ? "error" : " "}`}>
@@ -281,11 +292,11 @@ export function UnitSelect({ label, id, name, form, params = {}, options, placeh
         <select
           name={name}
           id={id}
-          className="formulario-input select"
+          className={`formulario-input select ${needErrors && "pe-2"}`}
           {...register(name, params)}
           {...props}
         >
-          <option value="">{placeholder}</option>
+          {placeholder && <option value="">{placeholder}</option>}
           {options.length
             ? options.map((element) => (
               <option key={element.value} value={element.value}>
@@ -294,11 +305,17 @@ export function UnitSelect({ label, id, name, form, params = {}, options, placeh
             ))
             : ""}
         </select>
-        <IconCircleX className="bi bi-x-circle-fill" />
+        {
+          needErrors &&
+          <IconCircleX className="bi bi-x-circle-fill" />
+        }
       </div>
-      <p className="formulario-message-error">
-        {errors[name] ? errors[name].message : "error"}
-      </p>
+      {
+        needErrors &&
+        <p className="formulario-message-error">
+          {errors[name] ? errors[name].message : "error"}
+        </p>
+      }
     </div>
   );
 }
@@ -340,17 +357,20 @@ export function MultiSelect({ id, label, options, save, placeholder, optionsDefa
   );
 }
 
-export function SelectAsync({ id, label, optionsDefault, placeholder, loadOptions, value, setValue, getOptionLabel, getOptionValue }) {
+export function SelectAsync({ id, label = null, optionsDefault, placeholder, loadOptions, value, setValue, getOptionLabel, getOptionValue, onChange = () => { } }) {
   const handleOnChange = (e) => {
+    onChange(e)
     setValue(e)
   }
   return (
     <div>
-      <label className="formulario-label" htmlFor={id}>
-        {label}
-      </label>
+      {
+        label &&
+        <label className="formulario-label" htmlFor={id}>
+          {label}
+        </label>
+      }
       <AsyncSelect
-        className="hello"
         cacheOptions
         defaultOptions={optionsDefault}
         value={value}
@@ -425,23 +445,23 @@ export function InputImgPerfil({ label, id, name, form, tamaño = "lg", imgPerfi
   )
 }
 
-export function InputFile({ label, id, name, form, onChange = ()=>{}, }) {
+export function InputFile({ label, id, name, form, onChange = () => { }, }) {
   const { errors, register } = form;
-  const [img, setImage] = useState({state:false, nombre:"Sin imagen"})
+  const [img, setImage] = useState({ state: false, nombre: "Sin imagen" })
 
   const cambio_imagen = (e) => {
     onChange(e)
     if (e.target.files[0]) {
       setImage({
         ...img,
-        state:true,
-        nombre:e.target.files[0].name
+        state: true,
+        nombre: e.target.files[0].name
       })
     } else {
       setImage({
         ...img,
-        state:false,
-        nombre:"Sin imagen"
+        state: false,
+        nombre: "Sin imagen"
       })
     }
   }
@@ -477,10 +497,10 @@ export function InputFile({ label, id, name, form, onChange = ()=>{}, }) {
   )
 }
 
-export function MoneyInput({ label, id, name, form, params = {}, flexRow = false, isError = true, onChange = ()=>{}, ...props }) {
+export function MoneyInput({ label, id, name, form, params = {}, flexRow = false, isError = true, onChange = () => { }, ...props }) {
   const [value, setValueMoney] = useState('0.00');
   const { errors, register, setValue } = form;
-  
+
   const handleChange = (event) => {
     onChange(event)
     const inputValue = event.target.value.replace(/[^\d]/g, ''); // allow only digits
@@ -510,7 +530,7 @@ export function MoneyInput({ label, id, name, form, params = {}, flexRow = false
     }
 
     // update state and input value
-    setValue(`${name}` ,formattedValue);
+    setValue(`${name}`, formattedValue);
 
     // move cursor to the end of the input field
     const cursorPosition = formattedValue.length;

@@ -1,10 +1,11 @@
 import { useEffect, useState, createContext, useContext } from 'react'
-import { verify_token } from "../utils/API.jsx"
+import { verify_token, generos, niveles, tipo_documentos, materiales, actividades, cargos } from "../utils/API.jsx"
 import { getCookie } from "../utils/cookie.jsx"
+import { getDataAll } from "../utils/actions.jsx"
 import { LoaderRule } from "../components/loader/Loader.jsx"
 const AuthContext = createContext();
 
-export const useAuthContext=()=>{
+export const useAuthContext = () => {
   return useContext(AuthContext)
 }
 
@@ -12,13 +13,157 @@ export function AuthContextProvider({ children }) {
   const [user, setUser] = useState({})
   const [isAuthenticateds, setIsAuthenticated] = useState(false)
   const [isloading, setIsLoading] = useState(true);
+  const [dataGeneros, setGeneros] = useState([])
+  const [dataNiveles, setNiveles] = useState([])
+  const [dataTipoDocumentos, setTipoDocumentos] = useState([])
+  const [dataMateriales, setMateriales] = useState([])
+  const [dataActividades, setActividades] = useState([])
+  const [dataCargos, setCargos] = useState([])
 
   useEffect(() => {
     checkAuth();
   }, []);
 
+  const getData = () => {
+    getDataAll({
+      api: generos,
+      setData: setGeneros,
+      message: "Error al consultar los Generos"
+    })
+    getDataAll({
+      api: niveles,
+      setData: setNiveles,
+      message: "Error al consultar los Niveles"
+    })
+    getDataAll({
+      api: tipo_documentos,
+      setData: setTipoDocumentos,
+      message: "Error al consultar los Tipos de Documentos"
+    })
+    getDataAll({
+      api: materiales,
+      setData: setMateriales,
+      message: "Error al consultar los Materiales"
+    })
+    getDataAll({
+      api: actividades,
+      setData: setActividades,
+      message: "Error al consultar los Actividades"
+    })
+    getDataAll({
+      api: cargos,
+      setData: setCargos,
+      message: "Error al consultar los Cargos"
+    })
+  }
+
+  const getDataOptional = () => {
+    if (!dataGeneros.length) {
+      getDataAll({
+        api: generos,
+        setData: setGeneros,
+        message: "Error al consultar los Generos"
+      })
+    }
+    if (!dataNiveles.length) {
+      getDataAll({
+        api: niveles,
+        setData: setNiveles,
+        message: "Error al consultar los Niveles"
+      })
+    }
+    if (!dataTipoDocumentos.length) {
+      getDataAll({
+        api: tipo_documentos,
+        setData: setTipoDocumentos,
+        message: "Error al consultar los Tipos de Documentos"
+      })
+    }
+    if (!dataMateriales.length) {
+      getDataAll({
+        api: materiales,
+        setData: setMateriales,
+        message: "Error al consultar los Materiales"
+      })
+    }
+    if (!dataActividades.length) {
+      getDataAll({
+        api: actividades,
+        setData: setActividades,
+        message: "Error al consultar los Actividades"
+      })
+    }
+    if (!dataCargos.length) {
+      getDataAll({
+        api: cargos,
+        setData: setCargos,
+        message: "Error al consultar los Cargos"
+      })
+    }
+  }
+
+  const getOption = (option) => {
+    switch (option) {
+      case 'genero':
+        getDataAll({
+          api: generos,
+          setData: setGeneros,
+          message: "Error al consultar los Generos"
+        })
+        break;
+      case 'nivel':
+        getDataAll({
+          api: niveles,
+          setData: setNiveles,
+          message: "Error al consultar los Niveles"
+        })
+        break;
+      case 'tipo_documento':
+        getDataAll({
+          api: tipo_documentos,
+          setData: setTipoDocumentos,
+          message: "Error al consultar los Tipos de Documentos"
+        })
+        break;
+      case 'material':
+        getDataAll({
+          api: materiales,
+          setData: setMateriales,
+          message: "Error al consultar los Materiales"
+        })
+        break;
+      case 'actividad':
+        getDataAll({
+          api: actividades,
+          setData: setActividades,
+          message: "Error al consultar los Actividades"
+        })
+        break;
+      case 'cargo':
+        getDataAll({
+          api: cargos,
+          setData: setCargos,
+          message: "Error al consultar los Cargos"
+        })
+        break;
+    }
+  }
+
+  const dataOptions = () => {
+    return {
+      niveles: dataNiveles,
+      generos: dataGeneros,
+      tipos_documentos: dataTipoDocumentos,
+      materiales: dataMateriales,
+      actividades: dataActividades,
+      cargos: dataCargos,
+    }
+  }
+
   // *funcion encargada de guardar los datos del usuario al ingresar
   const saveUser = (json, token) => {
+    document.cookie = `token=${token}; path=/; SameSite=Strict`
+    getData()
     setUser(
       {
         ...user,
@@ -30,13 +175,12 @@ export function AuthContextProvider({ children }) {
       }
     )
     setIsAuthenticated(true)
-    document.cookie = `token=${token}; path=/; SameSite=Strict`
-  }
+  };
 
   // *funcion que devuelve los datos del usuario
   const getUser = () => {
     return user
-  }
+  };
 
   // *funcion para chekear si el token es valido
   const checkAuth = async () => {
@@ -60,14 +204,17 @@ export function AuthContextProvider({ children }) {
     } finally {
       setIsLoading(false)
     }
-  }
+  };
 
   // *funcion para cerrar sesion
   const closeSession = () => {
+    setGeneros([])
+    setNiveles([])
+    setTipoDocumentos([])
     setUser({})
     setIsAuthenticated(false)
     document.cookie = `token=; path=/; max-age=0`
-  }
+  };
 
   return (
     <AuthContext.Provider value={
@@ -76,13 +223,17 @@ export function AuthContextProvider({ children }) {
         getUser,
         isAuthenticateds,
         closeSession,
+        getData,
+        dataOptions,
+        getDataOptional,
+        getOption
       }
     }>
-      {isloading ? 
+      {isloading ?
         <div className="w-100 d-flex justify-content-center align-items-center heigh-100 haikus">
           <LoaderRule />
-        </div> 
-        : 
+        </div>
+        :
         children
       }
     </AuthContext.Provider>

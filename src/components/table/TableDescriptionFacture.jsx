@@ -24,6 +24,7 @@ function TableDescriptionFacture({ listaData, listDescripcion, saveListDescripti
         array.splice(index, 1)
         saveListDescription(array)
     }
+    
     return (
         <table className="table-data border-none ">
             <thead>

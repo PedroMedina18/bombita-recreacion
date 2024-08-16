@@ -1,24 +1,25 @@
 import { useState, useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
 import { InputsGeneral, UnitSelect } from "../../components/input/Inputs.jsx"
 import { ButtonSimple } from "../../components/button/Button.jsx"
-import { useForm } from "react-hook-form";
 import { LoaderCircle } from "../../components/loader/Loader.jsx";
+import { useAuthContext } from '../../context/AuthContext.jsx';
 import { useParams, useNavigate } from "react-router-dom";
 import { Toaster } from "sonner";
-import { tipo_documentos, clientes } from "../../utils/API.jsx";
+import {  clientes } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
-import { verifyOptionsSelect, getPersona, controlResultPost } from "../../utils/actions.jsx"
+import { controlErrors, controlResultPost } from "../../utils/actions.jsx"
+import { IconRowLeft } from "../../components/Icon.jsx"
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import texts from "../../context/text_es.js";
 import Navbar from "../../components/navbar/Navbar.jsx"
 import pattern from "../../context/pattern.js"
-import { IconRowLeft } from "../../components/Icon.jsx"
 import Swal from 'sweetalert2';
 
 function FormClientes() {
-    const [data_tipo_documentos, setTipoDocumentos] = useState([])
-    const [cliente, setCliente] = useState({ id: null, numero_documento: null })
+    const {dataOptions} = useAuthContext()
+    const [tipos_documentos] = useState(dataOptions().tipos_documentos)
     const [loading, setLoading] = useState(true)
     const [errorServer, setErrorServer] = useState("")
     const [disabledInputs, setDisabledInputs] = useState(false)
@@ -29,56 +30,25 @@ function FormClientes() {
     useEffect(() => {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
-            get_data()
+            if (params.id) {
+                get_cliente()
+            }
             return
         }
     }, [])
 
-    // *Funcion para buscar los niveles y tipos de documentos
-    const get_data = async () => {
-        try {
-            const get_tipo_documentos = await tipo_documentos.get()
-            verifyOptionsSelect({
-                respuesta: get_tipo_documentos,
-                setError: setErrorServer,
-                setOptions: setTipoDocumentos
-            })
-            if (Number(params.numero_documento)) {
-                setCliente({
-                    ...cliente,
-                    numero_documento: Number(params.numero_documento)
-                })
-                get_cliente()
-            }
-        } catch (error) {
-            console.log(error)
-            setErrorServer(texts.errorMessage.errorSystem)
-        } finally {
-            setLoading(false)
-        }
-    }
-
     const get_cliente = async () => {
         try {
-            const respuesta = await clientes.get({subDominio:[Number(params.numero_documento)], params: { "_info": "true" }})
-            if (respuesta.status !== 200) {
-                setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
-                return
-            }
-            if (respuesta.data.status === false) {
-                setErrorServer(`${respuesta.data.message}`)
-                return
-            }
+            const respuesta = await clientes.get({subDominio:[Number(params.id)], params: { "_info": "true" }})
+            const errors = controlErrors({respuesta:respuesta, constrolError:setErrorServer})
+            if(errors) return
             setErrorServer("")
-            setCliente({
-                ...cliente,
-                id: respuesta.data.data.info.id
-            })
-            const keys = Object.keys(respuesta.data.data.info);
+            const data = respuesta.data.data
+            const keys = Object.keys(data.info);
             keys.forEach(key => {
-                setValue(key, respuesta.data.data.info[`${key}`])
+                setValue(key, data.info[`${key}`])
             });
-            setValue(`tipo_documento`, respuesta.data.data.info["tipo_documento_id"])
+            setValue(`tipo_documento`, data.info["tipo_documento_id"])
 
         } catch (error) {
             console.log(error)
@@ -113,7 +83,7 @@ function FormClientes() {
                     body.telefono_secundario = Number(data.telefono_secundario)
                     body.correo = data.correo
                     alertLoading("Cargando")
-                    const res = await clientes.put(body, cliente.id) 
+                    const res = await clientes.put(body, { subDominio:[Number(params.id)]}) 
 
                     controlResultPost({
                         respuesta: res,
@@ -164,7 +134,7 @@ function FormClientes() {
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-25 pe-0 pe-md-3 d-flex align-items-center">
                                             <UnitSelect label={texts.label.tipoDocuemnto} name="tipo_documento" id="tipo_documento" form={{ errors, register }}
-                                                options={data_tipo_documentos}
+                                                options={tipos_documentos}
                                                 params={{
                                                     validate: (value) => {
                                                         if ((value === "")) {

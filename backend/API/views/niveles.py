@@ -3,16 +3,17 @@ from django.http.response import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
+from django.db import IntegrityError, connection, models
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..models import Nivel
-from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
+from ..funtions.filtros import order, filtrosWhere, typeOrder
 from ..message import MESSAGE
 import json
 
 # CRUD COMPLETO DE LA TABLA DE nivel
-class Nivel_Views(View):
+class Niveles_Views(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -179,29 +180,25 @@ class Nivel_Views(View):
                         'data': None
                     }
             else:
-                if('all' in request.GET and request.GET['all']=='true'):
-                    query = """
-                    SELECT * FROM niveles ORDER BY id ASC;
-                    """
+                page = request.GET.get('page', 1)
+                inicio = indiceInicial(int(page))
+                final = indiceFinal(int(page))
+                all = request.GET.get('all', False)
+                orderType = order(request)
+
+                typeOrdenBy = "nombre" if typeOrder(request) else "id"
+
+                where = []
+                where = filtrosWhere(where)
+                query = "SELECT {} FROM niveles ORDER BY {} {} {};"
+
+                if(all == "true"):
+                    query = " SELECT id, nombre FROM niveles ORDER BY {} {};".format(typeOrdenBy, orderType)
                     cursor.execute(query)
-                    niveles = dictfetchall(cursor)
-                elif('page' in request.GET ):
-                    query = """
-                    SELECT * FROM niveles ORDER BY id ASC id LIMIT %s, %s;
-                    """
-                    cursor.execute(query, [indiceInicial(int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
-                    niveles = dictfetchall(cursor)
-                elif('page' in request.GET and "desc" in request.GET and request.GET["desc"]=='true'):
-                    query = """
-                    SELECT * FROM niveles ORDER BY id DESC LIMIT %s, %s;
-                    """
-                    cursor.execute(query, [indiceInicial(int(request.GET['page'])), indiceFinal(int(request.GET['page']))])
                     niveles = dictfetchall(cursor)
                 else:
-                    query = """
-                    SELECT * FROM niveles ORDER BY id LIMIT 25;
-                    """
-                    cursor.execute(query)
+                    query = " SELECT * FROM niveles ORDER BY {} {} LIMIT %s, %s;".format(typeOrdenBy, orderType)
+                    cursor.execute(query, [inicio, final])
                     niveles = dictfetchall(cursor)
 
                 query="""
@@ -209,13 +206,13 @@ class Nivel_Views(View):
                 """
                 cursor.execute(query)
                 result = dictfetchall(cursor)
-                if len(niveles) > 0:
+                if len(niveles)>0:
                     datos = {
                         'status': True,
                         'message': f"{MESSAGE['exitoGet']}",
                         'data': niveles,
                         'pages': int(result[0]['pages']),
-                        'total': result[0]['total'],
+                        'total':result[0]['total'],
                     }
                 else:
                     datos = {
@@ -223,9 +220,10 @@ class Nivel_Views(View):
                         'message': f"{MESSAGE['errorRegistrosNone']}",
                         'data': None,
                         'pages': None,
-                        'total': 0
+                        'total':0
                     }
             return JsonResponse(datos)
+        
         except Exception as error:
             print(f"{MESSAGE['errorGet']} - {error}")
             datos = {

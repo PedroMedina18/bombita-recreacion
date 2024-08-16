@@ -141,12 +141,11 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
                     </li>
 
                     <li className="sidebar-item">
-                        <a href="#" className="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
-                            data-bs-target="#configuracion" aria-expanded="false" aria-controls="configuracion">
+                        <Link to="/configuracion/" className="sidebar-link">
                             <IconConfig />
                             <span>Configuración</span>
-                        </a>
-                        <ul id="configuracion" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                        </Link>
+                        {/* <ul id="configuracion" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li className="sidebar-item">
                                 <Link to="/dolar/" className="sidebar-link">Dolar</Link>
                             </li>
@@ -162,7 +161,7 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
                             <li className="sidebar-item">
                                 <Link to="/metodos_pago/" className="sidebar-link">Metodos de Pago</Link>
                             </li>
-                        </ul>
+                        </ul> */}
                     </li>
 
                     <li className="sidebar-item"

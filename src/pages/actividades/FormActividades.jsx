@@ -1,24 +1,26 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate, useParams } from 'react-router-dom';
 import { InputsGeneral, InputTextTarea, MultiSelect } from "../../components/input/Inputs.jsx";
+import { useAuthContext } from '../../context/AuthContext.jsx';
 import { ButtonSimple } from "../../components/button/Button.jsx";
 import { useForm } from "react-hook-form";
-import { useNavigate, useParams } from 'react-router-dom';
-import { actividades, materiales } from "../../utils/API.jsx";
+import { actividades,  } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { LoaderCircle } from "../../components/loader/Loader.jsx";
-import { verifyOptionsSelect, controlResultPost } from "../../utils/actions.jsx";
+import { controlResultPost, controlErrors } from "../../utils/actions.jsx";
 import { hasLeadingOrTrailingSpace, coincidences } from "../../utils/process.jsx";
 import { Toaster } from "sonner";
+import { IconRowLeft } from "../../components/Icon.jsx";
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import Swal from 'sweetalert2';
 import Navbar from "../../components/navbar/Navbar.jsx";
 import texts from "../../context/text_es.js";
 import pattern from "../../context/pattern.js";
-import { IconRowLeft } from "../../components/Icon.jsx";
 
 function FormActividades() {
+  const {dataOptions, getOption} = useAuthContext()
+  const [materiales] = useState(dataOptions().materiales)
   const [errorServer, setErrorServer] = useState("");
-  const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectOptions, setSelectOptions] = useState([]);
   const [optionsDefault, setOptionsDefault] = useState([]);
@@ -29,55 +31,23 @@ function FormActividades() {
   useEffect(() => {
     if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1
-      get_materiales()
-      setLoading(false)
+      if (params.id) {
+        get_actividad()
+      }
       return
     }
   }, [])
-
-  useEffect(() => {
-    if (options.length) {
-      if (params.id) {
-        get_actividades()
-      }
-    }
-  }, [options])
-
-  //* funcion para buscar los permisos en la vase de datos
-  const get_materiales = async () => {
-    try {
-      const res = await materiales.get()
-      verifyOptionsSelect({
-        respuesta: res,
-        setError: setErrorServer,
-        setOptions
-      })
-    } catch (error) {
-      console.log(error)
-      setErrorServer(texts.errorMessage.errorSystem)
-    } finally {
-      if (!params.id) {
-        setLoading(false)
-      }
-    }
-  }
-
-  const get_actividades = async () => {
+  const get_actividad = async () => {
     try {
       const respuesta = await actividades.get({subDominio:[Number(params.id)]})
-      if (respuesta.status !== 200) {
-        setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
-        return
-      }
-      if (respuesta.data.status === false) {
-        setErrorServer(`${respuesta.data.message}`)
-        return
-      }
+      const errors = controlErrors({respuesta: respuesta, constrolError:setErrorServer})
+      if(errors) return
+      const data = respuesta.data.data
       setErrorServer("")
-      setValue("nombre", respuesta.data.data.nombre)
-      setValue("descripcion", respuesta.data.data.descripcion)
-      setOptionsDefault(coincidences(options, respuesta.data.data.materiales))
-      setSelectOptions(coincidences(options, respuesta.data.data.materiales))
+      setValue("nombre", data.nombre)
+      setValue("descripcion", data.descripcion)
+      setOptionsDefault(coincidences(materiales, data.materiales))
+      setSelectOptions(coincidences(materiales, data.materiales))
     } catch (error) {
       console.log(error)
       setErrorServer(texts.errorMessage.errorObjet)
@@ -110,11 +80,12 @@ function FormActividades() {
             materiales: materiales
           }
           alertLoading("Cargando")
-          const res = params.id ? await actividades.put(body, Number(params.id)) : await actividades.post(body)
+          const res = params.id ? await actividades.put(body, { subDominio:[Number(params.id)]}) : await actividades.post(body)
           controlResultPost({
             respuesta: res,
             messageExito: params.id ? texts.successMessage.editionActividad : texts.successMessage.registerActividad,
-            useNavigate: { navigate: navigate, direction: "/actividades/" }
+            useNavigate: { navigate: navigate, direction: "/actividades/" },
+            callbak: ()=>{getOption("actividad")}
           })
         }
 
@@ -126,7 +97,7 @@ function FormActividades() {
     }
   )
   return (
-    <Navbar name={params.id ? texts.pages.editActividad.name : texts.pages.registerActividades.name} descripcion={params.id ? texts.pages.editActividades.description : texts.pages.registerActividades.description}>
+    <Navbar name={params.id ? texts.pages.editActividad.name : texts.pages.registerActividades.name} descripcion={params.id ? texts.pages.editActividad.description : texts.pages.registerActividades.description}>
       <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/actividades/") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
       {
@@ -196,7 +167,7 @@ function FormActividades() {
                     }}
                     placeholder={texts.placeholder.descripcion}
                   />
-                  <MultiSelect id="materiales" name="materiales" label={texts.label.materiales} options={options} placeholder="Materiales" save={setSelectOptions} optionsDefault={optionsDefault} />
+                  <MultiSelect id="materiales" name="materiales" label={texts.label.materiales} options={materiales} placeholder="Materiales" save={setSelectOptions} optionsDefault={optionsDefault} />
                   <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
                     {params.id ? "Guardar" : "Registrar"}
                   </ButtonSimple>

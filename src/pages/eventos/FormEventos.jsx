@@ -1,18 +1,21 @@
 import { useState, useEffect, useRef } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { LoaderCircle } from "../../components/loader/Loader.jsx";
 import { Toaster } from "sonner";
-import { tipo_documentos, servicios, sobrecargos, clientes } from "../../utils/API.jsx";
-import { verifyOptionsSelect} from "../../utils/actions.jsx"
+import { toastError } from "../../components/alerts.jsx";
+import { servicios, sobrecargos, clientes } from "../../utils/API.jsx";
+import { controlErrors } from "../../utils/actions.jsx"
+import { ButtonSimple } from "../../components/button/Button.jsx";
+import { useFormEventContext } from "../../context/FormEventContext.jsx";
+import { IconRowLeft } from "../../components/Icon.jsx";
 import Navbar from "../../components/navbar/Navbar.jsx"
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import texts from "../../context/text_es.js";
-import { useFormEventContext } from "../../context/FormEventContext.jsx";
 
 function FormEventos() {
-    const { setTipoDocumentos, setServicios, setSobrecargos, setClientes } = useFormEventContext()
+    const navigate = useNavigate();
+    const { setServicios, setSobrecargos, setClientes } = useFormEventContext()
     const [loading, setLoading] = useState(true)
-    const [errorServer, setErrorServer] = useState("")
     const renderizado = useRef(0)
 
     useEffect(() => {
@@ -26,21 +29,18 @@ function FormEventos() {
     // *funcion para buscar los tipos de documentos y los cargos
     const getData = async () => {
         try {
-            const get_tipo_documentos = await tipo_documentos.get()
             const get_servicios = await servicios.get()
             const get_sobrecargos = await sobrecargos.get()
             const get_clientes = await clientes.get()
-            verifyOptionsSelect({
-                respuesta: get_tipo_documentos,
-                setError: setErrorServer,
-                setOptions: setTipoDocumentos
-            })
+            controlErrors({ respuesta: get_servicios, constrolError: toastError })
+            controlErrors({ respuesta: get_sobrecargos, constrolError: toastError })
+            controlErrors({ respuesta: get_clientes, constrolError: toastError })
             setClientes(get_clientes.data.data)
             setServicios(get_servicios.data.data)
             setSobrecargos(get_sobrecargos.data.data)
         } catch (error) {
             console.log(error)
-            setErrorServer(texts.inputsMessage.errorSystem)
+            toastError(texts.inputsMessage.errorSystem)
         } finally {
             setLoading(false)
         }
@@ -48,30 +48,25 @@ function FormEventos() {
 
     return (
         <Navbar name={`${texts.pages.registerEventos.name}`} descripcion={`${texts.pages.registerEventos.description}`}>
-                {
-                    loading ?
-                        (
-                            <div className="div-main justify-content-center p-4" >
-                                <LoaderCircle />
-                            </div>
-                        )
-                        :
-                        errorServer ?
-                            (
-                                <div className="div-main justify-content-center p-4">
-                                    <ErrorSystem error={errorServer} />
-                                </div>
-                            )
-                            :
-                            (
-                                //* Sección Principal
+            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/tipo_documentos/") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
-                                <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
-                                    <Outlet />
-                                </div>
-                            )
-                }
-                <Toaster />
+            {
+                loading ?
+                    (
+                        <div className="div-main justify-content-center p-4" >
+                            <LoaderCircle />
+                        </div>
+                    )
+                    :
+                    (
+                        //* Sección Principal
+
+                        <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
+                            <Outlet />
+                        </div>
+                    )
+            }
+            <Toaster />
         </Navbar >
     )
 }

@@ -81,7 +81,7 @@ function FormSobrecargos() {
                         monto: parseFloat(data.monto),
                     }
                     alertLoading("Cargando")
-                    const res = params.id ? await sobrecargos.put(body, Number(params.id)) : await sobrecargos.post(body)
+                    const res = params.id ? await sobrecargos.put(body, { subDominio:[Number(params.id)]}) : await sobrecargos.post(body)
                     controlResultPost({
                         respuesta: res,
                         messageExito: params.id ? texts.successMessage.editionSobrecargo : texts.successMessage.registerSobrecargo,

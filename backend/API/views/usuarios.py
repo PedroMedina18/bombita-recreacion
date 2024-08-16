@@ -6,13 +6,17 @@ from django.views import View
 from ..funtions.encriptado_contraseña import encriptado_constraseña, desencriptado_contraseña
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.token import verify_token
+from ..funtions.identificador import determinar_valor, edit_str
 from ..funtions.serializador import dictfetchall
 from ..models import Cargos, Permisos, TipoDocumento, Usuarios, Personas
 from django.db import IntegrityError, connection
+from ..funtions.filtros import order, filtrosWhere, typeOrder
+from ..message import MESSAGE
+from decouple import config
 import json
 
 
-class Usuario_Views(View):
+class Usuarios_Views(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -142,3 +146,162 @@ class Usuario_Views(View):
                 'message': 'Error. Error de sistema',
             }
             return JsonResponse(datos)
+
+    def get(self, request, identificador=None):
+        try:
+            cursor = connection.cursor()
+            verify = verify_token(request.headers)
+            info = request.GET.get("_info", "false")
+            if(not verify['status']):
+                datos = {
+                    'status': False,
+                    'message': verify['message'],
+                    'data': None
+                }
+                return JsonResponse(datos)
+            if identificador:
+                tipo = determinar_valor(identificador)
+                query = """
+                    SELECT 
+                    	us.usuario,
+                        pe.nombres, 
+                        pe.apellidos, 
+                        pe.numero_documento,
+                        pe.correo,
+                        tipo.id AS tipo_documento_id, 
+                        tipo.nombre AS tipo_documento, 
+                        us.inhabilitado,
+                        car.id as cargo_id,
+                        car.nombre,
+                        CONCAT('0', pe.telefono_principal) AS telefono_principal,
+                        CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
+                        us.fecha_registro,
+                        us.fecha_actualizacion
+                    FROM usuarios AS us
+                    LEFT JOIN personas AS pe ON us.persona_id=pe.id
+                    LEFT JOIN tipos_documentos AS tipo ON pe.tipo_documento_id=tipo.id
+                    LEFT JOIN cargos AS car ON us.cargo_id=car.id
+                """
+                if tipo["type"] == "int":
+                    if info == "true":
+                        query = query + "WHERE us.id=%s;"
+                        cursor.execute(query, [tipo["valor"]])
+                    else:
+                        id = str(tipo["valor"]) + "%"
+                        query = query + "WHERE us.id LIKE %s ;"
+                        cursor.execute(query, [id])
+                else:
+                    str_validate = edit_str(tipo["valor"])
+                    query = (
+                        query + "WHERE us.usuario LIKE %s ;"
+                    )
+                    cursor.execute(query, [str_validate])
+                usuario = dictfetchall(cursor)
+
+                if len(usuario) > 0:
+                    if info == "true":
+                        datos = {
+                            "status": True,
+                            "message": f"{MESSAGE['exitoGet']}",
+                            "data": {"info": usuario[0]},
+                        }
+                    else:
+                        datos = {
+                            "status": True,
+                            "message": f"{MESSAGE['exitoGet']}",
+                            "data": usuario,
+                            "total": len(usuario),
+                            "pages": 1,
+                        }
+                else:
+                    datos = {
+                        "status": False,
+                        "message": f"{MESSAGE['errorRegistrosNone']}",
+                        "data": None,
+                        "total": 0,
+                        "pages": 0,
+                    }
+
+            else:
+                page = request.GET.get('page', 1)
+                inicio = indiceInicial(int(page))
+                final = indiceFinal(int(page))
+
+                orderType = order(request)
+                typeOrdenBy = "us.usuario" if typeOrder(request) else "us.id"
+
+                where = []
+                cargo = request.GET.get('cargo', None)
+                estado = request.GET.get('estado', None)
+
+                if(cargo):
+                    where.append(f"car.id={cargo}")
+                if(estado):
+                    where.append(f"us.inhabilitado={estado}")
+
+                query = """
+                    SELECT 
+                    	us.usuario,
+                        pe.nombres, 
+                        pe.apellidos, 
+                        pe.numero_documento,
+                        pe.correo,
+                        tipo.id AS tipo_documento_id, 
+                        tipo.nombre AS tipo_documento, 
+                        us.inhabilitado,
+                        car.id as cargo_id,
+                        car.nombre,
+                        CONCAT('0', pe.telefono_principal) AS telefono_principal,
+                        CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
+                        us.fecha_registro,
+                        us.fecha_actualizacion
+                    FROM usuarios AS us
+                    LEFT JOIN personas AS pe ON us.persona_id=pe.id
+                    LEFT JOIN tipos_documentos AS tipo ON pe.tipo_documento_id=tipo.id
+                    LEFT JOIN cargos AS car ON us.cargo_id=car.id
+                    {}
+                    ORDER BY {} {} 
+                    LIMIT %s, %s;
+                """.format(where, typeOrdenBy, orderType)
+
+                cursor.execute(query, [inicio, final])
+                usuarios = dictfetchall(cursor)
+                
+                query = """
+                    SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM usuarios;
+                """
+                cursor.execute(query)
+                result = dictfetchall(cursor)
+
+                if len(usuarios) > 0:
+                    datos = {
+                        "status": True,
+                        "message": f"{MESSAGE['exitoGet']}",
+                        "data": usuarios,
+                        "pages": int(result[0]["pages"]),
+                        "total": result[0]["total"],
+                    }
+                else:
+                    datos = {
+                        "status": False,
+                        "message": f"{MESSAGE['errorRegistrosNone']}",
+                        "data": None,
+                        "pages": None,
+                        "total": 0,
+                    }
+
+            return JsonResponse(datos)
+        
+        except Exception as error:
+            print(f"{MESSAGE['errorGet']} - {error}")
+            datos = {
+                "status": False,
+                "message": f"{MESSAGE['errorConsulta']}: {error}",
+                "data": None,
+                "pages": None,
+                "total": 0,
+            }
+            return JsonResponse(datos)
+        finally:
+            cursor.close()
+            connection.close()

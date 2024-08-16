@@ -3,11 +3,12 @@ from django.http.response import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
+from django.db import IntegrityError, connection, models
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..funtions.email import emailRegistroEvento
+from ..funtions.filtros import order, typeOrder, filtrosWhere,peridoFecha
 from ..models import Eventos, EventosSobrecargos, EventosServicios, Clientes, Personas, Servicios, Sobrecargos, TipoDocumento
-from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
 from ..message import MESSAGE
 from datetime import datetime
@@ -194,51 +195,51 @@ class Eventos_Views(View):
                     FROM eventos AS eve
                     LEFT JOIN clientes AS cli ON eve.cliente_id=cli.id
                     INNER JOIN personas AS per ON cli.persona_id=per.id
-                    LEFT JOIN tipo_documentos AS tipo ON per.tipo_documento_id=tipo.id
+                    LEFT JOIN tipos_documentos AS tipo ON per.tipo_documento_id=tipo.id
                     WHERE eve.id LIKE %s ;
-                    """
+                """
                 cursor.execute(query, [id])
                 evento = dictfetchall(cursor)
                 if info == 'true' and len(evento) > 0:
                     evento = evento[0]
                     query = """
-                    SELECT 
-                        ser.nombre,
-                        ser.descripcion,
-                        ser.precio
-                    FROM servicios_eventos AS seve
-                    INNER JOIN servicios AS ser ON seve.servicio_id=ser.id
-                    WHERE seve.evento_id=%s;
+                        SELECT 
+                            ser.nombre,
+                            ser.descripcion,
+                            ser.precio
+                        FROM servicios_eventos AS seve
+                        INNER JOIN servicios AS ser ON seve.servicio_id=ser.id
+                        WHERE seve.evento_id=%s;
                     """
                     cursor.execute(query, [int(evento['id'])])
                     servicios = dictfetchall(cursor)
                     query = """
-                    SELECT 
-                        so.nombre,
-                        so.descripcion,
-                        so.monto
-                    FROM sobrecargos_eventos AS sove
-                    INNER JOIN sobrecargos AS so ON sove.sobrecargo_id=so.id
-                    WHERE sove.evento_id=%s;
+                        SELECT 
+                            so.nombre,
+                            so.descripcion,
+                            so.monto
+                        FROM sobrecargos_eventos AS sove
+                        INNER JOIN sobrecargos AS so ON sove.sobrecargo_id=so.id
+                        WHERE sove.evento_id=%s;
                     """
                     cursor.execute(query, [int(evento['id'])])
                     sobrecargos = dictfetchall(cursor)
 
                     query = """
-                    SELECT 
-                        pa.id,
-                        pa.tipo,
-                        pa.monto, 
-                        pa.referencia,
-                        pa.capture,
-                        me.id AS metodo_pago_id,
-                        me.nombre AS metodo_pago,
-                        pre.id AS precio_dolar_id,
-                        pre.precio AS precio_dolar
-                    FROM pagos AS pa
-                    INNER JOIN metodos_pago AS me ON pa.metodo_pago_id=me.id
-                    LEFT JOIN precio_dolar AS pre ON pa.precio_dolar_id=pre.id
-                    WHERE pa.evento_id=%s;
+                        SELECT 
+                            pa.id,
+                            pa.tipo,
+                            pa.monto, 
+                            pa.referencia,
+                            pa.capture,
+                            me.id AS metodo_pago_id,
+                            me.nombre AS metodo_pago,
+                            pre.id AS precio_dolar_id,
+                            pre.precio AS precio_dolar
+                        FROM pagos AS pa
+                        INNER JOIN metodos_pago AS me ON pa.metodo_pago_id=me.id
+                        LEFT JOIN precio_dolar AS pre ON pa.precio_dolar_id=pre.id
+                        WHERE pa.evento_id=%s;
                     """
                     cursor.execute(query, [int(evento['id'])])
                     pagos = dictfetchall(cursor)
@@ -273,21 +274,32 @@ class Eventos_Views(View):
                 page = request.GET.get('page', 1)
                 inicio = indiceInicial(int(page))
                 final = indiceFinal(int(page))
+                
+                orderType = order(request)
+                
 
-                order = request.GET.get('order', 'ASC')
-                if not(order == 'ASC') and not(order == 'DESC'):
-                    order = 'ASC'
 
-                filtros = request.GET.get('filter', '')
+                where = []
+                completado = request.GET.get('nivel', None)
+                cliente = request.GET.get('cliente', None)
+                fecha = peridoFecha(request)
+                if(completado):
+                    where.append(f"eve.completado={completado}")
+                if(cliente):
+                    where.append(f"cli.id={cliente}")
+                if(fecha):
+                    where.append(f"{fecha}")
 
-                if (filtros == 'pagado'):
-                    filtros = 'WHERE eve.total = 1'
-                elif (filtros == 'anticipo'):
-                    filtros = 'WHERE eve.anticipo = 1'
-                elif (filtros == 'no_pagado'):
-                    filtros = 'WHERE eve.total = 0'
-                elif (filtros == 'no_anticipo'):
-                    filtros = 'WHERE eve.anticipo = 0 AND eve.total = 0'
+                
+
+                # if (filtros == 'pagado'):
+                #     filtros = 'WHERE eve.total = 1'
+                # elif (filtros == 'anticipo'):
+                #     filtros = 'WHERE eve.anticipo = 1'
+                # elif (filtros == 'no_pagado'):
+                #     filtros = 'WHERE eve.total = 0'
+                # elif (filtros == 'no_anticipo'):
+                #     filtros = 'WHERE eve.anticipo = 0 AND eve.total = 0'
 
 
                 query = """
@@ -306,9 +318,9 @@ class Eventos_Views(View):
                 FROM eventos AS eve
                 LEFT JOIN clientes AS cli ON eve.cliente_id=cli.id
                 LEFT JOIN personas AS per ON cli.persona_id=per.id
-                LEFT JOIN tipo_documentos AS tipo ON per.tipo_documento_id=tipo.id
+                LEFT JOIN tipos_documentos AS tipo ON per.tipo_documento_id=tipo.id
                 ORDER BY eve.id {} LIMIT %s, %s;
-                """.format(order)
+                """.format(orderType)
                 cursor.execute(query, [inicio, final])
                 eventos = dictfetchall(cursor)
                 

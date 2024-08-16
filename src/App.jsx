@@ -18,7 +18,8 @@ import {
   FormSobrecargos, FormServicios,
   Eventos, Dolar,
   FormDataEvent, FormAccount,
-  EventosRecreadores
+  EventosRecreadores, FormUsuarios,
+  Configuracion
 } from "./pages/Pages.jsx"
 
 
@@ -32,6 +33,7 @@ function App() {
             <Route path="/cargos/" element={<Cargos />} />
             <Route path="/register/cargo/" element={<FormCargos />} />
             <Route path="/edit/cargo/:id/" element={<FormCargos />} />
+            <Route path="/register/usuario/" element={<FormUsuarios />} />
             <Route path="/usuarios/" element={<Usuarios />} />
             <Route path="/eventos/" element={<Eventos />} />
             <Route path="/eventos/recreadores/:id_evento/" element={<EventosRecreadores />} />
@@ -59,10 +61,10 @@ function App() {
             <Route path="/generos/" element={<Generos />} />
             <Route path="/register/genero/" element={<FormGeneros />} />
             <Route path="/edit/genero/:id/" element={<FormGeneros />} />
-            <Route path="/recreador/:numero_documento/" element={<Recreador />} />
+            <Route path="/recreador/:id/" element={<Recreador />} />
             <Route path="/recreadores/" element={<Recreadores />} />
             <Route path="/register/recreador/" element={<FormRecreadores />} />
-            <Route path="/edit/recreador/:numero_documento/" element={<FormRecreadores />} />
+            <Route path="/edit/recreador/:id/" element={<FormRecreadores />} />
             <Route path="/servicios/" element={<Servicios />} />
             <Route path="/register/servicio/" element={<FormServicios />} />
             <Route path="/edit/servicio/:id/" element={<FormServicios />} />
@@ -70,9 +72,10 @@ function App() {
             <Route path="/register/metodos_pago/" element={<FormMetodosPago />} />
             <Route path="/edit/metodos_pago/:id/" element={<FormMetodosPago />} />
             <Route path="/clientes/" element={<Clientes />} />
-            <Route path="/edit/cliente/:numero_documento/" element={<FormClientes />} />
+            <Route path="/edit/cliente/:id/" element={<FormClientes />} />
             <Route path="/dolar/" element={<Dolar />} />
             <Route path="/inicio/" element={<Inicio />} />
+            <Route path="/configuracion/" element={<Configuracion />} />
           </Route>
           <Route path="*" element={<Error404 />} />
         </Routes>

@@ -255,3 +255,48 @@ const InactivityProvider = ({ children }) => {
 };
 
 export { InactivityProvider,
+
+
+
+
+
+// -----------------------------------------------------------------------
+
+// prop
+// existe algun modulo en python para encriptar y desencriptar un id, estoy haciendo una api y la verdad no 
+// considero que no es muy seguro utilizar la id sola, por eso quiero cambiar los valores por ejemplo si la 
+// id es 1 o 12 que el codigo sea fad15 o asd45 esto tambien debe ser viceversa s yo te mando el codigo fad15 
+// o asd45 deberia poder decirme que id es, en python
+
+
+
+
+
+
+
+
+
+
+// import hashids
+
+// # Configuración de la clave secreta
+// salt = 'mi_clave_secreta'
+
+// # Crear un objeto Hashids
+// hashids = hashids.Hashids(salt=salt)
+
+// # Valor original: 1
+// encoded_value = hashids.encode(1)
+// print(encoded_value)  # Output: g5h4y
+
+// # Valor original: 15
+// encoded_value = hashids.encode(15)
+// print(encoded_value)  # Output: 5d4f7
+
+// # Decodificar el valor codificado
+// decoded_value = hashids.decode(encoded_value)
+// print(decoded_value)  # Output: 1
+
+// # Decodificar otro valor codificado
+// decoded_value = hashids.decode('5d4f7')
+// print(decoded_value)  # Output: 15

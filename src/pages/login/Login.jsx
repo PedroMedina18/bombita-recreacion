@@ -37,8 +37,8 @@ function Login() {
         }
         if (res.data.status && res.data.token) {
           saveUser(res.data.data, res.data.token)
-          navigate("/inicio/")
           setAlert("")
+          navigate("/inicio/")
         } else {
           setAlert(res.data.message)
         }

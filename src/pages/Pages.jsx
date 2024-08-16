@@ -10,6 +10,7 @@ import FormTipoDocumento from "./tipoDocumento/FormTipoDocumento.jsx";
 import Generos from "./generos/Generos.jsx";
 import FormGeneros from "./generos/FormGeneros.jsx";
 import Usuarios from "./usuarios/Usuarios.jsx";
+import FormUsuarios from "./usuarios/FormUsuarios.jsx";
 import Actividades from "./actividades/Actividades.jsx";
 import FormActividades from "./actividades/FormActividades.jsx";
 import Recreadores from "./recreadores/Recreadores.jsx"
@@ -30,7 +31,8 @@ import Dolar from "./dolar/Dolar.jsx";
 import Pagos from "./pagos/Pagos.jsx";
 import FormDataEvent from "./eventos/FormDataEvent.jsx";
 import FormAccount from "./eventos/FormAccount.jsx";
-import EventosRecreadores from "./recreaodres_eventos/EventosRecreadores.jsx";
+import Configuracion from "./configuracion/Configuracion.jsx";
+import EventosRecreadores from "./recreadores_eventos/EventosRecreadores.jsx";
 
 export {
     Login, Error404, 
@@ -49,7 +51,8 @@ export {
     FormSobrecargos, FormServicios,
     Eventos, Dolar,
     FormDataEvent, FormAccount,
-    EventosRecreadores
+    EventosRecreadores, FormUsuarios,
+    Configuracion
 }
 
 

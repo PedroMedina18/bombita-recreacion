@@ -5,7 +5,7 @@ from ..funtions.serializador import dictfetchall
 from django.db import IntegrityError, connection
 from ..funtions.token import verify_token
 
-class Persona_Views(View):
+class Personas_Views(View):
     def get(self, request, tipo_documento=0, documento=0):
         try:
             cursor = connection.cursor()
@@ -30,7 +30,7 @@ class Persona_Views(View):
                         tp.id AS id_documento,
                         tp.nombre AS nombre_documento
                     FROM personas AS p
-                        LEFT JOIN tipo_documentos AS tp
+                        LEFT JOIN tipos_documentos AS tp
                     ON p.tipo_documento_id= tp.id
                     WHERE p.numero_documento=%s AND tp.id=%s;
                 """

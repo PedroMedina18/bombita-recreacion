@@ -1,15 +1,20 @@
+import 'react-loading-skeleton/dist/skeleton.css'
 import "./table.css"
 import { useState, useEffect, useRef } from 'react'
 import { ButtonSimple } from "../button/Button.jsx"
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
 import { IconCheck, IconX, IconTrash, IconEdit, IconDetail, IconMoney } from "../Icon"
+import { UnitSelect, InputsGeneral } from "../input/Inputs.jsx"
+import { fechaFormat } from "../../utils/process.jsx"
+import { useForm } from "react-hook-form";
 
-function Table({ columns, rows, totalPages, totalElements = 0, options = null, loading = true }) {
+function Table({ columns, rows, totalPages, totalElements = 0, options = null, loading = true, filtradores = [], order = false, organizar = [], fechaOrganizer = false }) {
     const [pages, setPages] = useState(1)
     const [debounceTimeout, setDebounceTimeout] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [debounceDate, setDebounceDate] = useState(null);
     const renderizado = useRef(0)
+    const [filtros, setFilstros] = useState({})
     const option = Boolean(options.delete || options.put || options.get || options.money)
     
     useEffect(() => {
@@ -22,17 +27,96 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
             clearTimeout(debounceTimeout);
         }
         const timeout = setTimeout(() => {
-            options.search.function(searchTerm)
+            options.search.function(searchTerm, filtros)
         }, 900);
 
         setDebounceTimeout(timeout);
     }, [searchTerm])
 
+    useEffect(() => {
+        if (fechaOrganizer) {
+            setValue("hasta", fechaFormat())
+        }
+    }, [])
+
+    const filtrar = (e) => {
+        if (debounceDate) {
+            clearTimeout(debounceDate);
+        }
+        const timeout = setTimeout(() => {
+            const filtro = { ...filtros }
+            filtradores.forEach((e) => {
+                if (Boolean(watch(`${e.columnName}`))) {
+                    filtro[`${e.columnName}`] = watch(`${e.columnName}`)
+                }
+            })
+            if (order) {
+                filtro[`order`] = watch(`order`)
+            }
+            if (Boolean(organizar.length)) {
+                filtro[`organizar`] = watch(`organizar`)
+            }
+
+            const desde = e.target.name === "desde" ? e.target.value : watch(`desde`)
+            if (Boolean(desde)) {
+                filtro.desde = desde
+            } else {
+                delete filtro.desde
+            }
+
+            if (Boolean(e.target.value)) {
+                filtro[`${e.target.name}`] = e.target.value
+            } else {
+                delete filtro[`${e.target.name}`]
+            }
+            options.search.function(searchTerm, filtro)
+            setFilstros(filtro)
+
+        }, 800);
+
+        setDebounceDate(timeout);
+    }
+
+    // const filtrarFecha = (e) => {
+    //     if (debounceDate) {
+    //         clearTimeout(debounceDate);
+    //     }
+    //     const timeout = setTimeout(() => {
+    //         const filtro = { ...filtros }
+    //         const desde = e.target.name === "desde" ? e.target.value : watch(`desde`)
+    //         const hasta = e.target.name === "hasta" ? e.target.value : watch(`hasta`)
+    //         if (Boolean(desde)) {
+    //             filtro.desde = desde
+    //         } else {
+    //             delete filtro.desde
+    //         }
+    //         if (Boolean(hasta)) {
+    //             filtro.hasta = hasta
+    //         } else {
+    //             delete filtro.hasta
+    //         }
+    //         console.log()
+    //         setFilstros(filtro)
+    //     }, 800);
+
+    //     setDebounceDate(timeout);
+    // }
+
+
+    // *the useform
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+        setValue,
+        watch
+    } = useForm();
+
     return (
         <div className='div-main justify-content-between p-2 p-md-3 p-lg-4'>
 
             {/* info:Primera Seccion con el buscardor y el Boton de direccionamiento */}
-            <div className='w-100 d-flex flex-column flex-md-row justify-content-between'>
+            <div className='w-100 d-flex flex-column flex-md-row justify-content-between pb-3'>
                 {
                     options.register ?
                         (
@@ -66,6 +150,124 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                         ""
                 }
             </div>
+            {
+
+                (filtradores.length !== 0 || order || organizar.length !== 0 || fechaOrganizer) &&
+                <div className='w-100 mt-2 mb-3 position-relative rounded border-secundary border border-2 '>
+                    <button className='w-100 p-2 text-start fw-bold border border-0 row-collapse button-hover' type="button" data-bs-toggle="collapse" data-bs-target="#filter" aria-expanded="false" aria-controls="filter">Filtros</button>
+                    <div className=' collapse' id="filter">
+                        <div className='w-100 d-flex flex-column py-2'>
+
+                            {
+                                filtradores.length !== 0 &&
+                                <div className='w-100 d-flex flex-column '>
+                                    <span className='fw-bold text-center'>Categorías</span>
+                                    <div className='d-flex w-100 flex-column flex-md-row'>
+                                        {
+                                            filtradores.map((filtro, index) => (
+                                                <div key={`${filtro.columnName}_${index}`} className=' w-100 w-md-25 px-2'>
+                                                    <UnitSelect
+                                                        id={filtro.columnName}
+                                                        isError={false}
+                                                        name={filtro.columnName}
+                                                        placeholder='Todas'
+                                                        options={filtro.opciones}
+                                                        needErrors={false}
+                                                        label={filtro.nombre.replace(/\_/g, ' ').replace(/\b\w/g, match => match.toUpperCase())}
+                                                        form={{ errors, register }}
+                                                        onChange={(e) => {
+                                                            filtrar(e)
+                                                        }}
+                                                    />
+                                                </div>
+                                            ))
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            {
+
+                                (order || organizar.length !== 0 || fechaOrganizer) &&
+                                <div className='w-100 d-flex'>
+                                    {
+                                        (order || organizar.length !== 0) &&
+                                        <div className='w-50 d-flex flex-column justify-content-center align-items-center'>
+                                            <span className='fw-bold text-center'>Orden</span>
+                                            <div className='w-100 d-flex flex-column flex-md-row'>
+                                                {
+                                                    order &&
+                                                    <div className='w-100 w-md-50 px-2'>
+                                                        <UnitSelect
+                                                            id={"order"}
+                                                            isError={false}
+                                                            name={"order"}
+                                                            placeholder={null}
+                                                            options={[{ label: "ASC", value: "ASC" }, { label: "DESC", value: "DESC" }]}
+                                                            needErrors={false}
+                                                            label={"Orden"}
+                                                            form={{ errors, register }}
+                                                            onChange={(e) => {
+                                                                filtrar(e)
+                                                            }}
+                                                        />
+                                                    </div>
+                                                }
+                                                {
+                                                    organizar.length !== 0 &&
+                                                    <div className='w-100 w-md-50 px-2'>
+                                                        <UnitSelect
+                                                            id={"organizar"}
+                                                            isError={false}
+                                                            name={"organizar"}
+                                                            placeholder={null}
+                                                            needErrors={false}
+                                                            options={[{ label: organizar[0], value: "orig" }, { label: organizar[1], value: "alf" }]}
+                                                            label={"Ordenar"}
+                                                            form={{ errors, register }}
+                                                            onChange={(e) => {
+                                                                filtrar(e)
+                                                            }}
+                                                        />
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                    {
+                                        fechaOrganizer &&
+                                        <div className='w-50 d-flex flex-column justify-content-center align-items-center'>
+                                            <span className='fw-bold text-center'>Fecha</span>
+                                            <div className='w-100 d-flex flex-column flex-md-row'>
+                                                <div className='w-100 w-md-50 px-2'>
+                                                    <InputsGeneral type={"date"} label={`Desde`} isError={false}
+                                                        name="desde" id="d00000000000000 o  esde" form={{ errors, register }}
+                                                        needErrors={false}
+                                                        max={fechaFormat()}
+                                                        onChange={(e) => {
+                                                            filtrar(e)
+                                                        }}
+                                                    />
+                                                </div>
+                                                <div className='w-100 w-md-50 px-2'>
+                                                    <InputsGeneral type={"date"} label={`Hasta`} isError={false}
+                                                        name="hasta" id="hasta" form={{ errors, register }}
+                                                        needErrors={false}
+                                                        max={fechaFormat()}
+                                                        onChange={(e) => {
+                                                            filtrar(e)
+                                                        }}
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                </div>
+            }
 
             {/* Segunda Seccion de la Tabla */}
             {
@@ -75,7 +277,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                     )
                     :
                     (
-                        <div className='container-table  mt-4'>
+                        <div className='container-table'>
                             <table className='table-data border-table border-none'>
                                 <thead>
                                     <tr>
@@ -153,34 +355,34 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                                     }
                                                     {
                                                         option &&
-                                                            <td >
-                                                                <div className='d-flex justify-content-around'>
-                                                                    {
-                                                                        options.get ?
-                                                                            (<IconDetail onClick={() => { options.get(row) }} className='cursor-pointer get' />)
-                                                                            :
-                                                                            ("")
-                                                                    }
-                                                                    {
-                                                                        options.delete ?
-                                                                            (<IconTrash onClick={() => { options.delete(row) }} className='cursor-pointer eliminate' />)
-                                                                            :
-                                                                            ("")
-                                                                    }
-                                                                    {
-                                                                        options.put ?
-                                                                            (<IconEdit onClick={() => { options.put(row) }} className='cursor-pointer edit' />)
-                                                                            :
-                                                                            ("")
-                                                                    }
-                                                                    {
-                                                                        options.money ?
-                                                                            (<IconMoney onClick={() => { options.money(row) }} className='cursor-pointer money' />)
-                                                                            :
-                                                                            ("")
-                                                                    }
-                                                                </div>
-                                                            </td>
+                                                        <td >
+                                                            <div className='d-flex justify-content-around'>
+                                                                {
+                                                                    options.get ?
+                                                                        (<IconDetail onClick={() => { options.get(row) }} className='cursor-pointer get' />)
+                                                                        :
+                                                                        ("")
+                                                                }
+                                                                {
+                                                                    options.delete ?
+                                                                        (<IconTrash onClick={() => { options.delete(row) }} className='cursor-pointer eliminate' />)
+                                                                        :
+                                                                        ("")
+                                                                }
+                                                                {
+                                                                    options.put ?
+                                                                        (<IconEdit onClick={() => { options.put(row) }} className='cursor-pointer edit' />)
+                                                                        :
+                                                                        ("")
+                                                                }
+                                                                {
+                                                                    options.money ?
+                                                                        (<IconMoney onClick={() => { options.money(row) }} className='cursor-pointer money' />)
+                                                                        :
+                                                                        ("")
+                                                                }
+                                                            </div>
+                                                        </td>
                                                     }
                                                 </tr>
                                             ))
@@ -222,7 +424,6 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
     )
 }
 
-
 export function totalItems(pages, items) {
     if (pages === 1) {
         return items
@@ -230,7 +431,6 @@ export function totalItems(pages, items) {
     const totalPages = (pages - 1) * 25 + items
     return totalPages
 }
-
 
 function skeletonTable() {
     return (

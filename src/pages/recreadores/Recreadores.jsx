@@ -1,11 +1,13 @@
 import { useEffect, useState, useRef } from "react"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
-import { recreadores } from "../../utils/API.jsx"
+import { recreadores  } from "../../utils/API.jsx"
 import { calcularEdad } from "../../utils/process.jsx"
-import { searchCode, getListItems, deleteItem } from "../../utils/actions.jsx"
+import { searchCode, getListItems, deleteItem, verifyOptionsSelect } from "../../utils/actions.jsx"
 import { formatoId } from "../../utils/process.jsx"
+import { useAuthContext } from '../../context/AuthContext.jsx';
 import Navbar from "../../components/navbar/Navbar"
+import Pildora from "../../components/Pildora.jsx"
 import Table from "../../components/table/Table"
 import texts from "../../context/text_es.js";
 
@@ -13,6 +15,9 @@ function Recreadores() {
     const [listRecreadores, setRecreadores] = useState([])
     const [dataRecreadores, setDataRecreadores] = useState({ pages: 0, total: 0 })
     const [tableLoading, setTableLoaing] = useState(true)
+    const {dataOptions} = useAuthContext()
+    const [niveles] = useState(dataOptions().niveles)
+    const [generos] = useState(dataOptions().generos)
     const renderizado = useRef(0)
     const navigate = useNavigate()
 
@@ -24,14 +29,18 @@ function Recreadores() {
         }
     }, [])
 
-
-    const getRecreadores = () => {
-        getListItems({
-            object: recreadores,
-            setList: setRecreadores,
-            setData: setDataRecreadores,
-            setLoading: setTableLoaing
-        })
+    const getRecreadores = async() => {
+        try{
+            getListItems({
+                object: recreadores,
+                setList: setRecreadores,
+                setData: setDataRecreadores,
+                setLoading: setTableLoaing
+            })
+        }catch(error) {
+            console.log(error)
+            setErrorServer(texts.errorMessage.errorSystem)
+        }
     }
 
     const columns = [
@@ -59,18 +68,9 @@ function Recreadores() {
             }
         },
         {
-            name: "Teléfono Principal",
-            row: (row) => { return row.telefono_principal }
-        },
-        {
-            name: "Nivel",
-            row: (row) => { return row.nivel }
-        },
-        {
-            name: "Inhabilitado",
+            name: "Estado",
             row: (row) => {
-                const value = row.Inhabilitado ? true : false
-                return value
+                return row.inhabilitado ? <Pildora contenido="Invalido"/> : <Pildora contenido="Activo" color="bg-succes"/>
             }
         },
     ]
@@ -78,9 +78,10 @@ function Recreadores() {
     const options = {
         search: {
             placeholder: texts.registerMessage.searchNameDocument,
-            function: (value) => {
+            function: (value, filtros={}) => {
                 searchCode({
                     value: value,
+                    filtros:filtros,
                     object: recreadores,
                     setList: setRecreadores,
                     setData: setDataRecreadores,
@@ -109,6 +110,24 @@ function Recreadores() {
           },
     }
 
+    const filtros=[
+        {
+            nombre:"Estado",
+            columnName:"estado",
+            opciones:[{label:"Activo", value:0}, {label:"Desabilitado", value:1}]
+        },
+        {
+            nombre:"Nivel",
+            columnName:"nivel",
+            opciones:niveles
+        },
+        {
+            nombre:"Genero",
+            columnName:"genero",
+            opciones:generos
+        }
+    ]
+
     return (
         <Navbar name={`${texts.pages.getRecreadores.name}`} descripcion={`${texts.pages.getRecreadores.description}`}>
             <Table
@@ -118,6 +137,9 @@ function Recreadores() {
                 totalPages={dataRecreadores.pages}
                 options={options}
                 loading={tableLoading}
+                filtradores={filtros}
+                order={true}
+                organizar={["Origen", "Nombre"]}
             />
             <Toaster />
         </Navbar>

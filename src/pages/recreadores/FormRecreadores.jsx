@@ -1,14 +1,15 @@
 import { useState, useEffect, useRef } from "react";
 import { InputsGeneral, UnitSelect, InputCheckRadio, InputImgPerfil } from "../../components/input/Inputs.jsx"
 import { ButtonSimple } from "../../components/button/Button.jsx"
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
+import { useAuthContext } from '../../context/AuthContext.jsx';
 import { LoaderCircle } from "../../components/loader/Loader.jsx";
 import { useParams, useNavigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import { niveles, tipo_documentos, recreadores, generos } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
-import { hasLeadingOrTrailingSpace, calcularEdad } from "../../utils/process.jsx";
-import { habilitarEdicion, verifyOptionsSelect, getPersona, controlResultPost } from "../../utils/actions.jsx"
+import { hasLeadingOrTrailingSpace, calcularEdad , fechaFormat} from "../../utils/process.jsx";
+import { habilitarEdicion, controlErrors, getPersona, controlResultPost } from "../../utils/actions.jsx"
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import texts from "../../context/text_es.js";
 import Navbar from "../../components/navbar/Navbar.jsx"
@@ -17,17 +18,17 @@ import { IconRowLeft } from "../../components/Icon.jsx"
 import Swal from 'sweetalert2';
 
 function FormRecreadores() {
-    const [data_tipo_documentos, setTipoDocumentos] = useState([])
-    const [recreador, setRecreador] = useState({id:null, numero_documento:null, img:null})
-    const [data_niveles, setNiveles] = useState([])
-    const [data_generos, setGeneros] = useState([])
+    const [img, setImg] = useState(null)
+    const {dataOptions} = useAuthContext()
+    const [tipo_documentos, ] = useState(dataOptions().tipos_documentos)
+    const [niveles] = useState(dataOptions().niveles)
+    const [generos] = useState(dataOptions().generos)
     const [loading, setLoading] = useState(true)
     const [debounceTimeout, setDebounceTimeout] = useState(null);
     const [errorServer, setErrorServer] = useState("")
     const [dataNewUser, setdataNewUser] = useState({ tipo_documento: null, numero_documento: null })
     const [dataPersona, setPersona] = useState({})
     const [disabledInputs, setDisabledInputs] = useState(false)
-    const [fechaActual] = useState(new Date())
     const navigate = useNavigate();
     const renderizado = useRef(0)
     const params = useParams();
@@ -35,72 +36,29 @@ function FormRecreadores() {
     useEffect(() => {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
-            get_data()
+            if (Number(params.id)) {
+                get_recreador()
+            }
             return
         }
     }, [])
 
-    // *Funcion para buscar los niveles y tipos de documentos
-    const get_data = async () => {
-        try {
-            const get_niveles = await niveles.get()
-            const get_tipo_documentos = await tipo_documentos.get()
-            const get_generos = await generos.get()
-            verifyOptionsSelect({
-                respuesta: get_niveles,
-                setError: setErrorServer,
-                setOptions: setNiveles
-            })
-            verifyOptionsSelect({
-                respuesta: get_tipo_documentos,
-                setError: setErrorServer,
-                setOptions: setTipoDocumentos
-            })
-            verifyOptionsSelect({
-                respuesta: get_generos,
-                setError: setErrorServer,
-                setOptions: setGeneros
-            })
-            if (Number(params.numero_documento)){
-                setRecreador({
-                    ...recreador,
-                    numero_documento:Number(params.numero_documento)
-                })
-                get_recreador()
-            }
-        } catch (error) {
-            console.log(error)
-            setErrorServer(texts.errorMessage.errorSystem)
-        } finally {
-            setLoading(false)
-        }
-    }
-
     const get_recreador = async () => {
         try {
-            const respuesta = await recreadores.get({subDominio:[Number(params.numero_documento)], params:{"_info":"true"}})
-            if (respuesta.status !== 200) {
-                setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
-                return
-            }
-            if (respuesta.data.status === false) {
-                setErrorServer(`${respuesta.data.message}`)
-                return
-            } 
+            const respuesta = await recreadores.get({ subDominio: [Number(params.id)], params: { "_info": "true" } })
+            const errors = controlErrors({respuesta:respuesta, constrolError:setErrorServer})
+            if(errors) return
             setErrorServer("")
-            setRecreador({
-                ...recreador,
-                img:respuesta.data.data.info.img_perfil,
-                id:respuesta.data.data.info.id
-            })
-            const keys = Object.keys(respuesta.data.data.info);
+            const data = respuesta.data.data
+            setImg(data.info.img_perfil)
+            const keys = Object.keys(data.info);
             keys.forEach(key => {
-                setValue(key, respuesta.data.data.info[`${key}`])
+                setValue(key, data.info[`${key}`])
             });
-            setValue(`genero`, respuesta.data.data.info["genero_id"])
-            setValue(`nivel`, respuesta.data.data.info["nivel_id"])
-            setValue(`tipo_documento`, respuesta.data.data.info["tipo_documento_id"])
-            
+            setValue(`genero`, data.info["genero_id"])
+            setValue(`nivel`, data.info["nivel_id"])
+            setValue(`tipo_documento`, data.info["tipo_documento_id"])
+
         } catch (error) {
             console.log(error)
             setErrorServer(texts.errorMessage.errorObjet)
@@ -122,40 +80,40 @@ function FormRecreadores() {
     const onSubmit = handleSubmit(
         async (data) => {
             try {
-            const $archivo = document.getElementById(`img_perfil`).files[0]
-            const message = recreador.id? texts.confirmMessage.confirEdit : texts.confirmMessage.confirRegister
-            const confirmacion = await alertConfim("Confirmar", message)
-            if (confirmacion.isConfirmed) {
-                const Form = new FormData()
-                if (data.id_persona) {
-                    Form.append('id_persona', data.id_persona)
-                    Form.append('fecha_nacimiento', data.fecha_nacimiento)
-                    Form.append('nivel', data.nivel)
-                    Form.append('genero', data.genero)
-                    Form.append('img_perfil', $archivo?$archivo:null)
-                } else {
-                    Form.append('nombres', data.nombres)
-                    Form.append('apellidos', data.apellidos)
-                    Form.append('numero_documento', data.numero_documento)
-                    Form.append('tipo_documento', Number(data.tipo_documento))
-                    Form.append('telefono_principal', Number(data.telefono_principal))
-                    Form.append('telefono_secundario', Number(data.telefono_secundario))
-                    Form.append('correo', data.correo)
-                    Form.append('fecha_nacimiento', data.fecha_nacimiento)
-                    Form.append('nivel', Number(data.nivel))
-                    Form.append('genero', Number(data.genero))
-                    Form.append('img_perfil', $archivo?$archivo:null)
+                const $archivo = document.getElementById(`img_perfil`).files[0]
+                const message = params.id ? texts.confirmMessage.confirEdit : texts.confirmMessage.confirRegister
+                const confirmacion = await alertConfim("Confirmar", message)
+                if (confirmacion.isConfirmed) {
+                    const Form = new FormData()
+                    if (data.id_persona) {
+                        Form.append('id_persona', data.id_persona)
+                        Form.append('fecha_nacimiento', data.fecha_nacimiento)
+                        Form.append('nivel', data.nivel)
+                        Form.append('genero', data.genero)
+                        Form.append('img_perfil', $archivo ? $archivo : null)
+                    } else {
+                        Form.append('nombres', data.nombres)
+                        Form.append('apellidos', data.apellidos)
+                        Form.append('numero_documento', data.numero_documento)
+                        Form.append('tipo_documento', Number(data.tipo_documento))
+                        Form.append('telefono_principal', Number(data.telefono_principal))
+                        Form.append('telefono_secundario', Number(data.telefono_secundario))
+                        Form.append('correo', data.correo)
+                        Form.append('fecha_nacimiento', data.fecha_nacimiento)
+                        Form.append('nivel', Number(data.nivel))
+                        Form.append('genero', Number(data.genero))
+                        Form.append('img_perfil', $archivo ? $archivo : null)
+                    }
+                    Form.append('img_perfil', $archivo ? $archivo : null)
+                    alertLoading("Cargando")
+                    const res = params.id ? await recreadores.putData(Form, { subDominio:[Number(params.id)]}) : await recreadores.postData(Form)
+
+                    controlResultPost({
+                        respuesta: res,
+                        messageExito: params.id ? texts.successMessage.editionRecreador : texts.successMessage.registerRecreador,
+                        useNavigate: { navigate: navigate, direction: "/recreadores/" }
+                    })
                 }
-                Form.append('img_perfil', $archivo?$archivo:null)
-                alertLoading("Cargando")
-                const res = recreador.id? await recreadores.putData(Form, recreador.id) : await recreadores.postData(Form)
-                
-                controlResultPost({
-                    respuesta: res,
-                    messageExito:recreador.id? texts.successMessage.editionRecreador : texts.successMessage.registerRecreador,
-                    useNavigate: { navigate: navigate, direction: "/recreadores/" }
-                })
-            }
             } catch (error) {
                 console.log(error)
                 Swal.close()
@@ -165,7 +123,7 @@ function FormRecreadores() {
     )
 
     return (
-        <Navbar name={`${recreador.id? texts.pages.editRecreador.name : texts.pages.registerRecreadores.name}`} descripcion={`${recreador.id? texts.pages.editRecreador.description : texts.pages.registerRecreadores.description}`}>
+        <Navbar name={`${params.id ? texts.pages.editRecreador.name : texts.pages.registerRecreadores.name}`} descripcion={`${params.id ? texts.pages.editRecreador.description : texts.pages.registerRecreadores.description}`}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/recreadores/") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
             {
@@ -194,7 +152,6 @@ function FormRecreadores() {
                                         ...register("id_persona")
                                         }
                                     />
-                                    
                                     <InputCheckRadio label={`${texts.label.dataPersonaCheck}`} name="persona" id="persona" form={{ errors, register }} className={`${!disabledInputs ? "d-none" : ""}`} checked={disabledInputs}
                                         onClick={
                                             (e) => {
@@ -205,16 +162,16 @@ function FormRecreadores() {
                                                     dataPersona
                                                 })
                                             }
-                                        } 
+                                        }
                                     />
                                     <div className="w-100">
-                                        <InputImgPerfil name="img_perfil" id="img_perfil" label={`${texts.label.fotoRecreador}`} form={{ errors, register }} imgPerfil={recreador.img}/>
+                                        <InputImgPerfil name="img_perfil" id="img_perfil" label={`${texts.label.fotoRecreador}`} form={{ errors, register }} imgPerfil={img} />
                                     </div>
 
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-25 pe-0 pe-md-3 d-flex align-items-center">
                                             <UnitSelect label={texts.label.tipoDocuemnto} name="tipo_documento" id="tipo_documento" form={{ errors, register }}
-                                                options={data_tipo_documentos}
+                                                options={tipo_documentos}
                                                 params={{
                                                     validate: (value) => {
                                                         if ((value === "")) {
@@ -228,14 +185,14 @@ function FormRecreadores() {
                                                 isError={!watch("tipo_documento")}
                                                 onChange={
                                                     (e) => {
-                                                        
+
                                                         setdataNewUser({
                                                             ...dataNewUser,
                                                             tipo_documento: e.target.value
                                                         })
-                                                        if(!recreador.id){
+                                                        if (!params.id) {
                                                             getPersona({
-                                                                dataNewUser:{tipo_documento: e.target.value, numero_documento: dataNewUser.numero_documento},
+                                                                dataNewUser: { tipo_documento: e.target.value, numero_documento: dataNewUser.numero_documento },
                                                                 setPersona,
                                                                 setValue,
                                                                 setDisabledInputs
@@ -272,9 +229,9 @@ function FormRecreadores() {
                                                             clearTimeout(debounceTimeout);
                                                         }
                                                         const timeout = setTimeout(() => {
-                                                            if(!recreador.id){
+                                                            if (!params.id) {
                                                                 getPersona({
-                                                                    dataNewUser:{tipo_documento: dataNewUser.tipo_documento, numero_documento: e.target.value},
+                                                                    dataNewUser: { tipo_documento: dataNewUser.tipo_documento, numero_documento: e.target.value },
                                                                     setPersona,
                                                                     setValue,
                                                                     setDisabledInputs
@@ -285,7 +242,7 @@ function FormRecreadores() {
                                                     }
                                                 }
                                                 onBlur={(e) => {
-                                                    if(!recreador.id){
+                                                    if (!params.id) {
                                                         getPersona({
                                                             dataNewUser,
                                                             setPersona,
@@ -302,7 +259,7 @@ function FormRecreadores() {
 
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-50 pe-0 pe-md-3">
-                                            <InputsGeneral type={"text"} label={`${texts.label.namesRecreador}`} 
+                                            <InputsGeneral type={"text"} label={`${texts.label.namesRecreador}`}
                                                 name="nombres" id="nombres" form={{ errors, register }}
                                                 params={{
                                                     required: {
@@ -335,7 +292,7 @@ function FormRecreadores() {
                                             />
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
-                                            <InputsGeneral type={"text"} label={`${texts.label.lastNamesRecreador}`} 
+                                            <InputsGeneral type={"text"} label={`${texts.label.lastNamesRecreador}`}
                                                 name="apellidos" id="apellidos" form={{ errors, register }}
                                                 params={{
                                                     required: {
@@ -370,16 +327,16 @@ function FormRecreadores() {
                                     </div>
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-50 pe-0 pe-md-3">
-                                            <InputsGeneral type={"date"} label={`${texts.label.birthDate}`} 
+                                            <InputsGeneral type={"date"} label={`${texts.label.birthDate}`}
                                                 name="fecha_nacimiento" id="fecha_nacimiento" form={{ errors, register }}
-                                                max={`${fechaActual.getFullYear()}-${(fechaActual.getMonth() + 1) < 10 ? `0${fechaActual.getMonth() + 1}` : `${fechaActual.getMonth() + 1}`}-${fechaActual.getDate() < 10 ? `0${fechaActual.getDate()}` : fechaActual.getDate()}`}
+                                                max={fechaFormat()}
                                                 params={{
                                                     required: {
                                                         value: true,
                                                         message: texts.inputsMessage.requireDate,
                                                     },
                                                     validate: (e) => {
-                                                        const edad = calcularEdad(e, fechaActual)
+                                                        const edad = calcularEdad(e, new Date())
                                                         if (edad < 15 || edad > 60) {
                                                             return `Edad ${edad} años, recreador Invalido`
                                                         } else {
@@ -391,7 +348,7 @@ function FormRecreadores() {
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
                                             <UnitSelect label={texts.label.genero} name="genero" id="genero" form={{ errors, register }}
-                                                options={data_generos}
+                                                options={generos}
                                                 params={{
                                                     validate: (value) => {
                                                         if ((value === "")) {
@@ -401,7 +358,6 @@ function FormRecreadores() {
                                                         }
                                                     }
                                                 }}
-
                                             />
                                         </div>
                                     </div>
@@ -444,7 +400,6 @@ function FormRecreadores() {
                                                 placeholder={texts.placeholder.telefono}
                                             />
                                         </div>
-
                                     </div>
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-50 pe-0 pe-md-3 ">
@@ -477,7 +432,7 @@ function FormRecreadores() {
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
                                             <UnitSelect label={`${texts.label.nivel}`} name="nivel" id="nivel" form={{ errors, register }}
-                                                options={data_niveles}
+                                                options={niveles}
                                                 params={{
                                                     validate: (value) => {
                                                         if ((value === "")) {
@@ -492,7 +447,7 @@ function FormRecreadores() {
                                     </div>
 
                                     <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
-                                        {recreador.id? "Guardar" : "Registrar"}
+                                        {params.id ? "Guardar" : "Registrar"}
                                     </ButtonSimple>
                                 </form>
                             </div>

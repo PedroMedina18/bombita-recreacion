@@ -84,7 +84,7 @@ function FormMetodoPago() {
                         divisa: data.divisa
                     }
                     alertLoading("Cargando")
-                    const res = params.id ? await metodoPago.put(body, Number(params.id)) : await metodoPago.post(body)
+                    const res = params.id ? await metodoPago.put(body, { subDominio:[Number(params.id)]}) : await metodoPago.post(body)
                     controlResultPost({
                         respuesta: res,
                         messageExito: params.id ? texts.successMessage.editionMetodoPago : texts.successMessage.registerMetodoPago,

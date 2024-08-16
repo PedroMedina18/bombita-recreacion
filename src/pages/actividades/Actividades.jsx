@@ -3,7 +3,7 @@ import { actividades } from "../../utils/API.jsx";
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx";
-import { formatoId } from "../../utils/process.jsx";
+import { formatoId, formatDateWithTime12Hour } from "../../utils/process.jsx";
 import { alertInfo } from "../../components/alerts.jsx";
 import Navbar from "../../components/navbar/Navbar";
 import Table from "../../components/table/Table";
@@ -72,7 +72,12 @@ function Actividades() {
     get:(row)=>{
       alertInfo(
         row.nombre, 
-        row
+        {
+          codigo:formatoId(row.id),
+          descripción:row.descripcion,
+          fecha_de_registro:formatDateWithTime12Hour(row.fecha_registro),
+          fecha_de_actualizacion:formatDateWithTime12Hour(row.fecha_actualizacion),
+        }
       )
     },
     register: {
