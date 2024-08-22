@@ -48,7 +48,7 @@ export const verifyOptionsSelect = ({ respuesta, setOptions, label }) => {
 
 export const getDataAll = async ({ api, setData, label = null, message = null }) => {
     try {
-        const data = await api.get()
+        const data = await api.get({params:{all:true}})
         verifyOptionsSelect({
             respuesta: data,
             setOptions: setData,

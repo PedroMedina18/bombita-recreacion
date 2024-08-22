@@ -55,12 +55,11 @@ function FormAccount() {
                     body.telefono_secundario = dataEvent.telefono_secundario
                     body.correo = dataEvent.correo
                     body.tipo_documento = dataEvent.tipo_documento
-                    body.fecha_evento = dataEvent.fecha_evento
+                    body.fecha_evento_inicio = dataEvent.fecha_evento_inicio
                     body.numero_personas = dataEvent.numero_personas
                     body.direccion = dataEvent.direccion
                     body.servicios = saveDataServicios
                     body.sobrecargos = saveDataSobrecargos
-                    console.log(body)
                     alertLoading("Cargando")
                     const res = await eventos.post(body)
                     controlResultPost({

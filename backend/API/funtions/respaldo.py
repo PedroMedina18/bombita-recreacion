@@ -98,5 +98,3 @@ def buscar_carpeta_media():
                 return os.path.join(ruta_padre, nombre_carpeta)
         ruta_actual = ruta_padre
     return None
-
-respaldo()

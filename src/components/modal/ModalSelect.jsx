@@ -43,13 +43,13 @@ function ModalSelect({ titulo, columns, object, saveSelect, state, select }) {
             clearTimeout(debounceTimeout);
         }
         const timeout = setTimeout(() => {
-            searFuntion(searchTerm)
+            searhFuntion(searchTerm)
         }, 900);
 
         setDebounceTimeout(timeout);
     }, [searchTerm])
 
-    const searFuntion = (search) => {
+    const searhFuntion = (search) => {
         searchCode({
             object: object,
             setLoading: setLoading,
@@ -83,7 +83,7 @@ function ModalSelect({ titulo, columns, object, saveSelect, state, select }) {
                     <ButtonSimple
                         type="button"
                         onClick={(e) => {
-                            searFuntion(searchTerm)
+                            searhFuntion(searchTerm)
                         }}
                     >
                         Buscar

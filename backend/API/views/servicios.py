@@ -309,14 +309,15 @@ class Servicios_Views(View):
                 query = "SELECT {} FROM servicios ORDER BY {} {} {};"
 
                 if(all == "true"):
-                    query = "SELECT id, nombre FROM servicios ORDER BY {} {};".format(typeOrdenBy, orderType)
+                    query = "SELECT id, nombre, precio FROM servicios ORDER BY {} {};".format(typeOrdenBy, orderType)
                     cursor.execute(query)
                     servicios = dictfetchall(cursor)
                 else:
                     query = "SELECT * FROM servicios ORDER BY {} {} LIMIT %s, %s;".format(typeOrdenBy, orderType)
                     cursor.execute(query, [inicio, final])
                     servicios = dictfetchall(cursor)
-
+                    for servicio in servicios:
+                        servicio["duracion"] = duration(servicio['duracion'])
                 query="""
                     SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM servicios;
                 """

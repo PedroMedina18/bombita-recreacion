@@ -39,7 +39,7 @@ function Eventos() {
         },
         {
             name: "Fecha",
-            row: (row) => { const fecha = formatDateWithTime12Hour(row.fecha_evento); return fecha }
+            row: (row) => { const fecha = formatDateWithTime12Hour(row.fecha_evento_inicio); return fecha }
         },
         {
             name: "Documento",

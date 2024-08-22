@@ -5,6 +5,7 @@ import useInactivity from '../context/useInactivity.jsx';
 import { ButtonSimple } from "../components/button/Button.jsx"
 import { Toaster } from "sonner";
 import { respaldo } from "../utils/API.jsx"
+import ComponentCalendar from "../components/calendar/ComponentCalendar.jsx"
 
 function Inicio() {
   const { getUser } = useAuthContext();
@@ -18,6 +19,7 @@ function Inicio() {
         <ButtonSimple onClick={()=>{respaldo.get({})}}>
           Realizar Respaldo
         </ButtonSimple>
+        <ComponentCalendar/>
       </div>
       <Toaster />
     </Navbar>

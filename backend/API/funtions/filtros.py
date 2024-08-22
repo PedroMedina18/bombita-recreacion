@@ -26,16 +26,16 @@ def filtrosWhere(filtros=[]):
             where = where + " " +  operador + " " + filtro.strip()
         return where
     
-def peridoFecha(request):
+def peridoFecha(request, nameFecha):
     try:
         desde = request.GET.get('desde', None)
         hasta = request.GET.get('hasta', datetime.date.today())
         hasta = datetime.datetime.strptime(hasta, "%Y-%m-%d").date()
         if desde:
             desde = datetime.datetime.strptime(desde, "%Y-%m-%d").date()
-            query = f"DATE(fecha_registro) BETWEEN '{desde}' AND '{hasta}';"
+            query = f"DATE({str(nameFecha)}) BETWEEN '{desde}' AND '{hasta}';"
         else:
-            query = f"DATE(fecha_registro) <= '{hasta}';"
+            query = f"DATE({str(nameFecha)}) <= '{hasta}';"
             
         return query 
     except:

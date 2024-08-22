@@ -187,19 +187,23 @@ class Sobrecargos(models.Model):
     nombre = models.CharField(max_length = 100, unique = True)
     descripcion = models.CharField(max_length = 300)
     monto = models.FloatField(default = 0)
+    fecha_registro = models.DateTimeField(auto_now_add = True)
+    fecha_actualizacion = models.DateTimeField(auto_now = True)
 
     class Meta:
         db_table = 'sobrecargos'
 
 # *Tabla de los eventos registrados
 class Eventos(models.Model):
-    fecha_evento = models.DateTimeField()
+    fecha_evento_inicio = models.DateTimeField()
+    fecha_evento_final = models.DateTimeField()
     direccion = models.CharField(max_length = 500)
     numero_personas = models.IntegerField()
     cliente = models.ForeignKey(Clientes, on_delete = models.PROTECT, related_name = 'eventos', db_column = 'cliente_id')
     completado = models.BooleanField()
     total = models.BooleanField(default=False)
     anticipo = models.BooleanField(default=False)
+    opnion = models.CharField(max_length = 500, blank=True, null=True, default=None)
     fecha_registro = models.DateTimeField(auto_now_add = True)
     fecha_actualizacion = models.DateTimeField(auto_now = True)
 
@@ -217,6 +221,7 @@ class EventosSobrecargos(models.Model):
 class EventosServicios(models.Model):
     evento = models.ForeignKey(Eventos, on_delete = models.CASCADE, related_name = 'servicio', db_column = 'evento_id')
     servicio = models.ForeignKey(Servicios, on_delete = models.CASCADE, related_name = 'evento', db_column = 'servicio_id')
+    evaluacion_servicio = models.IntegerField(default=0)
 
     class Meta:
         db_table = 'servicios_eventos'
@@ -238,7 +243,7 @@ class Pagos(models.Model):
     metodoPago = models.ForeignKey(MetodosPago, on_delete = models.PROTECT, related_name = 'evento', db_column = 'metodo_pago_id')
     tipo = models.BooleanField(default=False)
     monto = models.FloatField()
-    precioDolar = models.ForeignKey(PrecioDolar, default=1, on_delete = models.PROTECT, related_name = 'pago', db_column = 'precio_dolar_id')
+    precioDolar = models.ForeignKey(PrecioDolar, on_delete = models.PROTECT, related_name = 'pago', db_column = 'precio_dolar_id')
     referencia = models.BigIntegerField(blank=True, null=True, default=None)
     capture = models.FileField(upload_to = 'capture_pago', null = True, blank = True)
 
@@ -249,11 +254,32 @@ class EventosRecreadoresServicios(models.Model):
     evento = models.ForeignKey(Eventos, on_delete = models.CASCADE, related_name = 'recreador', db_column = 'evento_id')
     recreador  = models.ForeignKey(Recreadores, on_delete = models.CASCADE, related_name = 'evento', db_column = 'recreador_id')
     servicio = models.ForeignKey(Servicios, on_delete = models.CASCADE, related_name = 'recreador', db_column = 'servicio_id')
+    evaluacion_recreador = models.IntegerField(default=0)
     class Meta:
         db_table = 'recreadores_eventos_servicios'
 
+class PreguntasEvento(models.Model):
+    pregunta = models.CharField(max_length = 100, unique = True)
+    estado = models.BooleanField(default=True)
 
+    class Meta:
+        db_table = 'preguntas_eventos'
 
+class PreguntasEventoEvento(models.Model):
+    evento = models.ForeignKey(Eventos, on_delete = models.CASCADE, related_name = 'pregunta', db_column = 'evento_id')
+    pregunta = models.ForeignKey(PreguntasEvento, on_delete = models.CASCADE, related_name = 'recreador', db_column = 'pregunta_id')
+    respuesta = models.CharField(max_length = 300, blank=True, null=True, default=None)
+
+    class Meta:
+        db_table = 'preguntas_eventos_evento'
+
+class RegistroMateriales(models.Model):
+    material = models.ForeignKey(Materiales, on_delete = models.CASCADE, related_name = 'registro', db_column = 'material_id')
+    descripcion = models.CharField(max_length = 300)
+    cantidad = models.IntegerField()
+    total = models.IntegerField()
+    tipo = models.CharField(max_length = 100)
+    fecha = models.DateTimeField(auto_now_add = True)
 
 # necesito una consulta sql un poco dificil veras ten go una tabla eventos, una de servicios y otra de 
 # recreadores, y dos intermedias eventosXservicios y eventosXrecreadores, y como ultimo dato la tabla 

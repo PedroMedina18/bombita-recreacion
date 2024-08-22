@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { InputsGeneral, UnitSelect, InputTextTarea, InputCheckRadio, SelectAsync } from "../../components/input/Inputs.jsx"
 import { ButtonSimple } from "../../components/button/Button"
 import { useAuthContext } from '../../context/AuthContext.jsx';
@@ -17,15 +17,15 @@ import pattern from "../../context/pattern.js";
 
 function FormDataEvent() {
     const { dataClientes, dataNewUser, valueCliente, setValueCliente, setdataNewUser, dataPersona, setPersona, setDataEvent, dataEvent } = useFormEventContext()
-    const [disabledInputs, setDisabledInputs] = useState(false)
+    const [ disabledInputs, setDisabledInputs ] = useState(false)
+    const [ isClient, setIsClient ] = useState(true)
+    const [ debounceTimeoutPersona, setDebounceTimeoutPersona ] = useState(null);
+    const [ debounceTimeoutCliente, setDebounceTimeoutCliente ] = useState(null);
     const { dataOptions } = useAuthContext()
-    const [tipos_documentos] = useState(dataOptions().tipos_documentos)
-    const [isClient, setIsClient] = useState(true)
+    const [ tipos_documentos ] = useState(dataOptions().tipos_documentos)
+    const [ submit, setSubmit ] = useState(false);
     const navigate = useNavigate();
-    const [debounceTimeoutPersona, setDebounceTimeoutPersona] = useState(null);
-    const [debounceTimeoutCliente, setDebounceTimeoutCliente] = useState(null);
-    const [submit, setSubmit] = useState(false);
-    const [fechaActual] = useState(new Date())
+    const [ fechaActual ] = useState(new Date())
 
     useEffect(() => {
         const keys = Object.keys(dataEvent);
@@ -35,7 +35,6 @@ function FormDataEvent() {
         if (valueCliente) {
             setIsClient(true)
         }
-        
         collapseElements()
     }, [])
 
@@ -395,7 +394,7 @@ function FormDataEvent() {
 
                 <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                     <div className="w-100 w-md-50 pe-0 pe-md-3">
-                        <InputsGeneral type={"datetime-local"} label={`${texts.label.fechaEvento}`} name="fecha_evento" id="fecha_evento" form={{ errors, register }}
+                        <InputsGeneral type={"datetime-local"} label={`${texts.label.fechaEvento}`} name="fecha_evento_inicio" id="fecha_evento_inicio" form={{ errors, register }}
                             min={formatoFechaInput(fechaActual)}
                             params={{
                                 required: {
@@ -450,7 +449,7 @@ function FormDataEvent() {
                 onClick={(e) => {
                     setSubmit(true);
                 }}>
-                Registrar
+                Siguiente
             </ButtonSimple>
         </form>
     )

@@ -193,7 +193,7 @@ class Sobrecargos_Views(View):
                 query = "SELECT {} FROM sobrecargos ORDER BY {} {} {};"
 
                 if(all == "true"):
-                    query = "SELECT id, nombre FROM sobrecargos ORDER BY {} {};".format(typeOrdenBy, orderType)
+                    query = "SELECT id, nombre, monto FROM sobrecargos ORDER BY {} {};".format(typeOrdenBy, orderType)
                     cursor.execute(query)
                     sobrecargos = dictfetchall(cursor)
                 else:
