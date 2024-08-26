@@ -8,7 +8,7 @@ from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..funtions.email import emailRegistroEvento
 from ..funtions.time import duration
-from ..funtions.filtros import order, typeOrder, filtrosWhere,peridoFecha
+from ..funtions.filtros import order, typeOrder, filtrosWhere, peridoFecha
 from ..models import Eventos, EventosSobrecargos, EventosServicios, Clientes, Personas, Servicios, Sobrecargos, TipoDocumento
 from ..funtions.token import verify_token
 from ..message import MESSAGE
@@ -106,8 +106,8 @@ class Eventos_Views(View):
                 getSobrecargo = Sobrecargos.objects.get(id=int(sobrecargo))
                 EventosSobrecargos.objects.create(evento=evento, sobrecargo=getSobrecargo)
             
-            if cliente.persona.correo:
-                emailRegistroEvento(cliente.persona.correo)
+            # if cliente.persona.correo:
+            #     emailRegistroEvento(cliente.persona.correo)
             datos = {'status': True, 'message': f"{MESSAGE['registerEvento']}"}
             return JsonResponse(datos)
 
@@ -287,15 +287,20 @@ class Eventos_Views(View):
                 page = request.GET.get('page', 1)
                 inicio = indiceInicial(int(page))
                 final = indiceFinal(int(page))
-                
+                all = request.GET.get('all', False)
+                limit = ""
+                ordenFecha = request.GET.get('fecha', "fecha_registro")
                 orderType = order(request)
                 
-
+                if ordenFecha =="fecha_registro":
+                    ordenFecha ="eve.fecha_registro"
+                elif ordenFecha =="fecha_evento":
+                    ordenFecha ="eve.fecha_evento_inicio"
 
                 where = []
                 completado = request.GET.get('nivel', None)
                 cliente = request.GET.get('cliente', None)
-                fecha = peridoFecha(request, "fecha_registro")
+                fecha = peridoFecha(request, ordenFecha)
                 if(completado):
                     where.append(f"eve.completado={int(completado)}")
                 if(cliente):
@@ -304,7 +309,10 @@ class Eventos_Views(View):
                     where.append(f"{fecha}")
                 where = filtrosWhere(where)
 
-                
+                if(all == "true"):
+                    limit=""
+                else:
+                    limit=f"LIMIT {inicio}, {final}"
 
                 # if (filtros == 'pagado'):
                 #     filtros = 'WHERE eve.total = 1'
@@ -314,7 +322,6 @@ class Eventos_Views(View):
                 #     filtros = 'WHERE eve.total = 0'
                 # elif (filtros == 'no_anticipo'):
                 #     filtros = 'WHERE eve.anticipo = 0 AND eve.total = 0'
-
 
                 query = """
                 SELECT 
@@ -328,6 +335,7 @@ class Eventos_Views(View):
                     eve.numero_personas,
                     eve.anticipo,
                     eve.total,
+                    eve.direccion,
                     eve.fecha_registro,
                     eve.completado
                 FROM eventos AS eve
@@ -335,9 +343,9 @@ class Eventos_Views(View):
                 LEFT JOIN personas AS per ON cli.persona_id=per.id
                 LEFT JOIN tipos_documentos AS tipo ON per.tipo_documento_id=tipo.id
                 {}
-                ORDER BY eve.id {} LIMIT %s, %s;
-                """.format(where, orderType)
-                cursor.execute(query, [inicio, final])
+                ORDER BY eve.id {} {};
+                """.format(where, orderType, limit)
+                cursor.execute(query)
                 eventos = dictfetchall(cursor)
                 
                 query = """

@@ -99,8 +99,22 @@ class Clientes_Views(View):
             cursor = connection.cursor()
             verify = verify_token(request.headers)
             info = request.GET.get("_info", "false")
+            totalClientes = request.GET.get("total", "false")
             if not verify["status"]:
                 datos = {"status": False, "message": verify["message"], "data": None}
+                return JsonResponse(datos)
+
+            if(totalClientes =="true"):
+                query="""
+                    SELECT COUNT(*) AS total FROM clientes
+                """
+                cursor.execute(query)
+                total = dictfetchall(cursor)
+                datos = {
+                        "status": True,
+                        "message": f"{MESSAGE['exitoGet']}",
+                        "data": total[0],
+                    }
                 return JsonResponse(datos)
 
             if identificador:

@@ -116,10 +116,7 @@ table .svg-check svg {
 table .svg-x svg {
   color: rgb(204, 19, 19);
 }
-table svg.edit,
-table svg.eliminate,
-table svg.get,
-table svg.money {
+table .options-table svg{
   color: rgb(var(--secundario));
   transition: transform 0.2s ease-out;
 }

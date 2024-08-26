@@ -3,7 +3,8 @@ import { niveles } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx"
-import { formatoId , formatDateWithTime12Hour} from "../../utils/process.jsx"
+import { IconTrash, IconEdit, IconDetail } from "../../components/Icon.jsx";
+import { formatoId, formatDateWithTime12Hour } from "../../utils/process.jsx"
 import { alertInfo } from "../../components/alerts.jsx"
 import Navbar from "../../components/navbar/Navbar"
 import Table from "../../components/table/Table"
@@ -36,7 +37,7 @@ function Niveles() {
   const columns = [
     {
       name: "Codigo",
-      row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
+      row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
     },
     {
       name: "Nombre",
@@ -45,6 +46,37 @@ function Niveles() {
     {
       name: "Descripcion",
       row: (row) => { return row.descripcion }
+    },
+    {
+      name: "Opciones",
+      row: (row) => {
+        return <div className='d-flex justify-content-around options-table'>
+          <IconDetail
+            onClick={() => {
+              alertInfo(
+                row.nombre,
+                {
+                  codigo: formatoId(row.id),
+                  descripción: row.descripcion,
+                  fecha_de_registro: formatDateWithTime12Hour(row.fecha_registro),
+                  fecha_de_actualizacion: formatDateWithTime12Hour(row.fecha_actualizacion),
+                }
+              )
+            }} className="cursor-pointer"
+          />
+          <IconTrash
+            onClick={() => {
+              deleteItem({
+                row: row,
+                objet: niveles,
+                functionGet: getNiveles
+              })
+            }}
+            className="cursor-pointer"
+          />
+          <IconEdit onClick={() => { navigate(`/edit/nivel/${row.id}/`) }} className="cursor-pointer" />
+        </div>
+      }
     },
   ]
   const options = {
@@ -55,17 +87,17 @@ function Niveles() {
         functionGet: getNiveles
       })
     },
-    put: (row)=>{
-            navigate(`/edit/nivel/${row.id}/`)
-        },
-    get:(row)=>{
+    put: (row) => {
+      navigate(`/edit/nivel/${row.id}/`)
+    },
+    get: (row) => {
       alertInfo(
-        row.nombre, 
+        row.nombre,
         {
-          codigo:formatoId(row.id),
-          descripción:row.descripcion,
-          fecha_de_registro:formatDateWithTime12Hour(row.fecha_registro),
-          fecha_de_actualizacion:formatDateWithTime12Hour(row.fecha_actualizacion),
+          codigo: formatoId(row.id),
+          descripción: row.descripcion,
+          fecha_de_registro: formatDateWithTime12Hour(row.fecha_registro),
+          fecha_de_actualizacion: formatDateWithTime12Hour(row.fecha_actualizacion),
         }
       )
     },

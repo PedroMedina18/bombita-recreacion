@@ -1,11 +1,12 @@
-import { useEffect, useState, useRef } from "react"
-import { cargos } from "../../utils/API.jsx"
+import { useEffect, useState, useRef } from "react";
+import { cargos } from "../../utils/API.jsx";
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
-import {deleteItem, searchCode, getListItems} from "../../utils/actions.jsx"
+import {deleteItem, searchCode, getListItems} from "../../utils/actions.jsx";
+import { IconTrash, IconEdit, IconDetail } from "../../components/Icon.jsx";
 import { formatoId } from "../../utils/process.jsx";
-import Navbar from "../../components/navbar/Navbar"
-import Table from "../../components/table/Table"
+import Navbar from "../../components/navbar/Navbar";
+import Table from "../../components/table/Table";
 import texts from "../../context/text_es.js";
 
 function Cargos() {
@@ -51,18 +52,38 @@ function Cargos() {
                 return value
             }
         },
+        {
+            name: "Opciones",
+            row: (row) => {
+              return <div className='d-flex justify-content-around options-table'>
+                {/* <IconDetail
+                  onClick={() => {
+                    alertInfo(
+                      row.nombre,
+                      {
+                        codigo: formatoId(row.id),
+                        descripción: row.descripcion,
+                        fecha_de_registro: formatDateWithTime12Hour(row.fecha_registro),
+                        fecha_de_actualizacion: formatDateWithTime12Hour(row.fecha_actualizacion),
+                      })
+                  }} className="cursor-pointer"
+                /> */}
+                <IconTrash
+                  onClick={() => {
+                    deleteItem({
+                        row: row,
+                        objet: cargos,
+                        functionGet: getCargos
+                    })
+                  }}
+                  className="cursor-pointer"
+                />
+                <IconEdit onClick={() => { navigate(`/edit/cargo/${row.id}/`) }} className="cursor-pointer" />
+              </div>
+            }
+          },
     ]
     const options = {
-        delete: (row) => {
-            deleteItem({
-                row: row,
-                objet: cargos,
-                functionGet: getCargos
-            })
-        },
-        put: (row)=>{
-            navigate(`/edit/cargo/${row.id}/`)
-        },
         search: {
             placeholder: texts.registerMessage.searchItem,
             function: (value) => {
@@ -75,13 +96,6 @@ function Cargos() {
                 })
             }
         },
-        // get:(row)=>{
-            
-        //     (
-        //       row.nombre, 
-        //       row.id
-        //     )
-        // },
         register: {
             name: texts.registerMessage.buttonRegisterCargo,
             function: () => {

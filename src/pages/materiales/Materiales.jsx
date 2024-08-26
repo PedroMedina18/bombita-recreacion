@@ -3,6 +3,7 @@ import { materiales } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx";
+import { IconTrash, IconEdit, IconDetail } from "../../components/Icon.jsx";
 import { formatoId } from "../../utils/process.jsx";
 import { alertInfo } from "../../components/alerts.jsx";
 import Navbar from "../../components/navbar/Navbar";
@@ -51,22 +52,35 @@ function Materiales() {
             name: "Total",
             row: (row) => { return row.total }
         },
+        {
+            name: "Opciones",
+            row: (row) => {
+                return <div className='d-flex justify-content-around options-table'>
+                    <IconDetail
+                        onClick={() => {
+                            alertInfo(
+                                row.nombre, 
+                                row
+                              )
+                        }} className="cursor-pointer"
+                    />
+                    <IconTrash
+                        onClick={() => {
+                            deleteItem({
+                                row: row,
+                                objet: materiales,
+                                functionGet: getMateriales
+                            })
+                        }}
+                        className="cursor-pointer"
+                    />
+                    <IconEdit onClick={() => { navigate(`/edit/material/${row.id}/`) }} className="cursor-pointer" />
+                </div>
+            }
+        },
     ]
 
     const options = {
-        delete: (row) => {
-            deleteItem({
-                row: row,
-                objet: materiales,
-                functionGet: getMateriales
-            })
-        },
-        get:(row)=>{
-            alertInfo(
-              row.nombre, 
-              row
-            )
-        },
         search: {
             placeholder: texts.registerMessage.searchItem,
             function: (value, filtros = null) => {
@@ -78,9 +92,6 @@ function Materiales() {
                     setLoading: setTableLoaing,
                 })
             }
-        },
-        put: (row)=>{
-            navigate(`/edit/material/${row.id}/`)
         },
         register: {
             name: texts.registerMessage.buttonRegisterMaterial,

@@ -200,7 +200,7 @@ class Eventos(models.Model):
     direccion = models.CharField(max_length = 500)
     numero_personas = models.IntegerField()
     cliente = models.ForeignKey(Clientes, on_delete = models.PROTECT, related_name = 'eventos', db_column = 'cliente_id')
-    completado = models.BooleanField()
+    estado = models.BooleanField(null=True, default=None)
     total = models.BooleanField(default=False)
     anticipo = models.BooleanField(default=False)
     opnion = models.CharField(max_length = 500, blank=True, null=True, default=None)

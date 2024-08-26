@@ -4,6 +4,7 @@ import { sobrecargos } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx"
+import { IconTrash, IconEdit, IconDetail } from "../../components/Icon.jsx";
 import { formatoId, normalizeDecimalNumber } from "../../utils/process.jsx"
 import { alertInfo } from "../../components/alerts.jsx"
 import Navbar from "../../components/navbar/Navbar"
@@ -37,7 +38,7 @@ function Niveles() {
   const columns = [
     {
       name: "Codigo",
-      row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
+      row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
     },
     {
       name: "Nombre",
@@ -48,28 +49,38 @@ function Niveles() {
       row: (row) => { return row.descripcion }
     },
     {
-        name: "Monto",
-        row: (row) => { return `${normalizeDecimalNumber(row.monto)} $` }
+      name: "Monto",
+      row: (row) => { return `${normalizeDecimalNumber(row.monto)} $` }
+    },
+    {
+      name: "Opciones",
+      row: (row) => {
+        return <div className='d-flex justify-content-around options-table'>
+          <IconDetail
+            onClick={() => {
+              alertInfo(
+                row.nombre,
+                row
+              )
+            }} className="cursor-pointer"
+          />
+          <IconTrash
+            onClick={() => {
+              deleteItem({
+                row: row,
+                objet: sobrecargos,
+                functionGet: getSobrecargos
+              })
+            }}
+            className="cursor-pointer"
+          />
+          <IconEdit onClick={() => { navigate(`/edit/sobrecargo/${row.id}/`) }} className="cursor-pointer" />
+        </div>
+      }
     },
   ]
-  
+
   const options = {
-    delete: (row) => {
-      deleteItem({
-        row: row,
-        objet: sobrecargos,
-        functionGet: getSobrecargos
-      })
-    },
-    put: (row)=>{
-            navigate(`/edit/sobrecargo/${row.id}/`)
-        },
-    get:(row)=>{
-      alertInfo(
-        row.nombre, 
-        row
-      )
-    },
     search: {
       placeholder: texts.registerMessage.searchItem,
       function: (value) => {

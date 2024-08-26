@@ -29,16 +29,16 @@ def filtrosWhere(filtros=[]):
 def peridoFecha(request, nameFecha):
     try:
         desde = request.GET.get('desde', None)
-        hasta = request.GET.get('hasta', datetime.date.today())
-        hasta = datetime.datetime.strptime(hasta, "%Y-%m-%d").date()
+        hasta = request.GET.get('hasta', datetime.date.today().strftime("%d-%m-%Y"))
+        hasta = datetime.datetime.strptime(str(hasta), "%d-%m-%Y").date()
         if desde:
-            desde = datetime.datetime.strptime(desde, "%Y-%m-%d").date()
-            query = f"DATE({str(nameFecha)}) BETWEEN '{desde}' AND '{hasta}';"
+            desde = datetime.datetime.strptime(desde, "%d-%m-%Y").date()
+            query = f"DATE({str(nameFecha)}) BETWEEN '{desde}' AND '{hasta}'"
         else:
-            query = f"DATE({str(nameFecha)}) <= '{hasta}';"
-            
+            query = f"DATE({str(nameFecha)}) <= '{hasta}'"
         return query 
-    except:
+    except Exception as error:
+        print(error)
         return False
     
     

@@ -15,7 +15,6 @@ from ..message import MESSAGE
 from decouple import config
 import json
 
-
 class Recreadores_Views(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -241,8 +240,22 @@ class Recreadores_Views(View):
             cursor = connection.cursor()
             verify = verify_token(request.headers)
             info = request.GET.get("_info", "false")
+            totalRecreadores = request.GET.get("total", "false")
             if not verify["status"]:
                 datos = {"status": False, "message": verify["message"], "data": None}
+                return JsonResponse(datos)
+                
+            if(totalRecreadores == "true"):
+                query="""
+                    SELECT COUNT(*) AS total FROM recreadores WHERE inhabilitado=0
+                """
+                cursor.execute(query)
+                total = dictfetchall(cursor)
+                datos = {
+                        "status": True,
+                        "message": f"{MESSAGE['exitoGet']}",
+                        "data": total[0],
+                    }
                 return JsonResponse(datos)
 
             if identificador:
@@ -315,7 +328,6 @@ class Recreadores_Views(View):
                         "total": 0,
                         "pages": 0,
                     }
-
             else:
                 page = request.GET.get('page', 1)
                 inicio = indiceInicial(int(page))

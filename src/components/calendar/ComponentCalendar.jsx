@@ -1,18 +1,22 @@
-import { useState, useEffect } from "react"
-import { Calendar, dayjsLocalizer } from "react-big-calendar"
-import dayjsEs from '../../utils/dayjs.js'
-import { toastError } from "../alerts.jsx"
-import "react-big-calendar/lib/css/react-big-calendar.css"
-import "./ComponentCalendar.css"
+import { useState, useEffect, useRef } from "react";
+import { Calendar, dayjsLocalizer } from "react-big-calendar";
+import dayjsEs from "../../utils/dayjs.js";
+import { toastError } from "../alerts.jsx";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import "./ComponentCalendar.css";
 
-function ComponentCalendar({height="100vh", width="100%", object, filtros={}}) {
-  const [view, setView]=useState("month")
-  const dayjs = dayjsEs({weekdaysAbre:false})
-  const [range, setRange]=useState([])
-  const [listEventos, setListeventos]=useState([])
-  const [navigate, setNavigate]=useState(null)
-  const [rangoFecha, setRangoFecha]=useState({})
-  const localizer = dayjsLocalizer(dayjs)
+function ComponentCalendar({ height = "100vh", width = "100%", object, filtros = {}, eventData, ...props}) {
+  const dayjs = dayjsEs({ weekdaysAbre: false });
+  const localizer = dayjsLocalizer(dayjs);
+  const [view, setView] = useState("month");
+  const [range, setRange] = useState([]);
+  const [listEventos, setListeventos] = useState([{}]);
+  const [navigateFecha, setNavigate] = useState(null);
+  const [rangoFechas, setRangoFechas] = useState({
+    desde: dayjs().format("DD-MM-YYYY"),
+    hasta: dayjs().format("DD-MM-YYYY"),
+  });
+  const renderizado = useRef(0);
   const messages = {
     allDay: "Todo el día",
     previous: "Anterior",
@@ -25,92 +29,175 @@ function ComponentCalendar({height="100vh", width="100%", object, filtros={}}) {
     date: "Fecha",
     time: "Hora",
     event: "Evento",
-    noEventsInRange: "Sin eventos"
+    noEventsInRange: "Sin eventos",
+    showMore: (total, remainingEvents, events) => `+${total} Más`,
   };
 
-  const buscarEventos=()=>{
-    // try{
-    //   const 
-    // }catch(error){
-    //   toastError(error)
-    // }
-  }
-  const RangoFecha=()=>{
+  useEffect(() => {
+    if (renderizado.current === 0) {
+      renderizado.current = renderizado.current + 1
+    }else{
+      buscarEventos()
+    }
+  }, [rangoFechas]);
+
+  useEffect(() => {
+    determinarRangoFechas()
+  }, [range]);
+
+  useEffect(() => {
+    color()
+  }, [listEventos]);
+
+  const color = () => {
+    const $eventos = document.querySelectorAll(".rbc-event");
+    $eventos.forEach((evento) => {
+      const $contenido = evento.querySelector(".rbc-event-content");
+      const $div = $contenido.querySelector("div");
+      if ($div) {
+        evento.style.backgroundColor = getComputedStyle($div).backgroundColor;
+      }
+    });
+  };
+
+  const buscarEventos = async () => {
+    try {
+      const params = {
+        ...filtros,
+        desde: rangoFechas.desde,
+        hasta: rangoFechas.hasta,
+        all:true,
+        fecha:"fecha_evento"
+      };
+      
+      const respuesta = await object.get({ params: params });
+      if (respuesta.status !== 200) {
+        toastError(`Error. ${respuesta.status} ${respuesta.statusText}`);
+        return;
+      }
+      if (respuesta.data.message !== "Error. No se encontraron registros en el sistema" && respuesta.data.status === false) {
+        toastError(`${respuesta.data.message}`);
+        return;
+      }
+      const events = respuesta.data.data?.map((event, index) => {
+        return eventData(event, index);
+      });
+      setListeventos(events);
+    } catch (error) {
+      toastError(error);
+    }
+  };
+
+  const determinarRangoFechas = () => {
     switch (view) {
       case "month":
-        let fecha
-        if(navigate){
-          fecha = dayjs(navigate)
-        }else{
-          fecha = dayjs()
+        let fecha;
+        if (navigateFecha) {
+          fecha = dayjs(navigateFecha);
+        } else {
+          fecha = dayjs();
         }
-        const totalDias = fecha.daysInMonth()
-        const mes = `${(fecha.month() + 1) < 10? "0":""}${fecha.month() + 1}`
-        return {
-          desde:`01-${mes}-${fecha.year()}`,
-          hasta:`${totalDias}-${mes}-${fecha.year()}`
-        }
+        const totalDias = fecha.daysInMonth();
+        const mes = `${fecha.month() + 1 < 10 ? "0" : ""}${fecha.month() + 1}`;
+        setRangoFechas({
+          desde: `01-${mes}-${fecha.year()}`,
+          hasta: `${totalDias}-${mes}-${fecha.year()}`,
+        });
+        break;
       case "week":
-        return {
-          desde:dayjs(range[0]).format("DD-MM-YYYY"),
-          hasta:dayjs(range[6]).format("DD-MM-YYYY")
-        }
+        setRangoFechas({
+          desde: dayjs(range[0]).format("DD-MM-YYYY"),
+          hasta: dayjs(range[6]).format("DD-MM-YYYY"),
+        });
+        break;
       case "day":
-        return {
-          desde:dayjs(range[0]).format("DD-MM-YYYY"),
-          hasta:dayjs(range[0]).format("DD-MM-YYYY")
-        }
-      default:
-        return {
-          desde:dayjs(range.start).format("DD-MM-YYYY"),
-          hasta:dayjs(range.end).format("DD-MM-YYYY")
-        }
+        setRangoFechas({
+          desde: dayjs(range[0]).format("DD-MM-YYYY"),
+          hasta: dayjs(range[0]).format("DD-MM-YYYY"),
+        });
+        break;
+      case "agenda":
+        setRangoFechas({
+          desde: dayjs(range.start).format("DD-MM-YYYY"),
+          hasta: dayjs(range.end).format("DD-MM-YYYY")
+        })
+        break;
     }
-  }
-  console.log(RangoFecha())
-  return (
-      <Calendar
-        localizer={localizer}
-        messages={messages} 
-        view={view}
+  };
 
-        style={{
-          width:width,
-          height:height
-        }}
-        formats={{
-          dayHeaderFormat:date=>{
-            return dayjs(date).format('dddd, DD [de] MMMM YYYY')
-          },
-          dayRangeHeaderFormat:date=>{
-            const startDate = dayjs(date.start);
-            const endDate = dayjs(date.end);
-            if (startDate.year() === endDate.year() && startDate.month() === endDate.month()) {
-              // Same year and month
-              return `${startDate.format('DD')} - ${endDate.format('DD')} de ${startDate.format('MMMM')} ${startDate.year()}`;
-            } else if (startDate.year() === endDate.year()) {
-              // Same year, different month
-              return `${startDate.format('DD')} de ${startDate.format('MMMM')} - ${endDate.format('DD')} de ${endDate.format('MMMM')} ${startDate.year()}`;
-            } else {
-              // Different year
-              return `${startDate.format('DD')} de ${startDate.format('MMMM')} ${startDate.year()} - ${endDate.format('DD')} de ${endDate.format('MMMM')} ${endDate.year()}`;
-            }
-          },
-          timeGutterFormat:date=>{
-            return dayjs(date).format('hh:mm A')
-          },
-        }}
-        onView={(e)=>{
-          setView(e)
-        }}
-        onNavigate={(e)=>{
-          setNavigate(e)
-        }}
-        onRangeChange={(date)=>{
-          setRange(date)
-        }}
-      />
-  )
+  return (
+    <Calendar
+      localizer={localizer}
+      messages={messages}
+      view={view}
+      style={{
+        width: width,
+        height: height,
+      }}
+      events={listEventos}
+      formats={{
+        dayHeaderFormat: (date) => {
+          return dayjs(date).format("dddd, DD [de] MMMM YYYY");
+        },
+
+        dayRangeHeaderFormat: (date) => {
+          const startDate = dayjs(date.start);
+          const endDate = dayjs(date.end);
+          if (
+            startDate.year() === endDate.year() &&
+            startDate.month() === endDate.month()
+          ) {
+            // Same year and month
+            return `${startDate.format("DD")} - ${endDate.format("DD")} de ${startDate.format("MMMM")} ${startDate.year()}`;
+          } else if (startDate.year() === endDate.year()) {
+            // Same year, different month
+            return `${startDate.format("DD")} de ${startDate.format("MMMM")} - ${endDate.format("DD")} de ${endDate.format("MMMM")} ${startDate.year()}`;
+          } else {
+            // Different year
+            return `${startDate.format("DD")} de ${startDate.format("MMMM")} ${startDate.year()} - ${endDate.format("DD")} de ${endDate.format("MMMM")} ${endDate.year()}`;
+          }
+        },
+        agendaHeaderFormat: (date) => {
+          const startDate = dayjs(date.start);
+          const endDate = dayjs(date.end);
+          if (
+            startDate.year() === endDate.year() &&
+            startDate.month() === endDate.month()
+          ) {
+            // Same year and month
+            return `${startDate.format("DD")} - ${endDate.format("DD")} de ${startDate.format("MMMM")} ${startDate.year()}`;
+          } else if (startDate.year() === endDate.year()) {
+            // Same year, different month
+            return `${startDate.format("DD")} de ${startDate.format("MMMM")} - ${endDate.format("DD")} de ${endDate.format("MMMM")} ${startDate.year()}`;
+          } else {
+            // Different year
+            return `${startDate.format("DD")} de ${startDate.format("MMMM")} ${startDate.year()} - ${endDate.format("DD")} de ${endDate.format("MMMM")} ${endDate.year()}`;
+          }
+        },
+        timeGutterFormat: (date) => {
+          return dayjs(date).format("hh:mm A");
+        },
+        eventTimeRangeFormat: (date) => {
+          return `${dayjs(date.start).format("hh:mm A")} - ${dayjs(date.end).format("hh:mm A")}`;
+        },
+        agendaTimeRangeFormat: (date) => {
+          return `${dayjs(date.start).format("hh:mm A")} - ${dayjs(date.end).format("hh:mm A")}`;
+        },
+      }}
+      onRangeChange={(date) => {
+        setRange(date);
+      }}
+      onView={(e) => {
+        setView(e);
+      }}
+      onNavigate={(e) => {
+        setNavigate(e);
+      }}
+      {
+        ...props
+      }
+    />
+  );
 }
 
-export default ComponentCalendar
+export default ComponentCalendar;

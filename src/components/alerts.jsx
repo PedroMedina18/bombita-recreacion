@@ -60,9 +60,6 @@ export const alerError = async (title, text) => {
     })
 }
 
-
-
-
 export const alertInfo = async (title, data) => {
     let datos=""
     Object.keys(data).forEach(key => {

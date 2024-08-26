@@ -173,6 +173,7 @@ export const getListItems = async ({ object, setList, setData, setLoading }) => 
         const result = await object.get()
         if (result.status === 200) {
             if (result.data.status === true) {
+                console.log(result.data.data)
                 setList(result.data.data)
                 setData({ pages: result.data.pages, total: result.data.total })
             } else {

@@ -1,8 +1,9 @@
 import { useEffect, useState, useRef } from "react"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
-import { recreadores  } from "../../utils/API.jsx"
+import { recreadores } from "../../utils/API.jsx"
 import { calcularEdad } from "../../utils/process.jsx"
+import { IconTrash, IconEdit, IconDetail } from "../../components/Icon.jsx";
 import { searchCode, getListItems, deleteItem, verifyOptionsSelect } from "../../utils/actions.jsx"
 import { formatoId } from "../../utils/process.jsx"
 import { useAuthContext } from '../../context/AuthContext.jsx';
@@ -15,7 +16,7 @@ function Recreadores() {
     const [listRecreadores, setRecreadores] = useState([])
     const [dataRecreadores, setDataRecreadores] = useState({ pages: 0, total: 0 })
     const [tableLoading, setTableLoaing] = useState(true)
-    const {dataOptions} = useAuthContext()
+    const { dataOptions } = useAuthContext()
     const [niveles] = useState(dataOptions().niveles)
     const [generos] = useState(dataOptions().generos)
     const renderizado = useRef(0)
@@ -29,15 +30,15 @@ function Recreadores() {
         }
     }, [])
 
-    const getRecreadores = async() => {
-        try{
+    const getRecreadores = async () => {
+        try {
             getListItems({
                 object: recreadores,
                 setList: setRecreadores,
                 setData: setDataRecreadores,
                 setLoading: setTableLoaing
             })
-        }catch(error) {
+        } catch (error) {
             console.log(error)
             setErrorServer(texts.errorMessage.errorSystem)
         }
@@ -46,7 +47,7 @@ function Recreadores() {
     const columns = [
         {
             name: "Codigo",
-            row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
+            row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
         },
         {
             name: "Documento",
@@ -70,7 +71,28 @@ function Recreadores() {
         {
             name: "Estado",
             row: (row) => {
-                return row.inhabilitado ? <Pildora contenido="Invalido"/> : <Pildora contenido="Activo" color="bg-succes"/>
+                return row.inhabilitado ? <Pildora contenido="Invalido" /> : <Pildora contenido="Activo" color="bg-succes" />
+            }
+        },
+        {
+            name: "Opciones",
+            row: (row) => {
+                return <div className='d-flex justify-content-around options-table'>
+                    <IconDetail
+                        onClick={() => { navigate(`/recreador/${row.numero_documento}/`) }} className="cursor-pointer"
+                    />
+                    <IconTrash
+                        onClick={() => {
+                            deleteItem({
+                                row: row,
+                                objet: recreadores,
+                                functionGet: getRecreadores
+                            })
+                        }}
+                        className="cursor-pointer"
+                    />
+                    <IconEdit onClick={() => { navigate(`/edit/recreador/${row.numero_documento}/`) }} className="cursor-pointer" />
+                </div>
             }
         },
     ]
@@ -78,10 +100,10 @@ function Recreadores() {
     const options = {
         search: {
             placeholder: texts.registerMessage.searchNameDocument,
-            function: (value, filtros={}) => {
+            function: (value, filtros = {}) => {
                 searchCode({
                     value: value,
-                    filtros:filtros,
+                    filtros: filtros,
                     object: recreadores,
                     setList: setRecreadores,
                     setData: setDataRecreadores,
@@ -95,36 +117,23 @@ function Recreadores() {
                 navigate("/register/recreador/")
             }
         },
-        put: (row)=>{
-            navigate(`/edit/recreador/${row.numero_documento}/`)
-        },
-        get: (row)=>{
-            navigate(`/recreador/${row.numero_documento}/`)
-        },
-        delete: (row) => {
-            deleteItem({
-              row: row,
-              objet: recreadores,
-              functionGet: getRecreadores
-            })
-          },
     }
 
-    const filtros=[
+    const filtros = [
         {
-            nombre:"Estado",
-            columnName:"estado",
-            opciones:[{label:"Activo", value:0}, {label:"Desabilitado", value:1}]
+            nombre: "Estado",
+            columnName: "estado",
+            opciones: [{ label: "Activo", value: 0 }, { label: "Desabilitado", value: 1 }]
         },
         {
-            nombre:"Nivel",
-            columnName:"nivel",
-            opciones:niveles
+            nombre: "Nivel",
+            columnName: "nivel",
+            opciones: niveles
         },
         {
-            nombre:"Genero",
-            columnName:"genero",
-            opciones:generos
+            nombre: "Genero",
+            columnName: "genero",
+            opciones: generos
         }
     ]
 

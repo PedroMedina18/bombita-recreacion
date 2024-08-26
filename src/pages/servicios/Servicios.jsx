@@ -3,6 +3,7 @@ import { servicios } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx";
+import { IconTrash, IconEdit, IconDetail } from "../../components/Icon.jsx";
 import {formatoId, normalizeDecimalNumber} from "../../utils/process.jsx";
 import Table from "../../components/table/Table";
 import Navbar from "../../components/navbar/Navbar";
@@ -63,19 +64,30 @@ function Servicios() {
       name: "Descripcion",
       row: (row) => { return row.descripcion }
     },
+    {
+      name: "Opciones",
+      row: (row) => {
+          return <div className='d-flex justify-content-around options-table'>
+              {/* <IconDetail
+                  onClick={() => { navigate(`/recreador/${row.numero_documento}/`) }} className="cursor-pointer"
+              /> */}
+              <IconTrash
+                  onClick={() => {
+                    deleteItem({
+                      row: row,
+                      objet: servicios,
+                      functionGet: getServicios
+                    })
+                  }}
+                  className="cursor-pointer"
+              />
+              <IconEdit onClick={() => { navigate(`/edit/servicio/${row.id}/`) }} className="cursor-pointer" />
+          </div>
+      }
+  },
   ]
 
   const options = {
-    delete: (row) => {
-      deleteItem({
-        row: row,
-        objet: servicios,
-        functionGet: getServicios
-      })
-    },
-    put: (row)=>{
-      navigate(`/edit/servicio/${row.id}/`)
-    },
     search: {
       placeholder: texts.registerMessage.searchItem,
       function: (value) => {

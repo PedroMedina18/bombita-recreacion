@@ -46,7 +46,6 @@ def comprobarSize(respaldo):
     while True:
         try:
             archivo_size = os.path.getsize(respaldo)
-            print(f"Archivo size: {archivo_size} bytes")
             if archivo_size > 0:
                 time.sleep(5)
                 new_size = os.path.getsize(respaldo)
@@ -88,13 +87,12 @@ def buscar_carpeta_media():
         ruta_padre = os.path.dirname(ruta_actual)
         if ruta_padre == ruta_actual:
             break
-        if os.path.basename(ruta_padre) == "bombita-recreacion":
-            print()
-            if "media" not in os.listdir(ruta_padre):
+        if os.path.basename(ruta_actual) == "bombita-recreacion":
+            if "media" not in os.listdir(ruta_actual):
                 print("No se encontró la carpeta media en el directorio bombita_recreacion")
                 return None
-        for nombre_carpeta in os.listdir(ruta_padre):
+        for nombre_carpeta in os.listdir(ruta_actual):
             if nombre_carpeta == "media":
-                return os.path.join(ruta_padre, nombre_carpeta)
+                return os.path.join(ruta_actual, nombre_carpeta)
         ruta_actual = ruta_padre
     return None

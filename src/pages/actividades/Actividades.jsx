@@ -4,6 +4,7 @@ import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx";
 import { formatoId, formatDateWithTime12Hour } from "../../utils/process.jsx";
+import { IconTrash, IconEdit, IconDetail } from "../../components/Icon.jsx";
 import { alertInfo } from "../../components/alerts.jsx";
 import Navbar from "../../components/navbar/Navbar";
 import Table from "../../components/table/Table";
@@ -23,6 +24,7 @@ function Actividades() {
       return
     }
   }, [])
+
   const getActividades = () => {
     getListItems({
       object: actividades,
@@ -31,10 +33,11 @@ function Actividades() {
       setLoading: setTableLoaing
     })
   }
+
   const columns = [
     {
       name: "Codigo",
-      row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
+      row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
     },
     {
       name: "Nombre",
@@ -44,16 +47,40 @@ function Actividades() {
       name: "Descripcion",
       row: (row) => { return row.descripcion }
     },
+    {
+      name: "Opciones",
+      row: (row) => {
+        return <div className='d-flex justify-content-around options-table'>
+          <IconDetail
+            onClick={() => {
+              alertInfo(
+                row.nombre,
+                {
+                  codigo: formatoId(row.id),
+                  descripción: row.descripcion,
+                  fecha_de_registro: formatDateWithTime12Hour(row.fecha_registro),
+                  fecha_de_actualizacion: formatDateWithTime12Hour(row.fecha_actualizacion),
+                }
+              )
+            }} className="cursor-pointer"
+          />
+          <IconTrash
+            onClick={() => {
+              deleteItem({
+                row: row,
+                objet: actividades,
+                functionGet: getActividades
+              })
+            }}
+            className="cursor-pointer"
+          />
+          <IconEdit onClick={() => { navigate(`/edit/actividad/${row.id}/`) }} className="cursor-pointer" />
+        </div>
+      }
+    },
   ]
 
   const options = {
-    delete: (row) => {
-      deleteItem({
-        row: row,
-        objet: actividades,
-        functionGet: getActividades
-      })
-    },
     search: {
       placeholder: texts.registerMessage.searchItem,
       function: (value) => {
@@ -66,20 +93,6 @@ function Actividades() {
         })
       }
     },
-    put: (row)=>{
-      navigate(`/edit/actividad/${row.id}/`)
-    },
-    get:(row)=>{
-      alertInfo(
-        row.nombre, 
-        {
-          codigo:formatoId(row.id),
-          descripción:row.descripcion,
-          fecha_de_registro:formatDateWithTime12Hour(row.fecha_registro),
-          fecha_de_actualizacion:formatDateWithTime12Hour(row.fecha_actualizacion),
-        }
-      )
-    },
     register: {
       name: texts.registerMessage.buttonRegisterActividad,
       function: () => {
@@ -89,15 +102,15 @@ function Actividades() {
   }
 
   return (
-    <Navbar name = {texts.pages.getActividades.name} descripcion = {texts.pages.getActividades.description}>
+    <Navbar name={texts.pages.getActividades.name} descripcion={texts.pages.getActividades.description}>
 
       <Table
-        columns = {columns}
-        rows = {listActividades}
-        totalElements = {dataActividades.total}
-        totalPages = {dataActividades.pages}
-        options = {options}
-        loading = {tableLoading}
+        columns={columns}
+        rows={listActividades}
+        totalElements={dataActividades.total}
+        totalPages={dataActividades.pages}
+        options={options}
+        loading={tableLoading}
       />
       <Toaster />
     </Navbar>

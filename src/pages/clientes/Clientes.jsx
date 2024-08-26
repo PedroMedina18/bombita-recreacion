@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from "react"
-import { clientes } from "../../utils/API.jsx"
+import { useEffect, useState, useRef } from "react";
+import { clientes } from "../../utils/API.jsx";
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { searchCode, getListItems } from "../../utils/actions.jsx";
+import { IconTrash, IconEdit, IconDetail } from "../../components/Icon.jsx";
 import { formatoId } from "../../utils/process.jsx";
 import Navbar from "../../components/navbar/Navbar";
 import Table from "../../components/table/Table";
@@ -58,6 +59,36 @@ function Clientes() {
             name: "Teléfono Secundario",
             row: (row) => { return row.telefono_secundario }
         },
+        {
+            name: "Opciones",
+            row: (row) => {
+              return <div className='d-flex justify-content-around options-table'>
+                {/* <IconDetail
+                  onClick={() => {
+                    alertInfo(
+                      row.nombre,
+                      {
+                        codigo: formatoId(row.id),
+                        descripción: row.descripcion,
+                        fecha_de_registro: formatDateWithTime12Hour(row.fecha_registro),
+                        fecha_de_actualizacion: formatDateWithTime12Hour(row.fecha_actualizacion),
+                      })
+                  }} className="cursor-pointer"
+                /> */}
+                {/* <IconTrash
+                  onClick={() => {
+                    deleteItem({
+                      row: row,
+                      objet: actividades,
+                      functionGet: getActividades
+                    })
+                  }}
+                  className="cursor-pointer"
+                /> */}
+                <IconEdit onClick={() => { navigate(`/edit/cliente/${row.numero_documento}/`) }} className="cursor-pointer" />
+              </div>
+            }
+          },
     ]
 
     const options = {
@@ -73,9 +104,6 @@ function Clientes() {
                 })
             }
         },
-        put: (row)=>{
-            navigate(`/edit/cliente/${row.numero_documento}/`)
-        }
     }
     
     return (

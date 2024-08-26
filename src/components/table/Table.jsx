@@ -3,7 +3,7 @@ import "./table.css"
 import { useState, useEffect, useRef } from 'react'
 import { ButtonSimple } from "../button/Button.jsx"
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
-import { IconCheck, IconX, IconTrash, IconEdit, IconDetail, IconMoney } from "../Icon"
+import { IconCheck, IconX} from "../Icon"
 import { UnitSelect, InputsGeneral } from "../input/Inputs.jsx"
 import { fechaFormat } from "../../utils/process.jsx"
 import { useForm } from "react-hook-form";
@@ -15,7 +15,6 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
     const [debounceDate, setDebounceDate] = useState(null);
     const renderizado = useRef(0)
     const [filtros, setFilstros] = useState({})
-    const option = Boolean(options.delete || options.put || options.get || options.money)
     
     useEffect(() => {
         // Para evitar el sobre renderizado al cargar el componente
@@ -76,31 +75,6 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
 
         setDebounceDate(timeout);
     }
-
-    // const filtrarFecha = (e) => {
-    //     if (debounceDate) {
-    //         clearTimeout(debounceDate);
-    //     }
-    //     const timeout = setTimeout(() => {
-    //         const filtro = { ...filtros }
-    //         const desde = e.target.name === "desde" ? e.target.value : watch(`desde`)
-    //         const hasta = e.target.name === "hasta" ? e.target.value : watch(`hasta`)
-    //         if (Boolean(desde)) {
-    //             filtro.desde = desde
-    //         } else {
-    //             delete filtro.desde
-    //         }
-    //         if (Boolean(hasta)) {
-    //             filtro.hasta = hasta
-    //         } else {
-    //             delete filtro.hasta
-    //         }
-    //         console.log()
-    //         setFilstros(filtro)
-    //     }, 800);
-
-    //     setDebounceDate(timeout);
-    // }
 
 
     // *the useform
@@ -240,7 +214,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                             <div className='w-100 d-flex flex-column flex-md-row'>
                                                 <div className='w-100 w-md-50 px-2'>
                                                     <InputsGeneral type={"date"} label={`Desde`} isError={false}
-                                                        name="desde" id="d00000000000000 o  esde" form={{ errors, register }}
+                                                        name="desde" id="desde" form={{ errors, register }}
                                                         needErrors={false}
                                                         max={fechaFormat()}
                                                         onChange={(e) => {
@@ -287,10 +261,6 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                                 <th key={`${index}-${column.name}`} scope="col">{column.name}</th>
                                             ))
                                         }
-                                        {
-                                            option &&
-                                            <th scope="col">Opciones</th>
-                                        }
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -305,10 +275,6 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                                             return (<td key={`${column.name}-${index}-1`} className="py-3"></td>)
                                                         })
                                                     }
-                                                    {
-                                                        option &&
-                                                        <td className="py-3"></td>
-                                                    }
                                                 </tr>
                                                 <tr>
                                                     <td className="py-3"></td>
@@ -318,10 +284,6 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                                             return (<td key={`${column.name}-${index}-2`} className="py-3"></td>)
                                                         })
                                                     }
-                                                    {
-                                                        option &&
-                                                        <td className="py-3"></td>
-                                                    }
                                                 </tr>
                                                 <tr>
                                                     <td className="py-3"></td>
@@ -330,10 +292,6 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                                         columns.map((column, index) => {
                                                             return (<td key={`${column.name}-${index}-3`} className="py-3"></td>)
                                                         })
-                                                    }
-                                                    {
-                                                        option &&
-                                                        <td className="py-3"></td>
                                                     }
                                                 </tr>
                                             </>
@@ -353,10 +311,10 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
 
                                                         })
                                                     }
-                                                    {
+                                                    {/* {
                                                         option &&
                                                         <td >
-                                                            <div className='d-flex justify-content-around'>
+                                                            <div className='d-flex justify-content-around options-table'>
                                                                 {
                                                                     options.get ?
                                                                         (<IconDetail onClick={() => { options.get(row) }} className='cursor-pointer get' />)
@@ -383,7 +341,7 @@ function Table({ columns, rows, totalPages, totalElements = 0, options = null, l
                                                                 }
                                                             </div>
                                                         </td>
-                                                    }
+                                                    } */}
                                                 </tr>
                                             ))
                                     }

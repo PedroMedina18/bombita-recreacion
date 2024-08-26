@@ -233,11 +233,25 @@ class Servicios_Views(View):
         try:
             cursor = connection.cursor()
             verify = verify_token(request.headers)
+            totalServicios = request.GET.get("total", "false")
             if (not verify['status']):
                 datos = {
                     'status': False,
                     'message': verify['message'],
                     'data': None
+                }
+                return JsonResponse(datos)
+
+            if(totalServicios =="true"):
+                query="""
+                    SELECT COUNT(*) AS total FROM servicios
+                """
+                cursor.execute(query)
+                total = dictfetchall(cursor)
+                datos = {
+                        "status": True,
+                        "message": f"{MESSAGE['exitoGet']}",
+                        "data": total[0],
                 }
                 return JsonResponse(datos)
 

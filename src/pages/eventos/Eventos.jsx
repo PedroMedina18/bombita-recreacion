@@ -1,8 +1,9 @@
-import { useEffect, useState, useRef } from "react"
-import { eventos } from "../../utils/API.jsx"
+import { useEffect, useState, useRef } from "react";
+import { eventos } from "../../utils/API.jsx";
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { searchCode, getListItems } from "../../utils/actions.jsx";
+import { IconTrash, IconEdit, IconDetail, IconMoney } from "../../components/Icon.jsx"
 import { formatoId, formatDateWithTime12Hour } from "../../utils/process.jsx";
 import Navbar from "../../components/navbar/Navbar";
 import Table from "../../components/table/Table";
@@ -74,6 +75,37 @@ function Eventos() {
                 return value 
             }
         },
+        {
+            name: "Opciones",
+            row: (row) => {
+              return <div className='d-flex justify-content-around options-table'>
+                {/* <IconDetail
+                  onClick={() => {
+                    alertInfo(
+                      row.nombre,
+                      {
+                        codigo: formatoId(row.id),
+                        descripción: row.descripcion,
+                        fecha_de_registro: formatDateWithTime12Hour(row.fecha_registro),
+                        fecha_de_actualizacion: formatDateWithTime12Hour(row.fecha_actualizacion),
+                      })
+                  }} className="cursor-pointer"
+                /> */}
+                {/* <IconTrash
+                  onClick={() => {
+                    deleteItem({
+                      row: row,
+                      objet: actividades,
+                      functionGet: getActividades
+                    })
+                  }}
+                  className="cursor-pointer"
+                /> */}
+                {/* <IconEdit onClick={() => { navigate(`/edit/cliente/${row.numero_documento}/`) }} className="cursor-pointer" /> */}
+                <IconMoney onClick={() => { navigate(`/eventos/recreadores/${row.id}/`) }} className="cursor-pointer" />
+              </div>
+            }
+          },
     ]
 
     const options = {
@@ -88,9 +120,6 @@ function Eventos() {
                     setLoading: setTableLoaing,
                 })
             }
-        },
-        money: (row)=>{
-            navigate(`/eventos/recreadores/${row.id}/`)
         },
         register: {
             name: texts.registerMessage.buttonRegisterEvento,
