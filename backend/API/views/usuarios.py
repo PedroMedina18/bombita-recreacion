@@ -6,11 +6,11 @@ from django.views import View
 from ..funtions.encriptado_contraseña import encriptado_constraseña, desencriptado_contraseña
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.token import verify_token
-from ..funtions.identificador import determinar_valor, edit_str
+from ..funtions.id import determinar_valor, edit_str
 from ..funtions.serializador import dictfetchall
 from ..models import Cargos, Permisos, TipoDocumento, Usuarios, Personas
-from django.db import IntegrityError, connection
-from ..funtions.filtros import order, filtrosWhere, typeOrder
+from django.db import IntegrityError, connection, models
+from ..funtions.filtros import order, filtrosWhere
 from ..message import MESSAGE
 from decouple import config
 import json
@@ -23,9 +23,9 @@ class Usuarios_Views(View):
 
     def post(self, request):
         try:
-            jd = json.loads(request.body)
-            verify = verify_token(jd['headers'])
-            jd = jd['body']
+            req = json.loads(request.body)
+            verify = verify_token(req['headers'])
+            req = req['body']
             if (not verify['status']):
                 datos = {
                     'status': False,
@@ -33,125 +33,154 @@ class Usuarios_Views(View):
                 }
                 return JsonResponse(datos)
 
+
             # Comprobar si se esta registrando un nuevo recreador con los datos de una persona existente
-            if('id_persona' in jd):
-                persona = list(Personas.objects.filter(id=jd['id_persona']).values())
+            if('id_persona' in req):
+                persona = list(Personas.objects.filter(id=int(req['id_persona'])).values())
                 if(len(persona)>0):
-                    persona = Personas.objects.get(id=jd['id_persona'])
+                    persona = Personas.objects.get(id=int(req['id_persona']))
                 else:
                     datos = {
                         'status': False,
-                        'message': "Error. Compruebe id de la persona"
+                        'message': MESSAGE["errorPersona"],
                     }
                     return JsonResponse(datos)
                     
             else:
-                tipo_documento = list(TipoDocumento.objects.filter(id=jd['tipo_documento']).values())
+                tipo_documento = list(TipoDocumento.objects.filter(id=int(req['tipo_documento'])).values())
                 if(len(tipo_documento)>0):
-                    tipo_documento = TipoDocumento.objects.get(id=jd['tipo_documento'])
+                    tipo_documento = TipoDocumento.objects.get(id=int(req['tipo_documento']))
                 else:
                     datos = {
                         'status': False,
-                        'message': 'Error. Compruebe id del tipo de documento'
+                        'message':  MESSAGE["errorTipoDocumento"],
                     }
                     return JsonResponse(datos)
                 persona = Personas.objects.create(
-                    nombres=jd['nombres'].title(), 
-                    apellidos=jd['apellidos'].title(), 
-                    numero_documento=jd['numero_documento'],
-                    telefono_principal=jd['telefono_principal'],
-                    telefono_secundario=jd['telefono_secundario'],
-                    correo=jd['correo'],
+                    nombres=req['nombres'].title(), 
+                    apellidos=req['apellidos'].title(), 
+                    numero_documento=req['numero_documento'],
+                    telefono_principal=req['telefono_principal'],
+                    telefono_secundario=req['telefono_secundario'],
+                    correo=req['correo'],
                     tipo_documento=tipo_documento
                 )
-            contraseña=encriptado_constraseña(jd['contraseña'])
-            cargo = list(Cargos.objects.filter(id=jd['cargo']).values())
+            contraseña=encriptado_constraseña(req['contraseña'])
+            cargo = list(Cargos.objects.filter(id=req['cargo']).values())
             if(len(cargo)>0):
-                cargo = Cargos.objects.get(id=jd['cargo'])
+                cargo = Cargos.objects.get(id=req['cargo'])
             else:
                 datos = {
                     'status': False,
-                    'message': 'Error. Compruebe id del cargo'
+                    'message': MESSAGE["errorCargo"],
                 }
                 return JsonResponse(datos)
             Usuarios.objects.create(
                 persona=persona,
-                usuario=jd['usuario'],
+                usuario=req['usuario'],
                 contraseña=contraseña,
                 cargo=cargo
             )
             datos = {
                 'status': True,
-                'message': 'Registro Completado'
+                'message': f"{MESSAGE['registerUsuario']}"
             }
             return JsonResponse(datos)
-        except Exception as ex:
-            print('Error', ex)
+        except IntegrityError as error:
+            print(f"{MESSAGE['errorIntegrity']} - {error}", )
+            if error.args[0]==1062:
+                if 'telefono_principal' in error.args[1]:
+                    message = MESSAGE['telefonoPrincipalDuplicate']
+                else:
+                    message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
+                datos = {
+                'status': False,
+                'message': message
+                }
+            else:
+                datos = {
+                'status': False,
+                'message': f"{MESSAGE['errorIntegrity']}: {error}"
+                }
+            return JsonResponse(datos)
+        except Exception as error:
+            print(f"{MESSAGE['errorPost']} - {error}", )
             datos = {
                 'status': False,
-                'message': 'Error. Compruebe Datos'
+                'message': f"{MESSAGE['errorRegistro']}: {error}"
             }
             return JsonResponse(datos)
     
     def put(self, request, id):
         try:
-            jd = json.loads(request.body)
+            req = json.loads(request.body)
+            verify = verify_token(req["headers"])
+            req = req["body"]
+            password = request.GET.get('password', "true")
+            if not verify["status"]:
+                datos = {"status": False, "message": verify["message"]}
+                return JsonResponse(datos)
+
             usuario = list(Usuarios.objects.filter(id=id).values())
+
             if len(usuario) > 0:
                 usuario = Usuarios.objects.get(id=id)
                 persona = Permisos.objects.get(id=usuario.persona)
-                tipo_documento = list(TipoDocumento.objects.filter(id=jd['tipo_documento']).values())
+                tipo_documento = list(TipoDocumento.objects.filter(id=int(req['tipo_documento'])).values())
                 if(len(tipo_documento)>0):
-                    tipo_documento = TipoDocumento.objects.get(id=jd['tipo_documento'])
+                    tipo_documento = TipoDocumento.objects.get(id=int(req['tipo_documento']))
                 else:
                     datos = {
                         'status': False,
-                        'message': 'Error. Compruebe id del tipo de documento'
+                        'message': MESSAGE["errorTipoDocumento"],
                     }
                     return JsonResponse(datos)
-                cargo = list(Cargos.objects.filter(id=jd['cargo']).values())
+                cargo = list(Cargos.objects.filter(id=int(req['cargo'])).values())
                 if(len(cargo)>0):
-                    cargo = Cargos.objects.get(id=jd['cargo'])
+                    cargo = Cargos.objects.get(id=int(req['cargo']))
                 else:
                     datos = {
                         'status': False,
-                        'message': 'Error. Compruebe id del cargo'
+                        'message': MESSAGE["errorCargo"],
                     }
                     return JsonResponse(datos)
-                persona.nombres=jd['nombres'].title()
-                persona.apellidos=jd['apellidos'].title(),
-                persona.numero_documento=jd['numero_documento']
-                persona.telefono_principal=jd['telefono_principal']
-                persona.telefono_secundario=jd['telefono_secundario']
-                persona.correo=jd['correo']
+                persona.nombres=req['nombres'].title()
+                persona.apellidos=req['apellidos'].title(),
+                persona.numero_documento=req['numero_documento']
+                persona.telefono_principal=req['telefono_principal']
+                persona.telefono_secundario=req['telefono_secundario']
+                persona.correo=req['correo']
                 persona.tipo_documento=tipo_documento
-                usuario.usuario=jd['usuario']
+                usuario.usuario=req['usuario']
                 usuario.cargo=cargo
                 persona.save()
                 usuario.save()
                 datos = {
-                    'status': True,
-                    'message': 'Exito. Registro editado'
+                    "status": True, 
+                    "message": f"{MESSAGE['edition']}"
                 }
             else:
                 datos = {
-                    'status': False,
-                    'message': 'Error. Registro no encontrado'
+                    "status": False,
+                    "message": f"{MESSAGE['errorRegistroNone']}",
                 }
+
             return JsonResponse(datos)
-        except Exception as ex:
-            print('Error', ex)
-            datos = {
-                'status': False,
-                'message': 'Error. Error de sistema',
-            }
+        except models.ProtectedError as error:
+            print(f"{MESSAGE['errorProteccion']}  - {str(error)}")
+            datos = {"status": False, "message": f"{MESSAGE['errorProtect']}"}
+            return JsonResponse(datos)
+        except Exception as error:
+            print(
+                f"{MESSAGE['errorDelete']} - {error}",
+            )
+            datos = {"status": False, "message": f"{MESSAGE['errorEliminar']}: {error}"}
             return JsonResponse(datos)
 
-    def get(self, request, identificador=None):
+    def get(self, request, id=0):
         try:
             cursor = connection.cursor()
             verify = verify_token(request.headers)
-            info = request.GET.get("_info", "false")
             if(not verify['status']):
                 datos = {
                     'status': False,
@@ -159,8 +188,7 @@ class Usuarios_Views(View):
                     'data': None
                 }
                 return JsonResponse(datos)
-            if identificador:
-                tipo = determinar_valor(identificador)
+            if id:
                 query = """
                     SELECT 
                     	us.usuario,
@@ -170,7 +198,7 @@ class Usuarios_Views(View):
                         pe.correo,
                         tipo.id AS tipo_documento_id, 
                         tipo.nombre AS tipo_documento, 
-                        us.inhabilitado,
+                        us.estado,
                         car.id as cargo_id,
                         car.nombre,
                         CONCAT('0', pe.telefono_principal) AS telefono_principal,
@@ -181,90 +209,76 @@ class Usuarios_Views(View):
                     LEFT JOIN personas AS pe ON us.persona_id=pe.id
                     LEFT JOIN tipos_documentos AS tipo ON pe.tipo_documento_id=tipo.id
                     LEFT JOIN cargos AS car ON us.cargo_id=car.id
+                    WHERE us.id=%s
                 """
-                if tipo["type"] == "int":
-                    if info == "true":
-                        query = query + "WHERE us.id=%s;"
-                        cursor.execute(query, [tipo["valor"]])
-                    else:
-                        id = str(tipo["valor"]) + "%"
-                        query = query + "WHERE us.id LIKE %s ;"
-                        cursor.execute(query, [id])
-                else:
-                    str_validate = edit_str(tipo["valor"])
-                    query = (
-                        query + "WHERE us.usuario LIKE %s ;"
-                    )
-                    cursor.execute(query, [str_validate])
+                cursor.execute(query, [id])
                 usuario = dictfetchall(cursor)
-
                 if len(usuario) > 0:
-                    if info == "true":
-                        datos = {
-                            "status": True,
-                            "message": f"{MESSAGE['exitoGet']}",
-                            "data": {"info": usuario[0]},
-                        }
-                    else:
-                        datos = {
-                            "status": True,
-                            "message": f"{MESSAGE['exitoGet']}",
-                            "data": usuario,
-                            "total": len(usuario),
-                            "pages": 1,
-                        }
+                    datos = {
+                        "status": True,
+                        "message": f"{MESSAGE['exitoGet']}",
+                        "data": usuario[0],
+                    }
                 else:
                     datos = {
                         "status": False,
                         "message": f"{MESSAGE['errorRegistrosNone']}",
                         "data": None,
-                        "total": 0,
-                        "pages": 0,
                     }
-
             else:
                 page = request.GET.get('page', 1)
                 inicio = indiceInicial(int(page))
                 final = indiceFinal(int(page))
-
+                all = request.GET.get('page', 'false')
+                typeOrdenBy = request.GET.get('organizar', 'orig')
                 orderType = order(request)
-                typeOrdenBy = "us.usuario" if typeOrder(request) else "us.id"
+
+                if(typeOrdenBy=='orig'):
+                    typeOrdenBy ='us.id'
+                elif(typeOrdenBy=='alf'):
+                    typeOrdenBy ='us.usuario'
+                else:
+                    typeOrdenBy='us.id'
 
                 where = []
+                search = request.GET.get('search', None)
+                search = determinar_valor(search)
+                if(search['valor'] and search['type']=='int'):
+                    where.append(f"us.id LIKE '{search['valor']}%%'" )
+                elif(search['valor'] and search['type']=='str'):
+                    str_validate = edit_str(search['valor'])
+                    where.append(f"us.usuarios LIKE '{str_validate}'" )
+
                 cargo = request.GET.get('cargo', None)
                 estado = request.GET.get('estado', None)
-
+                
                 if(cargo):
                     where.append(f"car.id={cargo}")
                 if(estado):
-                    where.append(f"us.inhabilitado={estado}")
-
+                    where.append(f"us.estado={estado}")
+                where = filtrosWhere(where)
+                
+                limit=""
+                if(all =='false'):
+                    limit= f"LIMIT {inicio}, {final}"
                 query = """
                     SELECT 
+                        us.id,
                     	us.usuario,
                         pe.nombres, 
                         pe.apellidos, 
-                        pe.numero_documento,
-                        pe.correo,
-                        tipo.id AS tipo_documento_id, 
-                        tipo.nombre AS tipo_documento, 
-                        us.inhabilitado,
+                        us.estado,
                         car.id as cargo_id,
-                        car.nombre,
-                        CONCAT('0', pe.telefono_principal) AS telefono_principal,
-                        CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
-                        us.fecha_registro,
-                        us.fecha_actualizacion
+                        car.nombre
                     FROM usuarios AS us
                     LEFT JOIN personas AS pe ON us.persona_id=pe.id
-                    LEFT JOIN tipos_documentos AS tipo ON pe.tipo_documento_id=tipo.id
                     LEFT JOIN cargos AS car ON us.cargo_id=car.id
                     {}
                     ORDER BY {} {} 
-                    LIMIT %s, %s;
-                """.format(where, typeOrdenBy, orderType)
+                    {};
+                """.format(where, typeOrdenBy, orderType, limit)
 
-                cursor.execute(query, [inicio, final])
+                cursor.execute(query)
                 usuarios = dictfetchall(cursor)
                 
                 query = """
@@ -283,7 +297,7 @@ class Usuarios_Views(View):
                     }
                 else:
                     datos = {
-                        "status": False,
+                        "status": True,
                         "message": f"{MESSAGE['errorRegistrosNone']}",
                         "data": None,
                         "pages": None,
@@ -291,7 +305,6 @@ class Usuarios_Views(View):
                     }
 
             return JsonResponse(datos)
-        
         except Exception as error:
             print(f"{MESSAGE['errorGet']} - {error}")
             datos = {

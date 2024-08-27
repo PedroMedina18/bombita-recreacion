@@ -6,7 +6,7 @@ from django.views import View
 from django.db import IntegrityError, connection, models
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
-from ..funtions.filtros import order, typeOrder, filtrosWhere,peridoFecha
+from ..funtions.filtros import order, filtrosWhere,peridoFecha
 from ..funtions.token import verify_token
 from ..message import MESSAGE
 from datetime import datetime
@@ -42,7 +42,7 @@ class Recraadores_Eventos_Views(View):
                     per.apellidos, 
                     tipo.nombre AS tipo_documento, 
                     per.numero_documento,
-                    eve.completado,
+                    eve.estado,
                 FROM recreadores_eventos_servicios res
                 INNER JOIN recreadores AS re ON res.recreador_id=re.id
                 INNER JOIN personas AS per ON re.persona_id=per.id
@@ -62,7 +62,7 @@ class Recraadores_Eventos_Views(View):
                 }
             else:
                 datos = {
-                    'status': False,
+                    'status': True,
                     'message': f"{MESSAGE['errorRegistrosNone']}",
                     'data': None,
                 }

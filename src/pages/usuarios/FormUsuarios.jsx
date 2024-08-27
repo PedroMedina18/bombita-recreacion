@@ -8,7 +8,7 @@ import { Toaster } from "sonner";
 import { usuarios } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx"
 import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx"
-import { getPersona, verifyOptionsSelect, controlResultPost, habilitarEdicion } from "../../utils/actions.jsx"
+import { getPersona, controlResultPost, habilitarEdicion } from "../../utils/actions.jsx"
 import { useAuthContext } from '../../context/AuthContext.jsx';
 import Navbar from "../../components/navbar/Navbar"
 import Swal from 'sweetalert2';

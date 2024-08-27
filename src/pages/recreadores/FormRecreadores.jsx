@@ -38,6 +38,8 @@ function FormRecreadores() {
             renderizado.current = renderizado.current + 1
             if (Number(params.id)) {
                 get_recreador()
+            }else{
+                setLoading(false)
             }
             return
         }
@@ -45,19 +47,19 @@ function FormRecreadores() {
 
     const get_recreador = async () => {
         try {
-            const respuesta = await recreadores.get({ subDominio: [Number(params.id)], params: { "_info": "true" } })
+            const respuesta = await recreadores.get({ subDominio: [Number(params.id)] })
             const errors = controlErrors({respuesta:respuesta, constrolError:setErrorServer})
             if(errors) return
             setErrorServer("")
             const data = respuesta.data.data
-            setImg(data.info.img_perfil)
-            const keys = Object.keys(data.info);
+            setImg(data.img_perfil)
+            const keys = Object.keys(data);
             keys.forEach(key => {
-                setValue(key, data.info[`${key}`])
+                setValue(key, data[`${key}`])
             });
-            setValue(`genero`, data.info["genero_id"])
-            setValue(`nivel`, data.info["nivel_id"])
-            setValue(`tipo_documento`, data.info["tipo_documento_id"])
+            setValue(`genero`, data["genero_id"])
+            setValue(`nivel`, data["nivel_id"])
+            setValue(`tipo_documento`, data["tipo_documento_id"])
 
         } catch (error) {
             console.log(error)

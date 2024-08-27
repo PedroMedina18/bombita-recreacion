@@ -84,9 +84,10 @@ function MetodosPago() {
     const options = {
         search: {
             placeholder: texts.registerMessage.searchItem,
-            function: (value) => {
+            function: (value, filtros={}) => {
                 searchCode({
                     value: value,
+                    filtros:filtros,
                     object: metodoPago,
                     setList: setMetodos_Pagos,
                     setData: setDataMetodos_Pagos,
@@ -104,7 +105,6 @@ function MetodosPago() {
 
     return (
         <Navbar name={`${texts.pages.getMetodosPago.name}`} descripcion={`${texts.pages.getMetodosPago.description}`}>
-
             <Table
                 columns={columns}
                 rows={listMetodos_Pagos}
@@ -112,6 +112,11 @@ function MetodosPago() {
                 totalPages={dataMetodos_Pagos.pages}
                 options={options}
                 loading={tableLoading}
+                order={true}
+                organizar={[
+                    { label: "Origen", value: "orig" },
+                    { label: "Nombre", value: "alf" },
+                ]}
             />
             <Toaster />
         </Navbar>

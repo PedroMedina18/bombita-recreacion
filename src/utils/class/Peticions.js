@@ -52,10 +52,10 @@ export default class Petisions {
     async putData(data, { subDominio = [], params = null} = {}) {
         const token = getCookie("token")
         let url = `${this.dominio}/`
+        url = addOptionalSubDomains(url, subDominio)
         if(typeof(params)==="object"){
             url = addOptionalQueryParams(url, {...params, _method:"PUT"})
         }
-        url = addOptionalSubDomains(url, subDominio)
         return API.request(url, {
             method: 'POST',
             headers: {

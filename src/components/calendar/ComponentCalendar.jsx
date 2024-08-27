@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Calendar, dayjsLocalizer } from "react-big-calendar";
 import dayjsEs from "../../utils/dayjs.js";
+import {controlErrors} from "../../utils/actions.jsx";
 import { toastError } from "../alerts.jsx";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./ComponentCalendar.css";
@@ -71,18 +72,14 @@ function ComponentCalendar({ height = "100vh", width = "100%", object, filtros =
       };
       
       const respuesta = await object.get({ params: params });
-      if (respuesta.status !== 200) {
-        toastError(`Error. ${respuesta.status} ${respuesta.statusText}`);
-        return;
+      controlErrors({respuesta:respuesta, constrolError:toastError})
+      if(controlErrors({respuesta:respuesta, constrolError:toastError})){
+        const data=respuesta.data.data? respuesta.data.data : []
+        const events = data.map((event, index) => {
+          return eventData(event, index);
+        });
+        setListeventos(events);
       }
-      if (respuesta.data.message !== "Error. No se encontraron registros en el sistema" && respuesta.data.status === false) {
-        toastError(`${respuesta.data.message}`);
-        return;
-      }
-      const events = respuesta.data.data?.map((event, index) => {
-        return eventData(event, index);
-      });
-      setListeventos(events);
     } catch (error) {
       toastError(error);
     }

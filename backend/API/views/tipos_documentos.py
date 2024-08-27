@@ -6,9 +6,10 @@ from django.views import View
 from django.db import IntegrityError, connection, models
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
-from ..funtions.filtros import order, filtrosWhere, typeOrder
+from ..funtions.filtros import order, filtrosWhere
 from ..funtions.token import verify_token
 from ..models import TipoDocumento
+from ..funtions.identificador import determinar_valor
 from ..message import MESSAGE
 import json
 
@@ -183,20 +184,29 @@ class Tipos_Documentos_Views(View):
                 inicio = indiceInicial(int(page))
                 final = indiceFinal(int(page))
                 all = request.GET.get('all', False)
+                typeOrdenBy = request.GET.get('organizar', "orig")
                 orderType = order(request)
 
-                typeOrdenBy = "nombre" if typeOrder(request) else "id"
+                if(typeOrdenBy=="orig"):
+                    typeOrdenBy ="id"
+                elif(typeOrdenBy=="alf"):
+                    typeOrdenBy ="nombre"
+                else:
+                    typeOrdenBy="id"
 
                 where = []
+                search = request.GET.get('search', None)
+                search = determinar_valor(search)
+                if(search['valor'] and search['type']=="int"):
+                    where.append(f"id LIKE '{search['valor']}%%'" )
                 where = filtrosWhere(where)
-                query = "SELECT {} FROM tipos_documentos ORDER BY {} {} {};"
 
                 if(all == "true"):
                     query = "SELECT id, nombre FROM tipos_documentos ORDER BY {} {};".format(typeOrdenBy, orderType)
                     cursor.execute(query)
                     tipos_documentos = dictfetchall(cursor)
                 else:
-                    query = "SELECT * FROM tipos_documentos ORDER BY {} {} LIMIT %s, %s;".format(typeOrdenBy, orderType)
+                    query = "SELECT * FROM tipos_documentos {} ORDER BY {} {} LIMIT %s, %s;".format(where, typeOrdenBy, orderType)
                     cursor.execute(query, [inicio, final])
                     tipos_documentos = dictfetchall(cursor)
 
@@ -215,7 +225,7 @@ class Tipos_Documentos_Views(View):
                     }
                 else:
                     datos = {
-                        'status': False,
+                        'status': True,
                         'message': f"{MESSAGE['errorRegistrosNone']}",
                         'data': None,
                         'pages': None,

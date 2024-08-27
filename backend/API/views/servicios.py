@@ -9,9 +9,10 @@ from ..funtions.serializador import dictfetchall
 from ..models import Servicios, ServiciosActividades, Materiales, ServiciosMateriales, Actividades
 from ..funtions.token import verify_token
 from ..funtions.time import duration
+from ..funtions.identificador import determinar_valor
 from ..message import MESSAGE
 from ..funtions.editorOpciones import editorOpciones
-from ..funtions.filtros import order, filtrosWhere, typeOrder
+from ..funtions.filtros import order, filtrosWhere
 import datetime
 import json
 
@@ -315,19 +316,28 @@ class Servicios_Views(View):
                 final = indiceFinal(int(page))
                 all = request.GET.get('all', False)
                 orderType = order(request)
+                typeOrdenBy = request.GET.get('organizar', "orig")
 
-                typeOrdenBy = "nombre" if typeOrder(request) else "id"
+                if(typeOrdenBy=="orig"):
+                    typeOrdenBy ="id"
+                elif(typeOrdenBy=="alf"):
+                    typeOrdenBy ="nombre"
+                else:
+                    typeOrdenBy="id"
 
                 where = []
+                search = request.GET.get('search', None)
+                search = determinar_valor(search)
+                if(search['valor'] and search['type']=="int"):
+                    where.append(f"id LIKE '{search['valor']}%%'" )
                 where = filtrosWhere(where)
-                query = "SELECT {} FROM servicios ORDER BY {} {} {};"
 
                 if(all == "true"):
                     query = "SELECT id, nombre, precio FROM servicios ORDER BY {} {};".format(typeOrdenBy, orderType)
                     cursor.execute(query)
                     servicios = dictfetchall(cursor)
                 else:
-                    query = "SELECT * FROM servicios ORDER BY {} {} LIMIT %s, %s;".format(typeOrdenBy, orderType)
+                    query = "SELECT * FROM servicios {} ORDER BY {} {} LIMIT %s, %s;".format(where, typeOrdenBy, orderType)
                     cursor.execute(query, [inicio, final])
                     servicios = dictfetchall(cursor)
                     for servicio in servicios:
@@ -347,7 +357,7 @@ class Servicios_Views(View):
                     }
                 else:
                     datos = {
-                        'status': False,
+                        'status': True,
                         'message': f"{MESSAGE['errorRegistrosNone']}",
                         'data': None,
                         'pages': None,

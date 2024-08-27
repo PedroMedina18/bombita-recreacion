@@ -34,7 +34,7 @@ class Login(View):
                 FROM usuarios user
                 LEFT JOIN personas per ON user.persona_id = per.id
                 LEFT JOIN cargos ca ON user.cargo_id = ca.id
-                WHERE user.usuario=%s;
+                WHERE user.usuario=%s AND estado=1;
             """
             cursor.execute(query, [str(jd['usuario'])])
             usuario=dictfetchall(cursor)

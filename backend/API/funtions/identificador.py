@@ -2,11 +2,15 @@
 # INFO: Para determinar si la variable es un string o un int 
 # ALERT: solo funciona con esos dos tipos de datos 
 def determinar_valor(variable):
+    if(not variable):
+        return {'type':'null', 'valor':None}
     try:
         numero=int(variable)
         return {'type':'int', 'valor':numero}
     except ValueError:
-        string=variable
+        string=str(variable)
+        if(string==""):
+            return {'type':'str', 'valor':None}
         return {'type':'str', 'valor':string}
 
 # INFO: funcion para editar un string y añadir % % al inicio y final de cada palabra
@@ -22,7 +26,7 @@ def edit_str(input_str):
     # *Iterar sobre la lista de palabras.
     for word in words:
         # *agréguela a la lista de palabras editadas con un signo '%' a cada lado.
-        edited_words.append('%' + word + '%')
+        edited_words.append('%%' + word + '%%')
     # *Unir la lista de palabras editadas en una sola cadena.
     edited_str = '_'.join(edited_words)
     # *Devuelve la cadena editada.

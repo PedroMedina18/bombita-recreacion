@@ -8,7 +8,8 @@ from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..models import Nivel
 from ..funtions.token import verify_token
-from ..funtions.filtros import order, filtrosWhere, typeOrder
+from ..funtions.filtros import order, filtrosWhere
+from ..funtions.identificador import determinar_valor
 from ..message import MESSAGE
 import json
 
@@ -185,19 +186,28 @@ class Niveles_Views(View):
                 final = indiceFinal(int(page))
                 all = request.GET.get('all', False)
                 orderType = order(request)
+                typeOrdenBy = request.GET.get('organizar', "orig")
 
-                typeOrdenBy = "nombre" if typeOrder(request) else "id"
+                if(typeOrdenBy=="orig"):
+                    typeOrdenBy ="id"
+                elif(typeOrdenBy=="alf"):
+                    typeOrdenBy ="nombre"
+                else:
+                    typeOrdenBy="id"
 
                 where = []
+                search = request.GET.get('search', None)
+                search = determinar_valor(search)
+                if(search['valor'] and search['type']=="int"):
+                    where.append(f"id LIKE '{search['valor']}%%'" )
                 where = filtrosWhere(where)
-                query = "SELECT {} FROM niveles ORDER BY {} {} {};"
 
                 if(all == "true"):
                     query = " SELECT id, nombre FROM niveles ORDER BY {} {};".format(typeOrdenBy, orderType)
                     cursor.execute(query)
                     niveles = dictfetchall(cursor)
                 else:
-                    query = " SELECT * FROM niveles ORDER BY {} {} LIMIT %s, %s;".format(typeOrdenBy, orderType)
+                    query = " SELECT * FROM niveles {} ORDER BY {} {} LIMIT %s, %s;".format(where, typeOrdenBy, orderType)
                     cursor.execute(query, [inicio, final])
                     niveles = dictfetchall(cursor)
 
@@ -216,7 +226,7 @@ class Niveles_Views(View):
                     }
                 else:
                     datos = {
-                        'status': False,
+                        'status': True,
                         'message': f"{MESSAGE['errorRegistrosNone']}",
                         'data': None,
                         'pages': None,

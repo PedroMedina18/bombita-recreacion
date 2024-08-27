@@ -56,7 +56,6 @@ def comprobarSize(respaldo):
             print("Archivo no encontrado. Esperando...")
             time.sleep(5)
 
-
 def comprimir(rutaArchivo):
     password  = config('KEYZIP')
 
@@ -96,3 +95,6 @@ def buscar_carpeta_media():
                 return os.path.join(ruta_actual, nombre_carpeta)
         ruta_actual = ruta_padre
     return None
+
+
+respaldo()

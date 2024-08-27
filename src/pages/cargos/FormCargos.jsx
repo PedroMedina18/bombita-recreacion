@@ -20,10 +20,10 @@ import pattern from "../../context/pattern.js";
 function FormCargos() {
     const [loading, setLoading] = useState(true);
     const [errorServer, setErrorServer] = useState("");
-    const [options, setOptions] = useState([]);
+    const [permisosList, setPermisosList] = useState([]);
     const [imgLogo, setImgLogo] = useState(null);
-    const [optionsDefault, setOptionsDefault] = useState([]);
-    const [selectOptions, setSelectOptions] = useState([]);
+    const [permisosDefault, setPermisosDefault] = useState([]);
+    const [selectPermisos, setSelectPermisos] = useState([]);
     const [checkInput, setCheckInput] = useState(false);
     const {getOption} = useAuthContext();
     const navigate = useNavigate();
@@ -39,12 +39,12 @@ function FormCargos() {
     }, [])
 
     useEffect(() => {
-        if (options.length) {
+        if (permisosList.length) {
             if (params.id) {
                 get_cargos()
             }
         }
-    }, [options])
+    }, [permisosList])
 
     // *funcion para buscar los permisos en la base de datos
     const get_Permisos = async () => {
@@ -52,8 +52,8 @@ function FormCargos() {
             const res = await permisos.get()
             verifyOptionsSelect({
                 respuesta: res,
-                setError: setErrorServer,
-                setOptions
+                setOptions: setPermisosList,
+                label:(e)=>{return e.nombre}
             })
         } catch (error) {
             console.log(error)
@@ -73,8 +73,8 @@ function FormCargos() {
             const data = respuesta.data.data
             setErrorServer("")
             if (data.permisos) {
-                setOptionsDefault(coincidences(options, data.permisos))
-                setSelectOptions(coincidences(options, data.permisos))
+                setPermisosDefault(coincidences(permisosList, data.permisos))
+                setSelectPermisos(coincidences(permisosList, data.permisos))
             }
             setValue("nombre", data.nombre)
             setValue("descripcion", data.descripcion)
@@ -102,7 +102,7 @@ function FormCargos() {
     const onSubmit = handleSubmit(
         async (data) => {
             try {
-                const permisos = selectOptions.map((elements) => { return elements.value })
+                const permisos = selectPermisos.map((elements) => { return elements.value })
                 const $archivo = document.getElementById(`icono`).files[0]
                 const message = params.id ? texts.confirmMessage.confirEdit : texts.confirmMessage.confirRegister
                 const confirmacion = await alertConfim("Confirmar", message)
@@ -201,10 +201,10 @@ function FormCargos() {
                                         }}
                                         placeholder={texts.placeholder.descripcion}
                                     />
-                                    <InputCheckRadio label={`${texts.label.admin}`} name="administrador" id="administrador" form={{ errors, register }} isError={Boolean(!selectOptions.length)} checked={checkInput}
+                                    <InputCheckRadio label={`${texts.label.admin}`} name="administrador" id="administrador" form={{ errors, register }} isError={Boolean(!selectPermisos.length)} checked={checkInput}
                                         params={{
                                             validate: (value) => {
-                                                if (!selectOptions.length && !value) {
+                                                if (!selectPermisos.length && !value) {
                                                     return texts.inputsMessage.noneSpace
                                                 } else {
                                                     return true
@@ -220,15 +220,15 @@ function FormCargos() {
                                     {
                                         !watch("administrador") ?
                                             (
-                                                <div className={`${Boolean(!selectOptions.length && errors["administrador"]) ? "error" : ""}`}>
+                                                <div className={`${Boolean(!selectPermisos.length && errors["administrador"]) ? "error" : ""}`}>
 
-                                                    <MultiSelect name="permisos" label={`${texts.label.permisos}`} id="permisos" options={options} save={setSelectOptions} optionsDefault={optionsDefault} placeholder={"Permisos"} />
+                                                    <MultiSelect name="permisos" label={`${texts.label.permisos}`} id="permisos" options={permisosList} save={setSelectPermisos} optionsDefault={permisosDefault} placeholder={"Permisos"} />
                                                 </div>
                                             )
                                             :
                                             ""
                                     }
-                                    {Boolean(!selectOptions.length && errors["administrador"]) ? <span className="message-error visible">{texts.inputsMessage.selecPermisos}</span> : <span className="message-error invisible">Sin errores</span>}
+                                    {Boolean(!selectPermisos.length && errors["administrador"]) ? <span className="message-error visible">{texts.inputsMessage.selecPermisos}</span> : <span className="message-error invisible">Sin errores</span>}
 
                                     <div className="w-100 mt-2">
                                         <InputImgPerfil name="icono" id="icono" label={`Icono`} form={{ errors, register }} tamaño="sm" imgPerfil={imgLogo} />

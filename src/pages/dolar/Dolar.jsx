@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react"
 import { Toaster } from "sonner";
 import { dolar } from "../../utils/API.jsx";
-import { getListItems } from "../../utils/actions.jsx";
+import { getListItems, searchCode } from "../../utils/actions.jsx";
 import { formatoId, formatDateWithTime12Hour } from "../../utils/process.jsx";
 import Navbar from "../../components/navbar/Navbar";
 import Table from "../../components/table/Table";
@@ -26,7 +26,7 @@ function Dolar() {
             object: dolar,
             setList: setDolar,
             setData: setDataDolar,
-            setLoading: setTableLoaing
+            setLoading: setTableLoaing,
         })
     }
 
@@ -44,6 +44,19 @@ function Dolar() {
             row: (row) => { const fecha = formatDateWithTime12Hour(row.fecha_registro); return fecha }
         },
     ]
+
+    const options = {
+        consult: (value, filtros={}) => {
+            searchCode({
+                value: value,
+                filtros:filtros,
+                object: dolar,
+                setList: setDolar,
+                setData: setDataDolar,
+                setLoading: setTableLoaing
+            })
+        }
+    }
     return (
         <Navbar name={`${texts.pages.getDolar.name}`} descripcion={`${texts.pages.getDolar.description}`}>
 
@@ -52,8 +65,13 @@ function Dolar() {
                 rows={listDolar}
                 totalElements={dataDolar.total}
                 totalPages={dataDolar.pages}
-                options={[]}
+                options={options}
                 loading={tableLoading}
+                order={true}
+                organizar={[
+                    { label: "Fecha", value: "fech" },
+                    { label: "Precio", value: "price" },
+                ]}
             />
             <Toaster />
         </Navbar>

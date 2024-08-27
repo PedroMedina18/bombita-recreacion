@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { recreadores } from "../../utils/API.jsx"
 import { calcularEdad } from "../../utils/process.jsx"
 import { IconTrash, IconEdit, IconDetail } from "../../components/Icon.jsx";
-import { searchCode, getListItems, deleteItem, verifyOptionsSelect } from "../../utils/actions.jsx"
+import { searchCode, getListItems, deleteItem } from "../../utils/actions.jsx"
 import { formatoId } from "../../utils/process.jsx"
 import { useAuthContext } from '../../context/AuthContext.jsx';
 import Navbar from "../../components/navbar/Navbar"
@@ -71,7 +71,7 @@ function Recreadores() {
         {
             name: "Estado",
             row: (row) => {
-                return row.inhabilitado ? <Pildora contenido="Invalido" /> : <Pildora contenido="Activo" color="bg-succes" />
+                return row.estado ? <Pildora contenido="Activo" color="bg-succes"/> : <Pildora contenido="Inhabilitado"  />
             }
         },
         {
@@ -79,7 +79,7 @@ function Recreadores() {
             row: (row) => {
                 return <div className='d-flex justify-content-around options-table'>
                     <IconDetail
-                        onClick={() => { navigate(`/recreador/${row.numero_documento}/`) }} className="cursor-pointer"
+                        onClick={() => { navigate(`/recreador/${row.id}/`) }} className="cursor-pointer"
                     />
                     <IconTrash
                         onClick={() => {
@@ -91,7 +91,7 @@ function Recreadores() {
                         }}
                         className="cursor-pointer"
                     />
-                    <IconEdit onClick={() => { navigate(`/edit/recreador/${row.numero_documento}/`) }} className="cursor-pointer" />
+                    <IconEdit onClick={() => { navigate(`/edit/recreador/${row.id}/`) }} className="cursor-pointer" />
                 </div>
             }
         },
@@ -148,7 +148,10 @@ function Recreadores() {
                 loading={tableLoading}
                 filtradores={filtros}
                 order={true}
-                organizar={["Origen", "Nombre"]}
+                organizar={[
+                    { label: "Origen", value: "orig" },
+                    { label: "Nombre", value: "alf" },
+                ]}
             />
             <Toaster />
         </Navbar>

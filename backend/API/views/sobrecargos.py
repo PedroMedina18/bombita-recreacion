@@ -7,7 +7,8 @@ from django.db import IntegrityError, connection, models
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..models import Sobrecargos
-from ..funtions.filtros import order, filtrosWhere, typeOrder
+from ..funtions.filtros import order, filtrosWhere
+from ..funtions.identificador import determinar_valor
 from ..funtions.token import verify_token
 from ..message import MESSAGE
 import json
@@ -185,19 +186,28 @@ class Sobrecargos_Views(View):
                 final = indiceFinal(int(page))
                 all = request.GET.get('all', False)
                 orderType = order(request)
+                typeOrdenBy = request.GET.get('organizar', "orig")
 
-                typeOrdenBy = "nombre" if typeOrder(request) else "id"
+                if(typeOrdenBy=="orig"):
+                    typeOrdenBy ="id"
+                elif(typeOrdenBy=="alf"):
+                    typeOrdenBy ="nombre"
+                else:
+                    typeOrdenBy="id"
 
                 where = []
+                search = request.GET.get('search', None)
+                search = determinar_valor(search)
+                if(search['valor'] and search['type']=="int"):
+                    where.append(f"id LIKE '{search['valor']}%%'" )
                 where = filtrosWhere(where)
-                query = "SELECT {} FROM sobrecargos ORDER BY {} {} {};"
 
                 if(all == "true"):
                     query = "SELECT id, nombre, monto FROM sobrecargos ORDER BY {} {};".format(typeOrdenBy, orderType)
                     cursor.execute(query)
                     sobrecargos = dictfetchall(cursor)
                 else:
-                    query = "SELECT * FROM sobrecargos ORDER BY {} {} LIMIT %s, %s;".format(typeOrdenBy, orderType)
+                    query = "SELECT * FROM sobrecargos {} ORDER BY {} {} LIMIT %s, %s;".format(where, typeOrdenBy, orderType)
                     cursor.execute(query, [inicio, final])
                     sobrecargos = dictfetchall(cursor)
 
@@ -216,7 +226,7 @@ class Sobrecargos_Views(View):
                     }
                 else:
                     datos = {
-                        'status': False,
+                        'status': True,
                         'message': f"{MESSAGE['errorRegistrosNone']}",
                         'data': None,
                         'pages': None,

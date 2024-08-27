@@ -2,10 +2,10 @@ import { useState, useEffect, useRef } from "react";
 import { ButtonSimple } from "../../components/button/Button";
 import { useNavigate, useParams } from 'react-router-dom';
 import { recreadores } from "../../utils/API.jsx";
-import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { LoaderCircle } from "../../components/loader/Loader";
 import { verifyOptionsSelect, controlResultPost } from "../../utils/actions.jsx";
-import { hasLeadingOrTrailingSpace, coincidences, formatoId } from "../../utils/process.jsx";
+import { formatoId } from "../../utils/process.jsx";
+import Pildora from "../../components/Pildora.jsx"
 import { Toaster } from "sonner";
 import ErrorSystem from "../../components/errores/ErrorSystem";
 import Navbar from "../../components/navbar/Navbar";
@@ -31,7 +31,7 @@ function Recreador() {
 
   const get_data = async () => {
     try {
-      const respuesta = await recreadores.get({subDominio:[Number(params.numero_documento)], params:{"_info":"true"}})
+      const respuesta = await recreadores.get({ subDominio: [Number(params.id)] })
       if (respuesta.status !== 200) {
         setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
         return
@@ -40,10 +40,12 @@ function Recreador() {
         setErrorServer(`${respuesta.data.message}`)
         return
       }
-      setData(respuesta.data.data.info)
+      console.log(respuesta.data.data)
+      setData(respuesta.data.data)
     } catch (error) {
       console.log(error)
       setErrorServer(texts.errorMessage.errorSystem)
+      setData(null)
     } finally {
       setLoading(false)
     }
@@ -71,54 +73,66 @@ function Recreador() {
             (
               <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
                 <h3 className="h2 fw-bold">{`${data.nombres} ${data.apellidos}`}</h3>
+
                 <div className={`section-perfil d-flex align-items-center justify-content-center sm ${data.img_perfil ? "section-perfil-img" : ""}`}>
                   <IconUserCircleSolid id="svg-perfil" className={`${data.img_perfil ? "d-none" : ""}`} />
                   <img src={data.img_perfil ? data.img_perfil : perfil} alt="img_perfil" className={`img-perfil sm ${data.img_perfil ? "" : "d-none"}`} />
                 </div>
+
                 <div className="w-100 flex-column flex-md-row d-flex justify-content-between">
                   <div className="w-100 w-md-50">
-                    <strong>Codigo:</strong>
-                    <p className="m-0 mb-1">{formatoId(data.id)}</p>
+                    <strong className="fs-5-5">Codigo:</strong>
+                    <p className="m-0 fs-5-5 mb-1">{formatoId(data.id)}</p>
                   </div>
                   <div className="w-100 w-md-50">
-                    <strong>Documento:</strong>
-                    <p className="m-0 mb-1">{`${data.tipo_documento_nombre}-${data.numero_documento}`}</p>
+                    <strong className="fs-5-5">Documento:</strong>
+                    <p className="m-0 fs-5-5 mb-1">{`${data.tipo_documento}-${data.numero_documento}`}</p>
                   </div>
                   <div className="w-100 w-md-50">
-                    <strong>Genero:</strong>
-                    <p className="m-0 mb-1">{`${data.genero_nombre}`}</p>
-                  </div>
-                </div>
-                <div className="w-100 flex-column flex-md-row d-flex justify-content-between">
-                  <div className="w-100 w-md-50">
-                    <strong>Correo:</strong>
-                    <p className="m-0 mb-1">{data.correo}</p>
+                    <strong className="fs-5-5">Genero:</strong>
+                    <p className="m-0 fs-5-5 mb-1">{`${data.genero}`}</p>
                   </div>
                   <div className="w-100 w-md-50">
-                    <strong>Telefono Principal:</strong>
-                    <p className="m-0 mb-1">{`${data.telefono_principal}`}</p>
+                    <strong className="fs-5-5">Correo:</strong>
+                    <p className="m-0 fs-5-5 mb-1">{data.correo}</p>
                   </div>
                   <div className="w-100 w-md-50">
-                    <strong>Telefono Secundario:</strong>
-                    <p className="m-0 mb-1">{`${data.telefono_secundario}`}</p>
+                    <strong className="fs-5-5">Telefono Principal:</strong>
+                    <p className="m-0 fs-5-5 mb-1">{`${data.telefono_principal}`}</p>
                   </div>
-                </div>
-                <div className="w-100 flex-column flex-md-row d-flex justify-content-between">
                   <div className="w-100 w-md-50">
-                    <strong>Nivel:</strong>
-                    <p className="m-0 mb-1">{`${data.nivel_nombre}`}</p>
+                    <strong className="fs-5-5">Telefono Secundario:</strong>
+                    <p className="m-0 fs-5-5 mb-1">{`${data.telefono_secundario}`}</p>
                   </div>
-                  <div className={`w-50 ${data.inhabilitado ? "svg-check" : "svg-x"}`}>
-                    <strong>Inhabilitado:</strong> <br/>
-                    {data.inhabilitado ? <IconCheck /> : <IconX />}
+                  <div className="w-100 w-md-50">
+                    <strong className="fs-5-5">Nivel:</strong>
+                    <p className="m-0 fs-5-5 mb-1">{`${data.nivel}`}</p>
+                  </div>
+                  <div className="w-100 w-md-50">
+                    <strong className="fs-5-5">Estado:</strong> <br />
+                    {data.estado ? <Pildora className="fs-5-5 py-8 px-4" contenido="Activo" color="bg-succes" /> : <Pildora className="fs-5-5 py-8 px-4" contenido="Inhabilitado" />}
                   </div>
                 </div>
 
+                {/* 
+                
+                <div className="w-100 flex-column flex-md-row d-flex justify-content-between">
+                  
+                </div>
+                
+                </div>
+                
+                <div className="w-100 flex-column flex-md-row d-flex justify-content-between">
+                  
+                <div className="w-100 flex-column flex-md-row d-flex justify-content-start">
+                  
+                </div> */}
+
                 <div>
-                  DE AQUI EN ADELANTE DEBERIA IR TODA LA INFORMACION RELACIONADA CON LE RECREADOR COMO <br/>
-                  -EVENTOS EN LOS QUE PARTICIPO <br/>
-                  -EVENTOS EN LOS QUE DEBE ESTAR EN EL FUTURO <br/>
-                  -SERVICIOS EN LOS QUE PUEDE ESTAR <br/>
+                  DE AQUI EN ADELANTE DEBERIA IR TODA LA INFORMACION RELACIONADA CON LE RECREADOR COMO <br />
+                  -EVENTOS EN LOS QUE PARTICIPO <br />
+                  -EVENTOS EN LOS QUE DEBE ESTAR EN EL FUTURO <br />
+                  -SERVICIOS EN LOS QUE PUEDE ESTAR <br />
                   -Y NO SE QUE MAS ASI QUE PONTE HACER LA TESIS :)
                 </div>
               </div>

@@ -19,7 +19,7 @@ import {
   Eventos, Dolar,
   FormDataEvent, FormAccount,
   EventosRecreadores, FormUsuarios,
-  Configuracion
+  Configuracion, Cargo
 } from "./pages/Pages.jsx"
 
 
@@ -31,6 +31,7 @@ function App() {
           <Route path="/" element={<Login />} />
           <Route element={<ProtectedRouter />}>
             <Route path="/cargos/" element={<Cargos />} />
+            <Route path="/cargo/:id/" element={<Cargo />} />
             <Route path="/register/cargo/" element={<FormCargos />} />
             <Route path="/edit/cargo/:id/" element={<FormCargos />} />
             <Route path="/register/usuario/" element={<FormUsuarios />} />

@@ -176,15 +176,23 @@ body::-webkit-scrollbar-thumb {
 .fs-7 {
   font-size: 12px;
 }
+.fs-5-5 {
+  font-size: 18px;
+}
 .fs-8 {
   font-size: 8px;
 }
 .w-max-contetn{
   width: max-content;
 }
+.link-action-secundary svg{
+  color: rgb(var(--secundario));
+  width: 30px;
+}
 .link-action-secundary:hover{
-  background-color: rgba(var(--secundario), 0.4);
+  background-color: rgba(var(--secundario), 0.5);
   box-shadow: 5px 13px 22px -10px rgba(0,0,0,0.73);
+  font-weight: bold;
   z-index: 5;
 }
 

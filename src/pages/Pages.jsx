@@ -33,6 +33,7 @@ import FormDataEvent from "./eventos/FormDataEvent.jsx";
 import FormAccount from "./eventos/FormAccount.jsx";
 import Configuracion from "./configuracion/Configuracion.jsx";
 import EventosRecreadores from "./recreadores_eventos/EventosRecreadores.jsx";
+import Cargo from "./cargos/Cargo.jsx"
 
 export {
     Login, Error404, 
@@ -52,7 +53,7 @@ export {
     Eventos, Dolar,
     FormDataEvent, FormAccount,
     EventosRecreadores, FormUsuarios,
-    Configuracion
+    Configuracion, Cargo
 }
 
 

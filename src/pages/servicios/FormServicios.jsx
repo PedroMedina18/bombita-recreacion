@@ -8,7 +8,7 @@ import { ButtonSimple } from "../../components/button/Button.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { InputsGeneral, InputTextTarea, InputDuration, MultiSelect, MoneyInput } from "../../components/input/Inputs.jsx";
 import { hasLeadingOrTrailingSpace, coincidences, normalizeDecimalNumber } from "../../utils/process.jsx";
-import { verifyOptionsSelect, controlResultPost, controlErrors } from "../../utils/actions.jsx";
+import { controlResultPost, controlErrors } from "../../utils/actions.jsx";
 import { useAuthContext } from '../../context/AuthContext.jsx';
 import { IconRowLeft } from "../../components/Icon.jsx"
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";

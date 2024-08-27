@@ -122,7 +122,6 @@ export function InputCheckRadio({ label, id, name, form, params = {}, isError = 
   )
 }
 
-
 export function InputDuration({ label, id, name, form, params = {}, isError = true, ...props }) {
   const { errors, register } = form;
   const hours = [

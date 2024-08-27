@@ -4,6 +4,7 @@ from django.views import View
 from ..funtions.token import verify_token
 from ..funtions.serializador import dictfetchall
 from django.db import IntegrityError, connection
+from ..message import MESSAGE
 import json
 
 
@@ -30,8 +31,8 @@ class Permisos_Views(View):
                 }
             else:
                 datos = {
-                    'status': False,
-                    'message': 'Error. Permisos no encontrados',
+                    'status': True,
+                    'message': f"{MESSAGE['errorRegistrosPermisos']}",
                     'data': None
                 }
             return JsonResponse(datos)

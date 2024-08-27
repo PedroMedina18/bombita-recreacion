@@ -4,6 +4,7 @@ from django.views import View
 from ..funtions.serializador import dictfetchall
 from django.db import IntegrityError, connection
 from ..funtions.token import verify_token
+from ..message import MESSAGE
 
 class Personas_Views(View):
     def get(self, request, tipo_documento=0, documento=0):
@@ -51,8 +52,8 @@ class Personas_Views(View):
                 }
             else:
                 datos = {
-                    'status': False,
-                    'message': 'Error. Persona no encontrada',
+                    'status': True,
+                    'message': f"{MESSAGE['errorRegistrosPersonas']}",
                     'data': None
                 }
             return JsonResponse(datos)

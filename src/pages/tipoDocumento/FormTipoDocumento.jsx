@@ -30,8 +30,7 @@ function FormTipoDocumento() {
             renderizado.current = renderizado.current + 1
             if (params.id) {
                 get_tipoDocumento()
-            }
-            setLoading(false)
+            }else setLoading(false)
             return
         }
     }, [])

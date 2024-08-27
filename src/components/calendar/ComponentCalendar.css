@@ -1,5 +1,5 @@
-table tbody tr:nth-child(odd) {
-    background-color: rgba(var(--secundario), 0.1) !important;
+table.rbc-agenda-table tbody tr:nth-child(odd) {
+    background-color: rgba(var(--secundario), 0.2) !important;
 }
 
 .rbc-month-view, .rbc-time-view, .rbc-btn-group button, .rbc-agenda-view table.rbc-agenda-table{

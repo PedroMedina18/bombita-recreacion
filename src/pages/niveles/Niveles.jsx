@@ -103,9 +103,10 @@ function Niveles() {
     },
     search: {
       placeholder: texts.registerMessage.searchItem,
-      function: (value) => {
+      function: (value, filtros={}) => {
         searchCode({
           value: value,
+          filtros:filtros,
           object: niveles,
           setList: setNiveles,
           setData: setDataNiveles,
@@ -130,6 +131,11 @@ function Niveles() {
         totalPages={dataNiveles.pages}
         options={options}
         loading={tableLoading}
+        order={true}
+        organizar={[
+          { label: "Origen", value: "orig" },
+          { label: "Nombre", value: "alf" },
+        ]}
       />
       <Toaster />
     </Navbar>

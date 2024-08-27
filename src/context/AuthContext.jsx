@@ -1,8 +1,8 @@
-import { useEffect, useState, createContext, useContext } from 'react'
-import { verify_token, generos, niveles, tipo_documentos, materiales, actividades, cargos } from "../utils/API.jsx"
-import { getCookie } from "../utils/cookie.jsx"
-import { getDataAll } from "../utils/actions.jsx"
-import { LoaderRule } from "../components/loader/Loader.jsx"
+import { useEffect, useState, createContext, useContext, useRef } from 'react';
+import { verify_token, generos, niveles, tipo_documentos, materiales, actividades, cargos } from "../utils/API.jsx";
+import { getCookie } from "../utils/cookie.jsx";
+import { getDataAll } from "../utils/actions.jsx";
+import { LoaderRule } from "../components/loader/Loader.jsx";
 const AuthContext = createContext();
 
 export const useAuthContext = () => {
@@ -19,9 +19,14 @@ export function AuthContextProvider({ children }) {
   const [dataMateriales, setMateriales] = useState([])
   const [dataActividades, setActividades] = useState([])
   const [dataCargos, setCargos] = useState([])
+  const renderizado = useRef(0);
 
   useEffect(() => {
-    checkAuth();
+    if(renderizado.current===0){
+      renderizado.current = renderizado.current + 1
+      checkAuth();
+      return
+  }
   }, []);
 
   const getData = () => {

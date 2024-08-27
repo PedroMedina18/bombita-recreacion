@@ -64,7 +64,7 @@ class Usuarios(models.Model):
         Personas, on_delete = models.PROTECT, related_name = 'usuario', db_column = 'persona_id')
     usuario = models.CharField(max_length = 20, unique = True)
     contraseña = models.CharField(max_length = 200)
-    inhabilitado = models.BooleanField(default = False)
+    estado = models.BooleanField(default = True)
     cargo = models.ForeignKey(
         Cargos, on_delete = models.PROTECT, related_name = 'usuarios', db_column = 'cargo_id')
     fecha_registro = models.DateTimeField(auto_now_add = True)
@@ -96,7 +96,7 @@ class Generos(models.Model):
 # *Tabla los recreadores que asisten a los eventos
 class Recreadores(models.Model):
     persona = models.OneToOneField(Personas, on_delete = models.PROTECT, related_name = 'recreador', db_column = 'persona_id')
-    inhabilitado = models.BooleanField(default = False)
+    estado = models.BooleanField(default = True)
     nivel = models.ForeignKey(Nivel, on_delete = models.PROTECT, related_name = 'recreadores', db_column = 'nivel_id')
     genero = models.ForeignKey(Generos, on_delete = models.PROTECT, related_name = 'recreadores', db_column = 'genero_id')
     img = models.FileField(upload_to = 'img_recreadores', null = True, blank = True)

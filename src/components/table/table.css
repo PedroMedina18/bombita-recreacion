@@ -3,9 +3,11 @@ button[disabled] {
   cursor: no-drop;
   background-color: rgba(var(--secundario), 0.5);
 }
+
 button[disabled]:hover {
   transform: scale(1);
 }
+
 .input-table {
   max-width: 100%;
   min-width: 50px;
@@ -17,20 +19,24 @@ button[disabled]:hover {
   padding: 10px 15px;
   transition: 0.3s ease all;
 }
+
 .input-table:focus {
   border: 2px solid #619bdd;
   outline: none;
   box-shadow: 0 0 0 0.25rem rgb(13 110 253 / 25%);
 }
+
 .input-table.page {
   padding: 10px 0px;
   text-align: center;
 }
+
 .container-table {
   width: 100%;
   overflow-x: auto;
   padding-bottom: 5px;
 }
+
 .table-overflow-y {
   max-height: 500px;
   overflow-y: auto;
@@ -41,6 +47,7 @@ button[disabled]:hover {
   height: 10px;
   margin-top: 5px;
 }
+
 .container-table::-webkit-scrollbar-thumb {
   background-color: rgb(var(--secundario));
   border-radius: 10px;
@@ -57,6 +64,7 @@ table.table-data,
 table.table-data.border-table {
   border: 2px solid rgb(92, 92, 92);
 }
+
 .table-loading {
   border: 2px solid rgb(92, 92, 92);
 }
@@ -75,16 +83,20 @@ table.table-data.border-none td {
   border-right: none;
   border-left: none;
 }
+
 table.table-data.border-none th {
   border-top: none;
 }
+
 tr.fc-none {
   color: transparent;
 }
+
 .table-loading th,
 .table-loading td {
   padding: 5px 8px;
 }
+
 table.table-data td.d-flex {
   align-items: center;
   margin: -1px;
@@ -96,6 +108,12 @@ thead tr th {
   font-size: 16px;
   font-weight: bold;
 }
+table.tr-select tbody tr:hover {
+  cursor: pointer;
+  background-color: rgba(var(--secundario), 0.9);
+  color: white;
+  transition: 0.1s ease all;
+}
 tbody tr td {
   font-size: 14px;
   font-weight: normal;
@@ -104,22 +122,28 @@ tbody tr td {
 table td:first-child {
   font-weight: bold;
 }
+
 table tbody tr:nth-child(odd) {
-  background-color: #e6e6e6;
+  background-color: rgba(var(--secundario), 0.2);
 }
+
 table svg {
   width: 30px;
 }
+
 table .svg-check svg {
   color: rgb(0, 167, 0);
 }
+
 table .svg-x svg {
   color: rgb(204, 19, 19);
 }
+
 table .options-table svg{
   color: rgb(var(--secundario));
   transition: transform 0.2s ease-out;
 }
+
 table svg.edit:hover,
 table svg.eliminate:hover,
 table svg.get:hover,
@@ -161,6 +185,7 @@ table svg.money:hover {
   background-color: rgba(var(--secundario), 0.9);
   color: hsl(0, 0%, 100%);
 }
+
 
 @media (max-width: 768px) {
   table.table-data {

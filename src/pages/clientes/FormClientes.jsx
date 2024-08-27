@@ -39,16 +39,16 @@ function FormClientes() {
 
     const get_cliente = async () => {
         try {
-            const respuesta = await clientes.get({subDominio:[Number(params.id)], params: { "_info": "true" }})
+            const respuesta = await clientes.get({subDominio:[Number(params.id)]})
             const errors = controlErrors({respuesta:respuesta, constrolError:setErrorServer})
             if(errors) return
             setErrorServer("")
             const data = respuesta.data.data
-            const keys = Object.keys(data.info);
+            const keys = Object.keys(data);
             keys.forEach(key => {
-                setValue(key, data.info[`${key}`])
+                setValue(key, data[`${key}`])
             });
-            setValue(`tipo_documento`, data.info["tipo_documento_id"])
+            setValue(`tipo_documento`, data["tipo_documento_id"])
 
         } catch (error) {
             console.log(error)

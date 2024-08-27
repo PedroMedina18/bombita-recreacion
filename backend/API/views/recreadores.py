@@ -10,17 +10,18 @@ from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..funtions.identificador import determinar_valor, edit_str
 from ..funtions.token import verify_token
-from ..funtions.filtros import order, filtrosWhere, typeOrder
+from ..funtions.filtros import order, filtrosWhere
 from ..message import MESSAGE
 from decouple import config
 import json
+
 
 class Recreadores_Views(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
 
-    def post(self, request, identificador=0):
+    def post(self, request, id=0):
         try:
             req = request.POST
             img = request.FILES
@@ -35,14 +36,12 @@ class Recreadores_Views(View):
 
             if method == "PUT":
 
-                tipo = determinar_valor(identificador)
+                tipo = determinar_valor(id)
                 if tipo["type"] != "int":
                     raise Http404("No se puede editar este objeto")
-                recreador = list(
-                    Recreadores.objects.filter(id=int(identificador)).values()
-                )
+                recreador = list(Recreadores.objects.filter(id=int(id)).values())
                 if len(recreador) > 0:
-                    recreador = Recreadores.objects.get(id=int(identificador))
+                    recreador = Recreadores.objects.get(id=int(id))
                     persona = Personas.objects.get(id=int(recreador.persona.id))
 
                     ### *comprobacion de tipo de documento
@@ -205,18 +204,18 @@ class Recreadores_Views(View):
                 }
             return JsonResponse(datos)
 
-    def delete(self, request, identificador=0):
+    def delete(self, request, id=0):
         try:
-            tipo = determinar_valor(identificador)
+            tipo = determinar_valor(id)
             if tipo["type"] != "int":
                 raise Http404("No se puede eliminar este objeto")
             verify = verify_token(request.headers)
             if not verify["status"]:
                 datos = {"status": False, "message": verify["message"]}
                 return JsonResponse(datos)
-            recreador = list(Recreadores.objects.filter(id=int(identificador)).values())
+            recreador = list(Recreadores.objects.filter(id=int(id)).values())
             if len(recreador) > 0:
-                Recreadores.objects.filter(id=int(identificador)).delete()
+                Recreadores.objects.filter(id=int(id)).delete()
                 datos = {"status": True, "message": f"{MESSAGE['delete']}"}
             else:
                 datos = datos = {
@@ -235,31 +234,29 @@ class Recreadores_Views(View):
             datos = {"status": False, "message": f"{MESSAGE['errorEliminar']}: {error}"}
             return JsonResponse(datos)
 
-    def get(self, request, identificador=None):
+    def get(self, request, id=0):
         try:
             cursor = connection.cursor()
             verify = verify_token(request.headers)
-            info = request.GET.get("_info", "false")
             totalRecreadores = request.GET.get("total", "false")
             if not verify["status"]:
                 datos = {"status": False, "message": verify["message"], "data": None}
                 return JsonResponse(datos)
-                
-            if(totalRecreadores == "true"):
-                query="""
-                    SELECT COUNT(*) AS total FROM recreadores WHERE inhabilitado=0
+
+            if totalRecreadores == "true":
+                query = """
+                    SELECT COUNT(*) AS total FROM recreadores WHERE estado=1
                 """
                 cursor.execute(query)
                 total = dictfetchall(cursor)
                 datos = {
-                        "status": True,
-                        "message": f"{MESSAGE['exitoGet']}",
-                        "data": total[0],
-                    }
+                    "status": True,
+                    "message": f"{MESSAGE['exitoGet']}",
+                    "data": total[0],
+                }
                 return JsonResponse(datos)
 
-            if identificador:
-                tipo = determinar_valor(identificador)
+            if id:
                 query = """
                     SELECT 
                     	re.id, 
@@ -276,77 +273,67 @@ class Recreadores_Views(View):
                         pe.numero_documento,
                         CONCAT('0', pe.telefono_principal) AS telefono_principal,
                         CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
-                        re.inhabilitado,
+                        re.estado,
                         re.img
                     FROM recreadores AS re
                     LEFT JOIN niveles AS ni ON re.nivel_id=ni.id
                     LEFT JOIN generos AS ge ON re.genero_id=ge.id
                     LEFT JOIN personas AS pe ON re.persona_id=pe.id
                     LEFT JOIN tipos_documentos AS tipo ON pe.tipo_documento_id=tipo.id
+                    WHERE re.id=%s;
                 """
-                if tipo["type"] == "int":
-                    if info == "true":
-                        query = query + "WHERE re.id=%s;"
-                        cursor.execute(query, [tipo["valor"]])
-                    else:
-                        numero_documento = str(tipo["valor"]) + "%"
-                        query = query + "WHERE pe.numero_documento LIKE %s ;"
-                        cursor.execute(query, [numero_documento])
-                else:
-                    str_validate = edit_str(tipo["valor"])
-                    query = (
-                        query + "WHERE CONCAT(pe.nombres, ' ', pe.apellidos) LIKE %s ;"
-                    )
-                    cursor.execute(query, [str_validate])
+                cursor.execute(query, [int(id)])
                 recreador = dictfetchall(cursor)
                 if len(recreador) > 0:
                     for data in recreador:
-                        data["img"] = (
+                        data["img_perfil"] = (
                             f"{config('URL')}media/{data['img']}"
                             if data["img"]
                             else None
                         )
-                    if info == "true":
-                        datos = {
-                            "status": True,
-                            "message": f"{MESSAGE['exitoGet']}",
-                            "data": {"info": recreador[0]},
-                        }
-                    else:
-                        datos = {
-                            "status": True,
-                            "message": f"{MESSAGE['exitoGet']}",
-                            "data": recreador,
-                            "total": len(recreador),
-                            "pages": 1,
-                        }
+                    datos = {
+                        "status": True,
+                        "message": f"{MESSAGE['exitoGet']}",
+                        "data": recreador[0],
+                    }
                 else:
                     datos = {
                         "status": False,
                         "message": f"{MESSAGE['errorRegistrosNone']}",
                         "data": None,
-                        "total": 0,
-                        "pages": 0,
                     }
             else:
-                page = request.GET.get('page', 1)
+                page = request.GET.get("page", 1)
+                typeOrdenBy = request.GET.get("organizar", "orig")
                 inicio = indiceInicial(int(page))
                 final = indiceFinal(int(page))
-
                 orderType = order(request)
-                typeOrdenBy = "pe.nombres" if typeOrder(request) else "re.id"
 
+                if typeOrdenBy == "orig":
+                    typeOrdenBy = "re.id"
+                elif typeOrdenBy == "alf":
+                    typeOrdenBy = "pe.nombres"
+                else:
+                    typeOrdenBy = "re.id"
+
+                nivel = request.GET.get("nivel", None)
+                genero = request.GET.get("genero", None)
+                estado = request.GET.get("estado", None)
                 where = []
-                nivel = request.GET.get('nivel', None)
-                genero = request.GET.get('genero', None)
-                estado = request.GET.get('estado', None)
 
-                if(nivel):
+                search = request.GET.get('search', None)
+                search = determinar_valor(search)
+                if(search['valor'] and search['type']=="int"):
+                    where.append(f"pe.numero_documento LIKE '{search['valor']}%%'" )
+                elif(search['valor'] and search['type']=="str"):
+                    str_validate = edit_str(search["valor"])
+                    where.append(f"CONCAT(pe.nombres, ' ', pe.apellidos) LIKE '{str_validate}'" )
+                if nivel:
                     where.append(f"ni.id={nivel}")
-                if(genero):
+                if genero:
                     where.append(f"ge.id={genero}")
-                if(estado):
-                    where.append(f"re.inhabilitado={estado}")
+                if estado:
+                    where.append(f"re.estado={estado}")
                 where = filtrosWhere(where)
 
                 query = """
@@ -365,7 +352,7 @@ class Recreadores_Views(View):
                         pe.numero_documento,
                         CONCAT('0', pe.telefono_principal) AS telefono_principal,
                         CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
-                        re.inhabilitado
+                        re.estado
                     FROM recreadores AS re
                     LEFT JOIN niveles AS ni ON re.nivel_id=ni.id
                     LEFT JOIN generos AS ge ON re.genero_id=ge.id
@@ -374,11 +361,13 @@ class Recreadores_Views(View):
                     {}
                     ORDER BY {} {} 
                     LIMIT %s, %s;
-                """.format(where, typeOrdenBy, orderType)
+                """.format(
+                    where, typeOrdenBy, orderType
+                )
 
                 cursor.execute(query, [inicio, final])
                 recreadores = dictfetchall(cursor)
-                
+
                 query = """
                     SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM recreadores;
                 """
@@ -395,13 +384,12 @@ class Recreadores_Views(View):
                     }
                 else:
                     datos = {
-                        "status": False,
+                        "status": True,
                         "message": f"{MESSAGE['errorRegistrosNone']}",
                         "data": None,
                         "pages": None,
                         "total": 0,
                     }
-
             return JsonResponse(datos)
         except Exception as error:
             print(f"{MESSAGE['errorGet']} - {error}")

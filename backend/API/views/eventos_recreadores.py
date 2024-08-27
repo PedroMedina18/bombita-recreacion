@@ -174,7 +174,7 @@ class Eventos_Recreadores_Servicios_View(View):
             cursor.close()
             connection.close()
 
-    def put(sel, request, id_evento):
+    def put(sel, request, id):
         try:
             req = json.loads(request.body)
             verify = verify_token(req['headers'])
@@ -188,9 +188,9 @@ class Eventos_Recreadores_Servicios_View(View):
                 }
                 return JsonResponse(datos)
 
-            evento = list(Eventos.objects.filter(id=id_evento).values())
+            evento = list(Eventos.objects.filter(id = id).values())
             if len(evento) > 0:
-                evento = Eventos.objects.get(id = id_evento)
+                evento = Eventos.objects.get(id = id)
             else:
                 datos = {'status': False, 'message': MESSAGE['errorEvento']}
                 return JsonResponse(datos)
@@ -212,15 +212,15 @@ class Eventos_Recreadores_Servicios_View(View):
                 WHERE 
                     es.evento_id = %s
             """
-            cursor.execute(query, [id_evento])
+            cursor.execute(query, [id])
             recreadores_registrados = dictfetchall(cursor)
             recreadores_nuevos = req["recreadores"]
             recreador_eliminar = [recreador_registrado for recreador_registrado in recreadores_registrados if not any(recreador_nuevo.id == recreador_registrado.id and recreador_nuevo.servicio == recreador_registrado.servicio for recreador_nuevo in recreadores_nuevos)]
             recreador_agregar = [recreador_nuevo for recreador_nuevo in recreadores_nuevos if not any(recreador_registrado.id == recreador_nuevo.id and recreador_registrado.servicio == recreador_nuevo.servicio for recreador_registrado in recreadores_registrados)]
             
             for eliminar in recreador_eliminar:
-                recreador = Recreadores.objects.get(id=int(eliminar["id"]))
-                servicio = Servicios.objects.get(id=int(eliminar["servicio"]))
+                recreador = Recreadores.objects.get(id=int(eliminar['id']))
+                servicio = Servicios.objects.get(id=int(eliminar['servicio']))
                 EventosRecreadoresServicios.filter(evento=evento, servicio=servicio, recreador=recreador).delete()
             
             query="""
@@ -244,9 +244,9 @@ class Eventos_Recreadores_Servicios_View(View):
 
 
             for agregar in recreador_agregar:
-                servicio = Servicios.objects.get(id=agregar["servicio"])
+                servicio = Servicios.objects.get(id=agregar['servicio'])
                 if(totalRecreadores[f"{servicio.id}"] < servicio.numero_recreadores):
-                    recreador = Recreadores.objects.get(id=agregar["id"])
+                    recreador = Recreadores.objects.get(id=agregar['id'])
                     EventosRecreadoresServicios.objects.create(evento = evento, recreador = recreador, servicio = servicio)
 
         except Exception as error:

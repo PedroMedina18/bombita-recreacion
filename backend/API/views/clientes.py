@@ -9,7 +9,7 @@ from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..funtions.identificador import determinar_valor, edit_str, normalize_id_list
 from ..funtions.token import verify_token
-from ..funtions.filtros import order, filtrosWhere, typeOrder
+from ..funtions.filtros import order, filtrosWhere
 from ..message import MESSAGE
 import json
 
@@ -64,9 +64,7 @@ class Clientes_Views(View):
                     TipoDocumento.objects.filter(id=int(req["tipo_documento"])).values()
                 )
                 if len(tipo_documento) > 0:
-                    tipo_documento = TipoDocumento.objects.get(
-                        id=int(req["tipo_documento"])
-                    )
+                    tipo_documento = TipoDocumento.objects.get(id=int(req["tipo_documento"]))
                 else:
                     datos = {
                         "status": False,
@@ -81,7 +79,15 @@ class Clientes_Views(View):
                 persona.correo = req["correo"]
                 persona.tipo_documento = tipo_documento
                 persona.save()
-
+                datos = {
+                    "status": True, 
+                    "message": f"{MESSAGE['edition']}"
+                }
+            else:
+                datos = {
+                    "status": False,
+                    "message": f"{MESSAGE['errorRegistroNone']}",
+                }
             return JsonResponse(datos)
         except models.ProtectedError as error:
             print(f"{MESSAGE['errorProteccion']}  - {str(error)}")
@@ -94,11 +100,10 @@ class Clientes_Views(View):
             datos = {"status": False, "message": f"{MESSAGE['errorEliminar']}: {error}"}
             return JsonResponse(datos)
 
-    def get(self, request, identificador=None):
+    def get(self, request, id=0):
         try:
             cursor = connection.cursor()
             verify = verify_token(request.headers)
-            info = request.GET.get("_info", "false")
             totalClientes = request.GET.get("total", "false")
             if not verify["status"]:
                 datos = {"status": False, "message": verify["message"], "data": None}
@@ -117,8 +122,7 @@ class Clientes_Views(View):
                     }
                 return JsonResponse(datos)
 
-            if identificador:
-                tipo = determinar_valor(identificador)
+            if id:
                 query = """
                     SELECT 
                     	cli.id, 
@@ -134,55 +138,44 @@ class Clientes_Views(View):
                     FROM clientes AS cli
                     LEFT JOIN personas AS pe ON cli.persona_id=pe.id
                     LEFT JOIN tipos_documentos AS tipo ON pe.tipo_documento_id=tipo.id
+                    WHERE cli.id=%s;
                 """
-                if tipo["type"] == "int":
-                    if info == "true":
-                        query = query + "WHERE cli.id=%s;"
-                        cursor.execute(query, [tipo["valor"]])
-                    else:
-                        numero_documento = str(tipo["valor"]) + "%"
-                        query = query + "WHERE pe.numero_documento LIKE %s;"
-                        cursor.execute(query, [numero_documento])
-                else:
-                    str_validate = edit_str(tipo["valor"])
-                    query = (
-                        query + "WHERE CONCAT(pe.nombres, ' ', pe.apellidos) LIKE %s ;"
-                    )
-                    cursor.execute(query, [str_validate])
+                cursor.execute(query, [id])
                 cliente = dictfetchall(cursor)
                 if len(cliente) > 0:
-                    if info == "true":
-                        datos = {
-                            "status": True,
-                            "message": f"{MESSAGE['exitoGet']}",
-                            "data": {"info": cliente[0]},
-                        }
-                    else:
-                        datos = {
-                            "status": True,
-                            "message": f"{MESSAGE['exitoGet']}",
-                            "data": cliente,
-                            "total": len(cliente),
-                            "pages": 1,
-                        }
+                    datos = {
+                        "status": True,
+                        "message": f"{MESSAGE['exitoGet']}",
+                        "data": cliente[0],
+                    }
                 else:
                     datos = {
                         "status": False,
                         "message": f"{MESSAGE['errorRegistrosNone']}",
                         "data": None,
-                        "total": 0,
-                        "pages": 0,
                     }
             else:
                 page = request.GET.get('page', 1)
                 inicio = indiceInicial(int(page))
                 final = indiceFinal(int(page))
-
+                typeOrdenBy = request.GET.get('organizar', "orig")
                 orderType = order(request)
-                typeOrdenBy = "pe.nombres" if typeOrder(request) else "cli.id"
 
+                if(typeOrdenBy=="orig"):
+                    typeOrdenBy ="cli.id"
+                elif(typeOrdenBy=="alf"):
+                    typeOrdenBy ="pe.nombres"
+                else:
+                    typeOrdenBy="cli.id"
 
                 where = []
+                search = request.GET.get('search', None)
+                search = determinar_valor(search)
+                if(search['valor'] and search['type']=="int"):
+                    where.append(f"pe.numero_documento LIKE '{search['valor']}%%'" )
+                elif(search['valor'] and search['type']=="str"):
+                    str_validate = edit_str(search["valor"])
+                    where.append(f"CONCAT(pe.nombres, ' ', pe.apellidos) LIKE '{str_validate}'" )
                 where = filtrosWhere(where)
                 
                 query="""
@@ -224,7 +217,7 @@ class Clientes_Views(View):
                     }
                 else:
                     datos = {
-                        "status": False,
+                        "status": True,
                         "message": f"{MESSAGE['errorRegistrosNone']}",
                         "data": None,
                         "pages": None,

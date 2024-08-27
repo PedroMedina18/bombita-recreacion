@@ -8,7 +8,8 @@ from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..funtions.email import emailRegistroEvento
 from ..funtions.time import duration
-from ..funtions.filtros import order, typeOrder, filtrosWhere, peridoFecha
+from ..funtions.identificador import determinar_valor
+from ..funtions.filtros import order, filtrosWhere, peridoFecha
 from ..models import Eventos, EventosSobrecargos, EventosServicios, Clientes, Personas, Servicios, Sobrecargos, TipoDocumento
 from ..funtions.token import verify_token
 from ..message import MESSAGE
@@ -96,7 +97,7 @@ class Eventos_Views(View):
                 direccion = req['direccion'], 
                 numero_personas = int(req['numero_personas']), 
                 cliente = cliente,
-                completado = False,
+                estado = None,
             )
             for servicio in servicios:
                 EventosServicios.objects.create(evento=evento, servicio=servicio)
@@ -185,7 +186,6 @@ class Eventos_Views(View):
         try:
             cursor = connection.cursor()
             verify = verify_token(request.headers)
-            info = request.GET.get('_info', 'false')
             if not verify['status']:
                 datos = {'status': False, 'message': verify['message'], 'data': None}
                 return JsonResponse(datos)
@@ -196,24 +196,24 @@ class Eventos_Views(View):
                         eve.id,
                     	eve.fecha_evento_inicio,
                     	eve.fecha_evento_final,
-                        per.nombres, 
+                        per.nombres,
                         per.apellidos, 
                         tipo.nombre AS tipo_documento, 
                         per.numero_documento,
                         eve.numero_personas,
                         eve.direccion,
-                        eve.completado,
+                        eve.estado,
                         eve.fecha_registro,
                         eve.fecha_actualizacion
                     FROM eventos AS eve
                     LEFT JOIN clientes AS cli ON eve.cliente_id=cli.id
                     INNER JOIN personas AS per ON cli.persona_id=per.id
                     LEFT JOIN tipos_documentos AS tipo ON per.tipo_documento_id=tipo.id
-                    WHERE eve.id LIKE %s ;
+                    WHERE eve.id=%s ;
                 """
                 cursor.execute(query, [id])
                 evento = dictfetchall(cursor)
-                if info == 'true' and len(evento) > 0:
+                if len(evento) > 0:
                     evento = evento[0]
                     query = """
                         SELECT 
@@ -267,14 +267,6 @@ class Eventos_Views(View):
                             'pagos': pagos,
                         }
                     }
-                elif info == 'false' and len(evento) > 0:
-                    datos = {
-                        'status': True,
-                        'message': f"{MESSAGE['exitoGet']}",
-                        'data': evento,
-                        'total': len(evento),
-                        'pages': 1,
-                    }
                 else:
                     datos = {
                         'status': False,
@@ -301,6 +293,10 @@ class Eventos_Views(View):
                 completado = request.GET.get('nivel', None)
                 cliente = request.GET.get('cliente', None)
                 fecha = peridoFecha(request, ordenFecha)
+                search = request.GET.get('search', None)
+                search = determinar_valor(search)
+                if(search['valor'] and search['type']=="int"):
+                    where.append(f"eve.id LIKE '{search['valor']}%%'" )
                 if(completado):
                     where.append(f"eve.completado={int(completado)}")
                 if(cliente):
@@ -337,7 +333,7 @@ class Eventos_Views(View):
                     eve.total,
                     eve.direccion,
                     eve.fecha_registro,
-                    eve.completado
+                    eve.estado
                 FROM eventos AS eve
                 LEFT JOIN clientes AS cli ON eve.cliente_id=cli.id
                 LEFT JOIN personas AS per ON cli.persona_id=per.id
@@ -364,7 +360,7 @@ class Eventos_Views(View):
                     }
                 else:
                     datos = {
-                        'status': False,
+                        'status': True,
                         'message': f"{MESSAGE['errorRegistrosNone']}",
                         'data': None,
                         'pages': None,

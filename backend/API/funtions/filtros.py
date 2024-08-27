@@ -2,19 +2,10 @@ import datetime
 
 
 def order(request):
-    order = request.GET.get('order', 'ASC')
+    order = request.GET.get('order', 'DESC')
     if not(order == 'ASC') and not(order == 'DESC'):
-        order = 'ASC'
+        order = 'DESC'
     return order
-
-def typeOrder(request):
-    order = request.GET.get('organizar', 'orig')
-    if order == "alf":
-        return True
-    elif order == "orig":
-        return False
-    else:
-        return False
 
 def filtrosWhere(filtros=[]):
     if(len(filtros)==0):

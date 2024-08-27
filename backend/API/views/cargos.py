@@ -9,9 +9,9 @@ from ..funtions.serializador import dictfetchall
 from ..models import Cargos, Privilegios, Permisos
 from ..funtions.token import verify_token
 from ..funtions.editorOpciones import editorOpciones
-from ..funtions.identificador import returnBoolean, normalize_id_list
+from ..funtions.identificador import returnBoolean, normalize_id_list, determinar_valor
 from ..message import MESSAGE
-from ..funtions.filtros import order, filtrosWhere, typeOrder
+from ..funtions.filtros import order, filtrosWhere
 from decouple import config
 import json
 
@@ -69,9 +69,9 @@ class Cargos_Views(View):
                         permisos = dictfetchall(cursor)
                         listTabla = normalize_id_list(req['permisos'])
                         editorOpciones(
-                            items = permisos,
+                            registros = permisos,
                             id = id,
-                            listTabla = listTabla,
+                            list_new_registros = listTabla,
                             tablaIntermedia = Privilegios,
                             itemGet = cargo,
                             tablaAgregar = Permisos,
@@ -237,20 +237,29 @@ class Cargos_Views(View):
                 inicio = indiceInicial(int(page))
                 final = indiceFinal(int(page))
                 all = request.GET.get('all', False)
+                typeOrdenBy = request.GET.get('organizar', "orig")
                 orderType = order(request)
 
-                typeOrdenBy = "nombre" if typeOrder(request) else "id"
+                if(typeOrdenBy=='orig'):
+                    typeOrdenBy ='id'
+                elif(typeOrdenBy=='alf'):
+                    typeOrdenBy ='nombre'
+                else:
+                    typeOrdenBy='id'
 
                 where = []
+                search = request.GET.get('search', None)
+                search = determinar_valor(search)
+                if(search['valor'] and search['type']=="int"):
+                    where.append(f"id LIKE '{search['valor']}%%'" )
                 where = filtrosWhere(where)
-                query = "SELECT {} FROM cargos ORDER BY {} {} {}"
 
                 if(all == "true"):
                     query = "SELECT id, nombre FROM cargos ORDER BY {} {};".format(typeOrdenBy, orderType)
                     cursor.execute(query)
                     cargos = dictfetchall(cursor)
                 else:
-                    query = "SELECT * FROM cargos ORDER BY {} {} LIMIT %s, %s;".format(typeOrdenBy, orderType)
+                    query = "SELECT * FROM cargos {} ORDER BY {} {} LIMIT %s, %s;".format(where, typeOrdenBy, orderType)
                     cursor.execute(query, [inicio, final])
                     cargos = dictfetchall(cursor)
 
@@ -270,7 +279,7 @@ class Cargos_Views(View):
                     }
                 else:
                     datos = {
-                        'status': False,
+                        'status': True,
                         'message': f"{MESSAGE['errorRegistrosNone']}",
                         'data': None,
                         'pages': None,

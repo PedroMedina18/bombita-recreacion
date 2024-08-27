@@ -333,6 +333,10 @@ const texts={
             name:"Información del Recreador",
             description:"Toda la información del recreador"
         },
+        cargo:{
+            name:"Información del Cargo",
+            description:"Toda la información del cargo"
+        },
         pagos:{
             name:"Registrar Pagos de Eventos",
         },
@@ -343,7 +347,7 @@ const texts={
     },
 
     registerMessage:{
-        searchItem:"Buscar por su Item",
+        searchItem:"Buscar por su Codigo",
         searchNameDocument:"Buscar por número de Documento o Nombre",
         buttonRegisterTipoDocumento:"Agregar un Nuevo Tipo de Documento",
         buttonRegisterGenero:"Agregar un Nuevo Genero",
