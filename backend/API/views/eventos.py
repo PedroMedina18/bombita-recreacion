@@ -8,7 +8,7 @@ from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..funtions.email import emailRegistroEvento
 from ..funtions.time import duration
-from ..funtions.identificador import determinar_valor
+from ..funtions.identificador import determinar_valor, edit_str
 from ..funtions.filtros import order, filtrosWhere, peridoFecha
 from ..models import Eventos, EventosSobrecargos, EventosServicios, Clientes, Personas, Servicios, Sobrecargos, TipoDocumento
 from ..funtions.token import verify_token
@@ -279,7 +279,8 @@ class Eventos_Views(View):
                 page = request.GET.get('page', 1)
                 inicio = indiceInicial(int(page))
                 final = indiceFinal(int(page))
-                all = request.GET.get('all', False)
+                all = request.GET.get('all', "false")
+                estadoPago = request.GET.get('estado_pago', None)
                 limit = ""
                 ordenFecha = request.GET.get('fecha', "fecha_registro")
                 orderType = order(request)
@@ -290,34 +291,37 @@ class Eventos_Views(View):
                     ordenFecha ="eve.fecha_evento_inicio"
 
                 where = []
-                completado = request.GET.get('nivel', None)
+                estado = request.GET.get('estado', None)
                 cliente = request.GET.get('cliente', None)
                 fecha = peridoFecha(request, ordenFecha)
                 search = request.GET.get('search', None)
                 search = determinar_valor(search)
                 if(search['valor'] and search['type']=="int"):
                     where.append(f"eve.id LIKE '{search['valor']}%%'" )
-                if(completado):
-                    where.append(f"eve.completado={int(completado)}")
+                elif(search['valor'] and search['type']=="str"):
+                    str_validate = edit_str(search["valor"])
+                    where.append(f"CONCAT(per.nombres, ' ', per.apellidos) LIKE '{str_validate}'" )
+
+                if(estado):
+                    where.append(f"eve.estado={estado}")
                 if(cliente):
                     where.append(f"cli.id={int(cliente)}")
                 if(fecha):
                     where.append(f"{fecha}")
+                if(estadoPago):
+                    if(int(estadoPago)==1):
+                        where.append(f"eve.pago_total=0 AND eve.anticipo=0")
+                    if(int(estadoPago)==2):
+                        where.append(f"eve.pago_total=0 AND eve.anticipo=1")
+                    if(int(estadoPago)==3):
+                        where.append(f"eve.pago_total=1")
+
                 where = filtrosWhere(where)
 
                 if(all == "true"):
                     limit=""
                 else:
                     limit=f"LIMIT {inicio}, {final}"
-
-                # if (filtros == 'pagado'):
-                #     filtros = 'WHERE eve.total = 1'
-                # elif (filtros == 'anticipo'):
-                #     filtros = 'WHERE eve.anticipo = 1'
-                # elif (filtros == 'no_pagado'):
-                #     filtros = 'WHERE eve.total = 0'
-                # elif (filtros == 'no_anticipo'):
-                #     filtros = 'WHERE eve.anticipo = 0 AND eve.total = 0'
 
                 query = """
                 SELECT 
@@ -330,7 +334,7 @@ class Eventos_Views(View):
                     per.numero_documento,
                     eve.numero_personas,
                     eve.anticipo,
-                    eve.total,
+                    eve.pago_total,
                     eve.direccion,
                     eve.fecha_registro,
                     eve.estado

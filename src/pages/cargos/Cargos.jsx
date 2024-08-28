@@ -5,8 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import {deleteItem, searchCode, getListItems} from "../../utils/actions.jsx";
 import { IconTrash, IconEdit, IconDetail } from "../../components/Icon.jsx";
 import { formatoId } from "../../utils/process.jsx";
-import Navbar from "../../components/navbar/Navbar";
-import Table from "../../components/table/Table";
+import Navbar from "../../components/navbar/Navbar.jsx";
+import Table from "../../components/table/Table.jsx";
 import texts from "../../context/text_es.js";
 
 function Cargos() {

@@ -52,7 +52,7 @@ function TipoDocumento() {
       },
     },
     {
-      name: "Descripcion",
+      name: "Descripción",
       row: (row) => {
         return row.descripcion;
       },
@@ -70,7 +70,7 @@ function TipoDocumento() {
                   fecha_de_registro: formatDateWithTime12Hour(
                     row.fecha_registro
                   ),
-                  fecha_de_actualizacion: formatDateWithTime12Hour(
+                  fecha_de_actualización: formatDateWithTime12Hour(
                     row.fecha_actualizacion
                   ),
                 });

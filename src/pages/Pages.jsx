@@ -16,6 +16,7 @@ import FormActividades from "./actividades/FormActividades.jsx";
 import Recreadores from "./recreadores/Recreadores.jsx"
 import FormRecreadores from "./recreadores/FormRecreadores.jsx";
 import Recreador from "./recreadores/Recreador.jsx";
+import CalendarRecreadores from "./recreadores/CalendarRecreadores.jsx";
 import MetodosPago from "./metodosPago/MetodosPago.jsx";
 import FormMetodosPago from "./metodosPago/FormMetodosPago.jsx";
 import Niveles from "./niveles/Niveles.jsx";
@@ -27,10 +28,12 @@ import Sobrecargos from "./sobrecargos/Sobrecargos.jsx";
 import FormSobrecargos from "./sobrecargos/FormSobrecargos.jsx";
 import FormServicios from "./servicios/FormServicios.jsx";
 import Eventos from "./eventos/Eventos.jsx";
+import CalendarEvent from "./eventos/CalendarEvent.jsx";
 import Dolar from "./dolar/Dolar.jsx";
 import Pagos from "./pagos/Pagos.jsx";
 import FormDataEvent from "./eventos/FormDataEvent.jsx";
 import FormAccount from "./eventos/FormAccount.jsx";
+import Evento from "./eventos/Evento.jsx";
 import Configuracion from "./configuracion/Configuracion.jsx";
 import EventosRecreadores from "./recreadores_eventos/EventosRecreadores.jsx";
 import Cargo from "./cargos/Cargo.jsx"
@@ -50,10 +53,11 @@ export {
     Materiales, FormMateriales,
     Servicios, Sobrecargos,
     FormSobrecargos, FormServicios,
-    Eventos, Dolar,
+    Eventos, Dolar, Evento,
     FormDataEvent, FormAccount,
     EventosRecreadores, FormUsuarios,
-    Configuracion, Cargo
+    Configuracion, Cargo,
+    CalendarRecreadores, CalendarEvent
 }
 
 

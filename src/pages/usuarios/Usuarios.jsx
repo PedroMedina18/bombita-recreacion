@@ -1,14 +1,13 @@
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef } from "react";
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
-import { usuarios } from "../../utils/API.jsx"
-import { calcularEdad } from "../../utils/process.jsx"
-import { searchCode, getListItems, deleteItem } from "../../utils/actions.jsx"
-import { formatoId } from "../../utils/process.jsx"
-import Navbar from "../../components/navbar/Navbar"
-import Table from "../../components/table/Table"
+import { usuarios } from "../../utils/API.jsx";
+import { searchCode, getListItems, deleteItem } from "../../utils/actions.jsx";
+import { formatoId } from "../../utils/process.jsx";
+import Navbar from "../../components/navbar/Navbar";
+import Table from "../../components/table/Table";
 import texts from "../../context/text_es.js";
-
+import Pildora from "../../components/Pildora.jsx";
 
 function Usuarios() {
     const [listUsuarios, setUsuarios] = useState([])
@@ -40,25 +39,24 @@ function Usuarios() {
             row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
         },
         {
-            name: "Nombre",
-            row: (row) => { return `${row.nombres} ${row.apellidos}` }
-        },
-        {
             name: "Usuario",
             row: (row) => { return `${row.usuario}` }
         },
         {
-            name: "Inhabilitado",
+            name: "Nombre",
+            row: (row) => { return `${row.nombres} ${row.apellidos}` }
+        },
+        {
+            name: "Estado",
             row: (row) => {
-                const value = row.Inhabilitado ? true : false
-                return value
+                return row.estado ? <Pildora contenido="Activo" color="bg-succes"/> : <Pildora contenido="Inhabilitado"  />
             }
         },
     ]
 
     const options = {
         search: {
-            placeholder: texts.registerMessage.searchNameDocument,
+            placeholder: texts.registerMessage.searchUser,
             function: (value) => {
                 searchCode({
                     value: value,
@@ -70,7 +68,7 @@ function Usuarios() {
             }
         },
         register: {
-            name: texts.registerMessage.buttonRegisterRecreador,
+            name: texts.registerMessage.buttonRegisterUser,
             function: () => {
                 navigate("/register/usuario/")
             }

@@ -6,7 +6,7 @@ from django.views import View
 from ..funtions.encriptado_contraseña import encriptado_constraseña, desencriptado_contraseña
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.token import verify_token
-from ..funtions.id import determinar_valor, edit_str
+from ..funtions.identificador import determinar_valor, edit_str
 from ..funtions.serializador import dictfetchall
 from ..models import Cargos, Permisos, TipoDocumento, Usuarios, Personas
 from django.db import IntegrityError, connection, models
@@ -116,14 +116,29 @@ class Usuarios_Views(View):
             req = json.loads(request.body)
             verify = verify_token(req["headers"])
             req = req["body"]
-            password = request.GET.get('password', "true")
+            password = request.GET.get('password', "false")
             if not verify["status"]:
                 datos = {"status": False, "message": verify["message"]}
                 return JsonResponse(datos)
-
             usuario = list(Usuarios.objects.filter(id=id).values())
+                
 
             if len(usuario) > 0:
+                if(password=="true"):
+                    if(req["contraseña"] == req["contraseña_repetida"]):
+                        contraseña=encriptado_constraseña(req['contraseña'])
+                        usuario.contraseña=contraseña
+                        datos = {
+                            "status": True, 
+                            "message": f"{MESSAGE['edition']}"
+                        }
+                    else:
+                        datos = {
+                            "status": False,
+                            "message": f"{MESSAGE['errorContraseña']}",
+                        }
+                    return JsonResponse(datos)
+                
                 usuario = Usuarios.objects.get(id=id)
                 persona = Permisos.objects.get(id=usuario.persona)
                 tipo_documento = list(TipoDocumento.objects.filter(id=int(req['tipo_documento'])).values())

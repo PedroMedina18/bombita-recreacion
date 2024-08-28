@@ -93,7 +93,7 @@ function Clientes() {
 
     const options = {
         search: {
-            placeholder: texts.registerMessage.searchItem,
+            placeholder: texts.registerMessage.searchClient,
             function: (value) => {
                 searchCode({
                     value: value,

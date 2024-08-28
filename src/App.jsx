@@ -19,7 +19,8 @@ import {
   Eventos, Dolar,
   FormDataEvent, FormAccount,
   EventosRecreadores, FormUsuarios,
-  Configuracion, Cargo
+  Configuracion, Cargo, Evento,
+  CalendarRecreadores, CalendarEvent
 } from "./pages/Pages.jsx"
 
 
@@ -37,9 +38,10 @@ function App() {
             <Route path="/register/usuario/" element={<FormUsuarios />} />
             <Route path="/usuarios/" element={<Usuarios />} />
             <Route path="/eventos/" element={<Eventos />} />
+            <Route path="/eventos/calendar/" element={<CalendarEvent />} />
             <Route path="/eventos/recreadores/:id_evento/" element={<EventosRecreadores />} />
             <Route path="/eventos/pagos/:id_evento/" element={<Pagos />} />
-            {/* <Route path="/eventos/:id_evento/" element={<Inicio />} /> */}
+            <Route path="/eventos/:id/" element={<Evento />} />
             <Route path="/register/eventos/" element={<FormEventContextProvider />} >
               <Route path="" element={<FormDataEvent />} />
               <Route path="account/" element={<FormAccount />} />
@@ -62,6 +64,7 @@ function App() {
             <Route path="/generos/" element={<Generos />} />
             <Route path="/register/genero/" element={<FormGeneros />} />
             <Route path="/edit/genero/:id/" element={<FormGeneros />} />
+            <Route path="/recreador/calendar/:id/" element={<CalendarRecreadores />} />
             <Route path="/recreador/:id/" element={<Recreador />} />
             <Route path="/recreadores/" element={<Recreadores />} />
             <Route path="/register/recreador/" element={<FormRecreadores />} />

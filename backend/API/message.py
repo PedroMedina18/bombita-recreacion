@@ -41,6 +41,7 @@ MESSAGE={
     'errorRegistrosPersonas': 'Personas no encontrados',
 
     'errorGenero':'Error. Compruebe el genero',
+    'errorContraseña':'Error. Contraseñas diferentes',
     'errorCliente':'Error. Compruebe que existe el cliente seleccionado',
     'errorNivel':'Error. Compruebe el nivel',
     'errorTipoDocumento':'Error. Compruebe el tipo de documento',

@@ -37,7 +37,7 @@ function EventosRecreadores() {
 
   const get_data = async () => {
     try {
-      const evento = await eventos.get({ subDominio: [Number(params.id_evento)], params: { "_info": "true" } })
+      const evento = await eventos.get({ subDominio: [Number(params.id_evento)]})
       const recreadoresEvento = await eventos.get({ subDominio: ["recreadores", Number(params.id_evento)] })
       const listRecreadores = await recreadores.get()
 
@@ -161,7 +161,7 @@ function EventosRecreadores() {
                   </div>
                   <div className='d-flex flex-column pe-sm-2 ps-sm-0  px-lg-2 mb-1 flex-fill'>
                     <strong>Fecha:</strong>
-                    <p className='m-0'>{`${formatDateWithTime12Hour(dataEvento.info.fecha_evento)}`}</p>
+                    <p className='m-0'>{`${formatDateWithTime12Hour(dataEvento.info.fecha_evento_inicio)}`}</p>
                   </div>
                   <div className='d-flex flex-column pe-sm-2 ps-sm-0  px-lg-2 mb-1 flex-fill'>
                     <strong>Numero de Asistentes:</strong>
@@ -209,9 +209,15 @@ function EventosRecreadores() {
 
 
 function CardRecreadorSelect({ recreador, id, optionsDefault, dataFuntion }) {
-  const [value, setRecreador] = useState(null)
+  const [value, setRecreador] = useState(recreador? recreador : null)
   const [debounceTimeoutRecreador, setDebounceTimeoutRecreador] = useState(null);
   const { indexServicio, indexRecreador, dataServicios, setDataServicios } = dataFuntion
+  
+  useEffect(()=>{
+    console.log(recreador)
+  },[value])
+
+
 
   const loadOptionsRecreador = (inputValue, callback) => {
     if (debounceTimeoutRecreador) {
@@ -241,7 +247,7 @@ function CardRecreadorSelect({ recreador, id, optionsDefault, dataFuntion }) {
     <div className="d-flex flex-column justify-content-between align-items-center mx-2 ">
       <CardRecreador
         edad={recreador ? calcularEdad(recreador.fecha_nacimiento) : null}
-        img={recreador ? recreador.img : null}
+        img={recreador ? recreador.img_perfil : null}
         nombre={recreador ? `${recreador.nombres} ${recreador.apellidos}` : null}
         genero={recreador ? recreador.genero : null}
         nivel={recreador ? recreador.nivel : null}

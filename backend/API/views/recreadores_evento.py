@@ -25,31 +25,44 @@ class Recraadores_Eventos_Views(View):
             if not verify['status']:
                 datos = {'status': False, 'message': verify['message'], 'data': None}
                 return JsonResponse(datos)
+            page = request.GET.get('page', 1)
+            inicio = indiceInicial(int(page))
+            final = indiceFinal(int(page))
+            all = request.GET.get('all', "false")
+            limit = ""
+            orderType = order(request)
             
             where = []
-            fecha = peridoFecha(request)
+            fecha = peridoFecha(request, "eve.fecha_evento_inicio")
             where.append(f"res.recreador_id={int(id)}")
             if(fecha):
                 where.append(f"{fecha}")
             where = filtrosWhere(where)
+
+            if(all == "true"):
+                limit=""
+            else:
+                limit=f"LIMIT {inicio}, {final}"
 
             query = """
                 SELECT 
                     eve.id,
                 	eve.fecha_evento_inicio,
                 	eve.fecha_evento_final,
+                    eve.direccion,
                     per.nombres, 
                     per.apellidos, 
                     tipo.nombre AS tipo_documento, 
                     per.numero_documento,
-                    eve.estado,
+                    eve.estado
                 FROM recreadores_eventos_servicios res
                 INNER JOIN recreadores AS re ON res.recreador_id=re.id
                 INNER JOIN personas AS per ON re.persona_id=per.id
                 LEFT JOIN tipos_documentos AS tipo ON per.tipo_documento_id=tipo.id
-                INNER JOIN evento as eve ON res.evento_id=eve.id
-                {};
-            """.format(where)
+                INNER JOIN eventos as eve ON res.evento_id=eve.id
+                {}
+                ORDER BY eve.id {} {};
+            """.format(where, orderType, limit)
 
             cursor.execute(query)
             eventos = dictfetchall(cursor)

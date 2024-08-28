@@ -68,39 +68,44 @@ function Cargo() {
             )
             :
             (
-              <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
+              <div className="div-main  px-3 px-md-4 px-lg-5 py-3">
                 <h3 className="h2 fw-bold">{`${dataCargo.nombre}`}</h3>
                 <div className="w-100 d-flex flex-column">
-                  <div className={`lg section-perfil d-flex align-items-center justify-content-center mt-2 mx-auto ${dataCargo.img ? "section-perfil-img" : ""}`}>
-                    {
-                      dataCargo.img ?
-                        <img src={dataCargo.img} alt="img_perfil" className={`lg img-perfil ${dataCargo.img ? "" : "d-none"}`} />
-                        :
-                        <IconUserCircleSolid />
-                    }
+                  <div className="d-flex flex-column flex-md-row  justify-content-between mt-3">
+                    <div className={`lg section-perfil d-flex align-items-center justify-content-center mt-2 mx-auto ${dataCargo.img ? "section-perfil-img" : ""}`}>
+                      {
+                        dataCargo.img ?
+                          <img src={dataCargo.img} alt="img_perfil" className={`lg img-perfil ${dataCargo.img ? "" : "d-none"}`} />
+                          :
+                          <IconUserCircleSolid />
+                      }
+                    </div>
+                    <div className="w-100 w-sm-50 d-flex flex-column">
+                      <p className="m-0 mb-2 text-start fs-5-5"><strong>Codigo: </strong> {formatoId(dataCargo.id)}</p>
+                      <p className="m-0 mb-2 text-start fs-5-5"><strong>Descripción: </strong> {dataCargo.descripcion}</p>
+                      {
+                        dataCargo.administrador ?
+                          (
+                            <p className="m-0 mb-2 text-start fs-5-5"><strong>Permisos: </strong> Posee permisos de administrador</p>
+                          )
+                          :
+
+                          <div>
+                            <strong className="m-0 mb-2 text-start fs-5-5">Permisos:</strong>
+                            {
+                              dataCargo.permisos.map((permiso, index) => (
+                                <p key={`permiso_${index}`} className="m-0 mb-2 ms-4 text-start fs-5-5"><strong>{permiso.nombre}: </strong>{permiso.descripcion}</p>
+
+                              ))
+                            }
+                          </div>
+
+                      }
+                      <p className="m-0 mb-2 text-start fs-5-5"><strong>Fecha de Registro: </strong> {formatDateWithTime12Hour(dataCargo.fecha_registro)}</p>
+                      <p className="m-0 mb-2 text-start fs-5-5"><strong>Fecha de Actualización: </strong> {formatDateWithTime12Hour(dataCargo.fecha_actualizacion)}</p>
+                    </div>
+
                   </div>
-                  <p className="m-0 mb-2 text-start fs-5-5"><strong>Codigo: </strong> {formatoId(dataCargo.id)}</p>
-                  <p className="m-0 mb-2 text-start fs-5-5"><strong>Descripción: </strong> {dataCargo.descripcion}</p>
-                  {
-                    dataCargo.administrador ?
-                      (
-                        <p className="m-0 mb-2 text-start fs-5-5"><strong>Permisos: </strong> Posee permisos de administrador</p>
-                      )
-                      :
-
-                      <div>
-                        <strong className="m-0 mb-2 text-start fs-5-5">Permisos:</strong>
-                        {
-                          dataCargo.permisos.map((permiso, index) => (
-                            <p key={`permiso_${index}`} className="m-0 mb-2 ms-4 text-start fs-5-5"><strong>{permiso.nombre}: </strong>{permiso.descripcion}</p>
-
-                          ))
-                        }
-                      </div>
-
-                  }
-                  <p className="m-0 mb-2 text-start fs-5-5"><strong>Fecha de Registro: </strong> {formatDateWithTime12Hour(dataCargo.fecha_registro)}</p>
-                  <p className="m-0 mb-2 text-start fs-5-5"><strong>Fecha de Actualización: </strong> {formatDateWithTime12Hour(dataCargo.fecha_actualizacion)}</p>
                   {
                     Boolean(usuariosList.length) &&
                     <div className="w-100 mt-2">
@@ -120,9 +125,9 @@ function Cargo() {
                           <tbody>
                             {
                               usuariosList.map((usuario, index) => (
-                                <tr key={`${index}-column-usuario`} onDoubleClick={()=>{navigate(`usuario/${usuario.id}`)}}>
+                                <tr key={`${index}-column-usuario`} onDoubleClick={() => { navigate(`usuario/${usuario.id}`) }}>
                                   <td >
-                                    {index +1}
+                                    {index + 1}
                                   </td>
                                   <td >
                                     {formatoId(usuario.id)}

@@ -6,18 +6,18 @@ import { toastError } from "../alerts.jsx";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./ComponentCalendar.css";
 
-function ComponentCalendar({ height = "100vh", width = "100%", object, filtros = {}, eventData, ...props}) {
+function ComponentCalendar({ height = "100vh", width = "100%", object, subDominio=[], filtros = {}, eventData, ...props}) {
   const dayjs = dayjsEs({ weekdaysAbre: false });
   const localizer = dayjsLocalizer(dayjs);
   const [view, setView] = useState("month");
   const [range, setRange] = useState([]);
   const [listEventos, setListeventos] = useState([{}]);
   const [navigateFecha, setNavigate] = useState(null);
+  const renderizado = useRef(0);
   const [rangoFechas, setRangoFechas] = useState({
     desde: dayjs().format("DD-MM-YYYY"),
     hasta: dayjs().format("DD-MM-YYYY"),
   });
-  const renderizado = useRef(0);
   const messages = {
     allDay: "Todo el día",
     previous: "Anterior",
@@ -37,9 +37,9 @@ function ComponentCalendar({ height = "100vh", width = "100%", object, filtros =
   useEffect(() => {
     if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1
-    }else{
-      buscarEventos()
+      return
     }
+    buscarEventos()
   }, [rangoFechas]);
 
   useEffect(() => {
@@ -47,6 +47,9 @@ function ComponentCalendar({ height = "100vh", width = "100%", object, filtros =
   }, [range]);
 
   useEffect(() => {
+    if (renderizado.current === 0) {
+      return
+    }
     color()
   }, [listEventos]);
 
@@ -71,9 +74,8 @@ function ComponentCalendar({ height = "100vh", width = "100%", object, filtros =
         fecha:"fecha_evento"
       };
       
-      const respuesta = await object.get({ params: params });
-      controlErrors({respuesta:respuesta, constrolError:toastError})
-      if(controlErrors({respuesta:respuesta, constrolError:toastError})){
+      const respuesta = await object.get({ subDominio:subDominio, params: params });
+      if(!controlErrors({respuesta:respuesta, constrolError:toastError})){
         const data=respuesta.data.data? respuesta.data.data : []
         const events = data.map((event, index) => {
           return eventData(event, index);

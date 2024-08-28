@@ -96,5 +96,3 @@ def buscar_carpeta_media():
         ruta_actual = ruta_padre
     return None
 
-
-respaldo()

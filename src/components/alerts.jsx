@@ -63,7 +63,7 @@ export const alerError = async (title, text) => {
 export const alertInfo = async (title, data) => {
     let datos=""
     Object.keys(data).forEach(key => {
-        datos = datos + `<p class="m-0 mb-2 text-start"><b>${key.replace(/\_/g, ' ').replace(/\b\w/g, match => match.toUpperCase())}: </b>${data[key]}</p>`
+        datos = datos + `<p class="m-0 mb-2 text-start"><b>${key.replace(/\_/g, ' ').replace(/\b\p{L}/gu, match => match.toUpperCase()).replace(/\p{L}+/gu, match => match.charAt(0) + match.slice(1).toLowerCase())}: </b>${data[key]}</p>`
     });
 
     return Swal.fire({

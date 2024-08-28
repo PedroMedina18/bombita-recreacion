@@ -1,15 +1,15 @@
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef } from "react";
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
-import { recreadores } from "../../utils/API.jsx"
-import { calcularEdad } from "../../utils/process.jsx"
+import { recreadores } from "../../utils/API.jsx";
+import { calcularEdad } from "../../utils/process.jsx";
 import { IconTrash, IconEdit, IconDetail } from "../../components/Icon.jsx";
-import { searchCode, getListItems, deleteItem } from "../../utils/actions.jsx"
-import { formatoId } from "../../utils/process.jsx"
+import { searchCode, getListItems, deleteItem } from "../../utils/actions.jsx";
+import { formatoId } from "../../utils/process.jsx";
 import { useAuthContext } from '../../context/AuthContext.jsx';
-import Navbar from "../../components/navbar/Navbar"
-import Pildora from "../../components/Pildora.jsx"
-import Table from "../../components/table/Table"
+import Navbar from "../../components/navbar/Navbar";
+import Pildora from "../../components/Pildora.jsx";
+import Table from "../../components/table/Table";
 import texts from "../../context/text_es.js";
 
 function Recreadores() {

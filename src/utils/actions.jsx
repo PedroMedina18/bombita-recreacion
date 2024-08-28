@@ -2,6 +2,7 @@ import { personas } from "./API.jsx"
 import { toastError, alertConfim, alertLoading, alertAceptar } from '../components/alerts.jsx'
 import Swal from 'sweetalert2';
 import texts from "../context/text_es.js"
+import {useAuthContext} from "../context/AuthContext.jsx"
 
 // *Para permitir editar los datos al registrar un usuario, cliente o recreador
 export const habilitarEdicion = ({ setValue, setdataNewUser, dataPersona }) => {
@@ -21,6 +22,7 @@ export const controlErrors = ({ respuesta, constrolError, message200=null, messa
     }
     if (respuesta.data.status === false) {
         constrolError(`${messageStatus? messageStatus : respuesta.data.message}`)
+        return true
     }
     return false
 }

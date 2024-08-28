@@ -19,6 +19,7 @@ function Table({
   order = false,
   organizar = [],
   fechaOrganizer = false,
+  childrenTop = null 
 }) {
   const [page, setPages] = useState(1);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
@@ -117,6 +118,11 @@ function Table({
 
   return (
     <div className="div-main justify-content-between p-2 p-md-3 p-lg-4">
+      {
+        childrenTop &&
+        childrenTop()
+      }
+
       {/* info:Primera Seccion con el buscardor y el Boton de direccionamiento */}
       <div className="w-100 d-flex flex-column flex-md-row justify-content-between pb-3">
         {options.register ? (

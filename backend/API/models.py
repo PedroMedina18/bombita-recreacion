@@ -99,7 +99,7 @@ class Recreadores(models.Model):
     estado = models.BooleanField(default = True)
     nivel = models.ForeignKey(Nivel, on_delete = models.PROTECT, related_name = 'recreadores', db_column = 'nivel_id')
     genero = models.ForeignKey(Generos, on_delete = models.PROTECT, related_name = 'recreadores', db_column = 'genero_id')
-    img = models.FileField(upload_to = 'img_recreadores', null = True, blank = True)
+    img = models.FileField(upload_to = 'img_recreadores', null = True, blank = True, db_column = 'img_perfil')
     fecha_nacimiento = models.DateField()
     fecha_registro = models.DateTimeField(auto_now_add = True)
     fecha_actualizacion = models.DateTimeField(auto_now = True)
@@ -201,9 +201,9 @@ class Eventos(models.Model):
     numero_personas = models.IntegerField()
     cliente = models.ForeignKey(Clientes, on_delete = models.PROTECT, related_name = 'eventos', db_column = 'cliente_id')
     estado = models.BooleanField(null=True, default=None)
-    total = models.BooleanField(default=False)
+    pago_total = models.BooleanField(default=False)
     anticipo = models.BooleanField(default=False)
-    opnion = models.CharField(max_length = 500, blank=True, null=True, default=None)
+    opinion = models.CharField(max_length = 500, blank=True, null=True, default=None)
     fecha_registro = models.DateTimeField(auto_now_add = True)
     fecha_actualizacion = models.DateTimeField(auto_now = True)
 
@@ -221,7 +221,7 @@ class EventosSobrecargos(models.Model):
 class EventosServicios(models.Model):
     evento = models.ForeignKey(Eventos, on_delete = models.CASCADE, related_name = 'servicio', db_column = 'evento_id')
     servicio = models.ForeignKey(Servicios, on_delete = models.CASCADE, related_name = 'evento', db_column = 'servicio_id')
-    evaluacion_servicio = models.IntegerField(default=0)
+    evaluacion_servicio = models.IntegerField(null = True, blank = True)
 
     class Meta:
         db_table = 'servicios_eventos'
@@ -246,6 +246,7 @@ class Pagos(models.Model):
     precioDolar = models.ForeignKey(PrecioDolar, on_delete = models.PROTECT, related_name = 'pago', db_column = 'precio_dolar_id')
     referencia = models.BigIntegerField(blank=True, null=True, default=None)
     capture = models.FileField(upload_to = 'capture_pago', null = True, blank = True)
+    fecha_registro = models.DateTimeField(auto_now_add = True)
 
     class Meta:
         db_table = 'pagos'
@@ -254,24 +255,25 @@ class EventosRecreadoresServicios(models.Model):
     evento = models.ForeignKey(Eventos, on_delete = models.CASCADE, related_name = 'recreador', db_column = 'evento_id')
     recreador  = models.ForeignKey(Recreadores, on_delete = models.CASCADE, related_name = 'evento', db_column = 'recreador_id')
     servicio = models.ForeignKey(Servicios, on_delete = models.CASCADE, related_name = 'recreador', db_column = 'servicio_id')
-    evaluacion_recreador = models.IntegerField(default=0)
+    evaluacion_recreador = models.IntegerField(null = True, blank = True)
     class Meta:
         db_table = 'recreadores_eventos_servicios'
 
 class PreguntasEvento(models.Model):
     pregunta = models.CharField(max_length = 100, unique = True)
     estado = models.BooleanField(default=True)
+    fecha_registro = models.DateTimeField(auto_now_add = True)
 
     class Meta:
         db_table = 'preguntas_eventos'
 
-class PreguntasEventoEvento(models.Model):
+class EventoPreguntasEvento(models.Model):
     evento = models.ForeignKey(Eventos, on_delete = models.CASCADE, related_name = 'pregunta', db_column = 'evento_id')
     pregunta = models.ForeignKey(PreguntasEvento, on_delete = models.CASCADE, related_name = 'recreador', db_column = 'pregunta_id')
     respuesta = models.CharField(max_length = 300, blank=True, null=True, default=None)
 
     class Meta:
-        db_table = 'preguntas_eventos_evento'
+        db_table = 'eventos_preguntas_evento'
 
 class RegistroMateriales(models.Model):
     material = models.ForeignKey(Materiales, on_delete = models.CASCADE, related_name = 'registro', db_column = 'material_id')

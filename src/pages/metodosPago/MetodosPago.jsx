@@ -44,7 +44,7 @@ function MetodosPago() {
             row: (row) => { return row.nombre }
         },
         {
-            name: "Descripcion",
+            name: "Descripción",
             row: (row) => { return row.descripcion }
         },
         {
@@ -57,7 +57,7 @@ function MetodosPago() {
                                 row.nombre, 
                                 {
                                   codigo:formatoId(row.id),
-                                  descripcion:row.descripcion,
+                                  descripción:row.descripcion,
                                   referencia:row.referencia? '<span class="badge p-2 bg-success">Obligatorio</span>' : '<span class="badge p-2 bg-danger">Inecesario</span>',
                                   capture:row.capture? '<span class="badge p-2 bg-success">Obligatorio</span>' : '<span class="badge p-2 bg-danger">Inecesario</span>',
                                   divisa:row.divisa? '<span class="badge p-2 bg-success">Monto en Divisa</span>' : '<span class="badge p-2 bg-danger">Monto en Bs.S</span>',

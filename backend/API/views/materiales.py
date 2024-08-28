@@ -211,7 +211,6 @@ class Materiales_Views(View):
                     query = "SELECT * FROM materiales {} ORDER BY {} {} LIMIT %s, %s;".format(where, typeOrdenBy, orderType)
                     cursor.execute(query, [inicio, final])
                     materiales = dictfetchall(cursor)
-
                 query="""
                     SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM materiales;
                 """

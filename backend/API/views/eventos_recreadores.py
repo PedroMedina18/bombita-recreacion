@@ -57,7 +57,7 @@ class Eventos_Recreadores_Servicios_View(View):
                     pe.apellidos, 
                     ni.nombre AS nivel,
                     ge.nombre AS genero,
-                    re.img,
+                    re.img_perfil,
                     ser.id AS servicio_id,
                     ser.nombre AS servicio
                 FROM recreadores_eventos_servicios reve
@@ -73,9 +73,9 @@ class Eventos_Recreadores_Servicios_View(View):
             recreadores = dictfetchall(cursor)
             isRecreadores = True if len(recreadores) != 0 else False 
             for recreador in recreadores:
-                recreador["img"] = (
-                    f"{config('URL')}media/{recreador['img']}"
-                    if recreador['img']
+                recreador["img_perfil"] = (
+                    f"{config('URL')}media/{recreador['img_perfil']}"
+                    if recreador['img_perfil']
                     else None
                 )
                 servicio_id = recreador['servicio_id']

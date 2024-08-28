@@ -10,11 +10,11 @@ import { Toaster } from "sonner";
 import { formatoId, formatDateWithTime12Hour } from "../../utils/process.jsx";
 import { controlResultPost } from "../../utils/actions.jsx";
 import { LoaderCircle } from "../../components/loader/Loader.jsx";
-import ModalPagos from "../../components/modal/ModalPagos.jsx";
 import { IconRowLeft } from "../../components/Icon.jsx";
+import { useAuthContext } from "../../context/AuthContext.jsx"
+import ModalPagos from "../../components/modal/ModalPagos.jsx";
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import Navbar from "../../components/navbar/Navbar.jsx";
-import { useAuthContext } from "../../context/AuthContext.jsx"
 import Swal from 'sweetalert2';
 import texts from "../../context/text_es.js";
 import pattern from "../../context/pattern.js";
@@ -137,7 +137,7 @@ function Pagos() {
         const respuesta = await eventos.postData(Form, {subDominio : ["pagos"]})
         controlResultPost({
           respuesta: respuesta,
-          messageExito: "listo",
+          messageExito: texts.confirmMessage.registerPago,
           useNavigate: { navigate: navigate, direction: "/inicio/" }
         })
       }
@@ -185,7 +185,7 @@ function Pagos() {
                   </div>
                   <div className='d-flex flex-column pe-sm-2 ps-sm-0  px-lg-2 mb-1 flex-fill'>
                     <strong>Fecha:</strong>
-                    <p className='m-0'>{`${formatDateWithTime12Hour(dataEvento.info.fecha_evento)}`}</p>
+                    <p className='m-0'>{`${formatDateWithTime12Hour(dataEvento.info.fecha_evento_inicio)}`}</p>
                   </div>
                   <div className='d-flex flex-column pe-sm-2 ps-sm-0  px-lg-2 mb-1 flex-fill'>
                     <strong>Numero de Asistentes:</strong>
@@ -197,7 +197,7 @@ function Pagos() {
                   <div className='w-100 d-flex'>
                     <div className='w-50 d-flex justify-content-start'>
                       <InputCheckRadio className='me-2' form={{ errors, register }} id="radio_total" label={"Pago Total"} name="tipo_pago" type='radio' checked={tipoPago} value="total" onClick={() => { setTipoPago(true) }} />
-                      <InputCheckRadio className='ms-2' form={{ errors, register }} id="radio_anticipo" label={"Pago Anticipado"} name="tipo_pago" type='radio' checked={!tipoPago} value="anticipo" onClick={() => { setTipoPago(false) }} />
+                      <InputCheckRadio className='ms-2' form={{ errors, register }} id="radio_anticipo" label={"Anticipo"} name="tipo_pago" type='radio' checked={!tipoPago} value="anticipo" onClick={() => { setTipoPago(false) }} />
                     </div>
                     <ButtonSimple disabled={isTotal()} onClick={() => { setStateMetodosPago(!stateMetodosPago) }} className="my-2 ms-auto">
                       Metodos de Pago

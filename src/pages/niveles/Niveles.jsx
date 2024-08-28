@@ -44,7 +44,7 @@ function Niveles() {
       row: (row) => { return row.nombre }
     },
     {
-      name: "Descripcion",
+      name: "Descripción",
       row: (row) => { return row.descripcion }
     },
     {
@@ -97,7 +97,7 @@ function Niveles() {
           codigo: formatoId(row.id),
           descripción: row.descripcion,
           fecha_de_registro: formatDateWithTime12Hour(row.fecha_registro),
-          fecha_de_actualizacion: formatDateWithTime12Hour(row.fecha_actualizacion),
+          fecha_de_actualización: formatDateWithTime12Hour(row.fecha_actualizacion),
         }
       )
     },

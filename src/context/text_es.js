@@ -77,6 +77,7 @@ const texts={
         registerEvento:"Evento Registrado",
         registerMetodoPago:"Metodo de Pago Registrado",
         registerEventoRecreadores:"Recreadores Asignados",
+        registerPago:"Pago Registrado",
         // -----------------------------------------------------------
         editionUsuario:"Usuario Editado",
         editionNivel:"Nivel Editado",
@@ -186,7 +187,7 @@ const texts={
             description:"Complete el formulario para registrar un nuevo Servicio"
         },
         registerUsuario:{
-            name:"Registrar un Nuevo Usuario",
+            name:"Registrar un nuevo Usuario",
             description:"Intruduzca los datos para agregar un nuevo usuario al sistema"
         },
         registerTipoDocumento:{
@@ -344,24 +345,31 @@ const texts={
             name:"Recreadores del Evento",
             description:"Recreadores Asignados al Evento"
         },
+        calendarEvents:{
+            name:"Calendario de Eventos",
+            description:"Calendario de los proximos Eventos"
+        },
     },
 
     registerMessage:{
-        searchItem:"Buscar por su Codigo",
-        searchNameDocument:"Buscar por número de Documento o Nombre",
-        buttonRegisterTipoDocumento:"Agregar un Nuevo Tipo de Documento",
-        buttonRegisterGenero:"Agregar un Nuevo Genero",
-        buttonRegisterNivel:"Agregar un Nuevo Nivel",
-        buttonRegisterMaterial:"Agregar un Nuevo Material",
-        buttonRegisterCargo:"Agregar un nuevo cargo",
-        buttonRegisterActividad:"Agregar una nueva actividad",
-        buttonRegisterRecreador:"Agregar un nuevo recreador",
-        buttonRegisterSobrecargo:"Agregar un nuevo sobrecargo",
-        buttonRegisterMetodoPago:"Agregar un nuevo metodo de pago",
-        buttonRegisterServicio:"Agregar un nuevo servicio",
+        searchItem:"Buscar por su codigo",
+        searchUser:"Buscar por su codigo o Usuario",
+        searchClient:"Buscar por su codigo o cliente",
+        searchNameDocument:"Buscar por número de documento o nombre",
+        buttonRegisterTipoDocumento:"Agregar un nuevo Tipo de Documento",
+        buttonRegisterGenero:"Agregar un nuevo Genero",
+        buttonRegisterNivel:"Agregar un nuevo Nivel",
+        buttonRegisterMaterial:"Agregar un nuevo Material",
+        buttonRegisterCargo:"Agregar un nuevo Cargo",
+        buttonRegisterActividad:"Agregar una nueva Actividad",
+        buttonRegisterRecreador:"Agregar un nuevo Recreador",
+        buttonRegisterSobrecargo:"Agregar un nuevo Sobrecargo",
+        buttonRegisterMetodoPago:"Agregar un nuevo Metodo de Pago",
+        buttonRegisterServicio:"Agregar un nuevo Servicio",
         buttonRegisterEvento:"Agregar un nuevo evento",
-        buttonRegisterEventosuccessMessage:"Agregar un nuevo evento",
-        buttonInactividad:"Extender sesión"
+        buttonRegisterEventosuccessMessage:"Agregar un nuevo Evento",
+        buttonRegisterUser:"Agregar un nuevo Usuario",
+        buttonInactividad:"Extender sesión",
     }
 }
 

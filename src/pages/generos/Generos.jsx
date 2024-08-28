@@ -44,7 +44,7 @@ function Generos() {
             row: (row) => { return row.nombre }
         },
         {
-            name: "Descripcion",
+            name: "Descripción",
             row: (row) => { return row.descripcion }
         },
         {

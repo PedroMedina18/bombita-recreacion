@@ -89,7 +89,7 @@ class Recreadores_Views(View):
                     recreador.genero = genero
                     recreador.fecha_nacimiento = req["fecha_nacimiento"]
                     if "img_recreador" in img:
-                        recreador.img = img["img_recreador"]
+                        recreador.img_perfil = img["img_recreador"]
                     persona.save()
                     recreador.save()
                     datos = {"status": True, "message": f"{MESSAGE['edition']}"}
@@ -161,7 +161,7 @@ class Recreadores_Views(View):
                     persona=persona,
                     nivel=nivel,
                     genero=genero,
-                    img=img["img_perfil"] if "img_perfil" in img else None,
+                    img_perfil=img["img_perfil"] if "img_perfil" in img else None,
                     fecha_nacimiento=req["fecha_nacimiento"],
                 )
                 datos = {"status": True, "message": f"{MESSAGE['registerRecreador']}"}
@@ -274,7 +274,7 @@ class Recreadores_Views(View):
                         CONCAT('0', pe.telefono_principal) AS telefono_principal,
                         CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
                         re.estado,
-                        re.img
+                        re.img_perfil
                     FROM recreadores AS re
                     LEFT JOIN niveles AS ni ON re.nivel_id=ni.id
                     LEFT JOIN generos AS ge ON re.genero_id=ge.id
@@ -287,8 +287,8 @@ class Recreadores_Views(View):
                 if len(recreador) > 0:
                     for data in recreador:
                         data["img_perfil"] = (
-                            f"{config('URL')}media/{data['img']}"
-                            if data["img"]
+                            f"{config('URL')}media/{data['img_perfil']}"
+                            if data["img_perfil"]
                             else None
                         )
                     datos = {
@@ -328,6 +328,7 @@ class Recreadores_Views(View):
                 elif(search['valor'] and search['type']=="str"):
                     str_validate = edit_str(search["valor"])
                     where.append(f"CONCAT(pe.nombres, ' ', pe.apellidos) LIKE '{str_validate}'" )
+                
                 if nivel:
                     where.append(f"ni.id={nivel}")
                 if genero:

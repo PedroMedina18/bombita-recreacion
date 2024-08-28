@@ -59,8 +59,8 @@ class Pagos_Views(View):
                 if f"capture_{int(req['evento'])}_{int(pago['metodo_pago'])}_{indice}" in imgs:
                     pagoEvento.capture = imgs[f"capture_{int(req['evento'])}_{int(pago['metodo_pago'])}_{indice}"]
                     pagoEvento.save()
-            if pagos:
-                evento.total = True
+            if tipo:
+                evento.pago_total = True
             else:
                 evento.anticipo = True
             evento.save()
