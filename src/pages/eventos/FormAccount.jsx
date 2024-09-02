@@ -1,17 +1,18 @@
 import { useState } from "react";
-import { ButtonSimple } from "../../components/button/Button"
+import { ButtonSimple } from "../../components/button/Button";
 import { useForm } from "react-hook-form";
-import { toastError, alertConfim, alertLoading } from "../../components/alerts.jsx"
-import { useNavigate } from 'react-router-dom'
-import { formatoId, truncateString } from "../../utils/process.jsx"
-import { useFormEventContext } from "../../context/FormEventContext.jsx"
-import ModalSelect from "../../components/modal/ModalSelect.jsx"
-import { sobrecargos, servicios, eventos } from "../../utils/API.jsx"
-import { controlResultPost } from "../../utils/actions.jsx"
-import { useAuthContext } from "../../context/AuthContext.jsx"
+import { toastError, alertConfim, alertLoading } from "../../components/alerts.jsx";
+import { useNavigate } from 'react-router-dom';
+import { formatoId, truncateString } from "../../utils/process.jsx";
+import { useFormEventContext } from "../../context/FormEventContext.jsx";
+import { sobrecargos, servicios, eventos } from "../../utils/API.jsx";
+import { IconService, IconBilletera } from "../../components/Icon.jsx";
+import { controlResultPost } from "../../utils/actions.jsx";
+import { useAuthContext } from "../../context/AuthContext.jsx";
+import ModalSelect from "../../components/modal/ModalSelect.jsx";
 import Swal from 'sweetalert2';
 import texts from "../../context/text_es.js";
-import TableDescriptionFacture from "../../components/table/TableDescriptionFacture.jsx"
+import TableDescriptionFacture from "../../components/table/TableDescriptionFacture.jsx";
 
 function FormAccount() {
     const { getUser, dataOptions } = useAuthContext();
@@ -34,7 +35,7 @@ function FormAccount() {
     const onSubmit = handleSubmit(
         async (data) => {
             try {
-                const message = texts.confirmMessage.confirRegister
+                const message = texts.confirmMessage.confirmRegister
                 if (!saveDataServicios.length) {
                     toastError("No ha seleccionado ningun servicio. Corrija Por favor")
                     return
@@ -79,19 +80,19 @@ function FormAccount() {
 
     const columnsServicio = [
         {
-            name: "Codigo",
+            name: "Código",
             row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
         },
         {
-            name: "Nombre",
+            name: "Servicio",
             row: (row) => { const nombre = truncateString(row.nombre, 50); return nombre }
         },
         {
-            name: "Precio",
+            name: "Precio Ref",
             row: (row) => { return `${row.precio} $` }
         },
         {
-            name: "Duracion",
+            name: "Duración",
             row: (row) => {
                 const horas = row.duracion.horas
                 const minutos = row.duracion.minutos
@@ -100,14 +101,14 @@ function FormAccount() {
             }
         },
         {
-            name: "Número de Recreadores",
+            name: "N° Recreadores Necesarios",
             row: (row) => { return `${row.numero_recreadores}` }
         }
     ]
 
     const columnsSobrecargo = [
         {
-            name: "Codigo",
+            name: "Código",
             row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
         },
         {
@@ -115,7 +116,7 @@ function FormAccount() {
             row: (row) => { return row.nombre }
         },
         {
-            name: "Monto",
+            name: "Monto Ref",
             row: (row) => { return `${row.monto} $` }
         },
     ]
@@ -139,12 +140,12 @@ function FormAccount() {
             <ModalSelect titulo={"Escoja los sobrecargo"} state={[estadoSobrecargos, setEstadoSobrecargos]} object={sobrecargos} columns={columnsSobrecargo} saveSelect={setSaveDataSobrecargos} select={saveDataSobrecargos} />
 
             <form className="w-100 d-flex flex-column justify-content-between" onSubmit={onSubmit}>
-                <div className="w-100 d-flex justify-content-between align-item-center">
-                    <ButtonSimple type="button" onClick={() => { setEstadoServicios(true) }} className="w-100 mx-5 mt-3">
-                        Servicios
+                <div className="w-100 d-flex justify-content-end align-item-center">
+                    <ButtonSimple type="button" onClick={() => { setEstadoServicios(true) }} className="px-4 mt-3">
+                        <IconService/>
                     </ButtonSimple>
-                    <ButtonSimple type="button" onClick={() => { setEstadoSobrecargos(true) }} className="w-100 mx-5 mt-3">
-                        Sobrecargos
+                    <ButtonSimple type="button" onClick={() => { setEstadoSobrecargos(true) }} className="px-4 ms-5 mt-3">
+                        <IconBilletera/>
                     </ButtonSimple>
                 </div>
                 <div className="w-100 d-flex flex-column justify-content-between align-item-center">

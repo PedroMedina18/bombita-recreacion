@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { cargos } from "../../utils/API.jsx";
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
-import {deleteItem, searchCode, getListItems} from "../../utils/actions.jsx";
+import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx";
 import { IconTrash, IconEdit, IconDetail } from "../../components/Icon.jsx";
 import { formatoId } from "../../utils/process.jsx";
 import Navbar from "../../components/navbar/Navbar.jsx";
@@ -34,7 +34,7 @@ function Cargos() {
     }
     const columns = [
         {
-            name: "Codigo",
+            name: "Código",
             row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
         },
         {
@@ -42,7 +42,7 @@ function Cargos() {
             row: (row) => { return row.nombre }
         },
         {
-            name: "Descripcion",
+            name: "Descripción",
             row: (row) => { return row.descripcion }
         },
         {

@@ -1,5 +1,5 @@
 .card-recreador {
-  background: rgb(36, 11, 54);
+  background: rgb(var(--principal));
   width: 14rem;
   height: 100%;
   padding-top: 15px;
@@ -67,28 +67,29 @@
   width: 80%;
   font-size: 25px;
   margin: 0;
+  /* color: rgb(15, 133, 0); */
 }
 
-.card-red {
-  --background-color-rgb: 185, 24, 24;
+.card-secundario {
+  --background-color-rgb: var(--secundario);
   --color: white;
   --color-border: white;
 }
 
 .card-greed {
-  --background-color-rgb: 16, 116, 46;
+  --background-color-rgb: 15, 133, 0;
   --color: white;
   --color-border: white;
 }
 
 .card-blue {
-  --background-color-rgb: 0, 84, 163;
+  --background-color-rgb: var(--principal);
   --color: white;
   --color-border: white;
 }
 
 .card-purple {
-  --background-color-rgb: 36, 11, 54;
+  --background-color-rgb: var(--purple);
   --color: white;
   --color-border: white;
 }

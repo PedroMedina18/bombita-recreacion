@@ -1,5 +1,5 @@
 from django.urls import path
-from .views.view import Metodos_Pagos_Views, Actividades_Views, Cargos_Views, Clientes_Views, Dollar_View, Eventos_Views, Generos_Views, Login, Eventos_Recreadores_Servicios_View, Materiales_Views, Niveles_Views, Permisos_Views, Personas_Views, Recreadores_Views, Respaldo, Servicios_Views, Sobrecargos_Views, Tipos_Documentos_Views, Usuarios_Views, Verify_Token_Views, Pagos_Views, Recraadores_Eventos_Views
+from .views.view import Metodos_Pagos_Views, Actividades_Views, Cargos_Views, Preguntas_Evento_View, Clientes_Views, Dollar_View, Eventos_Views, Generos_Views, Login, Eventos_Recreadores_Servicios_View, Materiales_Views, Niveles_Views, Permisos_Views, Personas_Views, Recreadores_Views, Respaldo, Servicios_Views, Sobrecargos_Views, Tipos_Documentos_Views, Usuarios_Views, Verify_Token_Views, Pagos_Views, Recraadores_Eventos_Views
 
 urlpatterns=[
     path('cargos/', Cargos_Views.as_view(), name='cargos'),
@@ -35,6 +35,8 @@ urlpatterns=[
     path('eventos/<int:id>/', Eventos_Views.as_view(), name='evento'),
     path('clientes/', Clientes_Views.as_view(), name='clientes'),
     path('clientes/<int:id>/', Clientes_Views.as_view(), name='cliente'),
+    path('preguntas/', Preguntas_Evento_View.as_view(), name='preguntas'),
+    path('preguntas/<int:id>/', Preguntas_Evento_View.as_view(), name='pregunta'),
     path('login/', Login.as_view(), name='login'),
     path('verify/', Verify_Token_Views.as_view(), name='verify'),
     path('respaldo/', Respaldo.as_view(), name='respaldo'),

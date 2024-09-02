@@ -41,6 +41,8 @@ export const servicios = new Petisions("servicios");
 
 export const respaldo = new Petisions("respaldo");
 
+export const preguntas = new Petisions("preguntas");
+
 export const metodoPago = new Petisions("metodos_pago");
 
 export const dolar = new Petisions("dolar");

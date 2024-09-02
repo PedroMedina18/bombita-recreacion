@@ -1,28 +1,25 @@
 import { useState, useEffect, useRef } from "react";
 import { InputsGeneral, UnitSelect, InputCheckRadio, InputImgPerfil } from "../../components/input/Inputs.jsx"
 import { ButtonSimple } from "../../components/button/Button.jsx"
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useAuthContext } from '../../context/AuthContext.jsx';
 import { LoaderCircle } from "../../components/loader/Loader.jsx";
 import { useParams, useNavigate } from "react-router-dom";
 import { Toaster } from "sonner";
-import { niveles, tipo_documentos, recreadores, generos } from "../../utils/API.jsx";
+import { recreadores, } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { hasLeadingOrTrailingSpace, calcularEdad , fechaFormat} from "../../utils/process.jsx";
 import { habilitarEdicion, controlErrors, getPersona, controlResultPost } from "../../utils/actions.jsx"
+import { IconRowLeft } from "../../components/Icon.jsx"
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import texts from "../../context/text_es.js";
 import Navbar from "../../components/navbar/Navbar.jsx"
 import pattern from "../../context/pattern.js"
-import { IconRowLeft } from "../../components/Icon.jsx"
 import Swal from 'sweetalert2';
 
 function FormRecreadores() {
     const [img, setImg] = useState(null)
     const {dataOptions} = useAuthContext()
-    const [tipo_documentos, ] = useState(dataOptions().tipos_documentos)
-    const [niveles] = useState(dataOptions().niveles)
-    const [generos] = useState(dataOptions().generos)
     const [loading, setLoading] = useState(true)
     const [debounceTimeout, setDebounceTimeout] = useState(null);
     const [errorServer, setErrorServer] = useState("")
@@ -83,7 +80,7 @@ function FormRecreadores() {
         async (data) => {
             try {
                 const $archivo = document.getElementById(`img_perfil`).files[0]
-                const message = params.id ? texts.confirmMessage.confirEdit : texts.confirmMessage.confirRegister
+                const message = params.id ? texts.confirmMessage.confirmEdit : texts.confirmMessage.confirmRegister
                 const confirmacion = await alertConfim("Confirmar", message)
                 if (confirmacion.isConfirmed) {
                     const Form = new FormData()
@@ -173,7 +170,7 @@ function FormRecreadores() {
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-25 pe-0 pe-md-3 d-flex align-items-center">
                                             <UnitSelect label={texts.label.tipoDocuemnto} name="tipo_documento" id="tipo_documento" form={{ errors, register }}
-                                                options={tipo_documentos}
+                                                options={dataOptions().tipos_documentos}
                                                 params={{
                                                     validate: (value) => {
                                                         if ((value === "")) {
@@ -220,6 +217,10 @@ function FormRecreadores() {
                                                         value: 7,
                                                         message: texts.inputsMessage.min7,
                                                     },
+                                                    min:{
+                                                        value:4000,
+                                                        message: texts.inputsMessage.invalidDocument,
+                                                    }
                                                 }}
                                                 onKeyUp={
                                                     (e) => {
@@ -350,7 +351,7 @@ function FormRecreadores() {
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
                                             <UnitSelect label={texts.label.genero} name="genero" id="genero" form={{ errors, register }}
-                                                options={generos}
+                                                options={dataOptions().generos}
                                                 params={{
                                                     validate: (value) => {
                                                         if ((value === "")) {
@@ -378,6 +379,10 @@ function FormRecreadores() {
                                                     minLength: {
                                                         value: 11,
                                                         message: texts.inputsMessage.onlyCharacter11,
+                                                    },
+                                                    min:{
+                                                        value:200000000,
+                                                        message: texts.inputsMessage.invalidTel,
                                                     }
                                                 }}
                                                 disabled={disabledInputs}
@@ -395,6 +400,10 @@ function FormRecreadores() {
                                                     minLength: {
                                                         value: 11,
                                                         message: texts.inputsMessage.onlyCharacter11,
+                                                    },
+                                                    min:{
+                                                        value:200000000,
+                                                        message: texts.inputsMessage.invalidTel,
                                                     }
                                                 }}
                                                 disabled={disabledInputs}
@@ -434,7 +443,7 @@ function FormRecreadores() {
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
                                             <UnitSelect label={`${texts.label.nivel}`} name="nivel" id="nivel" form={{ errors, register }}
-                                                options={niveles}
+                                                options={dataOptions().niveles}
                                                 params={{
                                                     validate: (value) => {
                                                         if ((value === "")) {

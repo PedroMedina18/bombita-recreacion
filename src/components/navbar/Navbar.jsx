@@ -1,5 +1,6 @@
 import "./navbar.css"
-import bombita from "../../assets/bomb.png"
+import bombita from "../../assets/logo-bombita.png"
+// import LogoBombita from "../../assets/"
 import { Link, useNavigate } from "react-router-dom"
 import { useState } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
@@ -16,7 +17,7 @@ import {
     IconInventario,
     IconRecreadores,
     IconService,
-    IconUser,
+    IconUsers,
     IconUserCircle,
     IconExit
 
@@ -31,7 +32,12 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
         <main className='d-flex'>
 
             {/* Ventana lateral izquierda del menu */}
-            <nav className="sidebar" id="sidebar">
+            <nav className="sidebar" id="sidebar" 
+            onClick={(e)=>{
+                if(e.target === document.querySelector(".sidebar.expand")){
+                    e.target.classList.remove('expand') 
+                }
+            }}>
 
                 {/* Logo */}
                 <div className="d-flex">
@@ -57,7 +63,7 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
 
                     <li className="sidebar-item">
                         <Link to="/usuarios/" className="sidebar-link">
-                            <IconUser />
+                            <IconUsers />
                             <span>Usuarios</span>
                         </Link>
                     </li>
@@ -166,7 +172,7 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
 
                     <li className="sidebar-item"
                         onClick={async () => {
-                            const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirCloset)
+                            const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirmCloset)
                             if (confirmacion.isConfirmed) {
                                 closeSession()
                                 navigate("/")
@@ -181,15 +187,15 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
             </nav>
 
             {/* Ventana Derecha */}
-            <section className="d-flex flex-column w-100" id="main">
+            <section className="d-flex flex-column w-100 " id="main">
 
                 {/* Barra Superior */}
                 <header className="barra-superior" id="barra-superior">
                     <Link to="/inicio" className="sidebar-logo">
                         <img src={bombita} alt="bombita" />
-                        <div>
+                        {/* <div>
                             <span>Bombitas <br />Recreación</span>
-                        </div>
+                        </div> */}
                     </Link>
                     <div className="user ms-2">
                         <p className="m-0 me-1 text-center inline-block">{dataUser.nombre}</p>

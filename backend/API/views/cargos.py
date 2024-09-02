@@ -110,7 +110,6 @@ class Cargos_Views(View):
                     'message': f"{MESSAGE['registerCargo']}"
                 }
             return JsonResponse(datos)
-        
         except IntegrityError as error:
             print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
@@ -188,6 +187,7 @@ class Cargos_Views(View):
         try:
             cursor = connection.cursor()
             verify=verify_token(request.headers)
+            direccion=config('URL')
             if(not verify['status']):
                 datos = {
                     'status': False,
@@ -197,11 +197,10 @@ class Cargos_Views(View):
                 return JsonResponse(datos)
             if (id > 0):
                 query = """
-                SELECT * FROM cargos WHERE cargos.id=%s;
-                """
+                SELECT *, IF(img IS NOT NULL AND img != '', CONCAT('{}media/', img), img) AS img FROM cargos WHERE cargos.id=%s;
+                """.format(direccion)
                 cursor.execute(query, [int(id)])
                 cargo = dictfetchall(cursor)
-                cargo[0]['img']=f"{config('URL')}media/{cargo[0]['img']}" if cargo[0]['img'] else None
                 if(len(cargo)>0):
                     if (not cargo[0]['administrador']):
                         query = """
@@ -259,7 +258,7 @@ class Cargos_Views(View):
                     cursor.execute(query)
                     cargos = dictfetchall(cursor)
                 else:
-                    query = "SELECT * FROM cargos {} ORDER BY {} {} LIMIT %s, %s;".format(where, typeOrdenBy, orderType)
+                    query = "SELECT *, IF(img IS NOT NULL AND img != '', CONCAT('{}media/', img), img) AS img FROM cargos {} ORDER BY {} {} LIMIT %s, %s;".format(direccion, where, typeOrdenBy, orderType)
                     cursor.execute(query, [inicio, final])
                     cargos = dictfetchall(cursor)
 

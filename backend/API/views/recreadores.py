@@ -88,8 +88,8 @@ class Recreadores_Views(View):
                     recreador.nivel = nivel
                     recreador.genero = genero
                     recreador.fecha_nacimiento = req["fecha_nacimiento"]
-                    if "img_recreador" in img:
-                        recreador.img_perfil = img["img_recreador"]
+                    if "img_perfil" in img:
+                        recreador.img = img["img_perfil"]
                     persona.save()
                     recreador.save()
                     datos = {"status": True, "message": f"{MESSAGE['edition']}"}
@@ -161,7 +161,7 @@ class Recreadores_Views(View):
                     persona=persona,
                     nivel=nivel,
                     genero=genero,
-                    img_perfil=img["img_perfil"] if "img_perfil" in img else None,
+                    img=img["img_perfil"] if "img_perfil" in img else None,
                     fecha_nacimiento=req["fecha_nacimiento"],
                 )
                 datos = {"status": True, "message": f"{MESSAGE['registerRecreador']}"}
@@ -239,6 +239,7 @@ class Recreadores_Views(View):
             cursor = connection.cursor()
             verify = verify_token(request.headers)
             totalRecreadores = request.GET.get("total", "false")
+            direccion=config('URL')
             if not verify["status"]:
                 datos = {"status": False, "message": verify["message"], "data": None}
                 return JsonResponse(datos)
@@ -274,23 +275,17 @@ class Recreadores_Views(View):
                         CONCAT('0', pe.telefono_principal) AS telefono_principal,
                         CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
                         re.estado,
-                        re.img_perfil
+                        IF(re.img_perfil IS NOT NULL AND re.img_perfil != '', CONCAT('{}media/', re.img_perfil), img_perfil) AS img_perfil
                     FROM recreadores AS re
                     LEFT JOIN niveles AS ni ON re.nivel_id=ni.id
                     LEFT JOIN generos AS ge ON re.genero_id=ge.id
                     LEFT JOIN personas AS pe ON re.persona_id=pe.id
                     LEFT JOIN tipos_documentos AS tipo ON pe.tipo_documento_id=tipo.id
                     WHERE re.id=%s;
-                """
+                """.format(direccion)
                 cursor.execute(query, [int(id)])
                 recreador = dictfetchall(cursor)
                 if len(recreador) > 0:
-                    for data in recreador:
-                        data["img_perfil"] = (
-                            f"{config('URL')}media/{data['img_perfil']}"
-                            if data["img_perfil"]
-                            else None
-                        )
                     datos = {
                         "status": True,
                         "message": f"{MESSAGE['exitoGet']}",
@@ -353,7 +348,8 @@ class Recreadores_Views(View):
                         pe.numero_documento,
                         CONCAT('0', pe.telefono_principal) AS telefono_principal,
                         CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
-                        re.estado
+                        re.estado,
+                        IF(re.img_perfil IS NOT NULL AND re.img_perfil != '', CONCAT('{}media/', re.img_perfil), img_perfil) AS img_perfil
                     FROM recreadores AS re
                     LEFT JOIN niveles AS ni ON re.nivel_id=ni.id
                     LEFT JOIN generos AS ge ON re.genero_id=ge.id
@@ -362,9 +358,7 @@ class Recreadores_Views(View):
                     {}
                     ORDER BY {} {} 
                     LIMIT %s, %s;
-                """.format(
-                    where, typeOrdenBy, orderType
-                )
+                """.format(direccion, where, typeOrdenBy, orderType)
 
                 cursor.execute(query, [inicio, final])
                 recreadores = dictfetchall(cursor)

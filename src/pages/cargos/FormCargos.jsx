@@ -104,7 +104,7 @@ function FormCargos() {
             try {
                 const permisos = selectPermisos.map((elements) => { return elements.value })
                 const $archivo = document.getElementById(`icono`).files[0]
-                const message = params.id ? texts.confirmMessage.confirEdit : texts.confirmMessage.confirRegister
+                const message = params.id ? texts.confirmMessage.confirmEdit : texts.confirmMessage.confirmRegister
                 const confirmacion = await alertConfim("Confirmar", message)
                 if (confirmacion.isConfirmed) {
                     const Form = new FormData()

@@ -29,11 +29,8 @@ class Pagos_Views(View):
                     'message': verify['message'],
                 }
                 return JsonResponse(datos)
-
-            if req['tipo_registro'].lower() == 'true':
-                tipo = True
-            elif req['tipo_registro'].lower() == 'false':
-                tipo = False
+            if int(req['tipo_pago'])==1 or int(req['tipo_pago'])==2 or int(req['tipo_pago'])==3 :
+                tipo = int(req['tipo_pago'])
             else:
                 datos = {
                     'status': False,
@@ -49,6 +46,15 @@ class Pagos_Views(View):
                 return JsonResponse(datos)
             precio_dolar = PrecioDolar.objects.latest('id')
             evento = Eventos.objects.get(id = int(req['evento']))
+            evento = list(Eventos.objects.filter(id=int(req['evento'])).values("id"))
+            if(len(evento)>0):
+                evento = Eventos.objects.get(id=int(req['evento']))
+            else:
+                datos = {
+                    'status': False,
+                    'message':  MESSAGE["errorEvento"],
+                }
+            
             for indice, pago in enumerate(pagos):
                 metodo_pago = MetodosPago.objects.get(id = int(pago['metodo_pago']))
                 pagoEvento = Pagos.objects.create(tipo = tipo, evento = evento, metodoPago = metodo_pago, monto = float(pago['monto']), precioDolar = precio_dolar)
@@ -59,10 +65,12 @@ class Pagos_Views(View):
                 if f"capture_{int(req['evento'])}_{int(pago['metodo_pago'])}_{indice}" in imgs:
                     pagoEvento.capture = imgs[f"capture_{int(req['evento'])}_{int(pago['metodo_pago'])}_{indice}"]
                     pagoEvento.save()
-            if tipo:
-                evento.pago_total = True
-            else:
-                evento.anticipo = True
+
+            if tipo == 1:
+                evento.estado_pago=1
+            if tipo == 2 or tipo == 3:
+                evento.estado_pago=2
+
             evento.save()
             emailRegistroPago(evento.cliente.persona.correo)
             datos = {

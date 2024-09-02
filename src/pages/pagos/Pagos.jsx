@@ -27,10 +27,11 @@ function Pagos() {
   const [dataPago, setDataPago] = useState([]);
   const [stateMetodosPago, setStateMetodosPago] = useState(false);
   const [tipoPago, setTipoPago] = useState(true);
-  const params = useParams();
   const [loading, setLoading] = useState(true);
   const [errorServer, setErrorServer] = useState("");
+  const [montoCancelar, setMontoCancelar] = useState(0);
   const renderizado = useRef(0);
+  const params = useParams();
 
   useEffect(() => {
     if (renderizado.current === 0) {
@@ -41,20 +42,20 @@ function Pagos() {
   }, [])
 
   useEffect(() => {
-    const totalPagado = dataPago.reduce((accumulator, current) => {
+    const totalCancelado = dataPago.reduce((accumulator, current) => {
       return accumulator + current.monto
     }, 0)
 
     setEvento({
       ...dataEvento,
-      totalPagado: totalPagado
+      totalCancelado: totalCancelado
     })
   }, [dataPago])
 
   const get_pagos = async () => {
     try {
-      const evento = await eventos.get({ subDominio: [Number(params.id_evento)], params: { "_info": "true" } })
-
+      const evento = await eventos.get({ subDominio: [Number(params.id_evento)] })
+      console.log(evento)
       if (evento.status !== 200 || evento.data.status === false) {
         setErrorServer(`Error. Error de Conexión Evento`)
         return
@@ -65,14 +66,19 @@ function Pagos() {
       const totalSobrecargos = evento.data.data.sobrecargos.reduce((accumulator, current) => {
         return accumulator + current.monto
       }, 0)
+      const Pagos = evento.data.data.pagos.reduce((accumulator, current) => {
+        return accumulator + current.monto
+      }, 0)
+      setMontoCancelar(totalServicios + totalSobrecargos - Pagos)
       setEvento({
         ...dataEvento,
         ...evento.data.data,
         totalServicios: totalServicios,
         totalSobrecargos: totalSobrecargos,
         totalEvento: totalServicios + totalSobrecargos,
+        MontoPagado : Pagos,
         anticipoEvento: (totalServicios + totalSobrecargos) / 2,
-        totalPagado: 0
+        totalCancelado: 0,
       })
 
     } catch (error) {
@@ -99,33 +105,35 @@ function Pagos() {
   }
 
   const isTotal = () => {
-    const totalEvento = dataEvento.totalEvento ? dataEvento.totalEvento : 0
-    const totalPagado = dataEvento.totalPagado ? dataEvento.totalPagado : 0
-    const anticipoEvento = dataEvento.anticipoEvento ? dataEvento.anticipoEvento : 0
-    if (tipoPago) {
-      const cancelado = totalPagado < totalEvento
-      return !cancelado
-    } else {
-      const cancelado = totalPagado < anticipoEvento
-      return !cancelado
-    }
+    const totalCancelado = dataEvento.totalCancelado ? dataEvento.totalCancelado : 0
+    const montoCancelar = dataEvento.montoCancelar ? dataEvento.montoCancelar : 0
+    const cancelado = totalCancelado < montoCancelar
+    return !cancelado
   }
+
   const onSubmit = async() => {
     try {
       if(!dataPago.length){
         toastError(texts.errorMessage.errorNotPago)
         return
       }
-      const totalCancelado = tipoPago ? (dataEvento.totalEvento - dataEvento.totalPagado) : (dataEvento.anticipoEvento - dataEvento.totalPagado)
+      const totalCancelado = montoCancelar - dataEvento.totalCancelado
       if(Number(totalCancelado) > 0) {
         toastError(texts.errorMessage.errorNotTotal)
         return
       }
-      const message = texts.confirmMessage.confirPago
-      const confirmacion = await alertConfim("Confirmar", message)
+      const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirmPago)
       if (confirmacion.isConfirmed) {
         const Form = new FormData()
-        Form.append('tipo_registro', tipoPago)
+        if(tipoPago && dataEvento.info.estado_pago===0){
+          Form.append('tipo_pago', 3) //pago total
+        }
+        if(!tipoPago){
+          Form.append('tipo_pago', 1)//pago anticipo
+        }
+        if(tipoPago && dataEvento.info.estado_pago===1){
+          Form.append('tipo_pago', 2) //pago faltante
+        }
         Form.append('evento', Number(dataEvento.info.id))
         Form.append('pagos', JSON.stringify(dataPago))
         dataPago.forEach((e, index)=>{
@@ -137,8 +145,8 @@ function Pagos() {
         const respuesta = await eventos.postData(Form, {subDominio : ["pagos"]})
         controlResultPost({
           respuesta: respuesta,
-          messageExito: texts.confirmMessage.registerPago,
-          useNavigate: { navigate: navigate, direction: "/inicio/" }
+          messageExito: texts.successMessage.registerPago,
+          useNavigate: { navigate: navigate, direction: "/eventos/" }
         })
       }
     } catch (error) {
@@ -150,7 +158,7 @@ function Pagos() {
 
   return (
     <Navbar name={texts.pages.pagos.name}>
-      <ModalPagos dataEvento={{ ...dataEvento, tipoPago }} state={[stateMetodosPago, setStateMetodosPago]} titulo="Agregar pago" saveDataState={[dataPago, setDataPago]} />
+      <ModalPagos dataEvento={{ ...dataEvento, montoCancelar }} state={[stateMetodosPago, setStateMetodosPago]} titulo="Agregar pago" saveDataState={[dataPago, setDataPago]} />
       <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/eventos/") }}><IconRowLeft /> Regresar</ButtonSimple>
 
       {
@@ -196,8 +204,19 @@ function Pagos() {
                   <hr />
                   <div className='w-100 d-flex'>
                     <div className='w-50 d-flex justify-content-start'>
-                      <InputCheckRadio className='me-2' form={{ errors, register }} id="radio_total" label={"Pago Total"} name="tipo_pago" type='radio' checked={tipoPago} value="total" onClick={() => { setTipoPago(true) }} />
-                      <InputCheckRadio className='ms-2' form={{ errors, register }} id="radio_anticipo" label={"Anticipo"} name="tipo_pago" type='radio' checked={!tipoPago} value="anticipo" onClick={() => { setTipoPago(false) }} />
+                      {
+                        dataEvento.info.estado_pago ===2 ?
+                        <InputCheckRadio className='me-2' form={{ errors, register }} id="radio_total" label={`Totalmente Cancelado`} name="tipo_pago" type='radio' checked={tipoPago} value="total" />
+                        :
+                        <>
+                          <InputCheckRadio className='me-2' form={{ errors, register }} id="radio_total" label={`${dataEvento.info.estado_pago === 0 && "Completo" || dataEvento.info.estado_pago === 1 && "Monto Faltante"}`} name="tipo_pago" type='radio' checked={tipoPago} value="total" onClick={() => { setTipoPago(true); setMontoCancelar(dataEvento.totalEvento - dataEvento.MontoPagado) }} />
+                          {
+                            (dataEvento.info.estado_pago === 0) &&
+                            <InputCheckRadio className='ms-2' form={{ errors, register }} id="radio_anticipo" label={"Anticipo"} name="tipo_pago" type='radio' checked={!tipoPago} value="anticipo" onClick={() => { setTipoPago(false); setMontoCancelar(dataEvento.anticipoEvento) }} />
+                          }
+                          </>
+                      }
+                      
                     </div>
                     <ButtonSimple disabled={isTotal()} onClick={() => { setStateMetodosPago(!stateMetodosPago) }} className="my-2 ms-auto">
                       Metodos de Pago
@@ -221,7 +240,12 @@ function Pagos() {
                     <LineDescription nombre={"Sobrecargos"} dolar={dolar} precio={dataEvento.totalSobrecargos} />
                   }
                   <LineDescription nombre={"Total"} dolar={dolar} precio={dataEvento.totalEvento} fs={5} />
-                  <LineDescription nombre={"Monto a Cancelar"} dolar={dolar} precio={tipoPago ? dataEvento.totalEvento : dataEvento.anticipoEvento} fs={5} />
+                  { 
+                    dataEvento.MontoPagado > 0 &&
+                    <LineDescription nombre={"Monto Cancelado"} dolar={dolar} precio={dataEvento.MontoPagado} fs={5} />
+                  }
+                  <LineDescription nombre={"Monto a Cancelar"} dolar={dolar} precio={montoCancelar} fs={5} />
+                  
                   {
                     Boolean(dataPago.length) &&
                     <>
@@ -238,13 +262,13 @@ function Pagos() {
                     Boolean(dataPago.length) &&
                     <>
                       <hr />
-                      <LineDescription nombre={"Total Debitado"} dolar={dolar} precio={dataEvento.totalPagado} fs={5} />
-                      <LineDescription nombre={"Monto Faltante"} dolar={dolar} precio={tipoPago ? (dataEvento.totalEvento - dataEvento.totalPagado) : (dataEvento.anticipoEvento - dataEvento.totalPagado)} fs={5} />
+                      <LineDescription nombre={"Total a Debitar"} dolar={dolar} precio={dataEvento.totalCancelado} fs={5} />
+                      <LineDescription nombre={"Monto Faltante"} dolar={dolar} precio={montoCancelar - dataEvento.totalCancelado} fs={5} />
                     </>
                   }
                 </div>
                 <div className='w-100 d-flex'>
-                  <ButtonSimple className="mt-4 mx-auto w-50" onClick={onSubmit}>
+                  <ButtonSimple className="mt-4 mx-auto w-50" onClick={onSubmit} disabled={dataEvento.info.estado_pago===2}>
                     Registrar
                   </ButtonSimple>
                 </div>

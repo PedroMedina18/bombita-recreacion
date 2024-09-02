@@ -46,7 +46,7 @@ function Recreadores() {
 
     const columns = [
         {
-            name: "Codigo",
+            name: "Código",
             row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
         },
         {
@@ -54,7 +54,7 @@ function Recreadores() {
             row: (row) => { return `${row.tipo_documento}-${row.numero_documento}` }
         },
         {
-            name: "Genero",
+            name: "Género",
             row: (row) => { return `${row.genero}` }
         },
         {
@@ -71,7 +71,7 @@ function Recreadores() {
         {
             name: "Estado",
             row: (row) => {
-                return row.estado ? <Pildora contenido="Activo" color="bg-succes"/> : <Pildora contenido="Inhabilitado"  />
+                return row.estado ? <Pildora contenido="Activo" color="bg-succes"/> : <Pildora contenido="Inhabilitado" color="bg-danger"/>
             }
         },
         {

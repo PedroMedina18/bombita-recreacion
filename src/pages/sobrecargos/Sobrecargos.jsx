@@ -37,7 +37,7 @@ function Niveles() {
 
   const columns = [
     {
-      name: "Codigo",
+      name: "Código",
       row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
     },
     {
@@ -49,7 +49,7 @@ function Niveles() {
       row: (row) => { return row.descripcion }
     },
     {
-      name: "Monto",
+      name: "Monto Ref",
       row: (row) => { return `${normalizeDecimalNumber(row.monto)} $` }
     },
     {

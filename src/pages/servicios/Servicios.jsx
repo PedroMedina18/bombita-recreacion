@@ -36,7 +36,7 @@ function Servicios() {
 
   const columns = [
     {
-      name: "Codigo",
+      name: "Código",
       row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
   },
     {
@@ -44,11 +44,11 @@ function Servicios() {
       row: (row) => { return row.nombre }
     },
     {
-      name: "Precio",
+      name: "Precio Ref",
       row: (row) => { return `${normalizeDecimalNumber(row.precio)} $` }
     },
     {
-      name: "Duracion",
+      name: "Duración",
       row: (row) => {
           const horas=row.duracion.horas
           const minutos=row.duracion.minutos
@@ -57,11 +57,11 @@ function Servicios() {
        }
     },
     {
-      name: "Número de Recreadores",
+      name: "N° de Recreadores",
       row: (row) => { return `${row.numero_recreadores}` }
     },
     {
-      name: "Descripcion",
+      name: "Descripción",
       row: (row) => { return row.descripcion }
     },
     {

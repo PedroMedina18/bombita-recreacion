@@ -37,7 +37,7 @@ function Materiales() {
 
     const columns = [
         {
-            name: "Codigo",
+            name: "Código",
             row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
         },
         {
@@ -45,7 +45,7 @@ function Materiales() {
             row: (row) => { return row.nombre }
         },
         {
-            name: "Descripcion",
+            name: "Descripción",
             row: (row) => { return row.descripcion }
         },
         {

@@ -9,7 +9,7 @@ function CardRecreador({ nombre = null, nivel = null, genero = null, edad = null
             <div className='card-header'>
                 {
                     img ?
-                        <img src={img ? img : userx} alt="..." />
+                        <img src={img ? img : userx} alt="..."  width={"130px"}/>
                         :
                         <IconUserCircle />
                 }

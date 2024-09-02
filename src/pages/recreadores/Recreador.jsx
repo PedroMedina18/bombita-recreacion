@@ -36,7 +36,6 @@ function Recreador() {
       controlErrors({ respuesta: recreador, constrolError: setErrorServer })
       controlErrors({ respuesta: recreadorEventos, constrolError: setErrorServer })
       if (controlErrors({ respuesta: recreador, constrolError: setErrorServer }) || controlErrors({ respuesta: recreadorEventos, constrolError: setErrorServer })) return
-      console.log(recreadorEventos)
       setData(recreador.data.data)
 
     } catch (error) {

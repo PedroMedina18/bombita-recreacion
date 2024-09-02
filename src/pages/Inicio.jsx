@@ -3,7 +3,7 @@ import { useAuthContext } from '../context/AuthContext.jsx';
 import { ButtonSimple } from "../components/button/Button.jsx";
 import { Toaster } from "sonner";
 import { toastError } from '../components/alerts.jsx'
-import { respaldo, eventos, recreadores, clientes, servicios } from "../utils/API.jsx";
+import {  eventos, recreadores, clientes, servicios } from "../utils/API.jsx";
 import { controlErrors } from "../utils/actions.jsx";
 import { IconClient, IconRecreadores, IconDollar, IconService } from "../components/Icon.jsx"
 import Navbar from '../components/navbar/Navbar';
@@ -47,13 +47,13 @@ function Inicio() {
         <div className='w-100 d-flex flex-wrap justify-content-between'>
           <CardInfo title={`Clientes: ${dataCards.clientes}`} icon={<IconClient />} cursor={true} margin='5px 10px' color='purple' />
           <CardInfo title={`Recreadores: ${dataCards.recreadores}`} icon={<IconRecreadores />} cursor={true} margin='5px 10px' color='blue' />
-          <CardInfo title={`Servicios: ${dataCards.servicios}`} icon={<IconService />} cursor={true} margin='5px 10px' color='red' />
+          <CardInfo title={`Servicios: ${dataCards.servicios}`} icon={<IconService />} cursor={true} margin='5px 10px' color='secundario' />
           <CardInfo title={`Precio Dolar: ${dollar.price} Bs`} icon={<IconDollar />} cursor={true} margin='5px 10px' color='greed' />
         </div>
         {/* <p className='h2'>{`${dataUser.dollar.price} Bs`}</p> */}
-        <ButtonSimple onClick={()=>{respaldo.get({})}}>
+        {/* <ButtonSimple onClick={()=>{respaldo.get({})}}>
           Realizar Respaldo
-        </ButtonSimple>
+        </ButtonSimple> */}
         <ComponentCalendarEvents/>
       </div>
       <Toaster />

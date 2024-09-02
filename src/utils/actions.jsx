@@ -110,7 +110,7 @@ export const deleteItem = async ({ row, objet, functionGet }) => {
         if (confirmacion.isConfirmed) {
             alertLoading("Cargando")
             const respuesta = await objet.delete(row.id)
-            if (respuesta.status = 200) {
+            if (respuesta.status === 200) {
                 if (respuesta.data.status) {
                     Swal.close()
                     functionGet()
@@ -135,31 +135,31 @@ export const deleteItem = async ({ row, objet, functionGet }) => {
 export const searchCode = async ({ value, object, setList, setLoading, setData, filtros={} }) => {
     try {
         setLoading(true)
-        const result = value ? await object.get({ params:{...filtros, search:value} }) : await object.get({params:filtros})
-        if (result.status !== 200) {
+        const respuesta = value ? await object.get({ params:{...filtros, search:value} }) : await object.get({params:filtros})
+        if (respuesta.status !== 200) {
             setList([])
             setData({ pages: 1, total: 0 })
-            toastError(`Error. ${result.status} ${result.statusText}`)
+            toastError(`Error. ${respuesta.status} ${respuesta.statusText}`)
             return
         }
-        if (result.data.status === false) {
+        if (respuesta.data.status === false) {
             setList([])
             setData({ pages: 1, total: 0 })
-            toastError(`${result.data.message}`)
+            toastError(`${respuesta.data.message}`)
             return
         }
-        if (result.data.data === null) {
+        if (respuesta.data.data === null) {
             setList([])
             setData({ pages: 1, total: 0 })
-            toastError(`Sin Resultados`)
+            toastError(`Sin respuestaados`)
             return
         }
-        if (!Array.isArray(result.data.data)) {
-            setList([result.data.data])
-            setData({ pages: result.data.pages ? result.data.pages : 1, total: result.data.total ? result.data.total : 1 })
+        if (!Array.isArray(respuesta.data.data)) {
+            setList([respuesta.data.data])
+            setData({ pages: respuesta.data.pages ? respuesta.data.pages : 1, total: respuesta.data.total ? respuesta.data.total : 1 })
         } else {
-            setList(result.data.data)
-            setData({ pages: result.data.pages ? result.data.pages : 1, total: result.data.total ? result.data.total : 1 })
+            setList(respuesta.data.data)
+            setData({ pages: respuesta.data.pages ? respuesta.data.pages : 1, total: respuesta.data.total ? respuesta.data.total : 1 })
         }
 
     } catch (error) {
@@ -177,15 +177,20 @@ export const searchCode = async ({ value, object, setList, setLoading, setData, 
 // *funcion para buscar lista de elementos en la API
 export const getListItems = async ({ object, setList, setData, setLoading, filtros={}}) => {
     try {
-        const result = await object.get({params:filtros})
-        if (result.status === 200) {
-            if (result.data.status === true) {
-                setList(result.data.data)
-                setData({ pages: result.data.pages, total: result.data.total })
-            } else {
-                toastError(`${result.data.message}`)
-            }
+        const respuesta = await object.get({params:filtros})
+        if (respuesta.status !== 200) {
+            toastError(`Error.${respuesta.status} ${respuesta.statusText}`)
+            return
         }
+        if (respuesta.data.status === false) {
+            toastError(`${respuesta.data.message}`)
+            return
+        } 
+        if(!respuesta.data.data){
+            toastError(`Sin resultados`)
+        }
+        setList(respuesta.data.data? respuesta.data.data : [])
+        setData({ pages: respuesta.data.pages, total: respuesta.data.total })
     } catch (error) {
         console.log(error)
         setData({ pages: 1, total: 0 })

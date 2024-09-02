@@ -9,7 +9,6 @@ from ..funtions.serializador import dictfetchall
 from ..funtions.filtros import order, filtrosWhere,peridoFecha
 from ..funtions.token import verify_token
 from ..message import MESSAGE
-from datetime import datetime
 import json
 
 

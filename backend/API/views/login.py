@@ -108,11 +108,11 @@ class Login(View):
                     'data':None
                 }
                 return JsonResponse(response)
-        except Exception as ex:
-            print("Error", ex)
+        except Exception as error:
+            print(f"{MESSAGE['errorPost']} - {error}")
             datos = {
                 'status':False,
-                'message': MESSAGE['errorSystem'],
+                'message': f"{MESSAGE['errorSystem']}: {error}",
                 'token':None, 
                 'data':None}
             return JsonResponse(datos)

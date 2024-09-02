@@ -2,10 +2,11 @@ import { useEffect, useState, useRef } from "react";
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { usuarios } from "../../utils/API.jsx";
-import { searchCode, getListItems, deleteItem } from "../../utils/actions.jsx";
+import { searchCode, getListItems } from "../../utils/actions.jsx";
 import { formatoId } from "../../utils/process.jsx";
-import Navbar from "../../components/navbar/Navbar";
-import Table from "../../components/table/Table";
+import { IconDetail, IconEdit, IconKey } from "../../components/Icon.jsx";
+import Navbar from "../../components/navbar/Navbar.jsx";
+import Table from "../../components/table/Table.jsx";
 import texts from "../../context/text_es.js";
 import Pildora from "../../components/Pildora.jsx";
 
@@ -36,7 +37,7 @@ function Usuarios() {
     const columns = [
         {
             name: "Codigo",
-            row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
+            row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
         },
         {
             name: "Usuario",
@@ -49,9 +50,24 @@ function Usuarios() {
         {
             name: "Estado",
             row: (row) => {
-                return row.estado ? <Pildora contenido="Activo" color="bg-succes"/> : <Pildora contenido="Inhabilitado"  />
+                return row.estado ? <Pildora contenido="Activo" color="bg-succes" /> : <Pildora contenido="Inhabilitado" />
             }
         },
+        {
+            name: "Opciones",
+            row: (row) => {
+                return <div className='d-flex justify-content-around options-table'>
+                    <IconDetail
+                        onClick={() => {
+                            navigate(`/usuario/${row.id}`)
+                        }} 
+                        className="cursor-pointer"
+                    />
+                    <IconEdit onClick={() => { navigate(`/edit/usuario/${row.id}/`) }} className="cursor-pointer" />
+                    <IconKey onClick={() => { navigate(`/password/usuario/${row.id}/`) }} className="cursor-pointer" />
+                </div>
+            }
+        }
     ]
 
     const options = {
@@ -73,9 +89,9 @@ function Usuarios() {
                 navigate("/register/usuario/")
             }
         },
-        
+
     }
-    
+
     return (
         <Navbar name={`${texts.pages.getUsuarios.name}`} descripcion={`${texts.pages.getUsuarios.description}`}>
             <Table

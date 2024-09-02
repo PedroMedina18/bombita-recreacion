@@ -1,34 +1,45 @@
-import { useState, useEffect } from "react";
-import { InputsGeneral, UnitSelect, InputCheckRadio } from "../../components/input/Inputs.jsx"
+import { useState, useEffect, useRef } from "react";
+import { InputsGeneral, UnitSelect, InputCheckRadio, TogleSwiches } from "../../components/input/Inputs.jsx"
 import { ButtonSimple } from "../../components/button/Button"
 import { LoaderCircle } from "../../components/loader/Loader";
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useForm } from "react-hook-form";
 import { Toaster } from "sonner";
 import { usuarios } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx"
+import { IconRowLeft } from "../../components/Icon.jsx"
 import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx"
-import { getPersona, controlResultPost, habilitarEdicion } from "../../utils/actions.jsx"
+import { getPersona, controlResultPost, habilitarEdicion, controlErrors } from "../../utils/actions.jsx"
 import { useAuthContext } from '../../context/AuthContext.jsx';
-import Navbar from "../../components/navbar/Navbar"
+import Navbar from "../../components/navbar/Navbar.jsx"
 import Swal from 'sweetalert2';
-import ErrorSystem from "../../components/errores/ErrorSystem";
+import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import texts from "../../context/text_es.js";
 import pattern from "../../context/pattern.js";
 
 
 function FormUsuarios() {
-    const {getOption} = useAuthContext()
-    const [tipo_documentos, setTipoDocumentos] = useState(getOption().tipos_documentos)
-    const [cargos, setCargos] = useState(getOption().cargos)
+    const { dataOptions } = useAuthContext()
     const [loading, setLoading] = useState(true)
     const [errorServer, setErrorServer] = useState("")
     const [dataNewUser, setdataNewUser] = useState({ tipo_documento: null, numero_documento: null })
     const [dataPersona, setPersona] = useState({})
     const [disabledInputs, setDisabledInputs] = useState(false)
+    const [disabled, setDisabled] = useState(false)
     const navigate = useNavigate();
+    const renderizado = useRef(0)
+    const params = useParams();
 
     useEffect(() => {
+        if (renderizado.current === 0) {
+            renderizado.current = renderizado.current + 1
+            if (Number(params.id)) {
+                get_usuario()
+            } else {
+                setLoading(false)
+            }
+            return
+        }
     }, [])
 
     // *the useform
@@ -40,43 +51,67 @@ function FormUsuarios() {
         setValue
     } = useForm();
 
+    const get_usuario = async () => {
+        try {
+            const respuesta = await usuarios.get({ subDominio: [Number(params.id)] })
+            const errors = controlErrors({ respuesta: respuesta, constrolError: setErrorServer })
+            if (errors) return
+            setErrorServer("")
+            const data = respuesta.data.data
+            const keys = Object.keys(data);
+            keys.forEach(key => {
+                setValue(key, data[`${key}`])
+            });
+            setValue(`cargo`, data["cargo_id"])
+            setValue(`tipo_documento`, data["tipo_documento_id"])
+            setDisabled(!data["estado"])
+
+        } catch (error) {
+            console.log(error)
+            setErrorServer(texts.errorMessage.errorObjet)
+        } finally {
+            setLoading(false)
+        }
+    }
+
     // *Funcion para registrar
     const onSubmit = handleSubmit(
         async (data) => {
             try {
-                const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirRegister)
+                const message = params.id ? texts.confirmMessage.confirmEdit : texts.confirmMessage.confirmRegister
+                const confirmacion = await alertConfim("Confirmar", message)
                 if (confirmacion.isConfirmed) {
-                    let body
+                    const body={}
                     if (data.id_persona) {
-                        body = {
-                            id_persona: data.id_persona,
-                            usuario: data.usuario,
-                            contraseña: data.contraseña,
-                            cargo: Number(data.cargo)
-                        }
+                        body.id_persona = data.id_persona,
+                        body.usuario = data.usuario,
+                        body.contraseña = data.contraseña,
+                        body.cargo = Number(data.cargo)
+                        
                     } else {
-                        body = {
-                            nombres: data.nombres,
-                            apellidos: data.apellidos,
-                            numero_documento: data.numero_documento,
-                            tipo_documento: Number(data.tipo_documento),
-                            telefono_principal: Number(data.telefono_principal),
-                            telefono_secundario: Number(data.telefono_secundario),
-                            correo: data.correo,
-                            usuario: data.usuario,
-                            contraseña: data.contraseña,
-                            cargo: Number(data.cargo)
+                        body.nombres = data.nombres,
+                        body.apellidos = data.apellidos,
+                        body.numero_documento = data.numero_documento,
+                        body.tipo_documento = Number(data.tipo_documento),
+                        body.telefono_principal = Number(data.telefono_principal),
+                        body.telefono_secundario = Number(data.telefono_secundario),
+                        body.correo = data.correo,
+                        body.usuario = data.usuario,
+                        body.contraseña = data.contraseña,
+                        body.cargo = Number(data.cargo)
+                        if(data.estado !== undefined){
+                            body.estado = data.estado
                         }
                     }
                     alertLoading("Cargando")
-                    const res = await usuarios.post(body)
+                    const res = params.id ? await usuarios.put(body, { subDominio: [Number(params.id)] }) : await usuarios.post(body)
                     controlResultPost({
                         respuesta: res,
                         useNavigate: {
                             navigate,
                             direction: "/usuarios/"
                         },
-                        messageExito: texts.successMessage.usuario,
+                        messageExito: params.id ? texts.successMessage.editionUsuario : texts.successMessage.registerUsuario,
                     })
                 }
 
@@ -88,7 +123,9 @@ function FormUsuarios() {
     )
 
     return (
-        <Navbar name={`${texts.pages.registerUsuario.name}`} descripcion={`${texts.pages.registerUsuario.description}`}>
+        <Navbar name={`${params.id ? texts.pages.editUsuario.name : texts.pages.registerUsuario.name}`} descripcion={`${params.id ? texts.pages.editUsuario.description : texts.pages.registerUsuario.description}`} dollar={false}>
+            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/usuarios/") }}> <IconRowLeft /> Regresar</ButtonSimple>
+
             {
                 loading ?
                     (
@@ -109,7 +146,6 @@ function FormUsuarios() {
                             <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
                                 <form className="w-100 d-flex flex-column"
                                     onSubmit={onSubmit}
-                                    autoComplete={"off"}
                                 >
                                     <input type="number" className="d-none"
                                         {
@@ -126,11 +162,28 @@ function FormUsuarios() {
                                                     dataPersona
                                                 })
                                             }
-                                        } />
+                                        }
+                                        disabled={disabled}
+                                    />
+                                    {
+                                        params.id &&
+                                        <div className="w-100 d-flex">
+                                            <TogleSwiches
+                                                className="ms-auto mb-2"
+                                                name="estado"
+                                                id="estado"
+                                                form={{ errors, register }}
+                                                onChange={(e) => {
+                                                    setDisabled(!e.target.checked)
+                                                }}
+                                            />
+
+                                        </div>
+                                    }
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-md-25  w-100 pe-0 pe-md-3">
                                             <UnitSelect label={texts.label.tipoDocuemnto} name="tipo_documento" id="tipo_documento" form={{ errors, register }}
-                                                options={tipo_documentos}
+                                                options={dataOptions().tipos_documentos}
                                                 params={{
                                                     validate: (value) => {
                                                         if (!value) {
@@ -154,7 +207,7 @@ function FormUsuarios() {
                                                         })
                                                     }
                                                 }
-                                                disabled={disabledInputs}
+                                                disabled={disabledInputs || disabled}
                                             />
                                         </div>
 
@@ -173,6 +226,10 @@ function FormUsuarios() {
                                                         value: 7,
                                                         message: texts.inputsMessage.min7,
                                                     },
+                                                    min: {
+                                                        value: 4000,
+                                                        message: texts.inputsMessage.invalidDocument,
+                                                    }
                                                 }}
                                                 onKeyUp={
                                                     (e) => {
@@ -190,7 +247,8 @@ function FormUsuarios() {
                                                         setDisabledInputs
                                                     })
                                                 }}
-                                                disabled={disabledInputs}
+                                                disabled={disabledInputs || disabled}
+                                                placeholder={texts.placeholder.numeroDocumento}
                                             />
                                         </div>
                                     </div>
@@ -223,8 +281,9 @@ function FormUsuarios() {
                                                         }
                                                     }
                                                 }}
-                                                disabled={disabledInputs}
+                                                disabled={disabledInputs || disabled}
                                                 isError={!disabledInputs}
+                                                placeholder={texts.placeholder.nombre}
                                             />
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
@@ -254,8 +313,9 @@ function FormUsuarios() {
                                                         }
                                                     }
                                                 }}
-                                                disabled={disabledInputs}
+                                                disabled={disabledInputs || disabled}
                                                 isError={!disabledInputs}
+                                                placeholder={texts.placeholder.apellidos}
                                             />
                                         </div>
                                     </div>
@@ -275,10 +335,15 @@ function FormUsuarios() {
                                                     minLength: {
                                                         value: 11,
                                                         message: texts.inputsMessage.onlyCharacter11,
+                                                    },
+                                                    min: {
+                                                        value: 200000000,
+                                                        message: texts.inputsMessage.invalidTel,
                                                     }
                                                 }}
-                                                disabled={disabledInputs}
+                                                disabled={disabledInputs || disabled}
                                                 isError={!disabledInputs}
+                                                placeholder={texts.placeholder.telefono}
                                             />
                                         </div>
 
@@ -292,13 +357,19 @@ function FormUsuarios() {
                                                     minLength: {
                                                         value: 11,
                                                         message: texts.inputsMessage.onlyCharacter11,
+                                                    },
+                                                    min: {
+                                                        value: 200000000,
+                                                        message: texts.inputsMessage.invalidTel,
                                                     }
                                                 }}
-                                                disabled={disabledInputs}
+                                                disabled={disabledInputs || disabled}
                                                 isError={!disabledInputs}
+                                                placeholder={texts.placeholder.telefono}
                                             />
                                         </div>
                                     </div>
+
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-50 pe-0 pe-md-3">
                                             <InputsGeneral type={"email"} label={`${texts.label.email}`} name="correo" id="correo" form={{ errors, register }}
@@ -323,13 +394,14 @@ function FormUsuarios() {
                                                         }
                                                     }
                                                 }}
-                                                disabled={disabledInputs}
+                                                disabled={disabledInputs || disabled}
                                                 isError={!disabledInputs}
+                                                placeholder={texts.placeholder.correo}
                                             />
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
                                             <UnitSelect label={`${texts.label.cargo}`} name="cargo" id="cargo" form={{ errors, register }}
-                                                options={cargos}
+                                                options={dataOptions().cargos}
                                                 params={{
                                                     validate: (value) => {
                                                         if ((value === "")) {
@@ -339,9 +411,11 @@ function FormUsuarios() {
                                                         }
                                                     }
                                                 }}
+                                                disabled={disabled}
                                             />
                                         </div>
                                     </div>
+
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-50 pe-0 pe-md-3">
                                             <InputsGeneral type={"text"} label={`${texts.label.user}`} name="usuario" id="usuario" form={{ errors, register }}
@@ -368,57 +442,68 @@ function FormUsuarios() {
                                                         } else {
                                                             return true
                                                         }
-                                                    }
+                                                    },
                                                 }}
+                                                disabled={disabled}
+                                                placeholder={texts.placeholder.usuario}
                                             />
                                         </div>
-                                        <div className="w-100 w-md-50 ps-0 ps-md-3">
-                                            <InputsGeneral type={"password"} label={`${texts.label.password}`} name="contraseña" id="contraseña" form={{ errors, register }}
+                                        {
+                                            !params.id &&
+                                            <div className="w-100 w-md-50 ps-0 ps-md-3">
+                                                <InputsGeneral type={"password"} label={`${texts.label.password}`} name="contraseña" id="contraseña" form={{ errors, register }}
+                                                    params={{
+                                                        required: {
+                                                            value: true,
+                                                            message: texts.inputsMessage.requirePassword
+                                                        },
+                                                        minLength: {
+                                                            value: 5,
+                                                            message: texts.inputsMessage.min5
+                                                        },
+                                                        maxLength: {
+                                                            value: 20,
+                                                            message: texts.inputsMessage.max20
+                                                        },
+                                                        pattern: {
+                                                            value: pattern.password,
+                                                            message: texts.inputsMessage.invalidPassword,
+                                                        },
+                                                        validate: (value) => {
+                                                            if (hasLeadingOrTrailingSpace(value)) {
+                                                                return texts.inputsMessage.noneSpace
+                                                            } else {
+                                                                return true
+                                                            }
+                                                        },
+                                                    }}
+                                                    placeholder={texts.placeholder.password}
+                                                />
+                                            </div>
+                                        }
+
+                                    </div>
+                                    {
+                                        !params.id &&
+                                        <div className="w-100 w-md-50 d-flex justify-content-between align-item-cente pe-0 pe-md-3">
+                                            <InputsGeneral type={"password"} label={texts.label.password2} name="contraseñaTwo" id="contraseñaTwo" form={{ errors, register }}
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: texts.inputsMessage.requirePassword
-                                                    },
-                                                    minLength: {
-                                                        value: 5,
-                                                        message: texts.inputsMessage.min5
-                                                    },
-                                                    maxLength: {
-                                                        value: 20,
-                                                        message: texts.inputsMessage.max20
-                                                    },
-                                                    pattern: {
-                                                        value: pattern.password,
-                                                        message: texts.inputsMessage.invalidPassword,
+                                                        message: texts.inputsMessage.confirmPassword
                                                     },
                                                     validate: (value) => {
-                                                        if (hasLeadingOrTrailingSpace(value)) {
-                                                            return texts.inputsMessage.noneSpace
+                                                        if (!(value === watch("contraseña"))) {
+                                                            return texts.inputsMessage.errorPassword
                                                         } else {
                                                             return true
                                                         }
-                                                    }
+                                                    },
                                                 }}
+                                                placeholder={texts.placeholder.repeatPassword}
                                             />
                                         </div>
-                                    </div>
-                                    <div className="w-100 w-md-50 d-flex justify-content-between align-item-cente pe-0 pe-md-3">
-                                        <InputsGeneral type={"password"} label={texts.label.password2} name="contraseñaTwo" id="contraseñaTwo" form={{ errors, register }}
-                                            params={{
-                                                required: {
-                                                    value: true,
-                                                    message: texts.inputsMessage.confirmPassword
-                                                },
-                                                validate: (value) => {
-                                                    if (!(value === watch("contraseña"))) {
-                                                        return texts.inputsMessage.errorPassword
-                                                    } else {
-                                                        return true
-                                                    }
-                                                }
-                                            }}
-                                        />
-                                    </div>
+                                    }
 
                                     <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
                                         Registrar

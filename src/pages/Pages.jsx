@@ -10,6 +10,8 @@ import FormTipoDocumento from "./tipoDocumento/FormTipoDocumento.jsx";
 import Generos from "./generos/Generos.jsx";
 import FormGeneros from "./generos/FormGeneros.jsx";
 import Usuarios from "./usuarios/Usuarios.jsx";
+import Usuario from "./usuarios/Usuario.jsx";
+import Password from "./usuarios/Password.jsx";
 import FormUsuarios from "./usuarios/FormUsuarios.jsx";
 import Actividades from "./actividades/Actividades.jsx";
 import FormActividades from "./actividades/FormActividades.jsx";
@@ -37,6 +39,7 @@ import Evento from "./eventos/Evento.jsx";
 import Configuracion from "./configuracion/Configuracion.jsx";
 import EventosRecreadores from "./recreadores_eventos/EventosRecreadores.jsx";
 import Cargo from "./cargos/Cargo.jsx"
+import Preguntas from "./preguntas/Preguntas.jsx"
 
 export {
     Login, Error404, 
@@ -44,8 +47,8 @@ export {
     Clientes, FormClientes, 
     FormCargos, TipoDocumento, 
     FormTipoDocumento, Generos,
-    FormGeneros, Pagos,
-    Usuarios, Actividades,
+    FormGeneros, Pagos, Password,
+    Usuarios, Actividades, Usuario,
     FormActividades, Recreadores, 
     FormRecreadores, Recreador,
     MetodosPago, FormMetodosPago,
@@ -57,7 +60,8 @@ export {
     FormDataEvent, FormAccount,
     EventosRecreadores, FormUsuarios,
     Configuracion, Cargo,
-    CalendarRecreadores, CalendarEvent
+    CalendarRecreadores, CalendarEvent,
+    Preguntas
 }
 
 

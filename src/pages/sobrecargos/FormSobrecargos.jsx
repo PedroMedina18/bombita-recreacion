@@ -72,7 +72,7 @@ function FormSobrecargos() {
     const onSubmit = handleSubmit(
         async (data) => {
             try {
-                const message = params.id ? texts.confirmMessage.confirEdit : texts.confirmMessage.confirRegister
+                const message = params.id ? texts.confirmMessage.confirmEdit : texts.confirmMessage.confirmRegister
                 const confirmacion = await alertConfim("Confirmar", message)
                 if (confirmacion.isConfirmed) {
                     const body = {

@@ -6,7 +6,7 @@ import { toastError } from "../alerts.jsx";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./ComponentCalendar.css";
 
-function ComponentCalendar({ height = "100vh", width = "100%", object, subDominio=[], filtros = {}, eventData, ...props}) {
+function ComponentCalendar({ className="", object, subDominio=[], filtros = {}, eventData, ...props}) {
   const dayjs = dayjsEs({ weekdaysAbre: false });
   const localizer = dayjsLocalizer(dayjs);
   const [view, setView] = useState("month");
@@ -60,6 +60,7 @@ function ComponentCalendar({ height = "100vh", width = "100%", object, subDomini
       const $div = $contenido.querySelector("div");
       if ($div) {
         evento.style.backgroundColor = getComputedStyle($div).backgroundColor;
+        evento.style.color = getComputedStyle($div).color;
       }
     });
   };
@@ -127,13 +128,11 @@ function ComponentCalendar({ height = "100vh", width = "100%", object, subDomini
   return (
     <Calendar
       localizer={localizer}
+      className={className}
       messages={messages}
       view={view}
-      style={{
-        width: width,
-        height: height,
-      }}
       events={listEventos}
+      
       formats={{
         dayHeaderFormat: (date) => {
           return dayjs(date).format("dddd, DD [de] MMMM YYYY");

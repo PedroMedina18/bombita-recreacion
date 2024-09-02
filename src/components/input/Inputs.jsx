@@ -379,6 +379,7 @@ export function SelectAsync({ id, label = null, optionsDefault, placeholder, loa
         getOptionValue={getOptionValue}
         placeholder={placeholder}
         id={id}
+        className="prueba"
         styles={(e) => { cosole.log(e) }}
         noOptionsMessage={() => {
           return "Sin Opciones";
@@ -596,4 +597,17 @@ export function MoneyInput({ label, id, name, form, params = {}, flexRow = false
       </div>
     );
   }
+}
+
+export function TogleSwiches({id, name, form, className="", ...props}){
+  const { errors, register } = form;
+  return (
+    <label className={`switch ${className}`}>
+      <input type="checkbox"  id={id}
+      {...register(name)}
+      {...props}
+      />
+        <span className="slider"></span>
+    </label>
+  )
 }

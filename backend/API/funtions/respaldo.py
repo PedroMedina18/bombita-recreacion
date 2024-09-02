@@ -16,7 +16,11 @@ mes = fechaActual.strftime('%B')
 rutaRespaldo = config('RUTA_RAIZ') + f"\\respaldo_bombita_recreacion\\{año}\\{mes}"
 
 def respaldo():
+
     os.makedirs(rutaRespaldo, exist_ok = True)
+    carpeta=config('RUTA_RAIZ') + '\\respaldo_bombita_recreacion'
+    comand= f"attrib +h {carpeta}"
+    os.system(comand)
     
     # Nombre del archivo
     respaldo = rutaRespaldo + f"\\respaldo_{fechaHora}.sql"
@@ -30,17 +34,21 @@ def respaldo():
     pathPasword = f"p {pasword} " if pasword else " "
     
     try:
-        print("CARGANDO ....")
+        print("INICIANDO RESPALDO ....")
         os.popen(pathBase + f" -h localhost -u {config('USER')}"+ pathPasword + f"{config('NAME_BASE_DATOS')} > " + respaldo)
+        resultado = comprobarSize(respaldo)
+        return resultado
     except PermissionError as e:
         print(f"Error de permisos: {e}")
+        return False
     except OSError as e:
         print(f"Error de sistema: {e}")
+        return False
     except Exception as e:
         print(f"Error desconocido: {e}")
-        exit
-    finally:
-        comprobarSize(respaldo)
+        return False
+
+    
 
 def comprobarSize(respaldo):
     while True:
@@ -50,10 +58,13 @@ def comprobarSize(respaldo):
                 time.sleep(5)
                 new_size = os.path.getsize(respaldo)
                 if new_size == archivo_size:
-                    comprimir(respaldo  )
-                    break 
+                    compresion = comprimir(respaldo  )
+                    if compresion:
+                        return True
+                    else:
+                        return False
         except FileNotFoundError:
-            print("Archivo no encontrado. Esperando...")
+            print("Archivo sql no encontrado. Esperando...")
             time.sleep(5)
 
 def comprimir(rutaArchivo):
@@ -75,12 +86,15 @@ def comprimir(rutaArchivo):
                         file_path = os.path.join(root, file)
                         rel_path = os.path.relpath(file_path, imagenes)
                         zip_file.write(file_path, f'media/{rel_path}')
-        print(f"Respaldo COMPLETADO {rutaArchivo}")
+        print(f"Respaldo COMPLETADO")
         os.remove(rutaArchivo)
+        return True
     except Exception as e:
         print(f"Error desconocido: {e}")
+        return False
 
 def buscar_carpeta_media():
+    print("Buscando carpeta media ...")
     ruta_actual = os.path.abspath(".")
     while True:
         ruta_padre = os.path.dirname(ruta_actual)

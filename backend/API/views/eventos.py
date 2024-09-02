@@ -9,6 +9,7 @@ from ..funtions.serializador import dictfetchall
 from ..funtions.email import emailRegistroEvento
 from ..funtions.time import duration
 from ..funtions.identificador import determinar_valor, edit_str
+from ..funtions.estado_pago import estadoPagoDescription
 from ..funtions.filtros import order, filtrosWhere, peridoFecha
 from ..models import Eventos, EventosSobrecargos, EventosServicios, Clientes, Personas, Servicios, Sobrecargos, TipoDocumento
 from ..funtions.token import verify_token
@@ -149,17 +150,19 @@ class Eventos_Views(View):
             evento = list(Eventos.objects.filter(id=id).values())
             if len(evento) > 0:
                 evento=evento[0]
-                if (not evento['completado'] and not evento['anticipo'] and not evento['pagado']):
-                    Eventos.objects.filter(id=id).delete()
-                    datos = {
-                        'status': True,
-                        'message': f"{MESSAGE['delete']}"
-                    }
-                else:
+                if (not evento['estado_pago']==0):
                     datos = {
                         'status': False,
-                        'message': f"{MESSAGE['errorProtectEvento']}"
+                        'message': f"{MESSAGE['errorPagado']}"
                     }
+                    return JsonResponse(datos)
+                
+                Eventos.objects.filter(id=id).delete()
+                datos = {
+                    'status': True,
+                    'message': f"{MESSAGE['delete']}"
+                }
+                
             else:
                 datos = datos = {
                     'status': False,
@@ -203,6 +206,7 @@ class Eventos_Views(View):
                         eve.numero_personas,
                         eve.direccion,
                         eve.estado,
+                        eve.estado_pago,
                         eve.fecha_registro,
                         eve.fecha_actualizacion
                     FROM eventos AS eve
@@ -309,12 +313,12 @@ class Eventos_Views(View):
                 if(fecha):
                     where.append(f"{fecha}")
                 if(estadoPago):
+                    if(int(estadoPago)==0):
+                        where.append(f"eve.estado_pago=0")
                     if(int(estadoPago)==1):
-                        where.append(f"eve.pago_total=0 AND eve.anticipo=0")
+                        where.append(f"eve.estado_pago=1")
                     if(int(estadoPago)==2):
-                        where.append(f"eve.pago_total=0 AND eve.anticipo=1")
-                    if(int(estadoPago)==3):
-                        where.append(f"eve.pago_total=1")
+                        where.append(f"eve.estado_pago=2")
 
                 where = filtrosWhere(where)
 
@@ -333,8 +337,7 @@ class Eventos_Views(View):
                     tipo.nombre AS tipo_documento, 
                     per.numero_documento,
                     eve.numero_personas,
-                    eve.anticipo,
-                    eve.pago_total,
+                    eve.estado_pago,
                     eve.direccion,
                     eve.fecha_registro,
                     eve.estado
@@ -347,7 +350,10 @@ class Eventos_Views(View):
                 """.format(where, orderType, limit)
                 cursor.execute(query)
                 eventos = dictfetchall(cursor)
-                
+
+                if(all == "false"):
+                    for evento in eventos:
+                        evento["estado_pago_descripcion"]=estadoPagoDescription(evento["estado_pago"])
                 query = """
                     SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM eventos;
                 """

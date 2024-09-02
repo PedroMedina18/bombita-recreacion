@@ -37,8 +37,7 @@ function ModalPagos({ titulo, state, saveDataState, dataEvento }) {
     useEffect(() => {
         if (tecleKey >= 3) {
             setTecleKey(0)
-            const totalACancelar = dataEvento.tipoPago ? dataEvento.totalEvento : dataEvento.anticipoEvento
-            const totalFaltante = Number(totalACancelar) - Number(dataEvento.totalPagado)
+            const totalFaltante = Number(dataEvento.montoCancelar) - Number(dataEvento.totalCancelado)
             if (estado && option) {
                 if (!Boolean(option.divisa)) {
                     const montoBs = (totalFaltante * dolar).toFixed(2)
@@ -127,8 +126,7 @@ function ModalPagos({ titulo, state, saveDataState, dataEvento }) {
             if (Number(data.monto) <= 0) {
                 return
             }
-            const totalACancelar = dataEvento.tipoPago ? dataEvento.totalEvento : dataEvento.anticipoEvento
-            const totalCancelado = totalACancelar - dataEvento.totalPagado
+            const totalCancelado = dataEvento.montoCancelar - dataEvento.totalCancelado
             let monto
             if (!Boolean(option.divisa)) {
                 monto = (Number(data.monto) / dolar).toFixed(2)

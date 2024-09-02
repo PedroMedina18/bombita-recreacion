@@ -8,7 +8,7 @@ from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.token import verify_token
 from ..funtions.identificador import determinar_valor, edit_str
 from ..funtions.serializador import dictfetchall
-from ..models import Cargos, Permisos, TipoDocumento, Usuarios, Personas
+from ..models import Cargos, TipoDocumento, Usuarios, Personas
 from django.db import IntegrityError, connection, models
 from ..funtions.filtros import order, filtrosWhere
 from ..message import MESSAGE
@@ -121,7 +121,6 @@ class Usuarios_Views(View):
                 datos = {"status": False, "message": verify["message"]}
                 return JsonResponse(datos)
             usuario = list(Usuarios.objects.filter(id=id).values())
-                
 
             if len(usuario) > 0:
                 if(password=="true"):
@@ -140,7 +139,16 @@ class Usuarios_Views(View):
                     return JsonResponse(datos)
                 
                 usuario = Usuarios.objects.get(id=id)
-                persona = Permisos.objects.get(id=usuario.persona)
+                persona = Personas.objects.get(id=usuario.persona.id)
+                usuario.estado=req['estado']
+                if(not req['estado']):
+                    usuario.save()
+                    datos = {
+                    "status": True, 
+                    "message": f"{MESSAGE['exitoUserDisabled']}"
+                    }
+                    return JsonResponse(datos)
+
                 tipo_documento = list(TipoDocumento.objects.filter(id=int(req['tipo_documento'])).values())
                 if(len(tipo_documento)>0):
                     tipo_documento = TipoDocumento.objects.get(id=int(req['tipo_documento']))
@@ -168,6 +176,7 @@ class Usuarios_Views(View):
                 persona.tipo_documento=tipo_documento
                 usuario.usuario=req['usuario']
                 usuario.cargo=cargo
+                
                 persona.save()
                 usuario.save()
                 datos = {
@@ -186,10 +195,8 @@ class Usuarios_Views(View):
             datos = {"status": False, "message": f"{MESSAGE['errorProtect']}"}
             return JsonResponse(datos)
         except Exception as error:
-            print(
-                f"{MESSAGE['errorDelete']} - {error}",
-            )
-            datos = {"status": False, "message": f"{MESSAGE['errorEliminar']}: {error}"}
+            print(f"{MESSAGE['errorPut']} - {error}")
+            datos = {"status": False, "message": f"{MESSAGE['errorEdition']}: {error}"}
             return JsonResponse(datos)
 
     def get(self, request, id=0):

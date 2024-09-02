@@ -36,7 +36,7 @@ function Actividades() {
 
   const columns = [
     {
-      name: "Codigo",
+      name: "Código",
       row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
     },
     {

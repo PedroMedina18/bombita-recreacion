@@ -7,8 +7,8 @@ import {
   Clientes, FormClientes,
   FormCargos, TipoDocumento,
   FormTipoDocumento, Generos,
-  FormGeneros, Pagos,
-  Usuarios, Actividades,
+  FormGeneros, Pagos, Password,
+  Usuarios, Actividades, Usuario,
   FormActividades, Recreadores,
   FormRecreadores, Recreador,
   MetodosPago, FormMetodosPago,
@@ -20,7 +20,8 @@ import {
   FormDataEvent, FormAccount,
   EventosRecreadores, FormUsuarios,
   Configuracion, Cargo, Evento,
-  CalendarRecreadores, CalendarEvent
+  CalendarRecreadores, CalendarEvent,
+  Preguntas
 } from "./pages/Pages.jsx"
 
 
@@ -36,7 +37,10 @@ function App() {
             <Route path="/register/cargo/" element={<FormCargos />} />
             <Route path="/edit/cargo/:id/" element={<FormCargos />} />
             <Route path="/register/usuario/" element={<FormUsuarios />} />
+            <Route path="/edit/usuario/:id/" element={<FormUsuarios />} />
             <Route path="/usuarios/" element={<Usuarios />} />
+            <Route path="/usuario/:id" element={<Usuario />} />
+            <Route path="/password/usuario/:id" element={<Password />} />
             <Route path="/eventos/" element={<Eventos />} />
             <Route path="/eventos/calendar/" element={<CalendarEvent />} />
             <Route path="/eventos/recreadores/:id_evento/" element={<EventosRecreadores />} />
@@ -78,6 +82,7 @@ function App() {
             <Route path="/clientes/" element={<Clientes />} />
             <Route path="/edit/cliente/:id/" element={<FormClientes />} />
             <Route path="/dolar/" element={<Dolar />} />
+            <Route path="/preguntas/" element={<Preguntas />} />
             <Route path="/inicio/" element={<Inicio />} />
             <Route path="/configuracion/" element={<Configuracion />} />
           </Route>

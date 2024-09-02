@@ -214,6 +214,10 @@ function FormDataEvent() {
                                     value: 7,
                                     message: texts.inputsMessage.min7,
                                 },
+                                min:{
+                                    value:4000,
+                                    message: texts.inputsMessage.invalidDocument,
+                                }
                             }}
                             onKeyUp={
                                 (e) => {
@@ -331,6 +335,10 @@ function FormDataEvent() {
                                 minLength: {
                                     value: 11,
                                     message: texts.inputsMessage.onlyCharacter11,
+                                },
+                                min:{
+                                    value:200000000,
+                                    message: texts.inputsMessage.invalidTel,
                                 }
                             }}
                             disabled={disabledInputs}
@@ -349,6 +357,10 @@ function FormDataEvent() {
                                 minLength: {
                                     value: 11,
                                     message: texts.inputsMessage.onlyCharacter11,
+                                },
+                                min:{
+                                    value:200000000,
+                                    message: texts.inputsMessage.invalidTel,
                                 }
                             }}
                             disabled={disabledInputs}
@@ -395,12 +407,15 @@ function FormDataEvent() {
                 <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                     <div className="w-100 w-md-50 pe-0 pe-md-3">
                         <InputsGeneral type={"datetime-local"} label={`${texts.label.fechaEvento}`} name="fecha_evento_inicio" id="fecha_evento_inicio" form={{ errors, register }}
-                            min={formatoFechaInput(fechaActual)}
                             params={{
                                 required: {
                                     value: true,
                                     message: texts.inputsMessage.requireFechaEvent,
                                 },
+                                min:{
+                                    value:formatoFechaInput(fechaActual),
+                                    message:texts.inputsMessage.fechaMenor,
+                                }
                             }}
                         />
                     </div>

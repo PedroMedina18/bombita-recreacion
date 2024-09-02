@@ -5,28 +5,31 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { recreadores, eventos } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { LoaderCircle } from "../../components/loader/Loader.jsx";
-import { verifyOptionsSelect, controlResultPost } from "../../utils/actions.jsx";
+import { controlResultPost } from "../../utils/actions.jsx";
 import { formatoId, formatDateWithTime12Hour, calcularEdad } from "../../utils/process.jsx";
 import { Toaster } from "sonner";
+import { IconRowLeft } from "../../components/Icon.jsx";
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import Swal from 'sweetalert2';
 import Navbar from "../../components/navbar/Navbar.jsx";
 import texts from "../../context/text_es.js";
-import pattern from "../../context/pattern.js";
-import { IconRowLeft } from "../../components/Icon.jsx";
+import dayjsEs from "../../utils/dayjs.js";
 import CardRecreador from "../../components/card/CardRecreador.jsx"
 
 function EventosRecreadores() {
   const navigate = useNavigate();
   const params = useParams();
   const renderizado = useRef(0);
+  const dayjs = dayjsEs();
   const [dataEvento, setEvento] = useState({});
   const [dataServicios, setDataServicios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [listRecreadores, setListRecreadores] = useState([]);
+  const [totalRecreadores, setTotalRecreadores] = useState(0);
   const [errorServer, setErrorServer] = useState("");
   const [isRecreadores, setIsRecreadores] = useState(false)
-
+  const [listNav, setListNav]=useState(0)
+  const [disabledButton, setDisabledButton]=useState(false)
   useEffect(() => {
     if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1
@@ -37,7 +40,7 @@ function EventosRecreadores() {
 
   const get_data = async () => {
     try {
-      const evento = await eventos.get({ subDominio: [Number(params.id_evento)]})
+      const evento = await eventos.get({ subDominio: [Number(params.id_evento)] })
       const recreadoresEvento = await eventos.get({ subDominio: ["recreadores", Number(params.id_evento)] })
       const listRecreadores = await recreadores.get()
 
@@ -58,13 +61,19 @@ function EventosRecreadores() {
         return
       }
 
+      const day = dayjs()
+      const start = dayjs(evento.data.data.info.fecha_evento_final)
+      setDisabledButton(day.isAfter(start))
       setEvento({
         ...dataEvento,
         ...evento.data.data
       })
-
+      const totalRe = recreadoresEvento.data.data.servicios.reduce((accumulator, current) => {
+        return accumulator + current.numero_recreadores
+      }, 0)
+      setTotalRecreadores(totalRe)
       setDataServicios(recreadoresEvento.data.data.servicios)
-      setIsRecreadores(recreadoresEvento.data.data.isRecreadores)
+      setIsRecreadores(recreadoresEvento.data.data.recreadores)
       setListRecreadores(listRecreadores.data.data)
     } catch (error) {
       console.log(error)
@@ -78,7 +87,6 @@ function EventosRecreadores() {
     const list = []
     for (let index = 0; index < servicio.numero_recreadores; index++) {
       const recreador = servicio.recreadores[index] ? servicio.recreadores[index] : null;
-
       list.push(
         <CardRecreadorSelect key={`card_${index}_${servicio.nombre}`}
           id={`card_${index}_${servicio.nombre}`}
@@ -97,21 +105,31 @@ function EventosRecreadores() {
 
   const onSubmit = async () => {
     try {
-      const message = isRecreadores ? texts.confirmMessage.confirEdit : texts.confirmMessage.confirRegister
+      const message = isRecreadores ? texts.confirmMessage.confirmEditRecreadores : texts.confirmMessage.confirmRegisterRecreadores
       const confirmacion = await alertConfim("Confirmar", message)
       if (confirmacion.isConfirmed) {
         const evento = Number(params.id_evento)
-        const recreadores = []
+        const listRecreadores = []
         dataServicios.forEach((servicio) => {
           servicio.recreadores.forEach((recreador) => {
-            recreadores.push({ id: recreador.id, servicio: servicio.id })
+            listRecreadores.push({ id: recreador.id, servicio: servicio.id })
           })
         })
+        const duplicados = listRecreadores.map(obj => obj.id);
+        if (duplicados.length !== new Set(duplicados).size) {
+          toastError(texts.errorMessage.errorRecreadoresRepeat)
+          return
+        }
+        if (listRecreadores.length !== totalRecreadores) {
+          toastError(texts.errorMessage.errorRecreadoresFaltantes)
+          return
+        }
+        alertLoading("Cargando")
         const data = {
           evento: evento,
-          recreadores: recreadores
+          recreadores: listRecreadores
         }
-        const respuesta = isRecreadores ? await eventos.put(data, { subDominio: ["recreadores"] }) : await eventos.post(data, { subDominio: ["recreadores"] })
+        const respuesta = isRecreadores ? await eventos.put(data, { subDominio: ["recreadores", Number(params.id_evento)] }) : await eventos.post(data, { subDominio: ["recreadores"] })
         controlResultPost({
           respuesta: respuesta,
           messageExito: isRecreadores ? texts.successMessage.editionEventoRecreadores : texts.successMessage.registerEventoRecreadores,
@@ -163,61 +181,72 @@ function EventosRecreadores() {
                     <strong>Fecha:</strong>
                     <p className='m-0'>{`${formatDateWithTime12Hour(dataEvento.info.fecha_evento_inicio)}`}</p>
                   </div>
-                  <div className='d-flex flex-column pe-sm-2 ps-sm-0  px-lg-2 mb-1 flex-fill'>
-                    <strong>Numero de Asistentes:</strong>
+                  <div className='d-flex flex-column pe-sm-2 ps-sm-0 align-items-center px-lg-2 mb-1 flex-fill'>
+                    <strong>N° Asistentes:</strong>
                     <p className='m-0'>{`${dataEvento.info.numero_personas}`}</p>
                   </div>
                 </div>
-                {
-                  dataServicios.map((servicio, index) => (
-                    <div className="w-100 d-flex flex-column mb-5" key={`container_${index}`}>
-                      <hr className="w-100" />
-                      <div className="d-flex flex-column flex-sm-row mb-4">
-                        <div className='d-flex flex-column pe-sm-2 ps-sm-0  px-lg-2 mb-1 flex-fill'>
-                          <strong>Servicio:</strong>
-                          <p className='m-0'>{`${servicio.nombre}`}</p>
-                        </div>
-                        <div className='d-flex flex-column pe-sm-2 ps-sm-0  px-lg-2 mb-1 flex-fill'>
-                          <strong>Número de Recreadores:</strong>
-                          <p className='m-0'>{servicio.numero_recreadores}</p>
-                        </div>
-                        <div className='d-flex flex-column pe-sm-2 ps-sm-0  px-lg-2 mb-1 flex-fill'>
-                          <strong>Duración:</strong>
-                          <p className='m-0'>{`${servicio.duracion.horas < 10 ? `0${servicio.duracion.horas}` : servicio.duracion.horas}:${servicio.duracion.minutos < 10 ? `0${servicio.duracion.minutos}` : servicio.duracion.minutos}`}</p>
-                        </div>
 
-                      </div>
-                      <div className="w-100 d-flex justify-content-evenly flex-wrap ">
-                        {
-                          cardsRecreadores({ servicio: servicio, indexServicio: index })
-                        }
-                      </div>
+                <ul className="nav nav-tabs w-100 nav-recreador">
+                  {
+                    dataServicios.map((servicio, index) => (
+                      <li className="nav-item" key={`servicio-${index}`} onClick={(e)=>{setListNav(Number(e.target.dataset.bsSlideTo))}}>
+                        <button className={`nav-link ${index===listNav&&'active'} fw-bold`} data-bs-target="#carouselExampleIndicators" data-bs-slide-to={`${index}`} aria-label={`Slide ${index + 1}`} aria-current="page">Servicio {index+1}</button>
+                      </li>
+                    ))
+                  }
+                </ul>
+                <div id="carouselExampleIndicators" className="carousel w-100 ">
+                  <div className="carousel-inner overflow-visible">
+                    {
+                      dataServicios.map((servicio, index) => (
+                        <div className={`carousel-item ${index === 0 && "active"}`}>
+                          <div className="w-100 d-flex flex-column mt-3" key={`container_${index}`}>
+                            <div className="d-flex flex-column flex-sm-row  justify-content-center align-items-center">
+                              <div className='d-flex flex-column pe-sm-2 ps-sm-0  px-lg-2 mb-1 flex-fill'>
+                                <strong>Servicio:</strong>
+                                <p className='m-0'>{`${servicio.nombre}`}</p>
+                              </div>
+                              <div className='d-flex flex-column align-items-center pe-sm-2 ps-sm-0 px-lg-2 mb-1 flex-fill'>
+                                <strong>N° Recreadores:</strong>
+                                <p className='m-0'>{servicio.numero_recreadores}</p>
+                              </div>
+                              <div className='d-flex flex-column pe-sm-2 ps-sm-0  px-lg-2 mb-1 flex-fill'>
+                                <strong>Duración:</strong>
+                                <p className='m-0'>
+                                  {`${servicio.duracion.horas < 10 ? `0${servicio.duracion.horas}` : servicio.duracion.horas}:${servicio.duracion.minutos < 10 ? `0${servicio.duracion.minutos}` : servicio.duracion.minutos} hr`}
+                                  </p>
+                              </div>
 
-                    </div>
-                  ))
-                }
-                <ButtonSimple className="mx-auto w-50 mt-5" onClick={onSubmit}>
+                            </div>
+                            <div className="w-100 d-flex justify-content-evenly flex-wrap ">
+                              {
+                                cardsRecreadores({ servicio: servicio, indexServicio: index })
+                              }
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    }
+                  </div>
+                </div>
+
+                <ButtonSimple className="mx-auto w-50 mt-5" onClick={onSubmit} disabled={disabledButton}>
                   Guardar
                 </ButtonSimple>
               </div>
             )
       }
-      <Toaster/>
+      <Toaster />
     </Navbar>
   )
 }
 
 
 function CardRecreadorSelect({ recreador, id, optionsDefault, dataFuntion }) {
-  const [value, setRecreador] = useState(recreador? recreador : null)
+  const [value, setRecreador] = useState(recreador ? recreador : null)
   const [debounceTimeoutRecreador, setDebounceTimeoutRecreador] = useState(null);
   const { indexServicio, indexRecreador, dataServicios, setDataServicios } = dataFuntion
-  
-  useEffect(()=>{
-    console.log(recreador)
-  },[value])
-
-
 
   const loadOptionsRecreador = (inputValue, callback) => {
     if (debounceTimeoutRecreador) {
@@ -226,7 +255,7 @@ function CardRecreadorSelect({ recreador, id, optionsDefault, dataFuntion }) {
 
     const timeout = setTimeout(async () => {
       try {
-        const respuesta = await recreadores.get({ subDominio: [inputValue] })
+        const respuesta = await recreadores.get({ params: { search: inputValue } })
         if (respuesta.status !== 200) {
           callback([])
         }

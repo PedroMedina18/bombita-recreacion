@@ -72,14 +72,14 @@ function Eventos() {
       name: "Estado de Pago",
       row: (row) => {
         let value;
-        if (row.pago_total) {
-          value = <Pildora contenido={"Pago Total"} color="bg-succes"></Pildora>
+        if (row.estado_pago===2) {
+          value = <Pildora contenido={`${row.estado_pago_descripcion}`} color="bg-succes"></Pildora>
         }
-        if (row.anticipo && !row.pago_total) {
-          value = <Pildora contenido={"Pago Anticipagdo"} color="bg-warning"></Pildora>
+        if (row.estado_pago===1) {
+          value = <Pildora contenido={`${row.estado_pago_descripcion}`} color="bg-warning"></Pildora>
         }
-        if (!row.pago_total && !row.anticipo) {
-          value = <Pildora contenido={"Ningun Pago"} color="bg-danger"></Pildora>
+        if (row.estado_pago===0) {
+          value = <Pildora contenido={`${row.estado_pago_descripcion}`} color="bg-danger"></Pildora>
         }
         return value;
       },
@@ -130,7 +130,7 @@ function Eventos() {
 
   const options = {
     search: {
-      placeholder: texts.registerMessage.searchClient,
+      placeholder: texts.registerMessage.searchClientEvent,
       function: (value) => {
         searchCode({
           value: value,

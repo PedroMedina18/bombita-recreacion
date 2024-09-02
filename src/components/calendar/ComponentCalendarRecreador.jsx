@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 import dayjsEs from '../../utils/dayjs.js'
 import { recreadores } from "../../utils/API.jsx";
 
-function ComponentCalendarRecreador({id_recreador, name=null}) {
+function ComponentCalendarRecreador({ id_recreador, name = null }) {
     const dayjs = dayjsEs({ weekdaysAbre: false })
     const navigate = useNavigate()
 
@@ -41,15 +41,16 @@ function ComponentCalendarRecreador({id_recreador, name=null}) {
     const eventoStandar = (event, dataExtra = false) => {
         const day = dayjs()
         const start = dayjs(event.event.start)
-        const estadoEvento = (day.isSame(start, 'day') || day.isAfter(start, 'day'))
+        const eventosAfter = (day.isAfter(start, 'day'))
+        const eventosSame = (day.isSame(start, 'day'))
         if (dataExtra) {
-            return <div className={`d-flex flex-column ${estadoEvento && "bg-new bg-after"}`}>
+            return <div className={`d-flex flex-column ${eventosAfter && "bg-new bg-after"} ${eventosSame && "bg-new bg-same"}`}>
                 <p className='m-0'>{event.title}</p>
                 <p className='m-0'>{event.event.cliente}</p>
                 <p className='m-0'>{event.event.direccion}</p>
             </div>
         } else {
-            return <div className={`${estadoEvento && "bg-new bg-after"}`}>
+            return <div className={`${eventosAfter && "bg-new bg-after"} ${eventosSame && "bg-new bg-same"}`}>
                 {event.title}
             </div>
         }
@@ -58,17 +59,20 @@ function ComponentCalendarRecreador({id_recreador, name=null}) {
     return (
         <div className=' px-sm-0 px-md-1 px-4 mt-5 w-100'>
             <h6 className='text-center h3 fw-bold mb-1'>{name}</h6>
-            <ComponentCalendar
-                object={recreadores}
-                subDominio={["eventos", Number(id_recreador)]}
-                eventData={eventData}
-                components={components}
-                onDoubleClickEvent={
-                    (event) => {
-                        navigate(`/eventos/${event.id}/`)
+            <div className='w-100 overflow-auto scroll'>
+                <ComponentCalendar
+                    object={recreadores}
+                    className='vh-100 w-calendar'
+                    subDominio={["eventos", Number(id_recreador)]}
+                    eventData={eventData}
+                    components={components}
+                    onDoubleClickEvent={
+                        (event) => {
+                            navigate(`/eventos/${event.id}/`)
+                        }
                     }
-                }
-            />
+                />
+            </div>
         </div>
     )
 }

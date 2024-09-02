@@ -1,13 +1,14 @@
 
 import './login.css'
 import { useForm } from "react-hook-form";
+import Logo from "../../assets/logo-bombita.png";
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
 import { login } from "../../utils/API.jsx"
 import { getCookie } from "../../utils/cookie.jsx"
 import { errorAxios } from "../../utils/process.jsx"
-import { IconUserCircleSolid, IconWarnig } from "../../components/Icon"
+import { IconUserCircleSolid, IconWarnig, IconUsers, IconBloq } from "../../components/Icon"
 import texts from '../../context/text_es.js';
 import pattern from '../../context/pattern.js';
 
@@ -59,7 +60,8 @@ function Login() {
   }
 
   return (
-    <main className='w-100 vh-100 d-flex justify-content-center align-items-center bg-login'>
+    <main className='w-100 vh-100 d-flex justify-content-center align-items-center bg-login position-relative'>
+
       <form className='form'
         autoComplete={"off"}
         onSubmit={onSubmit}
@@ -68,91 +70,103 @@ function Login() {
           <IconUserCircleSolid />
         </div>
 
-        <h1 className='h1 fw-bold mb-4 mt-5 text-white'>Inicio de Sesión</h1>
+        <h1 className='h3 fw-bold mb-4 mt-5 text-white'>Inicio de Sesión</h1>
 
-        <div className={`w-100 position-relative overflow-hidden my-2  ${errors.usuario ? "error" : ""}`} id="container-input-usuario">
-          <input
-            type="text"
-            id="user"
-            name="usuario"
-            {
-            ...register("usuario", {
-              required: {
-                value: true,
-                message: texts.inputsMessage.requireUser,
-              },
-              maxLength: {
-                value: 20,
-                message: texts.inputsMessage.max20,
-              },
-              min: {
-                value: 8,
-                message: texts.inputsMessage.min8,
-              },
-              pattern: {
-                value: pattern.user,
-                message: texts.inputsMessage.invalidUser
+        <div className='w-100 d-flex icon-input align-items-center'>
+          <label htmlFor="user" className='icon-input d-flex cursor-pointer'>
+            <IconUsers />
+          </label>
+          <div className={`w-100 position-relative overflow-hidden my-2  ${errors.usuario ? "error" : ""}`} id="container-input-usuario">
+
+            <input
+              type="text"
+              id="user"
+              name="usuario"
+              {
+              ...register("usuario", {
+                required: {
+                  value: true,
+                  message: texts.inputsMessage.requireUser,
+                },
+                maxLength: {
+                  value: 20,
+                  message: texts.inputsMessage.max20,
+                },
+                min: {
+                  value: 8,
+                  message: texts.inputsMessage.min8,
+                },
+                pattern: {
+                  value: pattern.user,
+                  message: texts.inputsMessage.invalidUser
+                }
+              })
               }
-            })
-            }
-            onKeyUp={
-              (e) => {
-                if (e.target.value) {
-                  document.getElementById("container-input-usuario").classList.add("valid")
-                } else {
-                  document.getElementById("container-input-usuario").classList.remove("valid")
+              onKeyUp={
+                (e) => {
+                  if (e.target.value) {
+                    document.getElementById("container-input-usuario").classList.add("valid")
+                  } else {
+                    document.getElementById("container-input-usuario").classList.remove("valid")
+                  }
                 }
               }
-            }
-          />
-          <label htmlFor="user" className='lb-name  cursor-pointer'>
-            <span className='text-name'>{texts.label.user}</span>
-          </label>
+            />
+            <label htmlFor="user" className='lb-name  cursor-pointer'>
+              <span className='text-name'>{texts.label.user}</span>
+            </label>
+          </div>
         </div>
         {errors.usuario ? <span className='error-login'>{errors.usuario.message}</span> : <span className='error-login invisible'>error</span>}
 
-        <div className={`w-100 position-relative overflow-hidden my-2 ${errors.contraseña ? "error" : ""}`} id="container-input-password">
-          <input
-            id="password"
-            type="password"
-            name="contraseña"
-            {
-            ...register("contraseña", {
-              required: {
-                value: true,
-                message: texts.inputsMessage.requirePassword,
-              },
-              maxLength: {
-                value: 16,
-                message: texts.inputsMessage.max16,
-              },
-              pattern: {
-                value: pattern.password,
-                message: texts.inputsMessage.invalidPassword,
+        <div className='w-100 d-flex icon-input align-items-center'>
+          <label htmlFor="password" className='icon-input d-flex cursor-pointer'>
+            <IconBloq />
+          </label>
+          <div className={`w-100 position-relative overflow-hidden my-2 ${errors.contraseña ? "error" : ""}`} id="container-input-password">
+            <input
+              id="password"
+              type="password"
+              name="contraseña"
+              {
+              ...register("contraseña", {
+                required: {
+                  value: true,
+                  message: texts.inputsMessage.requirePassword,
+                },
+                maxLength: {
+                  value: 16,
+                  message: texts.inputsMessage.max16,
+                },
+                pattern: {
+                  value: pattern.password,
+                  message: texts.inputsMessage.invalidPassword,
+                }
+              })
               }
-            })
-            }
-            onKeyUp={
-              (e) => {
-                if (e.target.value) {
-                  document.getElementById("container-input-password").classList.add("valid")
-                } else {
-                  document.getElementById("container-input-password").classList.remove("valid")
+              onKeyUp={
+                (e) => {
+                  if (e.target.value) {
+                    document.getElementById("container-input-password").classList.add("valid")
+                  } else {
+                    document.getElementById("container-input-password").classList.remove("valid")
+                  }
                 }
               }
-            }
-            autoComplete="current-password"
-          />
-          <label htmlFor="password" className='lb-name  cursor-pointer'>
-            <span className='text-name'>{texts.label.password}</span>
-          </label>
+              autoComplete="current-password"
+            />
+            <label htmlFor="password" className='lb-name  cursor-pointer'>
+              <span className='text-name'>{texts.label.password}</span>
+            </label>
+          </div>
         </div>
+
         {errors.contraseña ? <span className='error-login'>{errors.contraseña.message}</span> : <span className='error-login invisible'>error</span>}
 
         {
           alert ?
             (
-              <div className='alert-login'>
+              <div className='alert-login mt-3'>
                 <IconWarnig />
                 <p className='ms-2 '>{alert}</p>
               </div>

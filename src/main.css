@@ -1,13 +1,15 @@
 @import url(./normalize.css);
 
 :root {
-  --principal: 36, 11, 54;
-  --secundario: 195, 20, 50;
-  --exito: 43, 241, 96;
+  --principal: 0, 56, 129;
+  --secundario: 218, 12, 73;
+  --purple: 96, 7, 197;
+  --exito: 40, 199, 8;
+  --warning: 248, 206, 19;
   --error: 226, 32, 42;
   --info: 17, 182, 233;
   --base: 250, 250, 250;
-  --body:226, 221, 221;
+  --body: 226, 221, 221;
 }
 #root {
   overflow: hidden;
@@ -18,17 +20,25 @@
 
 /* background */
 
-.haikus{
-  background: rgb(194,101,122);
-  background: linear-gradient(180deg, rgba(194,101,122,0.835171568627451) 0%, rgba(195,20,50,1) 100%);
+.haikus {
+  background: rgb(var(--secundario));
+  background: linear-gradient(
+    180deg,
+    rgba(var(--secundario), 0.637) 0%,
+    rgba(var(--principal)) 100%
+  );
 }
 
-.bacerror{
-  background: rgb(238,174,174);
-  background: radial-gradient(circle, rgba(238,174,174,1) 0%, rgba(226,148,233,1) 100%);
+.bacerror {
+  background: rgb(238, 174, 174);
+  background: radial-gradient(
+    circle,
+    rgba(238, 174, 174, 1) 0%,
+    rgba(226, 148, 233, 1) 100%
+  );
 }
 
-.border-secundary{
+.border-secundary {
   --bs-border-color: rgb(var(--secundario));
 }
 
@@ -43,12 +53,12 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-body::-webkit-scrollbar {
+body::-webkit-scrollbar, .scroll::-webkit-scrollbar {
   width: 10px;
   background-color: transparent;
 }
 
-body::-webkit-scrollbar-thumb {
+body::-webkit-scrollbar-thumb, .scroll::-webkit-scrollbar-thumb {
   background-color: rgb(var(--secundario));
   border-radius: 10px;
 }
@@ -147,7 +157,7 @@ body::-webkit-scrollbar-thumb {
   font-size: 50px;
 }
 
-.div-main{
+.div-main {
   display: flex;
   flex-direction: column;
   min-height: 60vh;
@@ -160,8 +170,26 @@ body::-webkit-scrollbar-thumb {
   align-items: center;
 }
 
-.div-main form{
+.div-main form {
   min-height: 60vh;
+}
+
+.label-alert{
+  justify-self: start;
+  margin: 0 auto 0 2rem;
+  font-size: 16px;
+}
+.input-alert{
+  background: #fff;
+  border: 1px solid rgb(22, 21, 21);
+  border-radius: 5px;
+  line-height: 40px;
+  transition: 0.3s ease all;
+}
+.input-alert:focus{
+  border: 1px solid #619bdd;
+  outline: none;
+  box-shadow: 0 0 0 0.25rem rgb(13 110 253 / 25%);
 }
 
 /* heigh y width */
@@ -182,30 +210,52 @@ body::-webkit-scrollbar-thumb {
 .fs-8 {
   font-size: 8px;
 }
-.w-40{
+.w-40 {
   width: 40%;
 }
-.w-60{
+.w-60 {
   width: 60%;
 }
-.w-max-contetn{
+.w-max-contetn {
   width: max-content;
 }
-.link-action-secundary svg{
+.link-action-secundary {
+  background-color: transparent;
+}
+.link-action-secundary svg {
   color: rgb(var(--secundario));
   width: 30px;
 }
-.link-action-secundary:hover{
+.link-action-secundary:hover {
   background-color: rgba(var(--secundario), 0.5);
-  box-shadow: 5px 13px 22px -10px rgba(0,0,0,0.73);
+  box-shadow: 5px 13px 22px -10px rgba(0, 0, 0, 0.73);
   font-weight: bold;
   z-index: 5;
 }
 
-.link-action-secundary:active{
+.link-action-secundary:active {
   background-color: rgba(var(--secundario), 0.6);
 }
 
+.nav-recreador .active{
+  --bs-nav-tabs-link-active-bg:rgb(var(--principal));
+  --bs-nav-tabs-link-active-color:rgb(255, 255, 255)
+}
+
+.nav-recreador .nav-item:hover{
+  background-color: rgba(var(--principal), 0.2);
+} 
+
+.nav-recreador .nav-link:not(.active){
+  color: rgb(0, 0, 0);
+}
+.nav-tabs.nav-recreador{
+  --bs-nav-tabs-border-width:1px;
+  --bs-nav-tabs-border-color:rgb(0, 0, 0);
+}
+.nav-recreador.nav-tabs .nav-link{
+  border: var(--bs-nav-tabs-border-width) solid black;
+}
 
 @media (min-width: 992px) {
   .w-lg-25 {

@@ -71,7 +71,7 @@ function FormClientes() {
     const onSubmit = handleSubmit(
         async (data) => {
             try {
-                const message = texts.confirmMessage.confirEdit
+                const message = texts.confirmMessage.confimrEdit
                 const confirmacion = await alertConfim("Confirmar", message)
                 const body = {}
                 if (confirmacion.isConfirmed) {
@@ -164,6 +164,10 @@ function FormClientes() {
                                                         value: 7,
                                                         message: texts.inputsMessage.min7,
                                                     },
+                                                    min:{
+                                                        value:4000,
+                                                        message: texts.inputsMessage.invalidDocument,
+                                                    }
                                                 }}
                                                 disabled={disabledInputs}
                                                 placeholder={texts.placeholder.numeroDocumento}
@@ -254,6 +258,10 @@ function FormClientes() {
                                                     minLength: {
                                                         value: 11,
                                                         message: texts.inputsMessage.onlyCharacter11,
+                                                    },
+                                                    min:{
+                                                        value:200000000,
+                                                        message: texts.inputsMessage.invalidTel,
                                                     }
                                                 }}
                                                 disabled={disabledInputs}
@@ -271,6 +279,10 @@ function FormClientes() {
                                                     minLength: {
                                                         value: 11,
                                                         message: texts.inputsMessage.onlyCharacter11,
+                                                    },
+                                                    min:{
+                                                        value:200000000,
+                                                        message: texts.inputsMessage.invalidTel,
                                                     }
                                                 }}
                                                 disabled={disabledInputs}

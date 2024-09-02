@@ -13,7 +13,6 @@ import "../../components/input/input.css"
 import "../../components/table/table.css"
 import Pildora from "../../components/Pildora.jsx"
 import texts from "../../context/text_es.js";
-import pattern from "../../context/pattern.js";
 
 function Cargo() {
   const [loading, setLoading] = useState(true);
@@ -51,7 +50,6 @@ function Cargo() {
   return (
     <Navbar name={texts.pages.cargo.name} descripcion={texts.pages.cargo.description} dollar={false}>
       <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/cargos/") }}> <IconRowLeft /> Regresar</ButtonSimple>
-
       {
         loading ?
           (

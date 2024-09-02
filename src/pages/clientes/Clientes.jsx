@@ -36,7 +36,7 @@ function Clientes() {
 
     const columns = [
         {
-            name: "Codigo",
+            name: "Código",
             row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
         },
         {
@@ -52,11 +52,11 @@ function Clientes() {
             row: (row) => { return row.correo }
         },
         {
-            name: "Teléfono Principal",
+            name: "Tel. Principal",
             row: (row) => { return row.telefono_principal }
         },
         {
-            name: "Teléfono Secundario",
+            name: "Tel. Secundario",
             row: (row) => { return row.telefono_secundario }
         },
         {
@@ -85,7 +85,7 @@ function Clientes() {
                   }}
                   className="cursor-pointer"
                 /> */}
-                <IconEdit onClick={() => { navigate(`/edit/cliente/${row.numero_documento}/`) }} className="cursor-pointer" />
+                <IconEdit onClick={() => { navigate(`/edit/cliente/${row.id}/`) }} className="cursor-pointer" />
               </div>
             }
           },

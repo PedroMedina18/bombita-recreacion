@@ -4,7 +4,7 @@ const texts={
 
     inputsMessage:{
         confirmPassword:"Por favor confirmar la contraseña",
-        errorPassword:"Las contraseña no Coinciden",
+        errorPassword:"Las contraseña no coinciden",
         max500:"Máximo 500 caracteres",
         max200:"Máximo 200 caracteres",
         max300:"Máximo 300 caracteres",
@@ -26,6 +26,7 @@ const texts={
         step1:"Solo números enteros",
         requireName:"Se requiere un nombre",
         requireNames:"Se requiere los nombres",
+        requirePregunta:"Pregunta Requeridad",
         requireLastName:"Se requiere los apellidos",
         requiredDesription: "Se requiere una descripción",
         requireDate:"Se requiere la fecha de nacimiento",
@@ -59,8 +60,11 @@ const texts={
         invalidNombres:"Nombres invalidos",
         invalidLastNames:"Apellidos invalidos",
         invalidMonto:"Monto invalido",
+        invalidDocument:"Número de Documento Invalido",
+        invalidTel:"Teléfono Invalido",
         noneSpace:"Sin espacios al inicio o al final",
         onlyCharacter11:"Solo se admiten 11 caracteres",
+        fechaMenor:'Fecha inválida debe ser mayor'
     },
 
     successMessage:{
@@ -78,6 +82,7 @@ const texts={
         registerMetodoPago:"Metodo de Pago Registrado",
         registerEventoRecreadores:"Recreadores Asignados",
         registerPago:"Pago Registrado",
+        registerPregunta:"Pregunta Registrado",
         // -----------------------------------------------------------
         editionUsuario:"Usuario Editado",
         editionNivel:"Nivel Editado",
@@ -92,14 +97,18 @@ const texts={
         editionSobrecargo:"Sobrecargo Editado",
         editionMetodoPago:"Metodo de Pago Editado",
         editionEventoRecreadores:"Recreadores Actualizados",
+        editionPregunta:"Pregunta Actualizados",
     },
 
     confirmMessage:{
-        confirmDelete:"Confirmar la Solicitud de Eliminación",
-        confirRegister:"Por favor confirmar la solicitud de Registro",
-        confirEdit:"Confirmar la Solicitud de Edición",
-        confirCloset:"Desea cerrar sesión",
-        confirPago:"Desea registrar este pago",
+        confirmDelete:"Confirmar la solicitud de eliminación",
+        confirmRegister:"Por favor confirmar la solicitud de registro",
+        confirmRegisterRecreadores:"Desea asignar estos recreadores al evento",
+        confirmEditRecreadores:"Desea cambiar los  recreadores del evento",
+        confirmEdit:"Confirmar la solicitud de edición",
+        confirmCloset:"Desea cerrar sesión",
+        confirmPassword:"Desea cambiar la contraseña del usuario",
+        confirmPago:"Desea registrar este pago",
         inactividad:"No se ha detectado ninguna actividad por un periodo prolongado de tiempo el sistema cerrara sesión por seguridad"
     },
 
@@ -113,11 +122,13 @@ const texts={
         errorMonto:"El monto presentado supera el monto a cancelar",
         errorNotPago:"No se a añadido ninguna forma de pago",
         errorNotTotal:"No se a compleato el monto a cancelar",
+        errorRecreadoresRepeat:"Recreadores Duplicados",
+        errorRecreadoresFaltantes:"Asigne todos los recreadores faltantes",
     },
 
     label:{
         descripcion:"Descripción",
-        direccion:"Direccion del Evento",
+        direccion:"Dirección del Evento",
         monto:"Monto Extra",
         nombre:"Nombre",
         materiales:"Materiales",
@@ -179,6 +190,9 @@ const texts={
         nameSobrecargos:"Nombre de la Sobrecargos",
         nameServicio:"Nombre del Servicio",
         nameTipoDocumento:"Nombre del Tipo de Documento",
+        usuario:"Nombre de Usuario unico",
+        password:"Contraseña",
+        repeatPassword:"Repita Contraseña",
     },
 
     pages:{
@@ -230,9 +244,21 @@ const texts={
             name:"Registrar un Nuevo Metodo de Pago",
             description:"Intruduzca los datos para agregar un nuevo metodo de pago al sistema"
         },
+        registerPregunta:{
+            name:"Registrar una Nueva Pregunta",
+            description:"¿Qué Pregunta desea Registrar?"
+        },
         editRecreador:{
             name:"Editar un Recreador",
             description:"Intruduzca los datos para editar un recreador en el sistema"
+        },
+        editPregunta:{
+            name:"Editar una Pregunta",
+            description:"Complete para Editar"
+        },
+        editUsuario:{
+            name:"Editar un nuevo Usuario",
+            description:"Intruduzca los datos para editar un usuario en el sistema"
         },
         editActividad:{
             name:"Editar una Actividad",
@@ -281,6 +307,10 @@ const texts={
         getClientes:{
             name:"Lista de Clientes",
             description:"Verifique los Clientes agregados"
+        },
+        getPreguntas:{
+            name:"Lista de Preguntas",
+            description:"Verifique los Preguntas agregados"
         },
         getGeneros:{
             name:"Lista de Generos",
@@ -349,12 +379,17 @@ const texts={
             name:"Calendario de Eventos",
             description:"Calendario de los proximos Eventos"
         },
+        passwordUser:{
+            name:"Actualización de Contraseña",
+            description:"Complete los campos para actualizar la contraseña"
+        },
     },
 
     registerMessage:{
-        searchItem:"Buscar por su codigo",
-        searchUser:"Buscar por su codigo o Usuario",
-        searchClient:"Buscar por su codigo o cliente",
+        searchItem:"Buscar por codigo",
+        searchUser:"Buscar por codigo o usuario",
+        searchClient:"Buscar por codigo o nombre",
+        searchClientEvent:"Buscar por codigo o cliente",
         searchNameDocument:"Buscar por número de documento o nombre",
         buttonRegisterTipoDocumento:"Agregar un nuevo Tipo de Documento",
         buttonRegisterGenero:"Agregar un nuevo Genero",
@@ -366,6 +401,7 @@ const texts={
         buttonRegisterSobrecargo:"Agregar un nuevo Sobrecargo",
         buttonRegisterMetodoPago:"Agregar un nuevo Metodo de Pago",
         buttonRegisterServicio:"Agregar un nuevo Servicio",
+        buttonRegisterPregunta:"Agregar un nuevo Pregunta",
         buttonRegisterEvento:"Agregar un nuevo evento",
         buttonRegisterEventosuccessMessage:"Agregar un nuevo Evento",
         buttonRegisterUser:"Agregar un nuevo Usuario",

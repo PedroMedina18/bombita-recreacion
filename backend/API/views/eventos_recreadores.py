@@ -12,6 +12,7 @@ from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
 from ..message import MESSAGE
 from decouple import config
+import datetime
 import json
 
 
@@ -50,8 +51,7 @@ class Eventos_Recreadores_Servicios_View(View):
             servicios = [{**servicio, "recreadores":[], 'duracion' : duration(servicio['duracion'])} for servicio in servicios]
             query = """
                 SELECT
-                    reve.id,
-                    re.id AS recreador_id,
+                    re.id AS id,
                     pe.nombres, 
                     re.fecha_nacimiento,
                     pe.apellidos, 
@@ -71,7 +71,7 @@ class Eventos_Recreadores_Servicios_View(View):
 
             cursor.execute(query, [id])
             recreadores = dictfetchall(cursor)
-            isRecreadores = True if len(recreadores) != 0 else False 
+            isRecreadores = True if len(recreadores) > 0 else False 
             for recreador in recreadores:
                 recreador["img_perfil"] = (
                     f"{config('URL')}media/{recreador['img_perfil']}"
@@ -109,6 +109,7 @@ class Eventos_Recreadores_Servicios_View(View):
             verify = verify_token(req['headers'])
             req = req['body']
             cursor = connection.cursor()
+            fecha_actual = datetime.datetime.now()
 
             if (not verify['status']):
                 datos = {
@@ -122,6 +123,10 @@ class Eventos_Recreadores_Servicios_View(View):
                 evento = Eventos.objects.get(id = int(req["evento"]))
             else:
                 datos = {'status': False, 'message': MESSAGE['errorEvento']}
+                return JsonResponse(datos)
+
+            if evento.fecha_evento_inicio < fecha_actual:
+                datos = {'status': False, 'message': MESSAGE['errorEventoFecha']}
                 return JsonResponse(datos)
 
             query="""
@@ -180,7 +185,7 @@ class Eventos_Recreadores_Servicios_View(View):
             verify = verify_token(req['headers'])
             req = req['body']
             cursor = connection.cursor()
-
+            fecha_actual = datetime.datetime.now()
             if (not verify['status']):
                 datos = {
                     'status': False,
@@ -194,6 +199,9 @@ class Eventos_Recreadores_Servicios_View(View):
             else:
                 datos = {'status': False, 'message': MESSAGE['errorEvento']}
                 return JsonResponse(datos)
+            if evento.fecha_evento_inicio < fecha_actual:
+                datos = {'status': False, 'message': MESSAGE['errorEventoFecha']}
+                return JsonResponse(datos)
 
             recreadores_id= [recreador["id"] for recreador in req["recreadores"]]
             if len(recreadores_id) != len(set(recreadores_id)):
@@ -205,7 +213,7 @@ class Eventos_Recreadores_Servicios_View(View):
 
             query="""
                 SELECT 
-                    es.recreador_id AS id
+                    es.recreador_id AS id,
                     es.servicio_id AS servicio
                 FROM 
                     recreadores_eventos_servicios AS es
@@ -215,13 +223,12 @@ class Eventos_Recreadores_Servicios_View(View):
             cursor.execute(query, [id])
             recreadores_registrados = dictfetchall(cursor)
             recreadores_nuevos = req["recreadores"]
-            recreador_eliminar = [recreador_registrado for recreador_registrado in recreadores_registrados if not any(recreador_nuevo.id == recreador_registrado.id and recreador_nuevo.servicio == recreador_registrado.servicio for recreador_nuevo in recreadores_nuevos)]
-            recreador_agregar = [recreador_nuevo for recreador_nuevo in recreadores_nuevos if not any(recreador_registrado.id == recreador_nuevo.id and recreador_registrado.servicio == recreador_nuevo.servicio for recreador_registrado in recreadores_registrados)]
-            
+            recreador_eliminar = [recreador_registrado for recreador_registrado in recreadores_registrados if not any(recreador_nuevo["id"] == recreador_registrado["id"] and recreador_nuevo["servicio"] == recreador_registrado["servicio"] for recreador_nuevo in recreadores_nuevos)]
+            recreador_agregar = [recreador_nuevo for recreador_nuevo in recreadores_nuevos if not any(recreador_registrado["id"] == recreador_nuevo["id"] and recreador_registrado["servicio"] == recreador_nuevo["servicio"] for recreador_registrado in recreadores_registrados)]
             for eliminar in recreador_eliminar:
                 recreador = Recreadores.objects.get(id=int(eliminar['id']))
                 servicio = Servicios.objects.get(id=int(eliminar['servicio']))
-                EventosRecreadoresServicios.filter(evento=evento, servicio=servicio, recreador=recreador).delete()
+                EventosRecreadoresServicios.objects.filter(evento=evento, servicio=servicio, recreador=recreador).delete()
             
             query="""
                 SELECT 
@@ -235,9 +242,8 @@ class Eventos_Recreadores_Servicios_View(View):
                 GROUP BY 
                     es.servicio_id;
             """
-            cursor.execute(query, [int(req["evento"])])
+            cursor.execute(query, [id])
             resultados = dictfetchall(cursor)
-
             totalRecreadores={}
             for total in resultados:
                 totalRecreadores[f"{total['servicio_id']}"] = total["total_recreadores"]
@@ -248,7 +254,11 @@ class Eventos_Recreadores_Servicios_View(View):
                 if(totalRecreadores[f"{servicio.id}"] < servicio.numero_recreadores):
                     recreador = Recreadores.objects.get(id=agregar['id'])
                     EventosRecreadoresServicios.objects.create(evento = evento, recreador = recreador, servicio = servicio)
-
+            datos = {
+                'status': True,
+                'message': f"{MESSAGE['editRecreadores']}"
+            }
+            return JsonResponse(datos)
         except Exception as error:
             print(f"{MESSAGE['errorPut']} - {error}")
             datos = {

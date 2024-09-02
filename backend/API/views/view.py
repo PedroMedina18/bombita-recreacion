@@ -21,3 +21,4 @@ from .dollar import Dollar_View
 from .pagos import Pagos_Views
 from .eventos_recreadores import Eventos_Recreadores_Servicios_View
 from .recreadores_evento import Recraadores_Eventos_Views
+from .preguntas import Preguntas_Evento_View
