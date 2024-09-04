@@ -48,6 +48,9 @@ function EventosRecreadores() {
         setErrorServer('Error. Conexión Evento')
         return
       }
+      if(evento.data.data.info.estado===false){
+        navigate("/eventos/")
+      }
       if (recreadoresEvento.status !== 200 || recreadoresEvento.data.status === false) {
         setErrorServer('Error. Conexión  de Recreadores')
         return
@@ -166,16 +169,16 @@ function EventosRecreadores() {
               <div className="div-main  px-3 px-md-4 px-lg-5 py-3">
                 <div className='d-flex justify-content-between flex-wrap w-100'>
                   <div className='d-flex flex-column pe-2 mb-1 flex-fill'>
-                    <strong>Evento:</strong>
+                    <strong>Evento N°:</strong>
                     <p className='m-0'>{formatoId(dataEvento.info.id)}</p>
-                  </div>
-                  <div className='d-flex flex-column px-2 mb-1 flex-fill'>
-                    <strong>Documento:</strong>
-                    <p className='m-0'>{`${dataEvento.info.tipo_documento}-${dataEvento.info.numero_documento}`}</p>
                   </div>
                   <div className='d-flex flex-column pe-sm-2 ps-sm-0  px-lg-2 mb-1 flex-fill'>
                     <strong>Cliente:</strong>
                     <p className='m-0'>{`${dataEvento.info.nombres} ${dataEvento.info.apellidos}`}</p>
+                  </div>
+                  <div className='d-flex flex-column px-2 mb-1 flex-fill'>
+                    <strong>Documento:</strong>
+                    <p className='m-0'>{`${dataEvento.info.tipo_documento}-${dataEvento.info.numero_documento}`}</p>
                   </div>
                   <div className='d-flex flex-column pe-sm-2 ps-sm-0  px-lg-2 mb-1 flex-fill'>
                     <strong>Fecha:</strong>
@@ -200,16 +203,16 @@ function EventosRecreadores() {
                   <div className="carousel-inner overflow-visible">
                     {
                       dataServicios.map((servicio, index) => (
-                        <div className={`carousel-item ${index === 0 && "active"}`}>
+                        <div key={`servicio-carrusel-${index}`} className={`carousel-item ${index === 0 && "active"}`}>
                           <div className="w-100 d-flex flex-column mt-3" key={`container_${index}`}>
                             <div className="d-flex flex-column flex-sm-row  justify-content-center align-items-center">
                               <div className='d-flex flex-column pe-sm-2 ps-sm-0  px-lg-2 mb-1 flex-fill'>
-                                <strong>Servicio:</strong>
-                                <p className='m-0'>{`${servicio.nombre}`}</p>
+                                <strong>Servicio N°:</strong>
+                                <p className='m-0'>{`${formatoId(servicio.id)}`}</p>
                               </div>
-                              <div className='d-flex flex-column align-items-center pe-sm-2 ps-sm-0 px-lg-2 mb-1 flex-fill'>
-                                <strong>N° Recreadores:</strong>
-                                <p className='m-0'>{servicio.numero_recreadores}</p>
+                              <div className='d-flex flex-column pe-sm-2 ps-sm-0  px-lg-2 mb-1 flex-fill'>
+                                <strong>Nombre:</strong>
+                                <p className='m-0'>{`${servicio.nombre}`}</p>
                               </div>
                               <div className='d-flex flex-column pe-sm-2 ps-sm-0  px-lg-2 mb-1 flex-fill'>
                                 <strong>Duración:</strong>

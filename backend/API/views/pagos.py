@@ -72,7 +72,7 @@ class Pagos_Views(View):
                 evento.estado_pago=2
 
             evento.save()
-            emailRegistroPago(evento.cliente.persona.correo)
+            # emailRegistroPago(evento.cliente.persona.correo)
             datos = {
                 'status': True,
                 'message': f"{MESSAGE['registerPago']}"

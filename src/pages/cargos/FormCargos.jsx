@@ -131,7 +131,7 @@ function FormCargos() {
     )
 
     return (
-        <Navbar name={params.id ? texts.pages.editCargo.name : texts.pages.registerCargos.name} descripcion={params.id ? texts.pages.editCargo.description : texts.pages.registerCargos.description}>
+        <Navbar name={params.id ? texts.pages.editCargo.name : texts.pages.registerCargos.name} descripcion={params.id ? texts.pages.editCargo.description : texts.pages.registerCargos.description} dollar={false}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/cargos/") }}> <IconRowLeft /> Regresar</ButtonSimple>
             {
                 loading ?

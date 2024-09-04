@@ -101,7 +101,7 @@ function FormMetodoPago() {
     )
 
     return (
-        <Navbar name={params.id ? texts.pages.editMetodoPago.name : texts.pages.registerMetodoPago.name} descripcion={params.id ? texts.pages.editMetodoPago.description : texts.pages.registerMetodoPago.description}>
+        <Navbar name={params.id ? texts.pages.editMetodoPago.name : texts.pages.registerMetodoPago.name} descripcion={params.id ? texts.pages.editMetodoPago.description : texts.pages.registerMetodoPago.description} dollar={false}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/metodos_pago/") }}> <IconRowLeft /> Regresar</ButtonSimple>
             {
                 loading ?

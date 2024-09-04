@@ -1,8 +1,8 @@
 import Swal from 'sweetalert2';
 import { toast } from "sonner";
 import { formatDateWithTime12Hour, formatoId } from "../utils/process.jsx"
-import { cargos } from "../utils/API.jsx"
-
+import { cargos, eventos } from "../utils/API.jsx"
+import texts from "../context/text_es.js"
 export const alertConfim = async (title, text) => {
     return Swal.fire({
         title: `${title}`,
@@ -145,3 +145,64 @@ export const alertInactividad = async (title, text, titleButton, callback)=>{
           }
     });
 }
+
+export const alertMotivo = async (title, id, callback) => {
+    return Swal.fire({
+      title: `${title}`,
+      color: "black",
+      customClass: {
+        title: "h1 fw-bold text-black",
+        confirmButton: "px-5 py-3 mx-3 fs-6 fw-bold",
+        cancelButton: "px-5 py-3 mx-3 fs-6 fw-bold",
+        inputLabel: "fw-bold cursor-pointer label-alert",
+        input: "input-alert"
+      },
+      input: "text",
+      inputLabel: "Motivo",
+      inputPlaceholder: "Ingrese la pregunta",
+      confirmButtonText: "Aceptar",
+      confirmButtonColor: "rgb(var(--principal))",
+      showCancelButton: true,
+      cancelButtonText: "Cancelar",
+      cancelButtonColor: "rgb(var(--secundario))",
+      showLoaderOnConfirm: true,
+      width: "60%",
+      preConfirm: async (value) => {
+        try {
+          const body = {
+            estado: false,
+            motivo_cancelacion: value
+          }
+          if (!value) {
+            return Swal.showValidationMessage(texts.inputsMessage.requirePregunta);
+          }
+          if (value.length > 300) {
+            return Swal.showValidationMessage(texts.inputsMessage.max100);
+          }
+          if (value.length < 5) {
+            return Swal.showValidationMessage(texts.inputsMessage.min8);
+          }
+          const respuesta = await eventos.put(body, { subDominio: [Number(id)] })
+          if (respuesta.status !== 200) {
+            return Swal.showValidationMessage(`${`Error.${respuesta.status} ${respuesta.statusText}`}`);
+          }
+          if (respuesta.data.status === false) {
+            return Swal.showValidationMessage(`${respuesta.data.message}`);
+          }
+          return respuesta.data;
+        } catch (error) {
+          Swal.showValidationMessage(`
+                Petición Fallada: ${error}
+              `);
+        }
+      },
+      allowOutsideClick: () => !Swal.isLoading()
+    }).then(async (result) => {
+      if (result.value.status) {
+        const aceptar = await alertAceptar("Exito!", texts.successMessage.eventoCancelado)
+        if (aceptar.isConfirmed) {
+          callback()
+        }
+      }
+    })
+  }

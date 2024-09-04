@@ -23,11 +23,10 @@ class Verify_Token_Views(View):
             if verify['status']:
                 query="""
                 SELECT 
-                    user.id, 
-                    user.usuario, 
-                    user.contraseña, 
-                    CONCAT(per.nombres, ' ', per.apellidos ) AS nombre, 
+                    user.id,
+                    user.usuario,
                     ca.id AS cargo_id,
+                    ca.administrador,
                     ca.nombre AS cargo 
                 FROM usuarios user
                 LEFT JOIN personas per ON user.persona_id = per.id
@@ -36,6 +35,17 @@ class Verify_Token_Views(View):
                 """
                 cursor.execute(query, [int(verify['info']['id'])])
                 usuario = dictfetchall(cursor)
+                if(not usuario[0]['administrador']):
+                    
+                    query="""
+                        SELECT
+                            *
+                        FROM privilegios
+                        WHERE cargo_id=%s;
+                        """
+                    cursor.execute(query, [int(usuario[0]['cargo_id'])])
+                    permisos = dictfetchall(cursor)
+                    usuario[0]['permisos']=permisos
                 token = new_token(usuario[0])
                 precioDollar = consultDollar(cursor)
                 datos = {
@@ -44,7 +54,8 @@ class Verify_Token_Views(View):
                     'token': token['token'],
                     'data':{
                         'id':usuario[0]['id'],
-                        'nombre':usuario[0]['nombre'],
+                        'nombre':usuario[0]['usuario'],
+                        'cargo_id':usuario[0]['cargo_id'],
                         'cargo':usuario[0]['cargo'],
                         'inicio_sesion':datetime.now(),
                         'dollar':precioDollar

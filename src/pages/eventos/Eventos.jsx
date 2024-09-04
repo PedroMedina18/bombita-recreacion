@@ -1,20 +1,22 @@
 import { useEffect, useState, useRef } from "react";
 import { eventos } from "../../utils/API.jsx";
+import { alertConfim, toastError, alertMotivo } from "../../components/alerts.jsx";
 import { Toaster } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { searchCode, getListItems } from "../../utils/actions.jsx";
+import { searchCode, getListItems, deleteItem } from "../../utils/actions.jsx";
 import {
   IconTrash,
+  IconDesabilit,
   IconRecreadores,
   IconDetail,
   IconMoney,
   IconCalendar
 } from "../../components/Icon.jsx";
 import { formatoId, formatDateWithTime12Hour } from "../../utils/process.jsx";
+import { ButtonSimple } from "../../components/button/Button.jsx";
 import Navbar from "../../components/navbar/Navbar.jsx";
 import Table from "../../components/table/Table.jsx";
 import Pildora from "../../components/Pildora.jsx";
-import { ButtonSimple } from "../../components/button/Button.jsx";
 import texts from "../../context/text_es.js";
 
 function Eventos() {
@@ -32,9 +34,10 @@ function Eventos() {
     }
   }, []);
 
-  const getEventos = () => {
+  const getEventos = (filtros={}) => {
     getListItems({
       object: eventos,
+      filtros:filtros,
       setList: setEventos,
       setData: setDataEventos,
       setLoading: setTableLoaing,
@@ -92,10 +95,10 @@ function Eventos() {
           value = "En espera";
           value = <Pildora contenido={"En espera"} color="bg-info"></Pildora>
         }
-        if (row.estado === false) {
+        if (Boolean(row.estado) === false && row.estado !==null) {
           value = <Pildora contenido={"Cancelado"} color="bg-danger"></Pildora>
         }
-        if (row.estado === true) {
+        if (Boolean(row.estado) === true) {
           value = <Pildora contenido={"Completado"} color="bg-succes"></Pildora>
         }
         return value;
@@ -103,7 +106,7 @@ function Eventos() {
     },
     {
       name: "Opciones",
-      row: (row) => {
+      row: (row, filtros) => {
         return (
           <div className="d-flex justify-content-around options-table">
             <IconDetail
@@ -122,6 +125,12 @@ function Eventos() {
               }}
               className="cursor-pointer"
             />
+            <IconDesabilit
+              onClick={() => {
+                cancelarEvento(row.id, filtros)
+              }}
+              className="cursor-pointer"
+            />
           </div>
         );
       },
@@ -131,9 +140,10 @@ function Eventos() {
   const options = {
     search: {
       placeholder: texts.registerMessage.searchClientEvent,
-      function: (value) => {
+      function: (value, filtros={}) => {
         searchCode({
           value: value,
+          filtros:filtros,
           object: eventos,
           setList: setEventos,
           setData: setDataEventos,
@@ -155,6 +165,18 @@ function Eventos() {
         <ButtonSimple className={"ms-auto"} onClick={() => { navigate("/eventos/calendar/") }}>Calendario de Eventos <IconCalendar /></ButtonSimple>
       </div>
     )
+  }
+
+  const cancelarEvento = async (id, filtros) => {
+    try {
+      const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirmCancelarEvento)
+      if (confirmacion.isConfirmed) {
+        alertMotivo("Motivo por el que se Cancela el evento", id, ()=>{getEventos(filtros)})
+      }
+    } catch (error) {
+      console.log(error)
+      toastError(texts.errorMessage.errorSystem)
+    }
   }
 
   return (

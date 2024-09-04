@@ -28,8 +28,8 @@ class Login(View):
                     user.id, 
                     user.usuario, 
                     user.contraseña, 
-                    CONCAT(per.nombres, ' ', per.apellidos ) AS nombre, 
                     ca.id AS cargo_id,
+                    ca.administrador,
                     ca.nombre AS cargo 
                 FROM usuarios user
                 LEFT JOIN personas per ON user.persona_id = per.id
@@ -42,40 +42,17 @@ class Login(View):
                 # se comprueba de que la contraseña este correcta
                 contraseña = desencriptado_contraseña(usuario[0]['contraseña'], jd['contraseña'])
                 if(contraseña):
-                    # user_administrador=Cargos.objects.filter(id=usuario[0]['cargo_id']).values("administrador")
-                    # if(user_administrador[0]['administrador']):
-                    #     token=new_token(usuario[0], None, user_administrador[0]['administrador'])
-                    #     response={
-                    #         'status':True,
-                    #         'message': "Acceso permitido", 
-                    #         'token':token['token'], 
-                    #         'data':{
-                    #             "nombre":usuario[0]['nombre'], 
-                    #             "cargo":usuario[0]['cargo'], 
-                    #             "usuario":usuario[0]['usuario'],
-                    #             "administador":user_administrador[0]['administrador'],
-                    #             "permisos": None
-                    #         }
-                    #     }
-                    # else:
-                    #     query="""
-                    #     SELECT p.id 
-                    #     FROM
-                    #         cargos AS c
-                    #     INNER JOIN 
-                    #         permisos_has_cargos 
-                    #     ON 
-                    #         c.id = permisos_has_cargos.cargo_id
-                    #     INNER JOIN 
-                    #         permisos AS P
-                    #     ON 
-                    #         p.id = permisos_has_cargos.permiso_id
-                    #     WHERE 
-                    #         c.id = %s;
-                    #     """
-                    #     cursor.execute(query, [int(usuario[0]['cargo_id'])])
-                    #     permisos=dictfetchall(cursor)
-                    # token=new_token(usuario[0], [permiso['id'] for permiso in permisos], False)
+                    if(not usuario[0]['administrador']):
+                    
+                        query="""
+                        SELECT
+                            *
+                        FROM privilegios
+                        WHERE cargo_id=%s;
+                        """
+                        cursor.execute(query, [int(usuario[0]['cargo_id'])])
+                        permisos = dictfetchall(cursor)
+                        usuario[0]['permisos'] = permisos
                     precioDollar=consultDollar(cursor)
                     
                     token=new_token(usuario[0])
@@ -85,7 +62,8 @@ class Login(View):
                         'token':token['token'], 
                         'data':{
                             'id':usuario[0]['id'],
-                            'nombre':usuario[0]['nombre'],
+                            'nombre':usuario[0]['usuario'],
+                            'cargo_id':usuario[0]['cargo_id'],
                             'cargo':usuario[0]['cargo'],
                             'inicio_sesion':datetime.now(),
                             'dollar':precioDollar,

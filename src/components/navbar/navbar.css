@@ -95,6 +95,11 @@
     color: #fff;
 }
 
+.icono-nav{
+    width: 45px;
+    border-radius: 50%;
+}
+
 .sidebar-logo {
     align-items: center;
     text-align: center;

@@ -28,6 +28,7 @@ const texts={
         requireNames:"Se requiere los nombres",
         requirePregunta:"Pregunta Requeridad",
         requireLastName:"Se requiere los apellidos",
+        requiredOpinion:"Se requiere una Opinión",
         requiredDesription: "Se requiere una descripción",
         requireDate:"Se requiere la fecha de nacimiento",
         requireUser:"Se requiere el Usuario",
@@ -98,6 +99,9 @@ const texts={
         editionMetodoPago:"Metodo de Pago Editado",
         editionEventoRecreadores:"Recreadores Actualizados",
         editionPregunta:"Pregunta Actualizados",
+        // -+------------------
+        eventoCancelado:"Evento Cancelado",
+        eventoCompletado:"Evento Completado"
     },
 
     confirmMessage:{
@@ -109,6 +113,8 @@ const texts={
         confirmCloset:"Desea cerrar sesión",
         confirmPassword:"Desea cambiar la contraseña del usuario",
         confirmPago:"Desea registrar este pago",
+        confirmCancelarEvento:"Desea Cancelar el evento? Esta acción no es reversible",
+        confirmCompletar:"Se Completo el Evento",
         inactividad:"No se ha detectado ninguna actividad por un periodo prolongado de tiempo el sistema cerrara sesión por seguridad"
     },
 
@@ -119,6 +125,7 @@ const texts={
         errorConexion:"Error de conexion. Por favor intente mas tarde",
         errorRequest:"No se ha obtenido una respuesta. Por favor vuelva a intentar",
         errorResponse:"Error de consulta",
+        errorResponseCago:"Error. No se pudo buscar el cargo, comuniquese con el administrador",
         errorMonto:"El monto presentado supera el monto a cancelar",
         errorNotPago:"No se a añadido ninguna forma de pago",
         errorNotTotal:"No se a compleato el monto a cancelar",
@@ -167,6 +174,7 @@ const texts={
         telSecundario:"Teléfono Secundario",
         fechaEvento:"Fecha Evento",
         numeroPersonas:"Número de Personas",
+        opinion:"¿Cúal es su Opinion del Evento?"
     },
 
     placeholder:{
@@ -193,6 +201,7 @@ const texts={
         usuario:"Nombre de Usuario unico",
         password:"Contraseña",
         repeatPassword:"Repita Contraseña",
+        opinion:"Diganos su opinion del evento"
     },
 
     pages:{
@@ -371,9 +380,17 @@ const texts={
         pagos:{
             name:"Registrar Pagos de Eventos",
         },
+        evento:{
+            name:"Informacion del Evento",
+            description:"Toda la información del evento"
+        },
         recreadores_eventos:{
             name:"Recreadores del Evento",
             description:"Recreadores Asignados al Evento"
+        },
+        evaluacion:{
+            name:"Evaluación del Evento",
+            description:"Complete la evaluación del evento"
         },
         calendarEvents:{
             name:"Calendario de Eventos",

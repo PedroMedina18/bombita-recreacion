@@ -122,7 +122,7 @@ function Niveles() {
     }
   }
   return (
-    <Navbar name={`${texts.pages.getNiveles.name}`} descripcion={`${texts.pages.getNiveles.description}`}>
+    <Navbar name={`${texts.pages.getNiveles.name}`} descripcion={`${texts.pages.getNiveles.description}`} dollar={false}>
 
       <Table
         columns={columns}

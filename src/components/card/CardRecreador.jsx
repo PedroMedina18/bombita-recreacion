@@ -15,7 +15,7 @@ function CardRecreador({ nombre = null, nivel = null, genero = null, edad = null
                 }
                 <h5 className='card-title'>{nombre ? nombre : "Sin Assignar"}</h5>
                 {
-                    nombre &&
+                    nivel &&
                     <h6 className='text-capitalize m-0 mt-2 fs-5'>{nivel}</h6>
                 }
             </div>

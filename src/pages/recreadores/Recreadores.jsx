@@ -30,10 +30,11 @@ function Recreadores() {
         }
     }, [])
 
-    const getRecreadores = async () => {
+    const getRecreadores = async (filtros={}) => {
         try {
             getListItems({
                 object: recreadores,
+                filtros:filtros,
                 setList: setRecreadores,
                 setData: setDataRecreadores,
                 setLoading: setTableLoaing
@@ -76,7 +77,7 @@ function Recreadores() {
         },
         {
             name: "Opciones",
-            row: (row) => {
+            row: (row, filtros) => {
                 return <div className='d-flex justify-content-around options-table'>
                     <IconDetail
                         onClick={() => { navigate(`/recreador/${row.id}/`) }} className="cursor-pointer"
@@ -86,7 +87,7 @@ function Recreadores() {
                             deleteItem({
                                 row: row,
                                 objet: recreadores,
-                                functionGet: getRecreadores
+                                functionGet: ()=>{getRecreadores(filtros)}
                             })
                         }}
                         className="cursor-pointer"

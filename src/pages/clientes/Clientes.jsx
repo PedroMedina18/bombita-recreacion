@@ -63,28 +63,6 @@ function Clientes() {
             name: "Opciones",
             row: (row) => {
               return <div className='d-flex justify-content-around options-table'>
-                {/* <IconDetail
-                  onClick={() => {
-                    alertInfo(
-                      row.nombre,
-                      {
-                        codigo: formatoId(row.id),
-                        descripción: row.descripcion,
-                        fecha_de_registro: formatDateWithTime12Hour(row.fecha_registro),
-                        fecha_de_actualizacion: formatDateWithTime12Hour(row.fecha_actualizacion),
-                      })
-                  }} className="cursor-pointer"
-                /> */}
-                {/* <IconTrash
-                  onClick={() => {
-                    deleteItem({
-                      row: row,
-                      objet: actividades,
-                      functionGet: getActividades
-                    })
-                  }}
-                  className="cursor-pointer"
-                /> */}
                 <IconEdit onClick={() => { navigate(`/edit/cliente/${row.id}/`) }} className="cursor-pointer" />
               </div>
             }
@@ -94,9 +72,10 @@ function Clientes() {
     const options = {
         search: {
             placeholder: texts.registerMessage.searchClient,
-            function: (value) => {
+            function: (value, filtros={}) => {
                 searchCode({
                     value: value,
+                    filtros:filtros,
                     object: clientes,
                     setList: setClientes,
                     setData: setDataClientes,

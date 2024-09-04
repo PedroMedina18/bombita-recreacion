@@ -45,4 +45,6 @@ export const preguntas = new Petisions("preguntas");
 
 export const metodoPago = new Petisions("metodos_pago");
 
+export const evaluacion = new Petisions("evaluacion");
+
 export const dolar = new Petisions("dolar");

@@ -97,7 +97,7 @@ function FormActividades() {
     }
   )
   return (
-    <Navbar name={params.id ? texts.pages.editActividad.name : texts.pages.registerActividades.name} descripcion={params.id ? texts.pages.editActividad.description : texts.pages.registerActividades.description}>
+    <Navbar name={params.id ? texts.pages.editActividad.name : texts.pages.registerActividades.name} descripcion={params.id ? texts.pages.editActividad.description : texts.pages.registerActividades.description} dollar={false}>
       <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/actividades/") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
       {

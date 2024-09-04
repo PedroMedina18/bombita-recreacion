@@ -311,7 +311,6 @@ function Table({
           <table className="table-data border-table border-none">
             <thead>
               <tr>
-                <th scope="col">N°</th>
                 {columns.map((column, index) => (
                   <th key={`${index}-${column.name}`} scope="col">
                     {column.name}
@@ -383,7 +382,7 @@ function Table({
                       }
                       return (
                         <td key={`${column.row(row)}-${index}`}>
-                          {column.row(row)}
+                          {column.row(row, filtros)}
                         </td>
                       );
                     })}

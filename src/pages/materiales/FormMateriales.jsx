@@ -94,7 +94,7 @@ function FormMateriales() {
         }
     )
     return (
-        <Navbar name={params.id ? texts.pages.editMaterial.name : texts.pages.registerMaterial.name} descripcion={params.id ? texts.pages.editMaterial.description : texts.pages.registerMaterial.description}>
+        <Navbar name={params.id ? texts.pages.editMaterial.name : texts.pages.registerMaterial.name} descripcion={params.id ? texts.pages.editMaterial.description : texts.pages.registerMaterial.description} dollar={false}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/materiales/") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
             {

@@ -95,7 +95,7 @@ function FormTipoDocumento() {
     )
 
     return (
-        <Navbar name={params.id ? texts.pages.editTipoDocumento.name : texts.pages.registerTipoDocumento.name} descripcion={params.id ? texts.pages.editTipoDocumento.description : texts.pages.registerTipoDocumento.description}>
+        <Navbar name={params.id ? texts.pages.editTipoDocumento.name : texts.pages.registerTipoDocumento.name} descripcion={params.id ? texts.pages.editTipoDocumento.description : texts.pages.registerTipoDocumento.description} dollar={false}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/tipo_documentos/") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
 

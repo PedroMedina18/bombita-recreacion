@@ -40,6 +40,7 @@ import Configuracion from "./configuracion/Configuracion.jsx";
 import EventosRecreadores from "./recreadores_eventos/EventosRecreadores.jsx";
 import Cargo from "./cargos/Cargo.jsx"
 import Preguntas from "./preguntas/Preguntas.jsx"
+import Evaluacion from "./evaluacion/FormEvaluacion.jsx"
 
 export {
     Login, Error404, 
@@ -59,9 +60,9 @@ export {
     Eventos, Dolar, Evento,
     FormDataEvent, FormAccount,
     EventosRecreadores, FormUsuarios,
-    Configuracion, Cargo,
+    Configuracion, Cargo, 
     CalendarRecreadores, CalendarEvent,
-    Preguntas
+    Preguntas, Evaluacion,
 }
 
 

@@ -96,7 +96,7 @@ function FormGeneros() {
     )
 
     return (
-        <Navbar name={params.id ? texts.pages.editGenero.name : texts.pages.registerGenero.name} descripcion={params.id ? texts.pages.editGenero.description : texts.pages.registerGenero.description}>
+        <Navbar name={params.id ? texts.pages.editGenero.name : texts.pages.registerGenero.name} descripcion={params.id ? texts.pages.editGenero.description : texts.pages.registerGenero.description} dollar={false}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/generos/") }}> <IconRowLeft /> Regresar</ButtonSimple>
 
             {

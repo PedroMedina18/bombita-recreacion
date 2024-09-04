@@ -24,8 +24,9 @@ import {
 } from "../../components/Icon.jsx"
 
 function Navbar({ children, name = null, descripcion = null, dollar = true }) {
-    const { getUser, closeSession } = useAuthContext();
+    const { getUser, closeSession, getPermisos } = useAuthContext();
     const [dataUser] = useState(getUser());
+    const [permisos] = useState(getPermisos())
     const navigate = useNavigate();
 
     return (
@@ -151,23 +152,6 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
                             <IconConfig />
                             <span>Configuración</span>
                         </Link>
-                        {/* <ul id="configuracion" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                            <li className="sidebar-item">
-                                <Link to="/dolar/" className="sidebar-link">Dolar</Link>
-                            </li>
-                            <li className="sidebar-item">
-                                <Link to="/cargos/" className="sidebar-link">Cargos</Link>
-                            </li>
-                            <li className="sidebar-item">
-                                <Link to="/tipo_documentos/" className="sidebar-link">Tipo Documento</Link>
-                            </li>
-                            <li className="sidebar-item">
-                                <Link to="/generos/" className="sidebar-link">Generos</Link>
-                            </li>
-                            <li className="sidebar-item">
-                                <Link to="/metodos_pago/" className="sidebar-link">Metodos de Pago</Link>
-                            </li>
-                        </ul> */}
                     </li>
 
                     <li className="sidebar-item"
@@ -193,13 +177,15 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
                 <header className="barra-superior" id="barra-superior">
                     <Link to="/inicio" className="sidebar-logo">
                         <img src={bombita} alt="bombita" />
-                        {/* <div>
-                            <span>Bombitas <br />Recreación</span>
-                        </div> */}
                     </Link>
                     <div className="user ms-2">
                         <p className="m-0 me-1 text-center inline-block">{dataUser.nombre}</p>
-                        <IconUserCircle />
+                        {
+                            permisos.img && permisos.img !=="" ?
+                            <img className="icono-nav" src={permisos.img} alt="logo" />
+                            :
+                            <IconUserCircle />
+                        }
                     </div>
                 </header>
 

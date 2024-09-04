@@ -64,11 +64,14 @@ input:-webkit-autofill:focus {
   -webkit-box-shadow: 0 0 0px 1000px var(--fondo) inset;
   -webkit-text-fill-color: rgb(0, 0, 0);
 }
+label.icon-input {
+  height: 100%;
+  background-color: rgb(224, 224, 224);
+}
 .icon-input svg{
   color: black;
   width: 38px;
   height: 46px;
-  background-color: rgb(224, 224, 224);
 }
 .lb-name {
   position: absolute;

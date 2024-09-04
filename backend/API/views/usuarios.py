@@ -91,6 +91,10 @@ class Usuarios_Views(View):
             if error.args[0]==1062:
                 if 'telefono_principal' in error.args[1]:
                     message = MESSAGE['telefonoPrincipalDuplicate']
+                if 'usuario' in error.args[1]:
+                    message = MESSAGE['UsuarioDuplicate']
+                if 'numero_documento' in error.args[1]:
+                    message = MESSAGE['documentoDuplicate']
                 else:
                     message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
                 datos = {
@@ -189,6 +193,27 @@ class Usuarios_Views(View):
                     "message": f"{MESSAGE['errorRegistroNone']}",
                 }
 
+            return JsonResponse(datos)
+        except IntegrityError as error:
+            print(f"{MESSAGE['errorIntegrity']} - {error}", )
+            if error.args[0]==1062:
+                if 'telefono_principal' in error.args[1]:
+                    message = MESSAGE['telefonoPrincipalDuplicate']
+                if 'usuario' in error.args[1]:
+                    message = MESSAGE['usuarioDuplicate']
+                if 'numero_documento' in error.args[1]:
+                    message = MESSAGE['documentoDuplicate']
+                else:
+                    message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
+                datos = {
+                'status': False,
+                'message': message
+                }
+            else:
+                datos = {
+                'status': False,
+                'message': f"{MESSAGE['errorIntegrity']}: {error}"
+                }
             return JsonResponse(datos)
         except models.ProtectedError as error:
             print(f"{MESSAGE['errorProteccion']}  - {str(error)}")

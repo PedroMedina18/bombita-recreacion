@@ -2,19 +2,18 @@ from django.shortcuts import render
 from django.http.response import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.db import IntegrityError, connection, models
 from django.views import View
 from ..funtions.indice import indiceFinal, indiceInicial
 from ..funtions.serializador import dictfetchall
 from ..funtions.time import duration
 from ..funtions.identificador import determinar_valor, edit_str, normalize_id_list
 from ..models import Eventos, Servicios, EventosRecreadoresServicios, Recreadores
-from django.db import IntegrityError, connection, models
 from ..funtions.token import verify_token
 from ..message import MESSAGE
 from decouple import config
 import datetime
 import json
-
 
 class Eventos_Recreadores_Servicios_View(View):
     @method_decorator(csrf_exempt)
@@ -25,6 +24,7 @@ class Eventos_Recreadores_Servicios_View(View):
         try:
             cursor = connection.cursor()
             verify = verify_token(request.headers)
+            direccion=config('URL')
             if not verify['status']:
                 datos = {'status': False, 'message': verify['message'], 'data': None}
                 return JsonResponse(datos)
@@ -39,6 +39,7 @@ class Eventos_Recreadores_Servicios_View(View):
                     ser.id,
                     ser.nombre,
                     ser.duracion,
+                    ser.precio,
                     ser.numero_recreadores,
                     ser.descripcion
                 FROM servicios AS ser
@@ -57,7 +58,7 @@ class Eventos_Recreadores_Servicios_View(View):
                     pe.apellidos, 
                     ni.nombre AS nivel,
                     ge.nombre AS genero,
-                    re.img_perfil,
+                    IF(re.img_perfil IS NOT NULL AND re.img_perfil != '', CONCAT('{}media/', re.img_perfil), img_perfil) AS img_perfil,
                     ser.id AS servicio_id,
                     ser.nombre AS servicio
                 FROM recreadores_eventos_servicios reve
@@ -67,17 +68,12 @@ class Eventos_Recreadores_Servicios_View(View):
                 LEFT JOIN niveles AS ni ON ni.id=re.nivel_id
                 INNER JOIN servicios AS ser ON ser.id=reve.servicio_id
                 WHERE reve.evento_id=%s
-            """
+            """.format(direccion)
 
             cursor.execute(query, [id])
             recreadores = dictfetchall(cursor)
             isRecreadores = True if len(recreadores) > 0 else False 
             for recreador in recreadores:
-                recreador["img_perfil"] = (
-                    f"{config('URL')}media/{recreador['img_perfil']}"
-                    if recreador['img_perfil']
-                    else None
-                )
                 servicio_id = recreador['servicio_id']
                 for servicio in servicios:
                     if servicio['id'] == servicio_id:
@@ -133,9 +129,8 @@ class Eventos_Recreadores_Servicios_View(View):
                 SELECT 
                     es.servicio_id,
                     COUNT(res.id) AS total_recreadores
-                FROM 
-                    servicios_eventos AS es
-                    LEFT JOIN recreadores_eventos_servicios res ON es.servicio_id = res.servicio_id AND es.evento_id = res.evento_id
+                FROM servicios_eventos AS es
+                LEFT JOIN recreadores_eventos_servicios res ON es.servicio_id = res.servicio_id AND es.evento_id = res.evento_id
                 WHERE 
                     es.evento_id = %s
                 GROUP BY 
@@ -161,7 +156,8 @@ class Eventos_Recreadores_Servicios_View(View):
                 if(totalRecreadores[f"{servicio.id}"] < servicio.numero_recreadores):
                     recreadorGet = Recreadores.objects.get(id=recreador["id"])
                     EventosRecreadoresServicios.objects.create(evento = evento, recreador = recreadorGet, servicio = servicio)
-
+            evento.recreadores_asignados=True
+            evento.save()
             datos = {
                 'status': True,
                 'message': f"{MESSAGE['registerRecreadores']}"

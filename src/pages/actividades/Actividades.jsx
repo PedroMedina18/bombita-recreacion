@@ -102,7 +102,7 @@ function Actividades() {
   }
 
   return (
-    <Navbar name={texts.pages.getActividades.name} descripcion={texts.pages.getActividades.description}>
+    <Navbar name={texts.pages.getActividades.name} descripcion={texts.pages.getActividades.description} dollar={false}>
 
       <Table
         columns={columns}

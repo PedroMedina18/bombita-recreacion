@@ -102,7 +102,7 @@ function Generos() {
     }
 
     return (
-        <Navbar name={`${texts.pages.getGeneros.name}`} descripcion={`${texts.pages.getGeneros.description}`}>
+        <Navbar name={`${texts.pages.getGeneros.name}`} descripcion={`${texts.pages.getGeneros.description}`} dollar={false}>
 
             <Table
                 columns={columns}

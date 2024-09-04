@@ -35,8 +35,8 @@ function Cargo() {
     try {
       const cargo = await cargos.get({ subDominio: [Number(params.id)] })
       const usuarioRes = await usuarios.get({ params: { cargo: Number(params.id) } })
-      controlErrors({ respuesta: cargo, constrolError: setErrorServer, message200: "Error. Cargo no Encontrado" })
-      controlErrors({ respuesta: usuarioRes, constrolError: setErrorServer, message200: "Error. Usuarios de Cargo no Encontrado" })
+      if(controlErrors({ respuesta: cargo, constrolError: setErrorServer, message200: "Error. Cargo no Encontrado" })) return
+      if(controlErrors({ respuesta: usuarioRes, constrolError: setErrorServer, message200: "Error. Usuarios de Cargo no Encontrado" }))return
       setDataCargo(cargo.data.data)
       setUsuarios(usuarioRes.data.data ? usuarioRes.data.data : [])
     } catch (error) {

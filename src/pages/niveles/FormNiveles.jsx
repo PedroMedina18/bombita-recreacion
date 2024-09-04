@@ -93,7 +93,7 @@ function FormNiveles() {
         }
     )
     return (
-        <Navbar name={`${params.id ? texts.pages.editNivel.name : texts.pages.registerNiveles.name}`} descripcion={`${params.id ? texts.pages.editNivel.description : texts.pages.registerNiveles.description}`}>
+        <Navbar name={`${params.id ? texts.pages.editNivel.name : texts.pages.registerNiveles.name}`} descripcion={`${params.id ? texts.pages.editNivel.description : texts.pages.registerNiveles.description}`} dollar={false}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/niveles/") }}><IconRowLeft /> Regresar</ButtonSimple>
 
 

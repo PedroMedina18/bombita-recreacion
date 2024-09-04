@@ -125,6 +125,7 @@ function TipoDocumento() {
     <Navbar
       name={`${texts.pages.getTipoDocumentos.name}`}
       descripcion={`${texts.pages.getTipoDocumentos.description}`}
+      dollar={false}
     >
       <Table
         columns={columns}

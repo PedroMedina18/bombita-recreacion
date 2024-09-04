@@ -72,6 +72,16 @@ export function formatDateWithTime12Hour(date) {
   return new Intl.DateTimeFormat('es-ES', options).format(fecha);
 }
 
+export function formatTime12Hour(date) {
+  const fecha = new Date(date);
+  const options = {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  };
+  return new Intl.DateTimeFormat('es-ES', options).format(fecha);
+}
+
 export function fechaFormat(fecha=null){
   let date 
   if(fecha){

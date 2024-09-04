@@ -11,7 +11,7 @@ from ..funtions.time import duration
 from ..funtions.identificador import determinar_valor, edit_str
 from ..funtions.estado_pago import estadoPagoDescription
 from ..funtions.filtros import order, filtrosWhere, peridoFecha
-from ..models import Eventos, EventosSobrecargos, EventosServicios, Clientes, Personas, Servicios, Sobrecargos, TipoDocumento
+from ..models import Eventos, EventosSobrecargos, EventosServicios, Clientes, Pagos, Personas, Servicios, Sobrecargos, TipoDocumento, EventosRecreadoresServicios
 from ..funtions.token import verify_token
 from ..message import MESSAGE
 import datetime
@@ -116,8 +116,12 @@ class Eventos_Views(View):
         except IntegrityError as error:
             print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
-                if 'telefono_principal' in error.args[1]:
-                    message = MESSAGE['telefonoPrincipalDuplicate']
+                if "telefono_principal" in error.args[1]:
+                    message = MESSAGE["telefonoPrincipalDuplicate"]
+                elif "correo" in error.args[1]:
+                    message = MESSAGE["correoDuplicate"]
+                elif "numero_documento" in error.args[1]:
+                    message = MESSAGE["documentoDuplicate"]
                 else:
                     message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
                 datos = {
@@ -138,52 +142,71 @@ class Eventos_Views(View):
             }
             return JsonResponse(datos)
     
-    def delete(self, request, id):
-        try:
-            verify=verify_token(request.headers)
-            if(not verify['status']):
-                datos = {
-                    'status': False,
-                    'message': verify['message']
-                }
-                return JsonResponse(datos)
-            evento = list(Eventos.objects.filter(id=id).values())
-            if len(evento) > 0:
-                evento=evento[0]
-                if (not evento['estado_pago']==0):
-                    datos = {
-                        'status': False,
-                        'message': f"{MESSAGE['errorPagado']}"
-                    }
-                    return JsonResponse(datos)
+    # def delete(self, request, id):
+    #     try:
+    #         verify=verify_token(request.headers)
+    #         fechaActual = datetime.datetime.now()
+    #         if(not verify['status']):
+    #             datos = {
+    #                 'status': False,
+    #                 'message': verify['message']
+    #             }
+    #             return JsonResponse(datos)
+    #         evento = list(Eventos.objects.filter(id=id).values())
+    #         if len(evento) > 0:
+    #             evento=evento[0]
+    #             if (not evento['estado_pago']==0):
+    #                 datos = {
+    #                     'status': False,
+    #                     'message': f"{MESSAGE['errorPagado']}"
+    #                 }
+    #                 return JsonResponse(datos)
+    #             if evento['estado']==False:
+    #                 datos = {
+    #                     'status': False,
+    #                     'message': f"{MESSAGE['errorEventoCancelado']}"
+    #                 }
+    #                 return JsonResponse(datos)
+    #             if evento['estado']==True:
+    #                 datos = {
+    #                     'status': False,
+    #                     'message': f"{MESSAGE['errorEventoCompletado']}"
+    #                 }
+    #                 return JsonResponse(datos)
+    #             if evento.fecha_evento_final > fechaActual:
+    #                 datos = {'status': False, 'message': MESSAGE['errorEventoPasado']}
+    #                 return JsonResponse(datos)
+    #             if evento.fecha_evento_final > fechaActual:
+    #                 datos = {'status': False, 'message': MESSAGE['errorEventoPasado']}
+    #                 return JsonResponse(datos)
                 
-                Eventos.objects.filter(id=id).delete()
-                datos = {
-                    'status': True,
-                    'message': f"{MESSAGE['delete']}"
-                }
+    #             Eventos.objects.filter(id=id).delete()
+    #             datos = {
+    #                 'status': True,
+    #                 'message': f"{MESSAGE['delete']}"
+    #             }
                 
-            else:
-                datos = datos = {
-                    'status': False,
-                    'message': f"{MESSAGE['errorRegistroNone']}"
-                }
-            return JsonResponse(datos)
+    #         else:
+    #             datos = datos = {
+    #                 'status': False,
+    #                 'message': f"{MESSAGE['errorRegistroNone']}"
+    #             }
+    #         return JsonResponse(datos)
 
-        except models.ProtectedError as error:
-            print(f"{MESSAGE['errorProteccion']} - {str(error)}")
-            datos = {
-                'status': False,
-                'message': f"{MESSAGE['errorProtect']}"
-            }
-            return JsonResponse(datos)
-        except Exception as error:
-            print(f"{MESSAGE['errorDelete']} - {error}", )
-            datos = {
-                'status': False,
-                'message': f"{MESSAGE['errorEliminar']}: {error}"
-            }
-            return JsonResponse(datos)
+    #     except models.ProtectedError as error:
+    #         print(f"{MESSAGE['errorProteccion']} - {str(error)}")
+    #         datos = {
+    #             'status': False,
+    #             'message': f"{MESSAGE['errorProtect']}"
+    #         }
+    #         return JsonResponse(datos)
+    #     except Exception as error:
+    #         print(f"{MESSAGE['errorDelete']} - {error}", )
+    #         datos = {
+    #             'status': False,
+    #             'message': f"{MESSAGE['errorEliminar']}: {error}"
+    #         }
+    #         return JsonResponse(datos)
     
     def get(self, request, id=0):
         try:
@@ -203,6 +226,9 @@ class Eventos_Views(View):
                         per.apellidos, 
                         tipo.nombre AS tipo_documento, 
                         per.numero_documento,
+                        per.correo,
+                        CONCAT('0', per.telefono_principal) AS telefono_principal,
+                        CONCAT('0', per.telefono_secundario) AS telefono_secundario,
                         eve.numero_personas,
                         eve.direccion,
                         eve.estado,
@@ -219,8 +245,10 @@ class Eventos_Views(View):
                 evento = dictfetchall(cursor)
                 if len(evento) > 0:
                     evento = evento[0]
+                    evento["estado_pago_descripcion"]=estadoPagoDescription(evento["estado_pago"])
                     query = """
                         SELECT 
+                            ser.id,
                             ser.nombre,
                             ser.descripcion,
                             ser.precio
@@ -232,6 +260,7 @@ class Eventos_Views(View):
                     servicios = dictfetchall(cursor)
                     query = """
                         SELECT 
+                            so.id,
                             so.nombre,
                             so.descripcion,
                             so.monto
@@ -391,3 +420,62 @@ class Eventos_Views(View):
         finally:
             cursor.close()
             connection.close()
+
+    def put(self, request, id):
+        try:
+            req = json.loads(request.body)
+            verify = verify_token(req['headers'])
+            administrador = verify['info']['administrador']
+            permisos = verify['info']['permisos']
+            req = req['body']
+            fechaActual = datetime.datetime.now()
+            if (not verify['status']):
+                datos = {
+                    'status': False,
+                    'message': verify['message'],
+                }
+                return JsonResponse(datos)
+            evento = list(Eventos.objects.filter(id=id).values())
+            if len(evento) > 0:
+                evento = Eventos.objects.get(id=id)
+            else:
+                datos = {'status': False, 'message': MESSAGE['errorEvento'],}
+                return JsonResponse(datos)
+            if req['estado']==False:
+                if evento.estado == True:
+                    datos = {'status': False, 'message': MESSAGE['errorEventoCompletado'],}
+                    return JsonResponse(datos)
+                if evento.fecha_evento_final > fechaActual:
+                    datos = {'status': False, 'message': MESSAGE['errorEventoPasado']}
+                    return JsonResponse(datos)
+                EventosRecreadoresServicios.objects.filter(evento=id).delete()
+                Pagos.objects.filter(evento=id).delete()
+                evento.estado=False
+                evento.motivo_cancelacion = req['motivo_cancelacion']
+                evento.recreadores_asignados=False
+                evento.save()
+                datos = {'status': True, 'message': MESSAGE['eventoCancelado']}
+            elif req['estado']==True:
+                if evento.estado == False:
+                    datos = {'status': False, 'message': MESSAGE['errorEventoCancelado'],}
+                    return JsonResponse(datos)
+                if evento.fecha_evento_inicio < fechaActual and not bool(administrador) :
+                    datos = {'status': False, 'message': MESSAGE['errorEventoNoTranscurrido']}
+                    return JsonResponse(datos)
+                if evento.estado_pago!=2 and not bool(administrador):
+                    datos = {'status': False, 'message': MESSAGE['errorEventoNoPagado']}
+                    return JsonResponse(datos)
+                evento.estado=True
+                evento.save()
+                datos = {'status': True, 'message': MESSAGE['eventoCompletado']}
+            else:
+                datos = {'status': False, 'message': MESSAGE['errorEstado']}
+            return JsonResponse(datos)
+
+        except Exception as error:
+            print(f"{MESSAGE['errorPut']} - {error}")
+            datos = {
+                'status': False,
+                'message': f"{MESSAGE['errorEdition']}: {error}",
+            }
+            return JsonResponse(datos)

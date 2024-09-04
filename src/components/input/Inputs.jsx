@@ -379,8 +379,6 @@ export function SelectAsync({ id, label = null, optionsDefault, placeholder, loa
         getOptionValue={getOptionValue}
         placeholder={placeholder}
         id={id}
-        className="prueba"
-        styles={(e) => { cosole.log(e) }}
         noOptionsMessage={() => {
           return "Sin Opciones";
         }}
@@ -599,15 +597,70 @@ export function MoneyInput({ label, id, name, form, params = {}, flexRow = false
   }
 }
 
-export function TogleSwiches({id, name, form, className="", ...props}){
+export function TogleSwiches({ id, name, form, className = "", ...props }) {
   const { errors, register } = form;
   return (
     <label className={`switch ${className}`}>
-      <input type="checkbox"  id={id}
-      {...register(name)}
-      {...props}
+      <input className="switch-input" type="checkbox" id={id}
+        {...register(name)}
+        {...props}
       />
-        <span className="slider"></span>
+      <span className="slider"></span>
     </label>
+  )
+}
+
+export function RadioStart({ save, state, index, id, name, check }) {
+
+  return (
+    <div className="rating">
+  <input type="radio" id={`${name}-star-1`} name={name} value={5} checked={check===5}
+  onChange={(e)=>{
+    const list = [...state]
+    list[index]={id:id, value:Number(e.target.value)}
+    save(list)
+  }}/>
+  <label htmlFor={`${name}-star-1`}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+  </label>
+  <input type="radio" id={`${name}-star-2`} name={name} value={4} checked={check===4}
+  onChange={(e)=>{
+    const list = [...state]
+    list[index]={id:id, value:Number(e.target.value)}
+    save(list)
+  }}/>
+  <label htmlFor={`${name}-star-2`}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+  </label>
+  <input type="radio" id={`${name}-star-3`} name={name} value={3} checked={check===3}
+  onChange={(e)=>{
+    const list = [...state]
+    list[index]={id:id, value:Number(e.target.value)}
+    save(list)
+  }}/>
+  <label htmlFor={`${name}-star-3`}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+  </label>
+  <input type="radio" id={`${name}-star-4`} name={name} value={2} checked={check===2}
+  onChange={(e)=>{
+    const list = [...state]
+    list[index]={id:id, value:Number(e.target.value)}
+    save(list)
+  }}/>
+  <label htmlFor={`${name}-star-4`}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+  </label>
+  <input type="radio" id={`${name}-star-5`} name={name} value={1} checked={check===1}
+  onChange={(e)=>{
+    const list = [...state]
+    list[index]={id:id, value:Number(e.target.value)}
+    save(list)
+  }}/>
+  <label htmlFor={`${name}-star-5`}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+  </label>
+</div>
+
+
   )
 }

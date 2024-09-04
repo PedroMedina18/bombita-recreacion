@@ -3,7 +3,9 @@ import { verify_token, generos, niveles, tipo_documentos, materiales, actividade
 import { getCookie } from "../utils/cookie.jsx";
 import { getDataAll } from "../utils/actions.jsx";
 import { LoaderRule } from "../components/loader/Loader.jsx";
+import { toastError } from "../components/alerts.jsx";
 const AuthContext = createContext();
+
 
 export const useAuthContext = () => {
   return useContext(AuthContext)
@@ -11,6 +13,7 @@ export const useAuthContext = () => {
 
 export function AuthContextProvider({ children }) {
   const [user, setUser] = useState({})
+  const [permisos, setPermisos] = useState({ administrador: false, permisos: [], img: null })
   const [isAuthenticateds, setIsAuthenticated] = useState(false)
   const [isloading, setIsLoading] = useState(true);
   const [dataGeneros, setGeneros] = useState([])
@@ -22,11 +25,11 @@ export function AuthContextProvider({ children }) {
   const renderizado = useRef(0);
 
   useEffect(() => {
-    if(renderizado.current===0){
+    if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1
       checkAuth();
       return
-  }
+    }
   }, []);
 
   const getData = () => {
@@ -168,6 +171,7 @@ export function AuthContextProvider({ children }) {
   // *funcion encargada de guardar los datos del usuario al ingresar
   const saveUser = (json, token) => {
     document.cookie = `token=${token}; path=/; SameSite=Strict`
+    saveCargo(json)
     getData()
     setUser(
       {
@@ -182,6 +186,33 @@ export function AuthContextProvider({ children }) {
     setIsAuthenticated(true)
   };
 
+  // *funcion encargada de guardar la informacion relacionada con el cargo del usuario
+  const saveCargo = async (json) => {
+    const cargo = await cargos.get({ subDominio: [json.cargo_id] })
+    if (!cargo.status === 200) {
+      toastError(`Error 200. Permisos no encontrados`)
+      return
+    }
+    if (!cargo.data.status) {
+      toastError(`${cargo.data.message}`)
+      return
+    }
+    const permisosCargos=cargo.data.data
+    const permisosPermitidos = permisosCargos.permisos?.map((e) => {
+      return e.id
+    })
+    setPermisos({
+      ...permisos,
+      administrador: Boolean(permisosCargos.administrador),
+      permisos: permisosPermitidos ? permisosPermitidos : [],
+      img: permisosCargos.img
+    })
+  };
+
+  const getPermisos = () => {
+    return permisos
+  };
+
   // *funcion que devuelve los datos del usuario
   const getUser = () => {
     return user
@@ -192,19 +223,19 @@ export function AuthContextProvider({ children }) {
     try {
       const token = getCookie("token")
       if (token) {
-        const respuesta = await verify_token.get({})
-        if (respuesta.statusText = "OK" && respuesta.data.status && respuesta.data.token) {
+        const respuesta = await verify_token.get()
+        if (respuesta.statusText == "OK" && respuesta.data.status && respuesta.data.token) {
           saveUser(respuesta.data.data, respuesta.data.token)
+          setIsAuthenticated(true)
         } else {
           setUser({})
-          setIsAuthenticated(true)
           document.cookie = `token=; path=/; max-age=0`
+          setIsAuthenticated(false)
         }
       }
     } catch (error) {
-      console.log(error)
       setUser({})
-      setIsAuthenticated(true)
+      setIsAuthenticated(false)
       document.cookie = `token=; path=/; max-age=0`
     } finally {
       setIsLoading(false)
@@ -231,7 +262,9 @@ export function AuthContextProvider({ children }) {
         getData,
         dataOptions,
         getDataOptional,
-        getOption
+        getOption,
+        saveCargo,
+        getPermisos
       }
     }>
       {isloading ?

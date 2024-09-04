@@ -10,10 +10,9 @@ def new_token(user):
             'iat': fecha,
             'exp': fechaNew,
             "id":user["id"],
-            "nombre":user["nombre"],
-            "cargo":user["cargo_id"],
-            # // "administrador":administrador,
-            # // "permisos":permisos
+            "nombre":user["usuario"],
+            "administrador":user["administrador"],
+            "permisos":user["permisos"] if 'permisos' in user else [],
         }
     return {"token":encode(payload, config('TOKEN'), algorithm="HS256"), "fecha":fechaNew}
 

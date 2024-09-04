@@ -21,7 +21,7 @@ import {
   EventosRecreadores, FormUsuarios,
   Configuracion, Cargo, Evento,
   CalendarRecreadores, CalendarEvent,
-  Preguntas
+  Preguntas, Evaluacion
 } from "./pages/Pages.jsx"
 
 
@@ -83,6 +83,7 @@ function App() {
             <Route path="/edit/cliente/:id/" element={<FormClientes />} />
             <Route path="/dolar/" element={<Dolar />} />
             <Route path="/preguntas/" element={<Preguntas />} />
+            <Route path="/evaluacion/:id" element={<Evaluacion />} />
             <Route path="/inicio/" element={<Inicio />} />
             <Route path="/configuracion/" element={<Configuracion />} />
           </Route>

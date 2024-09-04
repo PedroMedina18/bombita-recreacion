@@ -55,10 +55,12 @@ function Pagos() {
   const get_pagos = async () => {
     try {
       const evento = await eventos.get({ subDominio: [Number(params.id_evento)] })
-      console.log(evento)
       if (evento.status !== 200 || evento.data.status === false) {
         setErrorServer(`Error. Error de Conexión Evento`)
         return
+      }
+      if(evento.data.data.info.estado===false){
+        navigate("/eventos/")
       }
       const totalServicios = evento.data.data.servicios.reduce((accumulator, current) => {
         return accumulator + current.precio

@@ -102,7 +102,7 @@ function Materiales() {
     }
     
     return (
-        <Navbar name={texts.pages.getMateriales.name} descripcion={texts.pages.getMateriales.description}>
+        <Navbar name={texts.pages.getMateriales.name} descripcion={texts.pages.getMateriales.description} dollar={false}>
 
             <Table
                 columns={columns}

@@ -19,7 +19,7 @@ function Preguntas() {
     const renderizado = useRef(0)
     const navigate = useNavigate()
 
-    const alertRegisterPregunta = ({title, dataEdit={value:"", id:0}}) => {
+    const alertRegisterPregunta = async ({ title, dataEdit = { value: "", id: 0 } }) => {
         return Swal.fire({
             title: `${title}`,
             color: "black",
@@ -40,7 +40,7 @@ function Preguntas() {
             cancelButtonText: "Cancelar",
             cancelButtonColor: "rgb(var(--secundario))",
             showLoaderOnConfirm: true,
-            width: "70%",
+            width: "60%",
             preConfirm: async (value) => {
                 try {
                     const body = {
@@ -55,7 +55,7 @@ function Preguntas() {
                     if (value.length < 8) {
                         return Swal.showValidationMessage(texts.inputsMessage.min8);
                     }
-                    const respuesta = int(dataEdit.id)>0? await preguntas.put(body, {subDominio:[int(dataEdit.id)]}) : await preguntas.post(body)
+                    const respuesta = Number(dataEdit.id) > 0 ? await preguntas.put(body, { subDominio: [Number(dataEdit.id)] }) : await preguntas.post(body)
                     if (respuesta.status !== 200) {
                         return Swal.showValidationMessage(`${`Error.${respuesta.status} ${respuesta.statusText}`}`);
                     }
@@ -70,10 +70,10 @@ function Preguntas() {
                 }
             },
             allowOutsideClick: () => !Swal.isLoading()
-        }).then(async(result) => {
-            if (result.value.status) {
-                const aceptar=await alertAceptar("Exito!", dataEdit.id > 0 ? texts.successMessage.editionPregunta : texts.successMessage.registerPregunta)
-                if (aceptar.isConfirmed ) {
+        }).then(async (result) => {
+            if (result.value?.status) {
+                const aceptar = await alertAceptar("Exito!", dataEdit.id > 0 ? texts.successMessage.editionPregunta : texts.successMessage.registerPregunta)
+                if (aceptar.isConfirmed) {
                     getPreguntas()
                 }
             }
@@ -118,21 +118,22 @@ function Preguntas() {
             row: (row) => {
                 return <div className='d-flex justify-content-around options-table'>
                     <IconDesabilit
-                    onClick={async()=>{
-                        const body={
-                            estado:!row.estado
-                        }
-                        const respuesta=await preguntas.put(body, {subDominio:[row.id]})
-                        if (respuesta.status !== 200) {
-                            toastError(`${`Error.${respuesta.status} ${respuesta.statusText}`}`);
-                            return
-                        }
-                        if (respuesta.data.status === false) {
-                            toastError(`${respuesta.data.message}`);
-                            return
-                        }
-                        getPreguntas()
-                    }}
+                        onClick={async () => {
+                            const body = {
+                                estado: !row.estado
+                            }
+                            const respuesta = await preguntas.put(body, { subDominio: [row.id] })
+                            if (respuesta.status !== 200) {
+                                toastError(`${`Error.${respuesta.status} ${respuesta.statusText}`}`);
+                                return
+                            }
+                            if (respuesta.data.status === false) {
+                                toastError(`${respuesta.data.message}`);
+                                return
+                            }
+                            getPreguntas()
+                        }}
+                        className="cursor-pointer"
                     />
                     <IconTrash
                         onClick={() => {
@@ -140,17 +141,17 @@ function Preguntas() {
                                 row: row,
                                 objet: preguntas,
                                 functionGet: getPreguntas,
-                              });
+                            });
                         }}
                         className="cursor-pointer"
                     />
                     <IconEdit
                         onClick={() => {
                             alertRegisterPregunta({
-                                title:texts.pages.editPregunta.name,
-                                dataEdit:{
-                                    id:row.id,
-                                    value:row.pregunta
+                                title: texts.pages.editPregunta.name,
+                                dataEdit: {
+                                    id: row.id,
+                                    value: row.pregunta
                                 }
                             })
                         }}
@@ -177,7 +178,7 @@ function Preguntas() {
             name: texts.registerMessage.buttonRegisterPregunta,
             function: () => {
                 alertRegisterPregunta({
-                    title:texts.pages.registerPregunta.name
+                    title: texts.pages.registerPregunta.name
                 })
             }
         }

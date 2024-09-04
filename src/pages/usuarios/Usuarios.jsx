@@ -93,7 +93,7 @@ function Usuarios() {
     }
 
     return (
-        <Navbar name={`${texts.pages.getUsuarios.name}`} descripcion={`${texts.pages.getUsuarios.description}`}>
+        <Navbar name={`${texts.pages.getUsuarios.name}`} descripcion={`${texts.pages.getUsuarios.description}`} dollar={false}>
             <Table
                 columns={columns}
                 rows={listUsuarios}

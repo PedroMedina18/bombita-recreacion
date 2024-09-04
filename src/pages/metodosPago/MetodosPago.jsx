@@ -104,7 +104,7 @@ function MetodosPago() {
     }
 
     return (
-        <Navbar name={`${texts.pages.getMetodosPago.name}`} descripcion={`${texts.pages.getMetodosPago.description}`}>
+        <Navbar name={`${texts.pages.getMetodosPago.name}`} descripcion={`${texts.pages.getMetodosPago.description}`} dollar={false}>
             <Table
                 columns={columns}
                 rows={listMetodos_Pagos}

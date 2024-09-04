@@ -201,10 +201,14 @@ class Eventos(models.Model):
     numero_personas = models.IntegerField()
     cliente = models.ForeignKey(Clientes, on_delete = models.PROTECT, related_name = 'eventos', db_column = 'cliente_id')
     estado = models.BooleanField(null=True, default=None)
+    evaluado = models.BooleanField(default=False)
+    recreadores_asignados = models.BooleanField(default=False)
     estado_pago = models.IntegerField(default=0)
+    motivo_cancelacion = models.CharField(max_length = 300, null=True, blank=True, default=None)
     opinion = models.CharField(max_length = 500, blank=True, null=True, default=None)
     fecha_registro = models.DateTimeField(auto_now_add = True)
     fecha_actualizacion = models.DateTimeField(auto_now = True)
+    opinion = models.CharField(max_length = 300, blank=True, null=True, default=None)
 
     class Meta:
         db_table = 'eventos'
@@ -220,7 +224,6 @@ class EventosSobrecargos(models.Model):
 class EventosServicios(models.Model):
     evento = models.ForeignKey(Eventos, on_delete = models.CASCADE, related_name = 'servicio', db_column = 'evento_id')
     servicio = models.ForeignKey(Servicios, on_delete = models.CASCADE, related_name = 'evento', db_column = 'servicio_id')
-    evaluacion_servicio = models.IntegerField(null = True, blank = True)
 
     class Meta:
         db_table = 'servicios_eventos'
@@ -251,9 +254,9 @@ class Pagos(models.Model):
         db_table = 'pagos'
 
 class EventosRecreadoresServicios(models.Model):
-    evento = models.ForeignKey(Eventos, on_delete = models.CASCADE, related_name = 'recreador', db_column = 'evento_id')
-    recreador  = models.ForeignKey(Recreadores, on_delete = models.CASCADE, related_name = 'evento', db_column = 'recreador_id')
-    servicio = models.ForeignKey(Servicios, on_delete = models.CASCADE, related_name = 'recreador', db_column = 'servicio_id')
+    evento = models.ForeignKey(Eventos, on_delete = models.PROTECT, related_name = 'recreador', db_column = 'evento_id')
+    recreador  = models.ForeignKey(Recreadores, on_delete = models.PROTECT, related_name = 'evento', db_column = 'recreador_id')
+    servicio = models.ForeignKey(Servicios, on_delete = models.PROTECT, related_name = 'recreador', db_column = 'servicio_id')
     evaluacion_recreador = models.IntegerField(null = True, blank = True)
     class Meta:
         db_table = 'recreadores_eventos_servicios'
@@ -267,9 +270,9 @@ class PreguntasEvento(models.Model):
         db_table = 'preguntas_eventos'
 
 class EventoPreguntasEvento(models.Model):
-    evento = models.ForeignKey(Eventos, on_delete = models.CASCADE, related_name = 'pregunta', db_column = 'evento_id')
-    pregunta = models.ForeignKey(PreguntasEvento, on_delete = models.CASCADE, related_name = 'recreador', db_column = 'pregunta_id')
-    respuesta = models.CharField(max_length = 300, blank=True, null=True, default=None)
+    evento = models.ForeignKey(Eventos, on_delete = models.PROTECT, related_name = 'pregunta', db_column = 'evento_id')
+    pregunta = models.ForeignKey(PreguntasEvento, on_delete = models.PROTECT, related_name = 'recreador', db_column = 'pregunta_id')
+    respuesta = models.IntegerField(blank=True, null=True, default=None)
 
     class Meta:
         db_table = 'eventos_preguntas_evento'

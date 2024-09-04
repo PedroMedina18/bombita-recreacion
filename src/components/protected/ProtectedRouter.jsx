@@ -8,8 +8,6 @@ import { useEffect } from 'react';
 function ProtectedRouter({children}) {
   const { isAuthenticateds } = useAuthContext();
   const token = getCookie("token")
-
-
   if (isAuthenticateds && token) {
     return (children ? children : <Outlet />)
 

@@ -5,7 +5,7 @@ import Logo from "../../assets/logo-bombita.png";
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
-import { login } from "../../utils/API.jsx"
+import { login, cargos } from "../../utils/API.jsx"
 import { getCookie } from "../../utils/cookie.jsx"
 import { errorAxios } from "../../utils/process.jsx"
 import { IconUserCircleSolid, IconWarnig, IconUsers, IconBloq } from "../../components/Icon"
@@ -33,16 +33,16 @@ function Login() {
         document.getElementById("button-login").disabled = true
         const res = await login(data)
         if (!res.status === 200) {
-          setAlert(`texts.errorMessage.errorResponse. Codigo ${res.status}`)
+          setAlert(`${texts.errorMessage.errorResponse}. Codigo ${res.status}`)
           return
         }
-        if (res.data.status && res.data.token) {
-          saveUser(res.data.data, res.data.token)
-          setAlert("")
-          navigate("/inicio/")
-        } else {
+        if (!(res.data.status && res.data.token)) {
           setAlert(res.data.message)
+          return
         }
+        saveUser(res.data.data, res.data.token)
+        setAlert("")
+        navigate("/inicio/")
       } catch (error) {
         const message = await errorAxios(error)
         setAlert(message)
@@ -72,7 +72,7 @@ function Login() {
 
         <h1 className='h3 fw-bold mb-4 mt-5 text-white'>Inicio de Sesión</h1>
 
-        <div className='w-100 d-flex icon-input align-items-center'>
+        <div className='w-100 d-flex align-items-center'>
           <label htmlFor="user" className='icon-input d-flex cursor-pointer'>
             <IconUsers />
           </label>
@@ -119,7 +119,7 @@ function Login() {
         </div>
         {errors.usuario ? <span className='error-login'>{errors.usuario.message}</span> : <span className='error-login invisible'>error</span>}
 
-        <div className='w-100 d-flex icon-input align-items-center'>
+        <div className='w-100 d-flex align-items-center'>
           <label htmlFor="password" className='icon-input d-flex cursor-pointer'>
             <IconBloq />
           </label>
