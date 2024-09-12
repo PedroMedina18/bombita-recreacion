@@ -1,0 +1,53 @@
+{% extends "./main.html" %}
+
+{% block titulo %} Completo {% endblock %}
+
+{% block content %}
+<img class="logo" src="./logo-bombita.png" alt="logo">
+
+<div
+    class="d-flex flex-column w-90 w-md-80 mx-auto bg-white-ligh py-3 px-4 border rounded-1 border-dark border-2 mt-10 mb-5">
+    <img src="./triste.png" alt="estrellas" width="100px" class="mx-auto my-2">
+    <div class="header-email">
+        <h2 class="text-center fw-bold  h1 mb-1 text-capitalize">EVENTO CANCELADO!</h2>
+        <h3 class="text-center fw-semibold mt-2">Lamentamos que se haya tenido que cancelar el evento
+        </h3>
+    </div>
+    <hr class="hr-email">
+
+    <div class="body-email px-4 ">
+        <p class="text-center text-description my-3">Lamentamos informarles que el evento programado ha sido cancelado
+            debido a circunstancias imprevistas.</p>
+        <p class="text-center text-description my-2">Si tienen alguna pregunta o inquietud, no duden en ponerse en
+            contacto con nosotros. <br>
+            ¡Gracias por su comprensión!</p>
+    </div>
+
+</div>
+<div class="w-90 w-md-80 mx-auto bg-white-ligh py-2 px-4 border rounded-4 border-dark border-2 my-2">
+    <div class="w-100 px-4">
+        <h3 class="text-center fw-bold">Información del Evento</h3>
+        <div class="d-flex aling-items-center justify-content-between w-100">
+            <div>
+                <strong class="m-0 fs-6">Código:</strong>
+                <p class="m-0 fs-6"> {{codigo}}</p>
+            </div>
+            <div>
+                <strong class="m-0 fs-6">Cliente:</strong>
+                <p class="m-0 fs-6"> {{nombre}} {{documento}}</p>
+
+            </div>
+        </div>
+        <div class="w-100">
+            <strong class="m-0 fs-6">Dirección:</strong>
+            <p class="m-0 fs-6"> {{direccion}}</p>
+        </div>
+        <div>
+            <strong class="m-0 fs-6">Fecha:</strong>
+            <p class="m-0 fs-6">{{fecha_inicio}}</p>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

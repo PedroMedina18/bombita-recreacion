@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { Calendar, dayjsLocalizer } from "react-big-calendar";
-import dayjsEs from "../../utils/dayjs.js";
 import {controlErrors} from "../../utils/actions.jsx";
 import { toastError } from "../alerts.jsx";
+import dayjsEs from "../../utils/dayjs.js";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "./ComponentCalendar.css";
 
@@ -111,10 +111,17 @@ function ComponentCalendar({ className="", object, subDominio=[], filtros = {}, 
         });
         break;
       case "day":
-        setRangoFechas({
+        if(Array.isArray(range)){
+          setRangoFechas({
           desde: dayjs(range[0]).format("DD-MM-YYYY"),
           hasta: dayjs(range[0]).format("DD-MM-YYYY"),
-        });
+        })
+        }else{
+          setRangoFechas({
+            desde: dayjs(range.start).format("DD-MM-YYYY"),
+            hasta: dayjs(range.end).format("DD-MM-YYYY")
+          })
+        }
         break;
       case "agenda":
         setRangoFechas({
@@ -132,7 +139,6 @@ function ComponentCalendar({ className="", object, subDominio=[], filtros = {}, 
       messages={messages}
       view={view}
       events={listEventos}
-      
       formats={{
         dayHeaderFormat: (date) => {
           return dayjs(date).format("dddd, DD [de] MMMM YYYY");

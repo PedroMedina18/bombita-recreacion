@@ -4,14 +4,15 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.db import IntegrityError, connection, models
-from ..funtions.indice import indiceFinal, indiceInicial
-from ..funtions.serializador import dictfetchall
-from ..models import Materiales
-from ..funtions.filtros import order, filtrosWhere
+from ..utils.indice import indiceFinal, indiceInicial
+from ..utils.serializador import dictfetchall
+from ..models import Materiales, RegistrosMateriales
+from ..utils.filtros import order, filtrosWhere
 from ..message import MESSAGE
-from ..funtions.identificador import determinar_valor
-from ..funtions.token import verify_token
+from ..utils.identificador import determinar_valor, edit_str
+from ..utils.token import verify_token
 import json
+import datetime
 
 # CRUD COMPLETO DE LA TABLA DE materiales
 class Materiales_Views(View):
@@ -30,14 +31,20 @@ class Materiales_Views(View):
                     'message': verify['message'],
                 }
                 return JsonResponse(datos)
-            Materiales.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'], total=req['total'])
+            if(not (bool(verify['info']['administrador']) or 9 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
+            material=Materiales.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'], total=req['total'])
+            RegistrosMateriales.objects.create(material=material, descripcion=f"Registro de {material.nombre}", cantidad=material.total, total=material.total, tipo=2)
             datos = {
                 'status': True,
                 'message': f"{MESSAGE['registerMaterial']}"
             }
             return JsonResponse(datos)
         except IntegrityError as error:
-            print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
                 if 'nombre' in error.args[1]:
                     message = MESSAGE['nombreDuplicate']
@@ -54,7 +61,6 @@ class Materiales_Views(View):
                 }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"{MESSAGE['errorPost']} - {error}", )
             datos = {
                 'status': False,
                 'message': f"{MESSAGE['errorRegistro']}: {error}"
@@ -72,12 +78,17 @@ class Materiales_Views(View):
                     'message': verify['message']
                 }
                 return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 9 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
             material = list(Materiales.objects.filter(id=id).values())
             if len(material) > 0:
                 material = Materiales.objects.get(id=id)
                 material.nombre = req['nombre']
                 material.descripcion = req['descripcion']
-                material.total = req['total']
                 material.save()
                 datos = {
                     'status': True,
@@ -123,6 +134,12 @@ class Materiales_Views(View):
                     'message': verify['message']
                 }
                 return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 9 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
             material = list(Materiales.objects.filter(id=id).values())
             if len(material) > 0:
                 Materiales.objects.filter(id=id).delete()
@@ -164,6 +181,12 @@ class Materiales_Views(View):
                 return JsonResponse(datos)
 
             if (id > 0):
+                if(not (bool(verify['info']['administrador']) or 9 in verify['info']['permisos'])):
+                    datos = {
+                        'status': False,
+                        'message': MESSAGE['NonePermisos'],
+                    }
+                    return JsonResponse(datos)
                 query = """
                 SELECT * FROM materiales WHERE materiales.id=%s;
                 """
@@ -186,8 +209,32 @@ class Materiales_Views(View):
                 inicio = indiceInicial(int(page))
                 final = indiceFinal(int(page))
                 all = request.GET.get('all', False)
+                bajo = request.GET.get('bajo', "false")
                 orderType = order(request)
+                totalMateriales = request.GET.get("total", "false")
                 typeOrdenBy = request.GET.get('organizar', "orig")
+                fechaActual = datetime.date.today()
+
+                if totalMateriales == "true":
+                    query = """
+                        SELECT COUNT(*) AS total FROM materiales
+                    """
+                    cursor.execute(query)
+                    total = dictfetchall(cursor)
+                    query = """
+                        SELECT COUNT(*) AS bajo FROM materiales WHERE total <=10
+                    """
+                    cursor.execute(query)
+                    bajo = dictfetchall(cursor)
+                    datos = {
+                        "status": True,
+                        "message": f"{MESSAGE['exitoGet']}",
+                        "data": {
+                            "total":total[0]["total"],
+                            "bajo":bajo[0]["bajo"],
+                        },
+                    }
+                    return JsonResponse(datos)
 
                 if(typeOrdenBy=="orig"):
                     typeOrdenBy ="id"
@@ -199,12 +246,18 @@ class Materiales_Views(View):
                 where = []
                 search = request.GET.get('search', None)
                 search = determinar_valor(search)
+                if(bajo == "true"):
+                    where.append(f"total <=10 " )
                 if(search['valor'] and search['type']=="int"):
                     where.append(f"id LIKE '{search['valor']}%%'" )
+                elif(search['valor'] and search['type']=="str"):
+                    str_validate = edit_str(search["valor"])
+                    where.append(f"nombre LIKE '{str_validate}'" )
                 where = filtrosWhere(where)
 
+
                 if(all == "true"):
-                    query = "SELECT id, nombre FROM materiales ORDER BY {} {};".format(typeOrdenBy, orderType)
+                    query = "SELECT id, nombre, total FROM materiales ORDER BY {} {};".format(typeOrdenBy, orderType)
                     cursor.execute(query)
                     materiales = dictfetchall(cursor)
                 else:

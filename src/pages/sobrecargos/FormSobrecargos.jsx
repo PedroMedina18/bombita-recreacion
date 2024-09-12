@@ -9,12 +9,12 @@ import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
 import { Toaster } from "sonner";
 import { controlResultPost } from "../../utils/actions.jsx";
 import { LoaderCircle } from "../../components/loader/Loader.jsx";
+import { IconRowLeft } from "../../components/Icon.jsx";
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import Navbar from "../../components/navbar/Navbar.jsx";
 import texts from "../../context/text_es.js";
 import Swal from 'sweetalert2';
 import pattern from "../../context/pattern.js";
-import { IconRowLeft } from "../../components/Icon.jsx";
 
 function FormSobrecargos() {
     const navigate = useNavigate();
@@ -130,8 +130,8 @@ function FormSobrecargos() {
                                                 message: texts.inputsMessage.max100
                                             },
                                             minLength: {
-                                                value: 5,
-                                                message: texts.inputsMessage.min5
+                                                value: 3,
+                                                message: texts.inputsMessage.min3,
                                             },
                                             pattern: {
                                                 value: pattern.textWithNumber,

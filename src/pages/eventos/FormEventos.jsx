@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { LoaderCircle } from "../../components/loader/Loader.jsx";
 import { Toaster } from "sonner";
@@ -12,6 +12,9 @@ import texts from "../../context/text_es.js";
 function FormEventos() {
     const navigate = useNavigate();
     const { loading } = useFormEventContext()
+    useEffect(()=>{
+        document.title="Registro de Eventos - Bombita Recreación "
+    },[])
     return (
         <Navbar name={`${texts.pages.registerEventos.name}`} descripcion={`${texts.pages.registerEventos.description}`}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/eventos/") }}> <IconRowLeft /> Regresar</ButtonSimple>

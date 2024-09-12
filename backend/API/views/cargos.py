@@ -4,15 +4,17 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.db import IntegrityError, connection, models
-from ..funtions.indice import indiceFinal, indiceInicial
-from ..funtions.serializador import dictfetchall
+from ..utils.indice import indiceFinal, indiceInicial
+from ..utils.serializador import dictfetchall
 from ..models import Cargos, Privilegios, Permisos
-from ..funtions.token import verify_token
-from ..funtions.editorOpciones import editorOpciones
-from ..funtions.identificador import returnBoolean, normalize_id_list, determinar_valor
+from ..utils.token import verify_token
+from ..utils.editorOpciones import editorOpciones
+from ..utils.identificador import returnBoolean, normalize_id_list, determinar_valor, edit_str
 from ..message import MESSAGE
-from ..funtions.filtros import order, filtrosWhere
+from ..utils.filtros import order, filtrosWhere
 from decouple import config
+from django.conf import settings
+from django.conf.urls.static import static 
 import json
 
 # CRUD COMPLETO DE LA TABLA DE CARGOS
@@ -32,6 +34,12 @@ class Cargos_Views(View):
                 datos = {
                     'status': False,
                     'message': verify['message'],
+                }
+                return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 1 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
                 }
                 return JsonResponse(datos)
             
@@ -111,7 +119,6 @@ class Cargos_Views(View):
                 }
             return JsonResponse(datos)
         except IntegrityError as error:
-            print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
                 if 'nombre' in error.args[1]:
                     message = MESSAGE['nombreDuplicate']
@@ -129,13 +136,11 @@ class Cargos_Views(View):
             return JsonResponse(datos)
         except Exception as error:
             if method=='PUT':
-                print(f"{MESSAGE['errorPut']} - {error}")
                 datos = {
                     'status': False,
                     'message': f"{MESSAGE['errorEdition']}: {error}",
                 }
             else:
-                print(f"{MESSAGE['errorPost']} - {error}", )
                 datos = {
                     'status': False,
                     'message': f"{MESSAGE['errorRegistro']}: {error}"
@@ -154,6 +159,19 @@ class Cargos_Views(View):
                     'message': verify['message']
                 }
                 return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 1 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
+            if id==1:
+                datos = {
+                    'status': False,
+                    'message': f"{MESSAGE['errorCargoAdministrador']}"
+                }
+                return JsonResponse(datos)
+
             cargo = list(Cargos.objects.filter(id=id).values())
             if len(cargo) > 0:
                 Cargos.objects.filter(id=id).delete()
@@ -169,14 +187,12 @@ class Cargos_Views(View):
             return JsonResponse(datos)
 
         except models.ProtectedError as error:
-            print(f"{MESSAGE['errorProteccion']} - {str(error)}")
             datos = {
                 'status': False,
                 'message': f"{MESSAGE['errorProtect']}"
             }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"{MESSAGE['errorDelete']} - {error}", )
             datos = {
                 'status': False,
                 'message': f"{MESSAGE['errorEliminar']}: {error}"
@@ -186,6 +202,7 @@ class Cargos_Views(View):
     def get(self, request, id=0):
         try:
             cursor = connection.cursor()
+
             verify=verify_token(request.headers)
             direccion=config('URL')
             if(not verify['status']):
@@ -193,6 +210,12 @@ class Cargos_Views(View):
                     'status': False,
                     'message': verify['message'],
                     'data': None
+                }
+                return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 1 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
                 }
                 return JsonResponse(datos)
             if (id > 0):
@@ -251,6 +274,9 @@ class Cargos_Views(View):
                 search = determinar_valor(search)
                 if(search['valor'] and search['type']=="int"):
                     where.append(f"id LIKE '{search['valor']}%%'" )
+                elif(search['valor'] and search['type']=="str"):
+                    str_validate = edit_str(search["valor"])
+                    where.append(f"nombre LIKE '{str_validate}'" )
                 where = filtrosWhere(where)
 
                 if(all == "true"):
@@ -287,7 +313,6 @@ class Cargos_Views(View):
             return JsonResponse(datos)
     
         except Exception as error:
-            print(f"{MESSAGE['errorGet']} - {error}")
             datos = {
                 'status': False,
                 'message': f"{MESSAGE['errorConsulta']}: {error}",

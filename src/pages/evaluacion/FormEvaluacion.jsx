@@ -139,7 +139,7 @@ function FormEvaluacion() {
                             dataEvaluacion.preguntas?.map((e, index) => (
                               <div className='mx-3 mb-4 d-flex flex-column w-100 w-md-40' key={`pregunta-start-${index}`}>
                                 <p className='fw-bold mb-1 text-center'>{e.pregunta}</p>
-                                <RadioStart id={e.id} save={setValPreguntas} state={valuePreguntas} index={index} name={`pregunta-${index}`} check={Number(e.value)}/>
+                                <RadioStart block={Boolean(dataEvaluacion.evento.evaluado)} id={e.id} save={setValPreguntas} state={valuePreguntas} index={index} name={`pregunta-${index}`} check={Number(e.value)}/>
                               </div>
                             ))
                           }
@@ -177,7 +177,7 @@ function FormEvaluacion() {
                             dataEvaluacion.recreadores?.map((e, index) => (
                               <div className='mx-3 mb-5 d-flex flex-column justify-content-center align-items-center w-100 w-md-40' key={`recreador-start-${index}`}>
                                 <CardRecreador img={e.img} nombre={`${e.nombres} ${e.apellidos}`}/>
-                                <RadioStart id={e.id} save={setValueRecreador} state={valueRecreadores} index={index} name={`recreador-${index}`} check={Number(e.value)}/>
+                                <RadioStart block={Boolean(dataEvaluacion.evento.evaluado)} id={e.id} save={setValueRecreador} state={valueRecreadores} index={index} name={`recreador-${index}`} check={Number(e.value)}/>
                               </div>
                             ))
                           }

@@ -1,15 +1,14 @@
-from django.shortcuts import render
 from django.http.response import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.db import IntegrityError, connection, models
-from ..funtions.indice import indiceFinal, indiceInicial
-from ..funtions.serializador import dictfetchall
+from ..utils.indice import indiceFinal, indiceInicial
+from ..utils.serializador import dictfetchall
 from ..models import Nivel
-from ..funtions.token import verify_token
-from ..funtions.filtros import order, filtrosWhere
-from ..funtions.identificador import determinar_valor
+from ..utils.token import verify_token
+from ..utils.filtros import order, filtrosWhere
+from ..utils.identificador import determinar_valor, edit_str
 from ..message import MESSAGE
 import json
 
@@ -30,6 +29,12 @@ class Niveles_Views(View):
                     'message': verify['message'],
                 }
                 return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'] or 7 in verify['info']['permisos'])):
+                    datos = {
+                        'status': False,
+                        'message': MESSAGE['NonePermisos'],
+                    }
+                    return JsonResponse(datos)
             Nivel.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'])
             datos = {
                 'status': True,
@@ -73,6 +78,12 @@ class Niveles_Views(View):
                     'message': verify['message'],
                 }
                 return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'] or 7 in verify['info']['permisos'])):
+                    datos = {
+                        'status': False,
+                        'message': MESSAGE['NonePermisos'],
+                    }
+                    return JsonResponse(datos)
             nivel = list(Nivel.objects.filter(id = id).values())
             if len(nivel) > 0:
                 nivel = Nivel.objects.get(id = id)
@@ -90,7 +101,6 @@ class Niveles_Views(View):
                 }
             return JsonResponse(datos)
         except IntegrityError as error:
-            print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
                 if 'nombre' in error.args[1]:
                     message = MESSAGE['nombreDuplicate']
@@ -123,6 +133,12 @@ class Niveles_Views(View):
                     'message': verify['message']
                 }
                 return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'] or 7 in verify['info']['permisos'])):
+                    datos = {
+                        'status': False,
+                        'message': MESSAGE['NonePermisos'],
+                    }
+                    return JsonResponse(datos)
             nivel = list(Nivel.objects.filter(id = id).values())
             if len(nivel) > 0:
                 Nivel.objects.filter(id = id).delete()
@@ -162,6 +178,13 @@ class Niveles_Views(View):
                     'data': None
                 }
                 return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'] or 7 in verify['info']['permisos'])):
+                    datos = {
+                        'status': False,
+                        'message': MESSAGE['NonePermisos'],
+                    }
+                    return JsonResponse(datos)
+            
             if (id > 0):
                 query = """
                 SELECT * FROM niveles WHERE niveles.id=%s;
@@ -200,6 +223,9 @@ class Niveles_Views(View):
                 search = determinar_valor(search)
                 if(search['valor'] and search['type']=="int"):
                     where.append(f"id LIKE '{search['valor']}%%'" )
+                elif(search['valor'] and search['type']=="str"):
+                    str_validate = edit_str(search["valor"])
+                    where.append(f"nombre LIKE '{str_validate}'" )
                 where = filtrosWhere(where)
 
                 if(all == "true"):

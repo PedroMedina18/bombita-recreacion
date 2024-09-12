@@ -62,7 +62,7 @@ function ComponentCalendarRecreador({ id_recreador, name = null }) {
             <div className='w-100 overflow-auto scroll'>
                 <ComponentCalendar
                     object={recreadores}
-                    className='vh-100 w-calendar'
+                    className='h-calendar w-calendar'
                     subDominio={["eventos", Number(id_recreador)]}
                     eventData={eventData}
                     components={components}

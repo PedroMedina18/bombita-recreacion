@@ -74,8 +74,10 @@ function FormMateriales() {
                 if (confirmacion.isConfirmed) {
                     const body = {
                         nombre: data.nombre,
-                        total: Number(data.total),
                         descripcion: data.descripcion,
+                    }
+                    if(!params.id){
+                        body.total= Number(data.total)
                     }
                     alertLoading("Cargando")
                     const res = params.id ? await materiales.put(body, { subDominio:[Number(params.id)]}) : await materiales.post(body)
@@ -127,8 +129,8 @@ function FormMateriales() {
                                                 message: texts.inputsMessage.max100
                                             },
                                             minLength: {
-                                                value: 5,
-                                                message: texts.inputsMessage.min5
+                                                value: 3,
+                                                message: texts.inputsMessage.min3,
                                             },
                                             pattern: {
                                                 value: pattern.textWithNumber,
@@ -144,7 +146,9 @@ function FormMateriales() {
                                         }}
                                         placeholder={texts.placeholder.nameMaterial}
                                     />
-                                    <InputsGeneral type={"number"} label={`${texts.label.cantidadTotal}`} name="total" id="total" form={{ errors, register }}
+                                    {
+                                        !params.id &&
+                                        <InputsGeneral type={"number"} label={`${texts.label.cantidadTotal}`} name="total" id="total" form={{ errors, register }}
                                         defaultValue={0}
                                         params={{
                                             min: {
@@ -157,7 +161,8 @@ function FormMateriales() {
                                             }
                                         }}
                                         placeholder="0"
-                                    />
+                                        />
+                                    }
                                     <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
                                         params={{
                                             required: {

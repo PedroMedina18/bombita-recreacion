@@ -4,6 +4,7 @@ import { alertConfim, toastError, alertMotivo } from "../../components/alerts.js
 import { Toaster } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { searchCode, getListItems, deleteItem } from "../../utils/actions.jsx";
+import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import {
   IconTrash,
   IconDesabilit,
@@ -18,15 +19,33 @@ import Navbar from "../../components/navbar/Navbar.jsx";
 import Table from "../../components/table/Table.jsx";
 import Pildora from "../../components/Pildora.jsx";
 import texts from "../../context/text_es.js";
+import dayjsEs from "../../utils/dayjs.js";
 
 function Eventos() {
+
+
+  return (
+    <Navbar
+      name={texts.pages.getEventos.name}
+      descripcion={texts.pages.getEventos.description}
+    >
+      <TableEventos />
+
+      <Toaster />
+    </Navbar>
+  );
+}
+
+export function TableEventos({ filtrosTable = {}, calendar = true, recreadoresIcon = true, desabilititIcon = true, moneyIcon = true, optionsRegister = true, optionsSerch = true }) {
   const [listEventos, setEventos] = useState([]);
   const [dataEventos, setDataEventos] = useState({ pages: 0, total: 0 });
   const [tableLoading, setTableLoaing] = useState(true);
   const renderizado = useRef(0);
   const navigate = useNavigate();
+  const dayjs = dayjsEs();
 
   useEffect(() => {
+    document.title = "Eventos - Bombita Recreación"
     if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1;
       getEventos();
@@ -34,10 +53,10 @@ function Eventos() {
     }
   }, []);
 
-  const getEventos = (filtros={}) => {
+  const getEventos = (filtros = {}) => {
     getListItems({
       object: eventos,
-      filtros:filtros,
+      filtros: { ...filtros, ...filtrosTable },
       setList: setEventos,
       setData: setDataEventos,
       setLoading: setTableLoaing,
@@ -46,7 +65,7 @@ function Eventos() {
 
   const columns = [
     {
-      name: "Codigo",
+      name: "Código",
       row: (row) => {
         const codigo = formatoId(Number(row.id));
         return codigo;
@@ -75,13 +94,16 @@ function Eventos() {
       name: "Estado de Pago",
       row: (row) => {
         let value;
-        if (row.estado_pago===2) {
+        if (row.estado_pago === 3) {
+          value = <Pildora contenido={`${row.estado_pago_descripcion}`} color="bg-info"></Pildora>
+        }
+        if (row.estado_pago === 2) {
           value = <Pildora contenido={`${row.estado_pago_descripcion}`} color="bg-succes"></Pildora>
         }
-        if (row.estado_pago===1) {
+        if (row.estado_pago === 1) {
           value = <Pildora contenido={`${row.estado_pago_descripcion}`} color="bg-warning"></Pildora>
         }
-        if (row.estado_pago===0) {
+        if (row.estado_pago === 0) {
           value = <Pildora contenido={`${row.estado_pago_descripcion}`} color="bg-danger"></Pildora>
         }
         return value;
@@ -95,7 +117,7 @@ function Eventos() {
           value = "En espera";
           value = <Pildora contenido={"En espera"} color="bg-info"></Pildora>
         }
-        if (Boolean(row.estado) === false && row.estado !==null) {
+        if (Boolean(row.estado) === false && row.estado !== null) {
           value = <Pildora contenido={"Cancelado"} color="bg-danger"></Pildora>
         }
         if (Boolean(row.estado) === true) {
@@ -114,50 +136,75 @@ function Eventos() {
                 navigate(`/eventos/${row.id}/`);
               }} className="cursor-pointer"
             />
-            <IconRecreadores
-              onClick={() => {
-                navigate(`/eventos/recreadores/${row.id}/`);
-              }} className="cursor-pointer"
-            />
-            <IconMoney
-              onClick={() => {
-                navigate(`/eventos/pagos/${row.id}/`);
-              }}
-              className="cursor-pointer"
-            />
-            <IconDesabilit
-              onClick={() => {
-                cancelarEvento(row.id, filtros)
-              }}
-              className="cursor-pointer"
-            />
+            {
+              recreadoresIcon &&
+              <IconRecreadores
+                onClick={() => {
+                  navigate(`/eventos/recreadores/${row.id}/`);
+                }} className="cursor-pointer"
+              />
+            }
+            {
+              moneyIcon &&
+              <IconMoney
+                onClick={() => {
+                  navigate(`/eventos/pagos/${row.id}/`);
+                }}
+                className="cursor-pointer"
+              />
+            }
+            {
+              desabilititIcon &&
+              <IconDesabilit
+                onClick={() => {
+                  const day = dayjs()
+                  const end = dayjs(row.fecha_evento_final)
+                  if (day.isAfter(end)) {
+                    return
+                  }
+                  if (row.estado == 1 || row.estado === 0) {
+                    return
+                  }
+                  cancelarEvento(row.id, filtros)
+                }}
+                className="cursor-pointer"
+              />
+            }
+
+
+
           </div>
         );
       },
     },
   ];
 
+
   const options = {
-    search: {
-      placeholder: texts.registerMessage.searchClientEvent,
-      function: (value, filtros={}) => {
-        searchCode({
-          value: value,
-          filtros:filtros,
-          object: eventos,
-          setList: setEventos,
-          setData: setDataEventos,
-          setLoading: setTableLoaing,
-        });
-      },
-    },
-    register: {
+  };
+  if (optionsRegister) {
+    options.register = {
       name: texts.registerMessage.buttonRegisterEvento,
       function: () => {
         navigate("/register/eventos/");
       },
-    },
-  };
+    }
+  }
+  if (optionsSerch) {
+    options.search = {
+      placeholder: texts.registerMessage.searchClientEvent,
+      function: (value, filtros = {}) => {
+        searchCode({
+          value: value,
+          filtros: { ...filtros, ...filtrosTable },
+          object: eventos,
+          setList: setEventos,
+          setData: setDataEventos,
+          setLoading: setTableLoaing,
+        })
+      }
+    }
+  }
 
   const ButtonCalendar = () => {
     return (
@@ -171,31 +218,45 @@ function Eventos() {
     try {
       const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirmCancelarEvento)
       if (confirmacion.isConfirmed) {
-        alertMotivo("Motivo por el que se Cancela el evento", id, ()=>{getEventos(filtros)})
+        alertMotivo("Motivo por el que se Cancela el evento", id, () => { getEventos(filtros) })
       }
     } catch (error) {
-      console.log(error)
       toastError(texts.errorMessage.errorSystem)
     }
   }
 
+  const filtros = [
+    {
+      nombre: "Estado",
+      columnName: "estado",
+      opciones: [{ label: "En espera", value: "null" }, { label: "Completado", value: 1 }, { label: "Cancelado", value: 0 }]
+    },
+    {
+      nombre: "Estado Pago",
+      columnName: "estado_pago",
+      opciones: [{ label: "Completo", value: 2 }, { label: "Anticipo", value: 1 }, { label: "Ningun Pago", value: 0 }]
+    },
+  ]
   return (
-    <Navbar
-      name={texts.pages.getEventos.name}
-      descripcion={texts.pages.getEventos.description}
-    >
-      <Table
-        childrenTop={ButtonCalendar}
-        columns={columns}
-        rows={listEventos}
-        totalElements={dataEventos.total}
-        totalPages={dataEventos.pages}
-        options={options}
-        loading={tableLoading}
-      />
-      <Toaster />
-    </Navbar>
-  );
+    <Table
+      childrenTop={calendar ? ButtonCalendar : () => { return (<></>) }}
+      filtradores={filtros}
+      columns={columns}
+      rows={listEventos}
+      totalElements={dataEventos.total}
+      totalPages={dataEventos.pages}
+      options={options}
+      loading={tableLoading}
+      fechaOrganizer={true}
+      order={true}
+      organizar={[
+        { label: "Codigo", value: "orig" },
+        { label: "Cliente", value: "alf" },
+      ]}
+
+    />
+  )
 }
+
 
 export default Eventos;

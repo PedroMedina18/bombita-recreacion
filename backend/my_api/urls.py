@@ -23,3 +23,19 @@ urlpatterns = [
     path('API/v1/', include('API.urls'))
 ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+# from django.http import HttpResponse
+# from django.views.decorators.http import require_http_methods
+# from django.core.files.storage import default_storage
+
+# @require_http_methods(['GET'])
+# def serve_image(request, image_path):
+#     token = request.GET.get('token')
+#     if not token or token != 'your_secret_token':
+#         return HttpResponseForbidden('Acceso denegado')
+
+#     image_file = default_storage.open(image_path)
+#     response = HttpResponse(image_file.read(), content_type='image/jpeg')
+#     response['Content-Disposition'] = f'inline; filename="{image_path}"'
+#     return response

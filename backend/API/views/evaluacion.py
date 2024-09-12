@@ -4,12 +4,12 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.db import IntegrityError, connection, models
-from ..funtions.indice import indiceFinal, indiceInicial
-from ..funtions.serializador import dictfetchall
-from ..funtions.time import duration
-from ..funtions.identificador import determinar_valor, edit_str, normalize_id_list
+from ..utils.indice import indiceFinal, indiceInicial
+from ..utils.serializador import dictfetchall
+from ..utils.time import duration
+from ..utils.identificador import determinar_valor, edit_str, normalize_id_list
 from ..models import EventosRecreadoresServicios, Eventos, Recreadores, PreguntasEvento, EventosServicios, EventoPreguntasEvento
-from ..funtions.token import verify_token
+from ..utils.token import verify_token
 from ..message import MESSAGE
 from decouple import config
 import datetime
@@ -30,6 +30,12 @@ class Evaluacion_View(View):
                 datos = {
                     "status": False,
                     "message": verify["message"],
+                }
+                return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 11 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
                 }
                 return JsonResponse(datos)
 
@@ -65,26 +71,24 @@ class Evaluacion_View(View):
                 datos = {"status": False, "message": MESSAGE["errorEventoNoCompletado"]}
                 return JsonResponse(datos)
                 
-            print(dataEvento)
-            print(evento.evaluado)
 
             queryRecreadores = """
-                    SELECT
-                        re.id,
-                        res.evaluacion_recreador AS value,
-                        IF(re.img_perfil IS NOT NULL AND re.img_perfil != '', CONCAT('{}media/', re.img_perfil), img_perfil) AS img_perfil,
-                        per.nombres, 
-                        per.apellidos
-                    FROM recreadores_eventos_servicios as res
-                    LEFT JOIN recreadores AS re ON res.recreador_id=re.id
-                    LEFT JOIN personas AS per ON re.persona_id=per.id
-                    WHERE res.evento_id = %s;
-                """.format(direccion)
+                SELECT
+                    re.id,
+                    res.evaluacion_recreador AS value,
+                    IF(re.img_perfil IS NOT NULL AND re.img_perfil != '', CONCAT('{}media/', re.img_perfil), img_perfil) AS img_perfil,
+                    per.nombres, 
+                    per.apellidos
+                FROM recreadores_eventos_servicios as res
+                LEFT JOIN recreadores AS re ON res.recreador_id=re.id
+                LEFT JOIN personas AS per ON re.persona_id=per.id
+                WHERE res.evento_id = %s;
+            """.format(direccion)
             if evento.evaluado:
                 query = """
                     SELECT
                         pre.id,
-                        evpre.respuesta AS value,
+                        evpre.evaluacion AS value,
                         pre.pregunta
                     FROM eventos_preguntas_evento as evpre
                     LEFT JOIN preguntas_eventos AS pre ON evpre.pregunta_id=pre.id
@@ -129,7 +133,6 @@ class Evaluacion_View(View):
                 }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"{MESSAGE['errorGet']} - {error}")
             datos = {
                 "status": False,
                 "message": f"{MESSAGE['errorConsulta']}: {error}",
@@ -151,6 +154,14 @@ class Evaluacion_View(View):
                     'message': verify['message'],
                 }
                 return JsonResponse(datos)
+                
+            if(not (bool(verify['info']['administrador']) or 11 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
+
             evento = list(Eventos.objects.filter(id=int(req["evento"])).values())
             if len(evento) > 0:
                 evento = Eventos.objects.get(id=int(req["evento"]))
@@ -176,10 +187,10 @@ class Evaluacion_View(View):
                 
                 if len(list(EventoPreguntasEvento.objects.filter(evento=req['evento'], pregunta=int(pregunta["id"])).values()))>0:
                     respuestaEvento = EventoPreguntasEvento.objects.get(evento=req['evento'], pregunta=int(pregunta["id"]))
-                    respuestaEvento.respuesta=pregunta['value']
+                    respuestaEvento.evaluacion=pregunta['value']
                     respuestaEvento.save()
                 else:
-                    EventoPreguntasEvento.objects.create(evento=evento, pregunta=preguntaEvento, respuesta=pregunta['value'])
+                    EventoPreguntasEvento.objects.create(evento=evento, pregunta=preguntaEvento, evaluacion=pregunta['value'])
 
             for recreador in req['recreadores']:
                 recreadorEvento = list(EventosRecreadoresServicios.objects.filter(evento=req['evento'], recreador=recreador['id']).values())
@@ -201,7 +212,6 @@ class Evaluacion_View(View):
             return JsonResponse(datos)
 
         except Exception as error:
-            print(f"{MESSAGE['errorPost']} - {error}")
             datos = {
                 'status': False,
                 'message': f"{MESSAGE['errorRegistro']}: {error}",

@@ -31,6 +31,7 @@ function FormClientes() {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             if (params.id) {
+                document.title="Edición Cliente - Bombita Recreación"
                 get_cliente()
             }
             return
@@ -49,9 +50,10 @@ function FormClientes() {
                 setValue(key, data[`${key}`])
             });
             setValue(`tipo_documento`, data["tipo_documento_id"])
+            setValue(`telefono_secundario`, data["telefono_secundario"]==="0"? "" : data["telefono_secundario"])
+
 
         } catch (error) {
-            console.log(error)
             setErrorServer(texts.errorMessage.errorObjet)
         } finally {
             setLoading(false)
@@ -71,13 +73,13 @@ function FormClientes() {
     const onSubmit = handleSubmit(
         async (data) => {
             try {
-                const message = texts.confirmMessage.confimrEdit
+                const message = texts.confirmMessage.confirmEdit
                 const confirmacion = await alertConfim("Confirmar", message)
                 const body = {}
                 if (confirmacion.isConfirmed) {
                     body.nombres = data.nombres
                     body.apellidos = data.apellidos
-                    body.numero_documento = numero_documento
+                    body.numero_documento = data.numero_documento
                     body.tipo_documento = Number(data.tipo_documento)
                     body.telefono_principal = Number(data.telefono_principal)
                     body.telefono_secundario = Number(data.telefono_secundario)
@@ -92,7 +94,6 @@ function FormClientes() {
                     })
                 }
             } catch (error) {
-                console.log(error)
                 Swal.close()
                 toastError(texts.errorMessage.errorConexion)
             }
@@ -102,7 +103,6 @@ function FormClientes() {
     return (
         <Navbar name={`${texts.pages.editCliente.name}`} descripcion={`${texts.pages.editCliente.description}`}>
             <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/clientes/") }}> <IconRowLeft /> Regresar</ButtonSimple>
-
             {
                 loading ?
                     (
@@ -129,8 +129,6 @@ function FormClientes() {
                                         ...register("id_persona")
                                         }
                                     />
-
-
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
                                         <div className="w-100 w-md-25 pe-0 pe-md-3 d-flex align-items-center">
                                             <UnitSelect label={texts.label.tipoDocuemnto} name="tipo_documento" id="tipo_documento" form={{ errors, register }}
@@ -145,7 +143,13 @@ function FormClientes() {
                                                     },
 
                                                 }}
-                                                isError={!watch("tipo_documento")}
+                                                onChange={
+                                                    (e)=>{
+                                                        if(Boolean(e.target.value)){
+                                                            clearErrors("tipo_documento")
+                                                        }
+                                                    }
+                                                }
                                                 disabled={disabledInputs}
                                             />
                                         </div>
@@ -157,15 +161,15 @@ function FormClientes() {
                                                         message: texts.inputsMessage.requireDocumento,
                                                     },
                                                     maxLength: {
-                                                        value: 10,
-                                                        message: texts.inputsMessage.max10,
+                                                        value: 9,
+                                                        message: texts.inputsMessage.max9,
                                                     },
                                                     minLength: {
                                                         value: 7,
                                                         message: texts.inputsMessage.min7,
                                                     },
-                                                    min:{
-                                                        value:4000,
+                                                    min: {
+                                                        value: 4000000,
                                                         message: texts.inputsMessage.invalidDocument,
                                                     }
                                                 }}
@@ -189,8 +193,8 @@ function FormClientes() {
                                                         message: texts.inputsMessage.max200,
                                                     },
                                                     minLength: {
-                                                        value: 5,
-                                                        message: texts.inputsMessage.min5,
+                                                        value: 3,
+                                                        message: texts.inputsMessage.min3,
                                                     },
                                                     pattern: {
                                                         value: pattern.textNoneNumber,
@@ -222,8 +226,8 @@ function FormClientes() {
                                                         message: texts.inputsMessage.max200,
                                                     },
                                                     minLength: {
-                                                        value: 5,
-                                                        message: texts.inputsMessage.min5,
+                                                        value: 3,
+                                                        message: texts.inputsMessage.min3,
                                                     },
                                                     pattern: {
                                                         value: pattern.textNoneNumber,
@@ -255,14 +259,14 @@ function FormClientes() {
                                                         value: 11,
                                                         message: texts.inputsMessage.onlyCharacter11,
                                                     },
-                                                    minLength: {
-                                                        value: 11,
-                                                        message: texts.inputsMessage.onlyCharacter11,
-                                                    },
-                                                    min:{
-                                                        value:200000000,
+                                                    min: {
+                                                        value: 2000000000,
                                                         message: texts.inputsMessage.invalidTel,
-                                                    }
+                                                    },
+                                                    pattern: {
+                                                        value: pattern.tel,
+                                                        message: texts.inputsMessage.invalidTel,
+                                                    },
                                                 }}
                                                 disabled={disabledInputs}
                                                 isError={!disabledInputs}
@@ -276,14 +280,14 @@ function FormClientes() {
                                                         value: 11,
                                                         message: texts.inputsMessage.onlyCharacter11,
                                                     },
-                                                    minLength: {
-                                                        value: 11,
-                                                        message: texts.inputsMessage.onlyCharacter11,
-                                                    },
-                                                    min:{
-                                                        value:200000000,
+                                                    min: {
+                                                        value: 2000000000,
                                                         message: texts.inputsMessage.invalidTel,
-                                                    }
+                                                    },
+                                                    pattern: {
+                                                        value: pattern.tel,
+                                                        message: texts.inputsMessage.invalidTel,
+                                                    },
                                                 }}
                                                 disabled={disabledInputs}
                                                 isError={!disabledInputs}
@@ -297,8 +301,8 @@ function FormClientes() {
                                             <InputsGeneral type={"email"} label={`${texts.label.email}`} name="correo" id="correo" form={{ errors, register }}
                                                 params={{
                                                     minLength: {
-                                                        value: 5,
-                                                        message: texts.inputsMessage.min5
+                                                        value: 10,
+                                                        message: texts.inputsMessage.min10
                                                     },
                                                     maxLength: {
                                                         value: 100,

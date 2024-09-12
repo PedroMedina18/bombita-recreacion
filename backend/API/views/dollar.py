@@ -3,11 +3,11 @@ from django.http.response import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
-from ..funtions.indice import indiceFinal, indiceInicial
-from ..funtions.serializador import dictfetchall
+from ..utils.indice import indiceFinal, indiceInicial
+from ..utils.serializador import dictfetchall
 from ..models import PrecioDolar
-from ..funtions.filtros import order, filtrosWhere
-from ..funtions.token import verify_token
+from ..utils.filtros import order, filtrosWhere, peridoFecha
+from ..utils.token import verify_token
 from django.db import IntegrityError, connection, models
 from ..message import MESSAGE
 import json
@@ -30,31 +30,43 @@ class Dollar_View(View):
                     'data': None
                 }
                 return JsonResponse(datos)
-        
+
+            if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'] or 12 in verify['info']['permisos'] or 6 in verify['info']['permisos'] or 5 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
+
+            ordenFecha = request.GET.get('fecha', "fecha_registro")
             page = request.GET.get('page', 1)
             typeOrdenBy = request.GET.get('organizar', "orig")
             inicio = indiceInicial(int(page))
             final = indiceFinal(int(page))
             all = request.GET.get('all', False)
             orderType = order(request)
+            fecha = peridoFecha(request, ordenFecha)
+            where = []
 
             if(typeOrdenBy=="fech"):
                 typeOrdenBy ="fecha_registro"
-            elif(typeOrdenBy=="price"):
+            elif(typeOrdenBy=="precio"):
                 typeOrdenBy ="precio"
             else:
                 typeOrdenBy="fecha_registro"
 
-            query="""
-                SELECT * FROM precio_dolar ORDER BY {} {} {};
-            """
+            if(fecha):
+                where.append(f"{fecha}")
+
+            where = filtrosWhere(where)
 
             if(all == "true"):
-                query = "SELECT * FROM precio_dolar ORDER BY {} {};".format(typeOrdenBy, orderType)
+                query = "SELECT * FROM precio_dolar {} ORDER BY {} {};".format(where, typeOrdenBy, orderType)
                 cursor.execute(query)
                 dollar = dictfetchall(cursor)
             else:
-                query = "SELECT * FROM precio_dolar ORDER BY {} {} LIMIT {}, {};".format(typeOrdenBy, orderType, inicio, final)
+                query = "SELECT * FROM precio_dolar {} ORDER BY {} {} LIMIT {}, {};".format(where, typeOrdenBy, orderType, inicio, final)
+                print(query)
                 cursor.execute(query)
                 dollar = dictfetchall(cursor)
 

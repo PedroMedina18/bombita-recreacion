@@ -19,6 +19,7 @@ function Actividades() {
 
   useEffect(() => {
     if (renderizado.current === 0) {
+      document.title = "Actividades - Bombita Recreación"
       renderizado.current = renderizado.current + 1
       getActividades()
       return
@@ -51,19 +52,6 @@ function Actividades() {
       name: "Opciones",
       row: (row) => {
         return <div className='d-flex justify-content-around options-table'>
-          <IconDetail
-            onClick={() => {
-              alertInfo(
-                row.nombre,
-                {
-                  codigo: formatoId(row.id),
-                  descripción: row.descripcion,
-                  fecha_de_registro: formatDateWithTime12Hour(row.fecha_registro),
-                  fecha_de_actualizacion: formatDateWithTime12Hour(row.fecha_actualizacion),
-                }
-              )
-            }} className="cursor-pointer"
-          />
           <IconTrash
             onClick={() => {
               deleteItem({

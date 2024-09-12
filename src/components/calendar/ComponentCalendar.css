@@ -19,7 +19,6 @@ table.rbc-agenda-table tbody tr:nth-child(odd) {
 }
 .rbc-header, .rbc-timeslot-group, .rbc-agenda-view table.rbc-agenda-table thead > tr > th{
     border-bottom: 1px solid rgb(0, 0, 0);
-
 }
 .rbc-time-header.rbc-overflowing{
     border-right: 1px solid rgb(0, 0, 0);
@@ -27,6 +26,7 @@ table.rbc-agenda-table tbody tr:nth-child(odd) {
 .rbc-day-bg.rbc-off-range-bg{
     background-color: rgb(var(--principal));
 }
+
 .rbc-today{
     background-color: rgba(96, 7, 197, 0.555);
 }
@@ -34,7 +34,15 @@ table.rbc-agenda-table tbody tr:nth-child(odd) {
     background-color: rgba(var(--secundario), 0.9);
     font-weight: bold;
     color: white;
+    padding: 20px 0px;
+    text-align: center;
 }
+div.rbc-header{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .rbc-btn-group button.rbc-active, .rbc-btn-group button.rbc-active:focus, .rbc-btn-group button:active{
     background-color: rgba(var(--secundario));
     font-weight: bold;
@@ -60,11 +68,12 @@ table.rbc-agenda-table tbody tr:nth-child(odd) {
     font-weight: bold;
 }
 .rbc-label.rbc-time-header-gutter{
-    width: 51px !important;
-}
+    width: 49px !important;
+} 
 .rbc-label{
     width: 100%;
-    font-weight: bold;
+    font-weight: 500;
+    padding: 0px 6px;
     text-align: center;
 }
 .rbc-date-cell.rbc-off-range button.rbc-button-link{
@@ -89,7 +98,6 @@ button.rbc-button-link:hover{
 }
 .rbc-time-content::-webkit-scrollbar-thumb, .rbc-agenda-view::-webkit-scrollbar-thumb {
   background-color: rgb(var(--secundario));
-  width: 2px;
   border-radius: 10px;
 }
 .rbc-event, .rbc-event.rbc-selected, .rbc-event .rbc-event-content div:not(.bg-new){
@@ -132,6 +140,9 @@ button.rbc-button-link:hover{
 .w-calendar{
     width: 100%;
     min-width: 700px;
+}
+.h-calendar{
+    height: 80vh;
 }
 @media (max-width: 1000px) {
     .rbc-toolbar{

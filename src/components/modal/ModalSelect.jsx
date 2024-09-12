@@ -3,6 +3,7 @@ import { searchCode, getListItems } from "../../utils/actions.jsx";
 import { ButtonSimple } from "../button/Button.jsx"
 import { totalItems } from "../table/Table.jsx"
 import { LoaderCircle } from "../loader/Loader.jsx"
+import { useForm } from "react-hook-form"
 import "./modal.css"
 import "../table/table.css"
 import ErrorSystem from "../errores/ErrorSystem.jsx"
@@ -13,8 +14,9 @@ function ModalSelect({ titulo, columns, object, saveSelect, state, select }) {
     const [estado, setEstado] = state
     const [dataTable, setDataTable] = useState({ pages: 0, total: 0 });
     const [dataList, setDataList] = useState([])
-    const [pages, setPages] = useState(1);
+    const [page, setPages] = useState(1);
     const [debounceTimeout, setDebounceTimeout] = useState(null);
+    const [debounceTimeoutPage, setDebounceTimeoutPage] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const renderizadoTable = useRef(0);
     const renderizado = useRef(0);
@@ -43,21 +45,28 @@ function ModalSelect({ titulo, columns, object, saveSelect, state, select }) {
             clearTimeout(debounceTimeout);
         }
         const timeout = setTimeout(() => {
-            searhFuntion(searchTerm)
+            searchFuntion(searchTerm)
         }, 900);
 
         setDebounceTimeout(timeout);
     }, [searchTerm])
 
-    const searhFuntion = (search) => {
+    const searchFuntion = (search, filtros = {}) => {
         searchCode({
             object: object,
             setLoading: setLoading,
             setData: setDataTable,
             value: search,
             setList: setDataList,
+            filtros: filtros
         })
     }
+
+    const paginar = (pagina) => {
+        const filtro = { page: pagina, }
+        searchFuntion(searchTerm, filtro)
+    };
+
     const selectOptions = (e) => {
         const ID = e.target.dataset.option ? Number(e.target.dataset.option) : Number(e.target.parentNode.dataset.option)
         const newOptions = [...listOptions]
@@ -75,15 +84,27 @@ function ModalSelect({ titulo, columns, object, saveSelect, state, select }) {
         setListOptions([])
         setEstado(false)
     }
-    
+
+    // *the useform
+    const {
+        register,
+        formState: { errors },
+        setValue,
+        watch,
+    } = useForm({
+        defaultValues: {
+            "page": 1
+        }
+    });
+
     return (
-        <ModalBase titulo={titulo} state={[estado, setEstado]} optionsSucces={["Agregar", AgregarOptions]} opcionsDelete={["Cerrar", ()=>{setListOptions([])}]} disabledTrue={Boolean(listOptions.length)? false : true}>
+        <ModalBase titulo={titulo} state={[estado, setEstado]} optionsSucces={["Agregar", AgregarOptions]} opcionsDelete={["Cerrar", () => { setListOptions([]) }]} disabledTrue={Boolean(listOptions.length) ? false : true}>
             <>
                 <div className='me-auto d-flex align-items-center w-100 w-md-50 mt-3 mt-md-0 mb-3'>
                     <ButtonSimple
                         type="button"
                         onClick={(e) => {
-                            searhFuntion(searchTerm)
+                            searchFuntion(searchTerm)
                         }}
                     >
                         Buscar
@@ -181,25 +202,66 @@ function ModalSelect({ titulo, columns, object, saveSelect, state, select }) {
                                             </tbody>
                                         </table>
                                     </div>
-                                    <div className='d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center w-100 mt-3'>
-                                        <p className='m-0 mb-3 mb-sm-0 fw-bold fs-6'>{`Mostrando ${totalItems(pages, dataList.length)} de ${dataTable.total}`}</p>
+                                    <div className='d-flex flex-column flex-sm-row justify-content-between align-items-center w-100 mt-3'>
+                                        <p className='m-0 mb-3 mb-sm-0 fw-bold fs-6'>{`Mostrando ${totalItems(page, dataList.length)} de ${dataTable.total}`}</p>
                                         <div className='d-flex justify-content-between align-items-center '>
                                             <ButtonSimple
                                                 type="button"
                                                 className="none-border-radius"
-                                                disabled={pages === 1 ? true : false}
+                                                disabled={page === 1 ? true : false}
                                                 onClick={(e) => {
-                                                    search.function(document.getElementById("table-search").value)
+                                                    const pagina = page - 1;
+                                                    setValue("page", pagina)
+                                                    setPages(pagina);
+                                                    paginar(pagina)
                                                 }}
                                             >
                                                 Anterior
                                             </ ButtonSimple>
-                                            <input className='mx-2 input-table page' max={dataTable.pages} min={1} type="number" defaultValue={pages} />
+                                            {/* <input className='mx-2 input-table page' max={dataTable.pages} min={1} type="number" defaultValue={page} /> */}
+                                            <input
+                                                className="mx-2 input-table page"
+                                                type="number"
+                                                {...register("page", {
+                                                    onChange: (e) => {
+                                                        if (debounceTimeoutPage) {
+                                                            clearTimeout(debounceTimeoutPage);
+                                                        }
+                                                        const timeout = setTimeout(() => {
+                                                            const value = Number(e.target.value)
+                                                            if (value < 0) {
+                                                                setValue("page", 1)
+                                                                setPages(1);
+                                                                paginar(1)
+                                                            } else if (value >= totalPages) {
+                                                                setValue("page", totalPages)
+                                                                setPages(totalPages);
+                                                                paginar(totalPages)
+                                                            } else {
+                                                                setValue("page", value)
+                                                                setPages(value);
+                                                                paginar(value)
+                                                            }
+                                                            setTimeout(() => {
+                                                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                                                            }, 100);
+                                                        }, 800);
+                                                        setDebounceTimeoutPage(timeout);
+                                                    },
+                                                    min: { value: 1 },
+                                                    max: { value: dataTable.pages }
+                                                })}
+                                            />
+
                                             <ButtonSimple
                                                 type="button"
                                                 className="none-border-radius"
-                                                disabled={dataTable.pages === pages || dataTable.pages === 0 ? true : false}
+                                                disabled={dataTable.pages === page || dataTable.pages === 0 ? true : false}
                                                 onClick={(e) => {
+                                                    const pagina = page + 1;
+                                                    setValue("page", pagina)
+                                                    setPages(pagina);
+                                                    paginar(pagina)
                                                     search.function(document.getElementById("table-search").value)
                                                 }}
                                             >

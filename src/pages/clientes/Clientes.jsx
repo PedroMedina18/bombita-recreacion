@@ -17,6 +17,7 @@ function Clientes() {
     const navigate = useNavigate()
 
     useEffect(() => {
+        document.title="Clientes - Bombita Recreación"
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             getClientes()
@@ -63,6 +64,7 @@ function Clientes() {
             name: "Opciones",
             row: (row) => {
               return <div className='d-flex justify-content-around options-table'>
+                <IconDetail onClick={() => { navigate(`/clientes/${row.id}/`) }} className="cursor-pointer" />
                 <IconEdit onClick={() => { navigate(`/edit/cliente/${row.id}/`) }} className="cursor-pointer" />
               </div>
             }
@@ -71,7 +73,7 @@ function Clientes() {
 
     const options = {
         search: {
-            placeholder: texts.registerMessage.searchClient,
+            placeholder: texts.registerMessage.searchNameDocument,
             function: (value, filtros={}) => {
                 searchCode({
                     value: value,

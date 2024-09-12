@@ -62,13 +62,19 @@ function FormAccount() {
                     body.servicios = saveDataServicios
                     body.sobrecargos = saveDataSobrecargos
                     alertLoading("Cargando")
-                    const res = await eventos.post(body)
-                    controlResultPost({
-                        respuesta: res,
-                        messageExito: texts.successMessage.registerEvento,
-                        useNavigate: { navigate: navigate, direction: "/inicio/" }
-                    })
-
+                    const respuesta = await eventos.post(body)
+                    if (respuesta.status = 200) {
+                        if (respuesta.data.status) {
+                            Swal.close()
+                            navigate(`/eventos/pagos/${respuesta.data.id}/`)
+                        } else {
+                            Swal.close()
+                            toastError(`${respuesta.data.message}`)
+                        }
+                    } else {
+                        Swal.close()
+                        toastError(`Error.${respuesta.status} ${respuesta.statusText}`)
+                    }
                 }
             } catch (error) {
                 console.log(error)
@@ -166,20 +172,20 @@ function FormAccount() {
                         }
 
                     </div>
-                    <div >
-                        <div className="d-flex justify-content-between mt-2">
-                            <p className="m-0 mb-1 fw-bold h5 w-100">Servicios</p>
-                            <p className="m-0 mb-1 fw-bold h5 w-100 text-center">{`${sumarPrecios(dataServicios, saveDataServicios)} $`}</p>
-                            <p className="m-0 mb-1 fw-bold h5 w-100 text-center">{`${(sumarPrecios(dataServicios, saveDataServicios) * dolar).toFixed(2)} BS.s`}</p>
+                    <div className="mt-3">
+                        <div className="d-flex justify-content-between mb-2">
+                            <p className="m-0 fw-bold h5 w-100">Servicios</p>
+                            <p className="m-0 fw-semibold h5 w-100 text-center">{`${sumarPrecios(dataServicios, saveDataServicios)} $`}</p>
+                            <p className="m-0 fw-semibold h5 w-100 text-center">{`${(sumarPrecios(dataServicios, saveDataServicios) * dolar).toFixed(2)} BS.s`}</p>
                         </div>
                         {
                             saveDataSobrecargos.length ?
                                 (
                                     <>
-                                        <div className="d-flex justify-content-between">
-                                            <p className="m-0 mb-1 fw-bold h5 w-100">Sobrecargos</p>
-                                            <p className="m-0 mb-1 fw-bold h5 w-100 text-center">{`${sumarPrecios(dataSobrecargos, saveDataSobrecargos)} $`}</p>
-                                            <p className="m-0 mb-1 fw-bold h5 w-100 text-center">{`${(sumarPrecios(dataSobrecargos, saveDataSobrecargos) * dolar).toFixed(2)} BS.s`}</p>
+                                        <div className="d-flex justify-content-between mb-2">
+                                            <p className="m-0 fw-bold h5 w-100">Sobrecargos</p>
+                                            <p className="m-0 fw-semibold h5 w-100 text-center">{`${sumarPrecios(dataSobrecargos, saveDataSobrecargos)} $`}</p>
+                                            <p className="m-0 fw-semibold h5 w-100 text-center">{`${(sumarPrecios(dataSobrecargos, saveDataSobrecargos) * dolar).toFixed(2)} BS.s`}</p>
                                         </div>
                                     </>
                                 )
@@ -187,10 +193,10 @@ function FormAccount() {
                                 ("")
                         }
 
-                        <div className="d-flex justify-content-between">
-                            <p className="m-0 fw-bold h3 w-100">Total</p>
-                            <p className="m-0 fw-bold h3 w-100 text-center">{`${sumarPrecios(dataServicios, saveDataServicios) + sumarPrecios(dataSobrecargos, saveDataSobrecargos)} $`}</p>
-                            <p className="m-0 fw-bold h3 w-100 text-center">{`${((sumarPrecios(dataServicios, saveDataServicios) + sumarPrecios(dataSobrecargos, saveDataSobrecargos)) * dolar).toFixed(2)} BS.s`}</p>
+                        <div className="d-flex justify-content-between mb-2">
+                            <p className="mb-0 fw-bold h3 w-100">Total</p>
+                            <p className="mb-0 fw-semibold h3 w-100 text-center">{`${sumarPrecios(dataServicios, saveDataServicios) + sumarPrecios(dataSobrecargos, saveDataSobrecargos)} $`}</p>
+                            <p className="mb-0 fw-semibold h3 w-100 text-center">{`${((sumarPrecios(dataServicios, saveDataServicios) + sumarPrecios(dataSobrecargos, saveDataSobrecargos)) * dolar).toFixed(2)} BS.s`}</p>
                         </div>
                     </div>
                 </div>

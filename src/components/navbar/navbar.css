@@ -1,5 +1,5 @@
 :root {
-    --width-sidebar: 95px;
+    --width-sidebar: 6rem;
 }
 
 .main {
@@ -91,7 +91,7 @@
 
 .toggle-btn svg,
 .barra-superior .user svg {
-    width: 45px;
+    width: 3rem;
     color: #fff;
 }
 
@@ -142,7 +142,7 @@
 
 a.sidebar-link,
 p.sidebar-link {
-    padding: 0.5rem 1rem;
+    padding: 6px 10px;
     color: #fff;
     display: block;
     font-size: 16px;
@@ -153,13 +153,14 @@ p.sidebar-link {
 }
 
 .sidebar-link svg {
-    width: 25px;
+    width: 1.5rem;
     margin-right: 0.75rem;
 }
 
 .sidebar-item {
     position: relative;
 }
+
 
 .sidebar:not(.expand) .sidebar-item .sidebar-dropdown {
     position: absolute;
@@ -175,11 +176,12 @@ p.sidebar-link {
 
 .sidebar:not(.expand) .sidebar-dropdown .sidebar-link {
     border-left: 3px solid rgb(var(--secundario));
+    padding: 8px 10px;
 }
 
 .sidebar:not(.expand) .sidebar-item:hover .has-dropdown+.sidebar-dropdown {
     display: block;
-    max-height: 15em;
+    max-height: 16em;
     width: var(--width-sidebar-dropdown);
     opacity: 1;
 }
@@ -189,10 +191,10 @@ p.sidebar-link {
     border-width: 0 0.15rem 0.15rem 0;
     content: "";
     display: inline-block;
-    padding: 2px;
+    padding: 3px;
     position: absolute;
     right: 1.5rem;
-    top: 1.4rem;
+    top: 18px;
     transform: rotate(-135deg);
     transition: all 0.2s ease-out;
 }
@@ -227,19 +229,10 @@ p.sidebar-link:hover,
         transform: translateX(100%);
     }
 
-    .main {
-        padding: 106px 26px 26px calc(var(--width-sidebar) + 26px);
-    }
-
     .expand-main {
         padding: 106px 26px 26px calc(var(--width-sidebar) + 106px);
     }
-}
-
-@media (max-width: 576px) {
-    .expand.sidebar::before {
-        transform: translateX(100%);
-    }
+    
     .sidebar{
         --width-sidebar:0px;
     }
@@ -252,4 +245,11 @@ p.sidebar-link:hover,
         --width-sidebar:0px;
         padding: 106px 16px 26px calc(var(--width-sidebar) + 16px);
     }
+}
+
+@media (max-width: 576px) {
+    .expand.sidebar::before {
+        transform: translateX(100%);
+    }
+    
 }

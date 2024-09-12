@@ -6,16 +6,23 @@ import { Toaster } from "sonner";
 import { Link } from 'react-router-dom';
 import Navbar from '../../components/navbar/Navbar.jsx';
 import Swal from 'sweetalert2';
+import { useEffect } from "react";
+import { useAuthContext } from '../../context/AuthContext';
 
 function Configuracion() {
-    const ejecutarRespaldo=async()=>{
-        try{
+    const { getPermisos } = useAuthContext();
+    useEffect(() => {
+        document.title = "Configuración - Bombita Recreación"
+    }, [])
+
+    const ejecutarRespaldo = async () => {
+        try {
             alertLoading("Cargado...")
-            const respuesta=await respaldo.get()
-            if(controlErrors({respuesta:respuesta, constrolError:toastError})) {Swal.close(); return}
+            const respuesta = await respaldo.get()
+            if (controlErrors({ respuesta: respuesta, constrolError: toastError })) { Swal.close(); return }
             Swal.close()
-            alertAceptar("Exito","Respaldo Completado")
-        }catch (erorr){
+            alertAceptar("Exito", "Respaldo Completado")
+        } catch (erorr) {
             Swal.close()
             toastError(erorr)
         }
@@ -25,30 +32,45 @@ function Configuracion() {
             <div className='div-main px-3 px-md-4 px-lg-5 py-3'>
                 <h2 className='mb-4 fw-bold'>Lista de Opciones</h2>
                 <ul className="list-group w-100 list-group-flush">
-                    <li className='list-group-item p-0 d-flex border-top'>
-                        <Link to="/dolar/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig/></span>Dolar</Link>
+                    {
+                        (getPermisos().administrador || [5, 12, 14, 6,].some(id => getPermisos().permisos.includes(id))) &&
+                        <li className='list-group-item p-0 d-flex border-top'>
+                            <Link to="/dolar/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig className="me-2" /></span>Dolar</Link>
+                        </li>
+                    }
+                    {
+                        (getPermisos().administrador || getPermisos().permisos.includes(1)) &&
+                        <li className='list-group-item p-0 d-flex'>
+                            <Link to="/cargos/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig className="me-2" /></span>Cargos</Link>
+                        </li>
+                    }
+
+                    <li className='list-group-item p-0 d-flex'>
+                        <Link to="/tipo_documentos/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig className="me-2" /></span>Tipo Documento</Link>
                     </li>
                     <li className='list-group-item p-0 d-flex'>
-                        <Link to="/cargos/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig/></span>Cargos</Link>
-                    </li>
-                    <li className='list-group-item p-0 d-flex'>
-                        <Link to="/tipo_documentos/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig/></span>Tipo Documento</Link>
-                    </li>
-                    <li className='list-group-item p-0 d-flex'>
-                        <Link to="/generos/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig/></span>Generos</Link>
+                        <Link to="/generos/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig className="me-2" /></span>Generos</Link>
                     </li>
                     <li className='list-group-item p-0 d-flex border-bottom'>
-                        <Link to="/metodos_pago/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig/></span>Metodos de Pago</Link>
+                        <Link to="/metodos_pago/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig className="me-2" /></span>Metodos de Pago</Link>
                     </li>
-                    <li className='list-group-item p-0 d-flex'>
-                        <Link to="/preguntas/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig/></span>Preguntas</Link>
-                    </li>
-                    <li className='list-group-item p-0 d-flex border-bottom'>
-                        <button  onClick={()=>{ejecutarRespaldo()}} className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary border border-0 text-start "><span><IconConfig/></span>Respaldo</button>
-                    </li>
+                    {
+                        (getPermisos().administrador || [11, 14].some(id => getPermisos().permisos.includes(id))) &&
+                        <li className='list-group-item p-0 d-flex'>
+                            <Link to="/preguntas/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig className="me-2" /></span>Preguntas</Link>
+                        </li>
+                    }
+
+                    {
+                        (getPermisos().administrador || getPermisos().permisos.includes(3)) &&
+                        <li className='list-group-item p-0 d-flex border-bottom'>
+                            <button onClick={() => { ejecutarRespaldo() }} className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary border border-0 text-start "><span><IconConfig className="me-2" /></span>Respaldo</button>
+                        </li>
+                    }
+
                 </ul>
             </div>
-            <Toaster/>
+            <Toaster />
         </Navbar>
     )
 }

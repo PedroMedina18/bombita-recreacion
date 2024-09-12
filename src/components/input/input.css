@@ -15,28 +15,27 @@
   background: #fff;
   border: 1px solid rgb(22, 21, 21);
   border-radius: 2px;
-  height: 35px;
   line-height: 40px;
-  padding: 0 40px 0 10px;
+  padding: 5px 40px 5px 10px;
   transition: 0.3s ease all;
 }
 
 .formulario-input[disabled],
 .formulario-textarea[disabled],
 .formulario-input-date[disabled]{
-  background: rgb(214, 214, 214);
+  background: rgba(214, 214, 214, 0.507);
 }
-
 .text-right{
   text-align: right;
 }
 
 .formulario-input-date {
-  padding: 0 10px 0 10px;
+  padding: 5px 10px 5px 10px;
+  line-height: 25px;
 }
 
 .formulario-input.select {
-  padding: 0 50px 0 10px;
+  padding: 5px 50px 5px 10px;
 }
 
 .formulario-textarea {
@@ -168,7 +167,10 @@
 .container-icon-file svg{
   width: 50px;
 }
-
+label.button-initial[disabled] {
+  pointer-events: all;
+  cursor: no-drop;
+}
 
 /* -------------------------------------------TOGLE SWICHES------------ */
 /* The switch - the box around the slider */

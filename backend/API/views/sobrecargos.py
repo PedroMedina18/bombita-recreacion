@@ -4,12 +4,12 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.db import IntegrityError, connection, models
-from ..funtions.indice import indiceFinal, indiceInicial
-from ..funtions.serializador import dictfetchall
+from ..utils.indice import indiceFinal, indiceInicial
+from ..utils.serializador import dictfetchall
 from ..models import Sobrecargos
-from ..funtions.filtros import order, filtrosWhere
-from ..funtions.identificador import determinar_valor
-from ..funtions.token import verify_token
+from ..utils.filtros import order, filtrosWhere
+from ..utils.identificador import determinar_valor, edit_str
+from ..utils.token import verify_token
 from ..message import MESSAGE
 import json
 
@@ -30,6 +30,12 @@ class Sobrecargos_Views(View):
                     'message': verify['message'],
                 }
                 return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 5 in verify['info']['permisos'])):
+                    datos = {
+                        'status': False,
+                        'message': MESSAGE['NonePermisos'],
+                    }
+                    return JsonResponse(datos)
             Sobrecargos.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'], monto=req['monto'])
             datos = {
                 'status': True,
@@ -70,6 +76,12 @@ class Sobrecargos_Views(View):
                 datos = {
                     'status': False,
                     'message': verify['message'],
+                }
+                return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 5 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
                 }
                 return JsonResponse(datos)
             sobrecargo = list(Sobrecargos.objects.filter(id = id).values())
@@ -123,6 +135,12 @@ class Sobrecargos_Views(View):
                     'message': verify['message']
                 }
                 return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 5 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
             sobrecargo = list(Sobrecargos.objects.filter(id = id).values())
             if len(sobrecargo) > 0:
                 Sobrecargos.objects.filter(id = id).delete()
@@ -163,6 +181,12 @@ class Sobrecargos_Views(View):
                 }
                 return JsonResponse(datos)
             if (id > 0):
+                if(not (bool(verify['info']['administrador']) or 5 in verify['info']['permisos'])):
+                    datos = {
+                        'status': False,
+                        'message': MESSAGE['NonePermisos'],
+                    }
+                    return JsonResponse(datos)
                 query = """
                 SELECT * FROM sobrecargos WHERE sobrecargos.id=%s;
                 """
@@ -200,6 +224,9 @@ class Sobrecargos_Views(View):
                 search = determinar_valor(search)
                 if(search['valor'] and search['type']=="int"):
                     where.append(f"id LIKE '{search['valor']}%%'" )
+                elif(search['valor'] and search['type']=="str"):
+                    str_validate = edit_str(search["valor"])
+                    where.append(f"nombre LIKE '{str_validate}'" )
                 where = filtrosWhere(where)
 
                 if(all == "true"):

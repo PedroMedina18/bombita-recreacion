@@ -4,12 +4,12 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.db import IntegrityError, connection, models
-from ..funtions.indice import indiceFinal, indiceInicial
-from ..funtions.serializador import dictfetchall
-from ..funtions.filtros import order, filtrosWhere
-from ..funtions.token import verify_token
+from ..utils.indice import indiceFinal, indiceInicial
+from ..utils.serializador import dictfetchall
+from ..utils.filtros import order, filtrosWhere
+from ..utils.token import verify_token
 from ..models import TipoDocumento
-from ..funtions.identificador import determinar_valor
+from ..utils.identificador import determinar_valor
 from ..message import MESSAGE
 import json
 
@@ -28,6 +28,13 @@ class Tipos_Documentos_Views(View):
                 datos = {
                     'status': False,
                     'message': verify['message'],
+                }
+                return JsonResponse(datos)
+
+            if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
                 }
                 return JsonResponse(datos)
             TipoDocumento.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'])
@@ -70,6 +77,12 @@ class Tipos_Documentos_Views(View):
                 datos = {
                     'status': False,
                     'message': verify['message']
+                }
+                return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
                 }
                 return JsonResponse(datos)
             tipo_documento = list(TipoDocumento.objects.filter(id=id).values())
@@ -122,6 +135,12 @@ class Tipos_Documentos_Views(View):
                     'message': verify['message']
                 }
                 return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
             tipo_documento = list(TipoDocumento.objects.filter(id=id).values())
             if len(tipo_documento) > 0:
                 TipoDocumento.objects.filter(id=id).delete()
@@ -162,6 +181,12 @@ class Tipos_Documentos_Views(View):
                 }
                 return JsonResponse(datos)
             if (id > 0):
+                if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'])):
+                    datos = {
+                        'status': False,
+                        'message': MESSAGE['NonePermisos'],
+                    }
+                    return JsonResponse(datos)
                 query = """
                 SELECT * FROM tipos_documentos WHERE tipos_documentos.id=%s;
                 """

@@ -3,7 +3,8 @@ import { materiales } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx";
-import { IconTrash, IconEdit, IconDetail } from "../../components/Icon.jsx";
+import { formatDateWithTime12Hour } from "../../utils/process.jsx";
+import { IconTrash, IconEdit, IconDetail, IconList,  } from "../../components/Icon.jsx";
 import { formatoId } from "../../utils/process.jsx";
 import { alertInfo } from "../../components/alerts.jsx";
 import Navbar from "../../components/navbar/Navbar";
@@ -18,6 +19,7 @@ function Materiales() {
     const navigate = useNavigate()
 
     useEffect(() => {
+        document.title = "Materiales - Bombita Recreación"
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             getMateriales()
@@ -31,14 +33,14 @@ function Materiales() {
             setList: setMateriales,
             setData: setDataMateriales,
             setLoading: setTableLoaing,
-            
+
         })
     }
 
     const columns = [
         {
             name: "Código",
-            row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
+            row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
         },
         {
             name: "Nombre",
@@ -56,13 +58,26 @@ function Materiales() {
             name: "Opciones",
             row: (row) => {
                 return <div className='d-flex justify-content-around options-table'>
+                    <IconList
+                        onClick={() => {
+                            navigate(`/inventario/${row.id}/`)
+                        }}
+                        className="cursor-pointer"
+                    />
                     <IconDetail
                         onClick={() => {
                             alertInfo(
-                                row.nombre, 
-                                row
-                              )
-                        }} className="cursor-pointer"
+                                row.nombre,
+                                {
+                                    codigo: formatoId(row.id),
+                                    descripción: row.descripcion,
+                                    total: row.total,
+                                    fecha_de_registro: formatDateWithTime12Hour(row.fecha_registro),
+                                    fecha_de_actualizacion: formatDateWithTime12Hour(row.fecha_actualizacion),
+                                }
+                            )
+                        }}
+                        className="cursor-pointer"
                     />
                     <IconTrash
                         onClick={() => {
@@ -100,10 +115,9 @@ function Materiales() {
             }
         }
     }
-    
+
     return (
         <Navbar name={texts.pages.getMateriales.name} descripcion={texts.pages.getMateriales.description} dollar={false}>
-
             <Table
                 columns={columns}
                 rows={listMateriales}
@@ -111,6 +125,11 @@ function Materiales() {
                 totalPages={dataMateriales.pages}
                 options={options}
                 loading={tableLoading}
+                order={true}
+                organizar={[
+                    { label: "Codigo", value: "orig" },
+                    { label: "Nombre", value: "alf" },
+                ]}
             />
             <Toaster />
         </Navbar>

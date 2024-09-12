@@ -29,7 +29,10 @@ function FormNiveles() {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             if (params.id) {
+                document.title = "Registro de Niveles - Bombita Recreación"
                 get_nivel()
+            }else{
+                document.title = "Edición de Niveles - Bombita Recreación"
             }
             setLoading(false)
             return
@@ -127,8 +130,8 @@ function FormNiveles() {
                                                 message: texts.inputsMessage.max100
                                             },
                                             minLength: {
-                                                value: 5,
-                                                message: texts.inputsMessage.min5
+                                                value: 3,
+                                                message: texts.inputsMessage.min3,
                                             },
                                             pattern: {
                                                 value: pattern.textWithNumber,

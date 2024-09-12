@@ -1,7 +1,7 @@
 import { servicios } from "../utils/API"
 
 const texts={
-
+    
     inputsMessage:{
         confirmPassword:"Por favor confirmar la contraseña",
         errorPassword:"Las contraseña no coinciden",
@@ -13,10 +13,13 @@ const texts={
         max20:"Máximo 20 caracteres",
         max16:"Máximo 16 caracteres",
         max10:"Máximo 10 caracteres",
+        max9:"Máximo 9 caracteres",
         min8:"Minimo 8 caracteres",
         min7:"Minimo 7 caracteres",
+        min10:"Minimo 10 caracteres",
         min5:"Minimo 5 caracteres",
         min4:"Minimo 4 caracteres",
+        min3:"Minimo 3 caracteres",
         min0:"Minimo 0",
         min1:"Minimo 1",
         minRecreador:"Minimo un recreador",
@@ -26,6 +29,8 @@ const texts={
         step1:"Solo números enteros",
         requireName:"Se requiere un nombre",
         requireNames:"Se requiere los nombres",
+        requireDescripcion:"Se requiere una descripción",
+        selectRegistro:"Seleccione el tipo de Registro",
         requirePregunta:"Pregunta Requeridad",
         requireLastName:"Se requiere los apellidos",
         requiredOpinion:"Se requiere una Opinión",
@@ -41,7 +46,7 @@ const texts={
         requireDocumento:"Se requiere el numero de recreadores",
         requiredDireccion:"Se requiere una dirección",
         requirePrecio:"Se requiere el precio",
-        requireCantidadMaterial:"Se requiere la cantidad de material a utilizar",
+        requireCantidadMaterial:"Se requiere la cantidad de material",
         selectRecreadores:"Seleccione los recreadores",
         selectActividades:"Seleccione las actividades a realizar",
         selectCargo:"Seleccione un cargo",
@@ -53,18 +58,20 @@ const texts={
         selectValor:"Seleccione un valor",
         selectCliente:"Seleccione un cliente o cree uno nuevo",
         selectTipoDocumento:"Seleccione un tipo de documento",
-        selectGenero:"Seleccione el genero",
+        selectGenero:"Seleccione el género",
         invalidUser:"Usuario invalido",
+        invalidCantidad:"Cantidad invalida",
         invalidName:"Nombre invalido",
         invalidEmail:"Correo Electronico invalido",
-        invalidPassword:"Usuario invalido",
+        invalidPassword:"Contraseña invalido",
         invalidNombres:"Nombres invalidos",
         invalidLastNames:"Apellidos invalidos",
         invalidMonto:"Monto invalido",
         invalidDocument:"Número de Documento Invalido",
         invalidTel:"Teléfono Invalido",
         noneSpace:"Sin espacios al inicio o al final",
-        onlyCharacter11:"Solo se admiten 11 caracteres",
+        cantidadNegativa:"Cantidad Negativa",
+        onlyCharacter11:"Son 11 caracteres",
         fechaMenor:'Fecha inválida debe ser mayor'
     },
 
@@ -77,13 +84,14 @@ const texts={
         registerActividad:"Actividad Registrado",
         registerRecreador:"Recreador Registrado",
         registerServicio:"Servicio Registrado",
-        registerGenero:"Genero Registrado",
+        registerGenero:"Género Registrado",
         registerSobrecargo:"Sobrecargo Registrado",
         registerEvento:"Evento Registrado",
         registerMetodoPago:"Metodo de Pago Registrado",
         registerEventoRecreadores:"Recreadores Asignados",
         registerPago:"Pago Registrado",
         registerPregunta:"Pregunta Registrado",
+        registerRegistroMaterial:"Registro de Inventario Completo",
         // -----------------------------------------------------------
         editionUsuario:"Usuario Editado",
         editionNivel:"Nivel Editado",
@@ -94,14 +102,17 @@ const texts={
         editionActividad:"Actividad Editado",
         editionRecreador:"Recreador Editado",
         editionServicio:"Servicio Editado",
-        editionGenero:"Genero Editado",
+        editContraseña:"Contraseña Editada",
+        editionGenero:"Género Editado",
         editionSobrecargo:"Sobrecargo Editado",
         editionMetodoPago:"Metodo de Pago Editado",
         editionEventoRecreadores:"Recreadores Actualizados",
         editionPregunta:"Pregunta Actualizados",
         // -+------------------
         eventoCancelado:"Evento Cancelado",
-        eventoCompletado:"Evento Completado"
+        eventoCompletado:"Evento Completado",
+        userDisabled: "Usuario Desabilitado",
+        recreadorDisabled: "Recreador Desabilitado",
     },
 
     confirmMessage:{
@@ -120,17 +131,21 @@ const texts={
 
     errorMessage:{
         errorDelete:`Error de Sistema al eliminar. Intente mas tarde`,
+        errorCargoProtect:`Error Cargo de Administrador Protejido`,
         errorObjet:`Error información no encontrada.`,
         errorSystem:`Error de Sistema. Por favor intente mas tarde`,
         errorConexion:"Error de conexion. Por favor intente mas tarde",
         errorRequest:"No se ha obtenido una respuesta. Por favor vuelva a intentar",
         errorResponse:"Error de consulta",
-        errorResponseCago:"Error. No se pudo buscar el cargo, comuniquese con el administrador",
+        errorResponseCargo:"Error. No se pudo buscar el cargo, comuniquese con el administrador",
         errorMonto:"El monto presentado supera el monto a cancelar",
         errorNotPago:"No se a añadido ninguna forma de pago",
         errorNotTotal:"No se a compleato el monto a cancelar",
         errorRecreadoresRepeat:"Recreadores Duplicados",
         errorRecreadoresFaltantes:"Asigne todos los recreadores faltantes",
+        errorUsuarioProtect:"Usuario Protejido",
+        errorUsuarioActual:"Usuario Actualmente en uso",
+        errorUserPasswor:"Este usuario es Administrador no se puede cambiar la contraseña"
     },
 
     label:{
@@ -140,7 +155,7 @@ const texts={
         nombre:"Nombre",
         materiales:"Materiales",
         fotoRecreador:"Foto del Recreador",
-        duracion:"Duracion",
+        duracion:"Duración",
         precio:"Precio",
         cargo:"Cargo",
         nivel:"Nivel",
@@ -155,7 +170,7 @@ const texts={
         birthDate:"Fecha de Nacimiento",
         password2:"Repita la Contraseña",
         tipoDocuemnto:"Tipo de Documento",
-        genero:"Genero",
+        genero:"Género",
         cantidadTotal:"Cantidad Total",
         dataPersonaCheck:"Datos de la persona ya registrados en el sistema",
         clienteCheck:"Nuevo Cliente",
@@ -191,7 +206,7 @@ const texts={
         numeroPersonas:"Numero aproximado de asistentes al evento",
         nameActividad:"Nombre de la Actividad",
         nameCargo:"Nombre del Cargo",
-        nameGenero:"Nombre del Genero",
+        nameGenero:"Nombre del Género",
         nameMetodoPago:"Nombre del Metodo de Pago",
         nameMaterial:"Nombre del Material",
         nameNivel:"Nombre de la Nivel",
@@ -211,47 +226,47 @@ const texts={
         },
         registerUsuario:{
             name:"Registrar un nuevo Usuario",
-            description:"Intruduzca los datos para agregar un nuevo usuario al sistema"
+            description:"Introduzca los datos para agregar un nuevo usuario al sistema"
         },
         registerTipoDocumento:{
             name:"Registrar un nuevo Tipo de Documento",
-            description:"Intruduzca los datos para agregar un nuevo tipo de documento"
+            description:"Introduzca los datos para agregar un nuevo tipo de documento"
         },
         registerGenero:{
-            name:"Registrar un nuevo Genero",
-            description:"Intruduzca los datos para agregar un nuevo genero"
+            name:"Registrar un nuevo Género",
+            description:"Introduzca los datos para agregar un nuevo género"
         },
         registerMaterial:{
             name:"Registrar un nuevo Material",
-            description:"Intruduzca los datos para agregar un nuevo material"
+            description:"Introduzca los datos para agregar un nuevo material"
         },
         registerCargos:{
             name:"Registrar un nuevo Cargo",
-            description:"Intruduzca los datos para agregar un nuevo cargo"
+            description:"Introduzca los datos para agregar un nuevo cargo"
         },
         registerNiveles:{
             name:"Registrar un nuevo Nivel",
-            description:"Intruduzca los datos para agregar un nuevo nivel"
+            description:"Introduzca los datos para agregar un nuevo nivel"
         },
         registerActividades:{
             name:"Registrar una Actividad",
-            description:"Intruduzca los datos para agregar una nueva Actividad"
+            description:"Introduzca los datos para agregar una nueva Actividad"
         },
         registerSobrecargos:{
             name:"Registrar un Sobrecargo",
-            description:"Intruduzca los datos para agregar un nuevo Sobrecargo"
+            description:"Introduzca los datos para agregar un nuevo Sobrecargo"
         },
         registerEventos:{
             name:"Registrar un Evento",
-            description:"Intruduzca los datos para agregar un nuevo Evento"
+            description:"Introduzca los datos para agregar un nuevo Evento"
         },
         registerRecreadores:{
             name:"Registrar un Nuevo Recreador",
-            description:"Intruduzca los datos para agregar un nuevo recreador al sistema"
+            description:"Introduzca los datos para agregar un nuevo recreador al sistema"
         },
         registerMetodoPago:{
             name:"Registrar un Nuevo Metodo de Pago",
-            description:"Intruduzca los datos para agregar un nuevo metodo de pago al sistema"
+            description:"Introduzca los datos para agregar un nuevo metodo de pago al sistema"
         },
         registerPregunta:{
             name:"Registrar una Nueva Pregunta",
@@ -259,7 +274,7 @@ const texts={
         },
         editRecreador:{
             name:"Editar un Recreador",
-            description:"Intruduzca los datos para editar un recreador en el sistema"
+            description:"Introduzca los datos para editar un recreador en el sistema"
         },
         editPregunta:{
             name:"Editar una Pregunta",
@@ -267,47 +282,47 @@ const texts={
         },
         editUsuario:{
             name:"Editar un nuevo Usuario",
-            description:"Intruduzca los datos para editar un usuario en el sistema"
+            description:"Introduzca los datos para editar un usuario en el sistema"
         },
         editActividad:{
             name:"Editar una Actividad",
-            description:"Intruduzca los datos para editar una Actividad"
+            description:"Introduzca los datos para editar una Actividad"
         },
         editMetodoPago:{
             name:"Editar un Metodo de Pago",
-            description:"Intruduzca los datos para editar un Metodo de Pago"
+            description:"Introduzca los datos para editar un Metodo de Pago"
         },
         editCargo:{
             name:"Editar un Cargo",
-            description:"Intruduzca los datos para editar un cargo"
+            description:"Introduzca los datos para editar un cargo"
         },
         editNivel:{
             name:"Editar un  Nivel",
-            description:"Intruduzca los datos para editar un nivel"
+            description:"Introduzca los datos para editar un nivel"
         },
         editSobrecargo:{
             name:"Editar un Sobrecargo",
-            description:"Intruduzca los datos para editar un sobrecargo"
+            description:"Introduzca los datos para editar un sobrecargo"
         },
         editMaterial:{
             name:"Editar un Material",
-            description:"Intruduzca los datos para editar un material"
+            description:"Introduzca los datos para editar un material"
         },
         editTipoDocumento:{
             name:"Editar un Tipo de Documento",
-            description:"Intruduzca los datos para editar un tipo de documento"
+            description:"Introduzca los datos para editar un tipo de documento"
         },
         editServicio:{
             name:"Editar un  Servicio",
-            description:"Intruduzca los datos para editar un nuevo servicio"
+            description:"Introduzca los datos para editar un nuevo servicio"
         },
         editGenero:{
-            name:"Editar un Genero",
-            description:"Intruduzca los datos para editar un genero"
+            name:"Editar un Género",
+            description:"Introduzca los datos para editar un género"
         },
         editCliente:{
             name:"Editar un Cliente",
-            description:"Intruduzca los datos para editar un cliente"
+            description:"Introduzca los datos para editar un cliente"
         },
         getTipoDocumentos:{
             name:"Lista de Tipos de Documentos",
@@ -319,11 +334,11 @@ const texts={
         },
         getPreguntas:{
             name:"Lista de Preguntas",
-            description:"Verifique los Preguntas agregados"
+            description:"Verifique las Preguntas agregadas"
         },
         getGeneros:{
-            name:"Lista de Generos",
-            description:"Verifique los Generos agregados"
+            name:"Lista de Géneros",
+            description:"Verifique los Géneros agregados"
         },
         getEventos:{
             name:"Lista de Eventos",
@@ -343,11 +358,15 @@ const texts={
         },
         getCargos:{
             name:"Lista de Cargos",
-            description:"Verifique los cargos agregados"
+            description:"Verifique los Cargos agregados"
         },
         getActividades:{
             name:"Lista de Actividades",
-            description:"Verifique los Actividades agregados"
+            description:"Verifique las Actividades agregados"
+        },
+        getInventario:{
+            name:"Registros de Inventario",
+            description:"Verifique los registros de inventario del material"
         },
         getRecreadores:{
             name:"Lista de Recreadores",
@@ -355,15 +374,15 @@ const texts={
         },
         getServicios:{
             name:"Lista de Servicios",
-            description:"Verifique los servicios agregados"
+            description:"Verifique los Servicios agregados"
         },
         getMetodosPago:{
             name:"Lista de los metodos de pago",
-            description:"Verifique los metodos de pagos agregados"
+            description:"Verifique los Metodos de Pagos agregados"
         },
         getUsuarios:{
             name:"Lista de Usuario",
-            description:"Verifique los usuarios agregados"
+            description:"Verifique los Usuarios agregados"
         },
         getDolar:{
             name:"Lista de Precios del Dolar BCV",
@@ -371,11 +390,11 @@ const texts={
         },
         recreador:{
             name:"Información del Recreador",
-            description:"Toda la información del recreador"
+            description:"Toda la información del Recreador"
         },
         cargo:{
             name:"Información del Cargo",
-            description:"Toda la información del cargo"
+            description:"Toda la información del Cargo"
         },
         pagos:{
             name:"Registrar Pagos de Eventos",
@@ -383,6 +402,14 @@ const texts={
         evento:{
             name:"Informacion del Evento",
             description:"Toda la información del evento"
+        },
+        cliente:{
+            name:"Informacion del Cliente",
+            description:"Toda la información del cliente"
+        },
+        servicio:{
+            name:"Informacion del Servicio",
+            description:"Toda la información del servicio"
         },
         recreadores_eventos:{
             name:"Recreadores del Evento",
@@ -403,13 +430,13 @@ const texts={
     },
 
     registerMessage:{
-        searchItem:"Buscar por codigo",
-        searchUser:"Buscar por codigo o usuario",
-        searchClient:"Buscar por codigo o nombre",
-        searchClientEvent:"Buscar por codigo o cliente",
+        searchItem:"Buscar por código",
+        searchUser:"Buscar por código o usuario",
+        searchClient:"Buscar por código o nombre",
+        searchClientEvent:"Buscar por código o cliente",
         searchNameDocument:"Buscar por número de documento o nombre",
         buttonRegisterTipoDocumento:"Agregar un nuevo Tipo de Documento",
-        buttonRegisterGenero:"Agregar un nuevo Genero",
+        buttonRegisterGenero:"Agregar un nuevo Género",
         buttonRegisterNivel:"Agregar un nuevo Nivel",
         buttonRegisterMaterial:"Agregar un nuevo Material",
         buttonRegisterCargo:"Agregar un nuevo Cargo",
@@ -423,6 +450,7 @@ const texts={
         buttonRegisterEventosuccessMessage:"Agregar un nuevo Evento",
         buttonRegisterUser:"Agregar un nuevo Usuario",
         buttonInactividad:"Extender sesión",
+        buttonRegisterInventario:"Actualizar Inventario de Material"
     }
 }
 

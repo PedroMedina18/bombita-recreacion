@@ -4,12 +4,12 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError, connection, models
 from django.views import View
-from ..funtions.indice import indiceFinal, indiceInicial
-from ..funtions.serializador import dictfetchall
-from ..funtions.time import duration
-from ..funtions.identificador import determinar_valor, edit_str, normalize_id_list
+from ..utils.indice import indiceFinal, indiceInicial
+from ..utils.serializador import dictfetchall
+from ..utils.time import duration
+from ..utils.identificador import determinar_valor, edit_str, normalize_id_list
 from ..models import Eventos, Servicios, EventosRecreadoresServicios, Recreadores
-from ..funtions.token import verify_token
+from ..utils.token import verify_token
 from ..message import MESSAGE
 from decouple import config
 import datetime
@@ -27,6 +27,13 @@ class Eventos_Recreadores_Servicios_View(View):
             direccion=config('URL')
             if not verify['status']:
                 datos = {'status': False, 'message': verify['message'], 'data': None}
+                return JsonResponse(datos)
+
+            if(not (bool(verify['info']['administrador']) or 12 in verify['info']['permisos'] or 7 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
                 return JsonResponse(datos)
 
             evento = list(Eventos.objects.filter(id=id).values())
@@ -114,11 +121,32 @@ class Eventos_Recreadores_Servicios_View(View):
                 }
                 return JsonResponse(datos)
 
+            if(not (bool(verify['info']['administrador']) or 12 in verify['info']['permisos'] or 7 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
+
             evento = list(Eventos.objects.filter(id = int(req["evento"])).values())
             if len(evento) > 0:
                 evento = Eventos.objects.get(id = int(req["evento"]))
             else:
                 datos = {'status': False, 'message': MESSAGE['errorEvento']}
+                return JsonResponse(datos)
+            
+            if evento.estado == False:
+                datos = {
+                    'status': False,
+                    'message':  MESSAGE["errorEventoCancelado"],
+                }
+                return JsonResponse(datos)
+            
+            if evento.estado == False:
+                datos = {
+                    'status': False,
+                    'message':  MESSAGE["errorEventoCancelado"],
+                }
                 return JsonResponse(datos)
 
             if evento.fecha_evento_inicio < fecha_actual:
@@ -156,6 +184,7 @@ class Eventos_Recreadores_Servicios_View(View):
                 if(totalRecreadores[f"{servicio.id}"] < servicio.numero_recreadores):
                     recreadorGet = Recreadores.objects.get(id=recreador["id"])
                     EventosRecreadoresServicios.objects.create(evento = evento, recreador = recreadorGet, servicio = servicio)
+            
             evento.recreadores_asignados=True
             evento.save()
             datos = {
@@ -189,11 +218,24 @@ class Eventos_Recreadores_Servicios_View(View):
                 }
                 return JsonResponse(datos)
 
+            if(not (bool(verify['info']['administrador']) or 12 in verify['info']['permisos'] or 7 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
+
             evento = list(Eventos.objects.filter(id = id).values())
             if len(evento) > 0:
                 evento = Eventos.objects.get(id = id)
             else:
                 datos = {'status': False, 'message': MESSAGE['errorEvento']}
+                return JsonResponse(datos)
+            if evento.estado == False:
+                datos = {
+                    'status': False,
+                    'message':  MESSAGE["errorEventoCancelado"],
+                }
                 return JsonResponse(datos)
             if evento.fecha_evento_inicio < fecha_actual:
                 datos = {'status': False, 'message': MESSAGE['errorEventoFecha']}

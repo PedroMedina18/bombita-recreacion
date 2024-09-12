@@ -3,16 +3,18 @@ import { ButtonSimple } from "../../components/button/Button";
 import { useNavigate, useParams } from 'react-router-dom';
 import { recreadores } from "../../utils/API.jsx";
 import { LoaderCircle } from "../../components/loader/Loader";
-import { verifyOptionsSelect, controlResultPost, controlErrors } from "../../utils/actions.jsx";
+import { controlErrors } from "../../utils/actions.jsx";
 import { formatoId } from "../../utils/process.jsx";
-import Pildora from "../../components/Pildora.jsx"
 import { Toaster } from "sonner";
+import { IconRowLeft, IconUserCircleSolid } from "../../components/Icon.jsx";
+import Pildora from "../../components/Pildora.jsx"
+import {RadioStart} from "../../components/input/Inputs.jsx"
 import ErrorSystem from "../../components/errores/ErrorSystem";
 import Navbar from "../../components/navbar/Navbar";
 import texts from "../../context/text_es.js";
-import { IconRowLeft, IconUserCircleSolid, IconCheck, IconX } from "../../components/Icon.jsx";
 import ComponentCalendarRecreador from "../../components/calendar/ComponentCalendarRecreador.jsx"
 import "../../components/input/input.css"
+
 function Recreador() {
   const [errorServer, setErrorServer] = useState("");
   const [data, setData] = useState(null);
@@ -22,6 +24,7 @@ function Recreador() {
   const params = useParams();
 
   useEffect(() => {
+    document.title="Recreador - Bombita Recreación"
     if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1
       get_data()
@@ -39,7 +42,6 @@ function Recreador() {
       setData(recreador.data.data)
 
     } catch (error) {
-      console.log(error)
       setErrorServer(texts.errorMessage.errorSystem)
       setData(null)
     } finally {
@@ -68,9 +70,10 @@ function Recreador() {
             :
             (
               <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
-                <h3 className="h2 fw-bold">{`${data.nombres} ${data.apellidos}`}</h3>
+                <h3 className="h2 fw-bold">{`Recreador N° ${formatoId(data.id)}`}</h3>
                 <div className="w-100 d-flex flex-column flex-md-row mt-3">
                   <div className="w-100 w-md-40 d-flex  flex-column">
+                    
                     <div className={`lg section-perfil d-flex align-items-center justify-content-center mt-2 mx-auto ${data.img_perfil ? "section-perfil-img" : ""}`}>
                       {
                         data.img_perfil ?
@@ -79,12 +82,14 @@ function Recreador() {
                           <IconUserCircleSolid />
                       }
                     </div>
+                    
+                      <RadioStart save={()=>{}} state={[]} index={1} id={"evaluacion-recreador"} name={"evaluacion-recreador"} check={Number(data.evaluacion).toFixed(0)} block={true} />
                   </div>
                   <div className="w-100 w-md-60 d-flex flex-column">
                     <div className="w-100 d-flex flex-wrap justify-content-around justify-content-md-between align-items-center">
                       <div className="my-1 my-md-2 d-flex flex-column">
-                        <strong className="fs-5-5">Codigo:</strong>
-                        <p className="m-0 fs-5-5 mb-1">{formatoId(data.id)}</p>
+                        <strong className="fs-5-5">Nombre:</strong>
+                        <p className="m-0 fs-5-5 mb-1">{`${data.nombres} ${data.apellidos}`}</p>
                       </div>
                       <div className="my-1 my-md-2 d-flex flex-column">
                         <strong className="fs-5-5">Documento:</strong>
@@ -102,7 +107,10 @@ function Recreador() {
                       </div>
                       <div className="my-1 my-md-2 d-flex flex-column">
                         <strong className="fs-5-5">Tel. Secundario:</strong>
-                        <p className="m-0 fs-5-5 mb-1">{`${data.telefono_secundario}`}</p>
+                        {
+                          Number(data.telefono_secundario)!=0 &&
+                          <p className="m-0 fs-5-5 mb-1">{`${data.telefono_secundario}`}</p>
+                        }
                       </div>
                     </div>
                     <div className="w-100 d-flex flex-wrap justify-content-around justify-content-md-between align-items-center">

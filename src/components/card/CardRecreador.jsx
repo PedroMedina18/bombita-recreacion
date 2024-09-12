@@ -2,10 +2,12 @@ import React from 'react'
 import userx from "../../assets/user-x.svg"
 import './cards.css'
 import { IconUserCircle, IconUserCircleSolid, IconUser } from "../Icon.jsx"
+import { useNavigate } from 'react-router-dom';
 
-function CardRecreador({ nombre = null, nivel = null, genero = null, edad = null, img = null }) {
+function CardRecreador({ id, nombre = null,  nivel = null, genero = null, edad = null, img = null }) {
+    const navigate=useNavigate()
     return (
-        <div className="card-recreador">
+        <div className="card-recreador" onDoubleClick={()=>{navigate(`/recreador/${id}/`)}}>
             <div className='card-header'>
                 {
                     img ?

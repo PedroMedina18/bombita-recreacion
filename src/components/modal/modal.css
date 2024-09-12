@@ -15,7 +15,6 @@
 }
 
 .content-modal {
-  width: 1250px;
   min-height: 100px;
   max-height: 600px;
   background-color: rgb(243, 243, 243);
@@ -35,11 +34,19 @@
 .width-md{
   width: 800px
 }
-.icon-menu svg {
+.icon-menu svg, .img-logo svg {
   width: 45px;
   color: rgb(var(--secundario));
 }
+.img-logo svg{
+  width: 30px;
+}
 
+.img-logo{
+  width: 120px;
+  object-fit: contain;
+
+}
 .button-close {
   background-color: transparent;
   display: flex;
@@ -58,7 +65,11 @@
 }
 
 .button-close:hover {
-  background-color: #a7a7a7;
+  background-color: #d6d6d6;
+}
+
+.button-close:hover svg{
+  color: rgb(211, 14, 14);
 }
 .body-modal {
   min-height: 200px;
@@ -119,24 +130,8 @@ tr.tr-select {
 }
 
 
-@media (max-width: 1100px) {
-  .content-modal {
-    width: 1000px;
-  }
-}
-
-@media (max-width: 992px) {
-  .content-modal {
-    width: 800px;
-  }
-}
 @media (max-width: 768px) {
   .content-modal {
-    width: 600px;
-  }
-}
-@media (max-width: 576px) {
-  .content-modal {
-    width: 450px;
+    width: 90%;
   }
 }

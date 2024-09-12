@@ -4,11 +4,11 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from ..models import PreguntasEvento
-from ..funtions.indice import indiceFinal, indiceInicial
-from ..funtions.serializador import dictfetchall
-from ..funtions.identificador import determinar_valor
-from ..funtions.filtros import order, filtrosWhere
-from ..funtions.token import verify_token
+from ..utils.indice import indiceFinal, indiceInicial
+from ..utils.serializador import dictfetchall
+from ..utils.identificador import determinar_valor
+from ..utils.filtros import order, filtrosWhere
+from ..utils.token import verify_token
 from ..message import MESSAGE
 from django.db import IntegrityError, connection, models
 import json
@@ -29,6 +29,13 @@ class Preguntas_Evento_View(View):
                     'message': verify['message'],
                 }
                 return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'] or 11 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
+
             PreguntasEvento.objects.create(pregunta=req['pregunta'].title())
             datos = {
                 'status': True,
@@ -69,6 +76,12 @@ class Preguntas_Evento_View(View):
                 datos = {
                     'status': False,
                     'message': verify['message']
+                }
+                return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'] or 11 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
                 }
                 return JsonResponse(datos)
             pregunta = list(PreguntasEvento.objects.filter(id=id).values())
@@ -123,6 +136,12 @@ class Preguntas_Evento_View(View):
                     'message': verify['message']
                 }
                 return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'] or 11 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
             pregunta = list(PreguntasEvento.objects.filter(id=id).values())
             if len(pregunta) > 0:
                 PreguntasEvento.objects.filter(id=id).delete()
@@ -164,6 +183,14 @@ class Preguntas_Evento_View(View):
                 return JsonResponse(datos)
 
             if (id > 0):
+                
+                if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'] or 11 in verify['info']['permisos'])):
+                    datos = {
+                        'status': False,
+                        'message': MESSAGE['NonePermisos'],
+                    }
+                    return JsonResponse(datos)
+
                 query = """
                 SELECT * FROM preguntas_eventos WHERE preguntas_eventos.id=%s;
                 """
@@ -233,7 +260,7 @@ class Preguntas_Evento_View(View):
                         'status': True,
                         'message': f"{MESSAGE['errorRegistrosNone']}",
                         'data': None,
-                        'pages': None,
+                        'pages': 0,
                         'total':0
                     }
             return JsonResponse(datos)

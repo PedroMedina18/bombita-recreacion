@@ -7,26 +7,37 @@ import { ButtonSimple } from "../../components/button/Button.jsx";
 import { alertConfim, toastError, alertLoading, alertMotivo } from "../../components/alerts.jsx";
 import { formatoId, formatDateWithTime12Hour, formatTime12Hour, calcularEdad } from "../../utils/process.jsx";
 import { controlErrors, controlResultPost } from "../../utils/actions.jsx";
-import { IconRowLeft, IconCheck, IconX, IconLista } from "../../components/Icon.jsx";
+import { IconRowLeft, IconCheck, IconX, IconLista, IconFactura } from "../../components/Icon.jsx";
+import { RadioStart } from "../../components/input/Inputs.jsx";
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
+import ModalFactura from "../../components/modal/ModalFactura.jsx";
 import Navbar from "../../components/navbar/Navbar.jsx";
 import CardRecreador from "../../components/card/CardRecreador.jsx"
 import Pildora from "../../components/Pildora.jsx"
 import texts from "../../context/text_es.js";
+import { useAuthContext } from '../../context/AuthContext.jsx';
 import "../../components/input/input.css"
 import "../../components/table/table.css"
 import Swal from 'sweetalert2';
+import { Tooltip } from "bootstrap";
 
 function Evento() {
   const [loading, setLoading] = useState(true);
   const [errorServer, setErrorServer] = useState("");
+  const { getPermisos } = useAuthContext();
   const navigate = useNavigate();
   const [dataEvento, setDataEvento] = useState(null);
   const [serviciosList, setServiciosList] = useState({ servicios: [], isRecreadores: false });
   const renderizado = useRef(0);
+  const [anticipo, setAnticipo] = useState(false);
+  const [faltante, setFaltante] = useState(false);
+  const [total, setTotal] = useState(false);
   const params = useParams();
 
   useEffect(() => {
+    document.title = "Evento - Bombita Recreación"
+    // const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    // const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new Tooltip(tooltipTriggerEl))
     if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1
       get_data()
@@ -47,15 +58,20 @@ function Evento() {
       const totalSobrecargos = evento.data.data.sobrecargos.reduce((accumulator, current) => {
         return accumulator + current.monto
       }, 0)
+      const pagosAnticipo = evento.data.data.pagos.filter(e => e.tipo === 1)
+      const pagosFaltante = evento.data.data.pagos.filter(e => e.tipo === 2)
+      const pagosTotal = evento.data.data.pagos.filter(e => e.tipo === 3)
       setDataEvento({
         ...evento.data.data,
         totalServicios: totalServicios,
         totalSobrecargos: totalSobrecargos,
         totalEvento: totalServicios + totalSobrecargos,
+        pagosAnticipo,
+        pagosFaltante,
+        pagosTotal
       })
       setServiciosList({ servicios: recreadoresEvento.data.data.servicios, isRecreadores: recreadoresEvento.data.data.recreadores })
     } catch (error) {
-      console.log(error)
       setErrorServer(texts.errorMessage.errorSystem)
       setDataCargo(null)
     } finally {
@@ -75,6 +91,7 @@ function Evento() {
           nombre={recreador ? `${recreador.nombres} ${recreador.apellidos}` : null}
           genero={recreador ? recreador.genero : null}
           nivel={recreador ? recreador.nivel : null}
+          id={recreador ? recreador.id : null}
         />)
     }
     return list
@@ -114,17 +131,20 @@ function Evento() {
 
   return (
     <Navbar name={texts.pages.evento.name} descripcion={texts.pages.evento.description} dollar={false}>
-      <div className="w-100 d-flex justify-content-between">
+      <div className="w-100 d-flex flex-wrap justify-content-between">
         <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/eventos/") }}> <IconRowLeft /> Regresar  </ButtonSimple>
-        <div className="d-lfex">
-          <ButtonSimple disabled={dataEvento?.info.estado !== null || dataEvento?.info.estado === true}
+        <div className="d-flex flex-column flex-md-row">
+          <ButtonSimple disabled={dataEvento?.info.estado !== null || dataEvento?.info.estado === 1}
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-custom-class="custom-tooltip"
+            data-bs-title="This top tooltip is themed via CSS variables."
             type="button"
             className="mb-2"
             onClick={() => {
               cancelarEvento()
             }}
           >Cancelar <IconX /> </ButtonSimple>
-          <ButtonSimple disabled={dataEvento?.info.estado !== null || dataEvento?.info.estado === false}
+          <ButtonSimple disabled={ !(dataEvento?.info.estado_pago === 2 && dataEvento?.info.recreadores === 1 &&  dataEvento?.info.estado===null && (getPermisos().administrador || getPermisos().permisos.includes(12)) ) }
             type="button"
             className="mb-2 ms-2"
             onClick={() => {
@@ -161,7 +181,7 @@ function Evento() {
                 <h3 className="h2 fw-bold">{`Evento N°${formatoId(dataEvento.info.id)}`}</h3>
                 <div className="w-100 d-flex flex-column">
                   <div className="w-100 d-flex flex-column mx-auto">
-                    <div className="w-100 d-flex justify-content-between">
+                    <div className="w-100 d-flex flex-column flex-md-row justify-content-between">
                       <div className="my-1 mx-2 my-md-2 d-flex flex-column">
                         <strong className="fs-6">Cliente:</strong>
                         <p className="m-0 fs-6 mb-1">{`${dataEvento.info.nombres} ${dataEvento.info.apellidos}`}</p>
@@ -171,7 +191,7 @@ function Evento() {
                         <p className="m-0 fs-6 mb-1">{`${dataEvento.info.tipo_documento}-${dataEvento.info.numero_documento}`}</p>
                       </div>
                       <div className="my-1 mx-2 my-md-2 d-flex flex-column">
-                        <strong className="fs-6">Cooreo:</strong>
+                        <strong className="fs-6">Correo:</strong>
                         <p className="m-0 fs-6 mb-1">{`${dataEvento.info.correo}`}</p>
                       </div>
                       <div className="my-1 mx-2 my-md-2 d-flex flex-column">
@@ -183,8 +203,8 @@ function Evento() {
                         <p className="m-0 fs-6 mb-1">{`${dataEvento.info.numero_personas}`}</p>
                       </div>
                     </div>
-                    <div className="w-100 d-flex justify-content-between">
-                      <div className="my-1 mx-2 my-md-2 d-flex flex-column w-50">
+                    <div className="w-100 d-flex flex-column flex-md-row justify-content-between">
+                      <div className="my-1 mx-2 my-md-2 d-flex flex-column w-100 w-md-50">
                         <strong className="fs-6">Dirección:</strong>
                         <p className="m-0 fs-6 mb-1">{`${dataEvento.info.direccion}`}</p>
                       </div>
@@ -194,30 +214,100 @@ function Evento() {
                       </div>
                       <div className="my-1 mx-2 my-md-2 d-flex flex-column">
                         <strong className="fs-6">Finaliza:</strong>
-                        <p className="m-0 fs-6 mb-1">{`${formatTime12Hour(dataEvento.info.fecha_evento_final)}`}</p>
+                        <p className="m-0 fs-6 mb-1">{`${formatDateWithTime12Hour(dataEvento.info.fecha_evento_final)}`}</p>
                       </div>
                     </div >
-                    <div className="w-100 d-flex justify-content-between">
+                    <div className="w-100 d-flex flex-column flex-md-row justify-content-between">
                       <div className="my-1 mx-2 my-md-2 d-flex flex-column">
                         <strong className="fs-6">Estado:</strong>
-                        {dataEvento.info.estado === null && <Pildora contenido={"En espera"} color="bg-info"></Pildora>}
-                        {Boolean(dataEvento.info.estado) === true && <Pildora contenido={"Completado"} color="bg-succes"></Pildora>}
-                        {(Boolean(dataEvento.info.estado) === false && dataEvento.info.estado !== null) && <Pildora contenido={"Cancelado"} color="bg-danger"></Pildora>}
+                        <spam className="">
+
+                          {dataEvento.info.estado === null && <Pildora contenido={"En espera"} color="bg-info"></Pildora>}
+                          {Boolean(dataEvento.info.estado) === true && <Pildora contenido={"Completado"} color="bg-succes"></Pildora>}
+                          {(Boolean(dataEvento.info.estado) === false && dataEvento.info.estado !== null) && <Pildora contenido={"Cancelado"} color="bg-danger"></Pildora>}
+                        </spam>
                       </div>
                       <div className="my-1 mx-2 my-md-2 d-flex flex-column">
                         <strong className="fs-6">Estado de Pago:</strong>
-                        {dataEvento.info.estado_pago === 0 && <Pildora contenido={`${dataEvento.info.estado_pago_descripcion}`} color="bg-danger"></Pildora>}
-                        {dataEvento.info.estado_pago === 1 && <Pildora contenido={`${dataEvento.info.estado_pago_descripcion}`} color="bg-warning"></Pildora>}
-                        {dataEvento.info.estado_pago === 2 && <Pildora contenido={`${dataEvento.info.estado_pago_descripcion}`} color="bg-succes"></Pildora>}
+                        <spam className="">
+
+                          {dataEvento.info.estado_pago === 0 && <Pildora contenido={`${dataEvento.info.estado_pago_descripcion}`} color="bg-danger"></Pildora>}
+                          {dataEvento.info.estado_pago === 1 && <Pildora contenido={`${dataEvento.info.estado_pago_descripcion}`} color="bg-warning"></Pildora>}
+                          {dataEvento.info.estado_pago === 2 && <Pildora contenido={`${dataEvento.info.estado_pago_descripcion}`} color="bg-succes"></Pildora>}
+                          {dataEvento.info.estado_pago === 3 && <Pildora contenido={`${dataEvento.info.estado_pago_descripcion}`} color="bg-info"></Pildora>}
+                        </spam>
                       </div>
                     </div>
                   </div>
+                  {
+                    Boolean(dataEvento.info.evaluado) &&
+                    <div className="w-100 w-md-50 mx-auto d-flex flex-column align-items-center my-3">
+                      <div className="my-1 mx-2 my-md-2 d-flex flex-column justify-content-center align-items-center">
+                        <strong className="fs-3">Opinión</strong>
+                        <p className="m-0 fs-6 mb-1">{`${dataEvento.info.opinion}`}</p>
+                      </div>
+                      <RadioStart save={()=>{}} state={[]} index={1} id={"evaluacion-evento"} name={"evaluacion-evento"} check={Number(dataEvento.info.evaluacion).toFixed(0)} block={true} />
+                    </div>
+                  }
 
                   {
                     (Boolean(dataEvento.info.estado) === false && dataEvento.info.estado !== null) &&
                     <div className="w-100 ">
                       <h2 className="text-center m-0 fw-bold ">Evento Cancelado!</h2>
                     </div>
+                  }
+                  {
+                    dataEvento.pagos.length > 0 &&
+                    <>
+                      <h3 className="text-center fw-bold"> Pagos Realizados</h3>
+                      <div className="d-100 d-flex gap-1">
+                        {
+                          dataEvento.pagosAnticipo.length > 0 &&
+                          <>
+                            <ModalFactura
+                              cliente={`${dataEvento.info.nombres} ${dataEvento.info.apellidos}`}
+                              documento={`${dataEvento.info.tipo_documento}-${dataEvento.info.numero_documento}`}
+                              id_evento={dataEvento.info.id}
+                              listPagos={dataEvento.pagosAnticipo}
+                              state={[anticipo, setAnticipo]}
+                              tipo_pago={1}
+                            />
+                            <ButtonSimple type={"button"} onClick={() => { setAnticipo(!anticipo) }}>Pago de Anticipo <IconFactura /></ButtonSimple>
+                          </>
+
+                        }
+                        {
+                          dataEvento.pagosFaltante.length > 0 &&
+                          <>
+                            <ModalFactura
+                              cliente={`${dataEvento.info.nombres} ${dataEvento.info.apellidos}`}
+                              documento={`${dataEvento.info.tipo_documento}-${dataEvento.info.numero_documento}`}
+                              id_evento={dataEvento.info.id}
+                              listPagos={dataEvento.pagosFaltante}
+                              state={[faltante, setFaltante]}
+                              tipo_pago={2}
+                            />
+                            <ButtonSimple type={"button"} onClick={() => { setFaltante(!faltante) }}>Pago Restante <IconFactura /></ButtonSimple>
+                          </>
+
+                        }
+                        {
+                          dataEvento.pagosTotal.length > 0 &&
+                          <>
+                            <ModalFactura
+                              cliente={`${dataEvento.info.nombres} ${dataEvento.info.apellidos}`}
+                              documento={`${dataEvento.info.tipo_documento}-${dataEvento.info.numero_documento}`}
+                              id_evento={dataEvento.info.id}
+                              listPagos={dataEvento.pagosTotal}
+                              state={[total, setTotal]}
+                              tipo_pago={3}
+                            />
+                            <ButtonSimple type={"button"} onClick={() => { setTotal(!total) }}>Pago Completo <IconFactura /></ButtonSimple>
+                          </>
+
+                        }
+                      </div>
+                    </>
                   }
 
                   <div className="accordion mt-5" id="accordionExample">
@@ -290,7 +380,7 @@ function Evento() {
                               <div className="w-100 d-flex flex-column ">
                                 <h3 className="text-center fw-bold">Recreadores - Servicio N° {formatoId(servicio.id)}</h3>
 
-                                <div className="w-100 d-flex flex-warp align-items-center justify-content-evenly">
+                                <div className="w-100 d-flex flex-column flex-md-row flex-warp align-items-center justify-content-evenly">
                                   {cardsRecreadores({ servicio: servicio })}
                                 </div>
                               </div>

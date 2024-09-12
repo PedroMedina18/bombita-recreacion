@@ -42,9 +42,9 @@ function TableDescriptionFacture({ listaData, listDescripcion, saveListDescripti
                         const precioBs = precio * dataUser.dollar.price
                         return (
                             <tr key={`${index}_${objet.nombre.toLowerCase().replace(/\s+/g, '')}`} onDoubleClick={()=>{deleteSelect(index)}}>
-                                <th className="text-start">{objet.nombre}</th>
-                                <th>{`${precio} $`}</th>
-                                <th>{`${precioBs.toFixed(2)} BS.s`}</th>
+                                <th className="fw-normal text-start th-description">{objet.nombre}</th>
+                                <th className="fw-normal ">{`${precio} $`}</th>
+                                <th className="fw-normal ">{`${precioBs.toFixed(2)} BS.s`}</th>
                             </tr>
                         )
                     })

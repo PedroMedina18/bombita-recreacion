@@ -78,7 +78,7 @@ export const getPersona = async ({ dataNewUser, setPersona, setValue, setDisable
             }
         }
     } catch (error) {
-        console.log(error)
+        toastError( "Error Consulta de Persona")
     }
 }
 // *Funcion encargada de buscar los datos del recreador y agregarlos al formulario
@@ -99,7 +99,7 @@ export const getRecreador = async ({ dataNewUser, setPersona, setValue, setDisab
             }
         }
     } catch (error) {
-        console.log(error)
+        toastError( "Error Consulta de Recreador")
     }
 }
 
@@ -126,16 +126,15 @@ export const deleteItem = async ({ row, objet, functionGet }) => {
         }
     } catch (error) {
         Swal.close()
-        console.log(error)
         toastError(texts.errorMessage.errorDelete)
     }
 }
 
 // *funcion para realizar una consulta get al pasar un search
-export const searchCode = async ({ value, object, setList, setLoading, setData, filtros={} }) => {
+export const searchCode = async ({ value, object, setList, setLoading, setData, filtros={}, subDominio=[] }) => {
     try {
         setLoading(true)
-        const respuesta = value ? await object.get({ params:{...filtros, search:value} }) : await object.get({params:filtros})
+        const respuesta = value ? await object.get({ subDominio:subDominio, params:{...filtros, search:value} }) : await object.get({subDominio:subDominio, params:filtros})
         if (respuesta.status !== 200) {
             setList([])
             setData({ pages: 1, total: 0 })
@@ -151,7 +150,7 @@ export const searchCode = async ({ value, object, setList, setLoading, setData, 
         if (respuesta.data.data === null) {
             setList([])
             setData({ pages: 1, total: 0 })
-            toastError(`Sin respuestaados`)
+            toastError(`Sin resultados`)
             return
         }
         if (!Array.isArray(respuesta.data.data)) {
@@ -163,7 +162,6 @@ export const searchCode = async ({ value, object, setList, setLoading, setData, 
         }
 
     } catch (error) {
-        console.log(error)
         setList([])
         setData({ pages: 1, total: 0 })
         if (!error.response.status === 404) {
@@ -175,9 +173,9 @@ export const searchCode = async ({ value, object, setList, setLoading, setData, 
 }
 
 // *funcion para buscar lista de elementos en la API
-export const getListItems = async ({ object, setList, setData, setLoading, filtros={}}) => {
+export const getListItems = async ({ object, setList, setData, data={}, setLoading, filtros={}, subDominio=[]}) => {
     try {
-        const respuesta = await object.get({params:filtros})
+        const respuesta = await object.get({subDominio:subDominio, params:filtros})
         if (respuesta.status !== 200) {
             toastError(`Error.${respuesta.status} ${respuesta.statusText}`)
             return
@@ -190,9 +188,9 @@ export const getListItems = async ({ object, setList, setData, setLoading, filtr
             toastError(`Sin resultados`)
         }
         setList(respuesta.data.data? respuesta.data.data : [])
-        setData({ pages: respuesta.data.pages, total: respuesta.data.total })
+        setData({...data, pages: respuesta.data.pages, total: respuesta.data.total })
+        return respuesta.data
     } catch (error) {
-        console.log(error)
         setData({ pages: 1, total: 0 })
         toastError(texts.errorMessage.errorSystem)
     } finally {

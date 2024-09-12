@@ -4,13 +4,13 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.db import IntegrityError, connection, models
-from ..funtions.indice import indiceFinal, indiceInicial
-from ..funtions.serializador import dictfetchall
+from ..utils.indice import indiceFinal, indiceInicial
+from ..utils.serializador import dictfetchall
 from ..models import Generos
 from ..message import MESSAGE
-from ..funtions.filtros import order, filtrosWhere
-from ..funtions.token import verify_token
-from ..funtions.identificador import determinar_valor
+from ..utils.filtros import order, filtrosWhere
+from ..utils.token import verify_token
+from ..utils.identificador import determinar_valor, edit_str
 import json
 
 # CRUD COMPLETO DE LA TABLA DE GENEROS
@@ -30,6 +30,14 @@ class Generos_Views(View):
                     'message': verify['message'],
                 }
                 return JsonResponse(datos)
+
+            if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
+
             Generos.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'])
             datos = {
                 'status': True,
@@ -37,7 +45,6 @@ class Generos_Views(View):
             }
             return JsonResponse(datos)
         except IntegrityError as error:
-            print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
                 if "nombre" in error.args[1]:
                     message = MESSAGE['nombreDuplicate']
@@ -54,7 +61,6 @@ class Generos_Views(View):
                 }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"{MESSAGE['errorPost']} - {error}", )
             datos = {
                 'status': False,
                 'message': f"{MESSAGE['errorRegistro']}: {error}"
@@ -70,6 +76,12 @@ class Generos_Views(View):
                 datos = {
                     'status': False,
                     'message': verify['message'],
+                }
+                return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
                 }
                 return JsonResponse(datos)
             genero = list(Generos.objects.filter(id=id).values())
@@ -89,7 +101,6 @@ class Generos_Views(View):
                 }
             return JsonResponse(datos)
         except IntegrityError as error:
-            print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
                 if "nombre" in error.args[1]:
                     message = MESSAGE['nombreDuplicate']
@@ -106,7 +117,6 @@ class Generos_Views(View):
                 }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"{MESSAGE['errorPut']} - {error}")
             datos = {
                 'status': False,
                 'message': f"{MESSAGE['errorEdition']}: {error}",
@@ -120,6 +130,12 @@ class Generos_Views(View):
                 datos = {
                     'status': False,
                     'message': verify['message']
+                }
+                return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
                 }
                 return JsonResponse(datos)
             genero = list(Generos.objects.filter(id=id).values())
@@ -136,14 +152,12 @@ class Generos_Views(View):
                 }
             return JsonResponse(datos)
         except models.ProtectedError as error:
-            print(f"{MESSAGE['errorProteccion']} - {str(error)}")
             datos = {
                 'status': False,
                 'message': f"{MESSAGE['errorProtect']}"
             }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"{MESSAGE['errorDelete']} - {error}", )
             datos = {
                 'status': False,
                 'message': f"{MESSAGE['errorEliminar']}: {error}"
@@ -162,6 +176,12 @@ class Generos_Views(View):
                 }
                 return JsonResponse(datos)
             if (id > 0):
+                if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'])):
+                    datos = {
+                        'status': False,
+                        'message': MESSAGE['NonePermisos'],
+                    }
+                    return JsonResponse(datos)
                 query = """
                 SELECT * FROM generos WHERE generos.id=%s;
                 """
@@ -199,6 +219,9 @@ class Generos_Views(View):
                 search = determinar_valor(search)
                 if(search['valor'] and search['type']=="int"):
                     where.append(f"id LIKE '{search['valor']}%%'" )
+                elif(search['valor'] and search['type']=="str"):
+                    str_validate = edit_str(search["valor"])
+                    where.append(f"nombre LIKE '{str_validate}'" )
                 where = filtrosWhere(where)
 
                 if(all == "true"):
@@ -233,7 +256,6 @@ class Generos_Views(View):
                     }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"{MESSAGE['errorGet']} - {error}")
             datos = {
                 'status': False,
                 'message': f"{MESSAGE['errorConsulta']}: {error}",

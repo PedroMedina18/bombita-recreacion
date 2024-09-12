@@ -2,8 +2,8 @@ from django.http.response import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
-from ..funtions.respaldo import respaldo
-from ..funtions.token import verify_token
+from ..utils.respaldo import respaldo
+from ..utils.token import verify_token
 from ..message import MESSAGE
 
 class Respaldo(View):
@@ -17,7 +17,12 @@ class Respaldo(View):
             if not verify["status"]:
                 datos = {"status": False, "message": verify["message"], "data": None}
                 return JsonResponse(datos)
-            
+            if(not (bool(verify['info']['administrador']) or 3 in verify['info']['permisos'] )):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
             respaldando = respaldo()
             if respaldando:
                 datos = {

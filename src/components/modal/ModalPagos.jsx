@@ -1,9 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
-import { searchCode, getListItems } from "../../utils/actions.jsx";
-import { ButtonSimple } from "../button/Button.jsx"
 import { InputsGeneral, MoneyInput, InputFile } from "../input/Inputs.jsx"
 import { useForm } from "react-hook-form";
-import { totalItems } from "../table/Table.jsx"
 import { LoaderCircle } from "../loader/Loader.jsx"
 import { formatoId } from "../../utils/process.jsx"
 import { metodoPago } from "../../utils/API.jsx"

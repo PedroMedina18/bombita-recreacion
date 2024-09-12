@@ -3,7 +3,7 @@ import './login.css'
 import { useForm } from "react-hook-form";
 import Logo from "../../assets/logo-bombita.png";
 import { useNavigate, Navigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
 import { login, cargos } from "../../utils/API.jsx"
 import { getCookie } from "../../utils/cookie.jsx"
@@ -24,6 +24,10 @@ function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm();
+
+  useEffect(() => {
+    document.title = "Login - Bombita Recreación"
+  }, [])
 
   //*funcion del evento submit para iniciar sesion
   const onSubmit = handleSubmit(
@@ -60,9 +64,9 @@ function Login() {
   }
 
   return (
-    <main className='w-100 vh-100 d-flex justify-content-center align-items-center bg-login position-relative'>
+    <main className='w-100 px-2 px-md-0 vh-100 d-flex justify-content-center align-items-center bg-login position-relative'>
 
-      <form className='form'
+      <form className='form w-100 w-sm-50 w-lg-30'
         autoComplete={"off"}
         onSubmit={onSubmit}
       >
@@ -70,13 +74,13 @@ function Login() {
           <IconUserCircleSolid />
         </div>
 
-        <h1 className='h3 fw-bold mb-4 mt-5 text-white'>Inicio de Sesión</h1>
+        <h1 className='h3 fw-bold mb-4 mt-5 text-white text-center'>Inicio de Sesión</h1>
 
         <div className='w-100 d-flex align-items-center'>
           <label htmlFor="user" className='icon-input d-flex cursor-pointer'>
             <IconUsers />
           </label>
-          <div className={`w-100 position-relative overflow-hidden my-2  ${errors.usuario ? "error" : ""}`} id="container-input-usuario">
+          <div className={`w-100 position-relative overflow-hidden  ${errors.usuario ? "error" : ""}`} id="container-input-usuario">
 
             <input
               type="text"
@@ -87,18 +91,6 @@ function Login() {
                 required: {
                   value: true,
                   message: texts.inputsMessage.requireUser,
-                },
-                maxLength: {
-                  value: 20,
-                  message: texts.inputsMessage.max20,
-                },
-                min: {
-                  value: 8,
-                  message: texts.inputsMessage.min8,
-                },
-                pattern: {
-                  value: pattern.user,
-                  message: texts.inputsMessage.invalidUser
                 }
               })
               }
@@ -123,7 +115,7 @@ function Login() {
           <label htmlFor="password" className='icon-input d-flex cursor-pointer'>
             <IconBloq />
           </label>
-          <div className={`w-100 position-relative overflow-hidden my-2 ${errors.contraseña ? "error" : ""}`} id="container-input-password">
+          <div className={`w-100 position-relative overflow-hidden ${errors.contraseña ? "error" : ""}`} id="container-input-password">
             <input
               id="password"
               type="password"
@@ -133,14 +125,6 @@ function Login() {
                 required: {
                   value: true,
                   message: texts.inputsMessage.requirePassword,
-                },
-                maxLength: {
-                  value: 16,
-                  message: texts.inputsMessage.max16,
-                },
-                pattern: {
-                  value: pattern.password,
-                  message: texts.inputsMessage.invalidPassword,
                 }
               })
               }
@@ -155,12 +139,11 @@ function Login() {
               }
               autoComplete="current-password"
             />
-            <label htmlFor="password" className='lb-name  cursor-pointer'>
+            <label htmlFor="password" className='lb-name cursor-pointer'>
               <span className='text-name'>{texts.label.password}</span>
             </label>
           </div>
         </div>
-
         {errors.contraseña ? <span className='error-login'>{errors.contraseña.message}</span> : <span className='error-login invisible'>error</span>}
 
         {

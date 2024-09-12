@@ -5,7 +5,7 @@ import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx"
 import { IconTrash, IconEdit, IconDetail } from "../../components/Icon.jsx";
-import { formatoId, normalizeDecimalNumber } from "../../utils/process.jsx"
+import { formatoId, normalizeDecimalNumber, formatDateWithTime12Hour } from "../../utils/process.jsx"
 import { alertInfo } from "../../components/alerts.jsx"
 import Navbar from "../../components/navbar/Navbar"
 import Table from "../../components/table/Table"
@@ -60,7 +60,13 @@ function Niveles() {
             onClick={() => {
               alertInfo(
                 row.nombre,
-                row
+                {
+                  código: formatoId(row.id),
+                  descripción: row.descripcion,
+                  monto: `${normalizeDecimalNumber(row.monto)} $`,
+                  fecha_de_registro: formatDateWithTime12Hour(row.fecha_registro),
+                  ultima_modificación: formatDateWithTime12Hour(row.fecha_actualizacion),
+                }
               )
             }} className="cursor-pointer"
           />
@@ -110,6 +116,11 @@ function Niveles() {
         totalPages={dataSobrecargos.pages}
         options={options}
         loading={tableLoading}
+        order={true}
+        organizar={[
+          { label: "Codigo", value: "orig" },
+          { label: "Nombre", value: "alf" },
+        ]}
       />
       <Toaster />
     </Navbar>

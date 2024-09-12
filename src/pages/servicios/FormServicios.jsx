@@ -166,6 +166,10 @@ function FormServicios() {
                       value: 100,
                       message: texts.inputsMessage.max100,
                     },
+                    minLength: {
+                      value: 3,
+                      message: texts.inputsMessage.min3,
+                  },
                     validate: (value) => {
                       if (hasLeadingOrTrailingSpace(value)) {
                         return texts.inputsMessage.noneSpace;

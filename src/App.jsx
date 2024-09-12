@@ -1,9 +1,10 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import ProtectedRouter from "./components/protected/ProtectedRouter";
+import ProtectedPrivate from "./components/protected/ProtectedPrivate";
 import { FormEventContextProvider } from "./context/FormEventContext.jsx";
 import {
   Login, Error404,
-  Inicio, Cargos,
+  Inicio, Cargos, Cliente,
   Clientes, FormClientes,
   FormCargos, TipoDocumento,
   FormTipoDocumento, Generos,
@@ -16,12 +17,12 @@ import {
   Materiales, FormMateriales,
   Servicios, Sobrecargos,
   FormSobrecargos, FormServicios,
-  Eventos, Dolar,
+  Eventos, Dolar, Inventario,
   FormDataEvent, FormAccount,
   EventosRecreadores, FormUsuarios,
   Configuracion, Cargo, Evento,
   CalendarRecreadores, CalendarEvent,
-  Preguntas, Evaluacion
+  Preguntas, Evaluacion, Servicio, Estadistica
 } from "./pages/Pages.jsx"
 
 
@@ -32,60 +33,135 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route element={<ProtectedRouter />}>
-            <Route path="/cargos/" element={<Cargos />} />
-            <Route path="/cargo/:id/" element={<Cargo />} />
-            <Route path="/register/cargo/" element={<FormCargos />} />
-            <Route path="/edit/cargo/:id/" element={<FormCargos />} />
-            <Route path="/register/usuario/" element={<FormUsuarios />} />
-            <Route path="/edit/usuario/:id/" element={<FormUsuarios />} />
-            <Route path="/usuarios/" element={<Usuarios />} />
-            <Route path="/usuario/:id" element={<Usuario />} />
-            <Route path="/password/usuario/:id" element={<Password />} />
-            <Route path="/eventos/" element={<Eventos />} />
-            <Route path="/eventos/calendar/" element={<CalendarEvent />} />
-            <Route path="/eventos/recreadores/:id_evento/" element={<EventosRecreadores />} />
-            <Route path="/eventos/pagos/:id_evento/" element={<Pagos />} />
-            <Route path="/eventos/:id/" element={<Evento />} />
-            <Route path="/register/eventos/" element={<FormEventContextProvider />} >
-              <Route path="" element={<FormDataEvent />} />
-              <Route path="account/" element={<FormAccount />} />
+
+            <Route element={<ProtectedPrivate permisos={[1]} />}>
+              <Route path="/cargos/" element={<Cargos />} />
+              <Route path="/cargo/:id/" element={<Cargo />} />
+              <Route path="/register/cargo/" element={<FormCargos />} />
+              <Route path="/edit/cargo/:id/" element={<FormCargos />} />
             </Route>
-            <Route path="/actividades/" element={<Actividades />} />
-            <Route path="/register/actividad/" element={<FormActividades />} />
-            <Route path="/edit/actividad/:id/" element={<FormActividades />} />
-            <Route path="/niveles/" element={<Niveles />} />
-            <Route path="/register/nivel/" element={<FormNiveles />} />
-            <Route path="/edit/nivel/:id/" element={<FormNiveles />} />
-            <Route path="/sobrecargos/" element={<Sobrecargos />} />
-            <Route path="/register/sobrecargo/" element={<FormSobrecargos />} />
-            <Route path="/edit/sobrecargo/:id/" element={<FormSobrecargos />} />
-            <Route path="/materiales/" element={<Materiales />} />
-            <Route path="/register/material/" element={<FormMateriales />} />
-            <Route path="/edit/material/:id/" element={<FormMateriales />} />
-            <Route path="/tipo_documentos/" element={<TipoDocumento />} />
-            <Route path="/register/tipo_documento/" element={<FormTipoDocumento />} />
-            <Route path="/edit/tipo_documento/:id/" element={<FormTipoDocumento />} />
-            <Route path="/generos/" element={<Generos />} />
-            <Route path="/register/genero/" element={<FormGeneros />} />
-            <Route path="/edit/genero/:id/" element={<FormGeneros />} />
-            <Route path="/recreador/calendar/:id/" element={<CalendarRecreadores />} />
-            <Route path="/recreador/:id/" element={<Recreador />} />
-            <Route path="/recreadores/" element={<Recreadores />} />
-            <Route path="/register/recreador/" element={<FormRecreadores />} />
-            <Route path="/edit/recreador/:id/" element={<FormRecreadores />} />
-            <Route path="/servicios/" element={<Servicios />} />
-            <Route path="/register/servicio/" element={<FormServicios />} />
-            <Route path="/edit/servicio/:id/" element={<FormServicios />} />
-            <Route path="/metodos_pago/" element={<MetodosPago />} />
-            <Route path="/register/metodos_pago/" element={<FormMetodosPago />} />
-            <Route path="/edit/metodos_pago/:id/" element={<FormMetodosPago />} />
-            <Route path="/clientes/" element={<Clientes />} />
-            <Route path="/edit/cliente/:id/" element={<FormClientes />} />
-            <Route path="/dolar/" element={<Dolar />} />
-            <Route path="/preguntas/" element={<Preguntas />} />
-            <Route path="/evaluacion/:id" element={<Evaluacion />} />
+
+            <Route element={<ProtectedPrivate permisos={[1, 4]} />}>
+              <Route path="/password/usuario/:id" element={<Password />} />
+            </Route>
+
+            <Route element={<ProtectedPrivate permisos={[2]} />}>
+              <Route path="/register/usuario/" element={<FormUsuarios />} />
+              <Route path="/edit/usuario/:id/" element={<FormUsuarios />} />
+              <Route path="/usuarios/" element={<Usuarios />} />
+              <Route path="/usuario/:id" element={<Usuario />} />
+            </Route>
+
+            <Route element={<ProtectedPrivate permisos={[2]} />}>
+              <Route path="/register/usuario/" element={<FormUsuarios />} />
+              <Route path="/edit/usuario/:id/" element={<FormUsuarios />} />
+              <Route path="/usuarios/" element={<Usuarios />} />
+              <Route path="/usuario/:id" element={<Usuario />} />
+            </Route>
+
+            <Route element={<ProtectedPrivate permisos={[12]} />}>
+              <Route path="/eventos/" element={<Eventos />} />
+              <Route path="/eventos/calendar/" element={<CalendarEvent />} />
+              <Route path="/eventos/:id/" element={<Evento />} />
+            </Route>
+
+            <Route element={<ProtectedPrivate permisos={[12]} />}>
+              <Route path="/eventos/" element={<Eventos />} />
+              <Route path="/eventos/calendar/" element={<CalendarEvent />} />
+              <Route path="/eventos/:id/" element={<Evento />} />
+              <Route path="/register/eventos/" element={<FormEventContextProvider />} >
+                <Route path="" element={<FormDataEvent />} />
+                <Route path="account/" element={<FormAccount />} />
+              </Route>
+              <Route path="/eventos/pagos/:id_evento/" element={<Pagos />} />
+            </Route>
+
+            <Route element={<ProtectedPrivate permisos={[12]} />}>
+              <Route path="/eventos/" element={<Eventos />} />
+              <Route path="/eventos/calendar/" element={<CalendarEvent />} />
+              <Route path="/eventos/:id/" element={<Evento />} />
+              <Route path="/register/eventos/" element={<FormEventContextProvider />} >
+                <Route path="" element={<FormDataEvent />} />
+                <Route path="account/" element={<FormAccount />} />
+              </Route>
+            </Route>
+
+            <Route element={<ProtectedPrivate permisos={[12]} />}>
+              <Route path="/eventos/recreadores/:id_evento/" element={<EventosRecreadores />} />
+            </Route>
+
+            <Route element={<ProtectedPrivate permisos={[12, 6]} />}>
+              <Route path="/eventos/pagos/:id_evento/" element={<Pagos />} />
+            </Route>
+
+            <Route element={<ProtectedPrivate permisos={[11]} />}>
+              <Route path="/evaluacion/:id" element={<Evaluacion />} />
+            </Route>
+
+            <Route element={<ProtectedPrivate permisos={[5]} />}>
+              <Route path="/actividades/" element={<Actividades />} />
+              <Route path="/register/actividad/" element={<FormActividades />} />
+              <Route path="/edit/actividad/:id/" element={<FormActividades />} />
+              <Route path="/servicios/" element={<Servicios />} />
+              <Route path="/servicios/:id/" element={<Servicio />} />
+              <Route path="/register/servicio/" element={<FormServicios />} />
+              <Route path="/edit/servicio/:id/" element={<FormServicios />} />
+              <Route path="/sobrecargos/" element={<Sobrecargos />} />
+              <Route path="/register/sobrecargo/" element={<FormSobrecargos />} />
+              <Route path="/edit/sobrecargo/:id/" element={<FormSobrecargos />} />
+            </Route>
+
+            <Route element={<ProtectedPrivate permisos={[7]} />}>
+              <Route path="/niveles/" element={<Niveles />} />
+              <Route path="/register/nivel/" element={<FormNiveles />} />
+              <Route path="/edit/nivel/:id/" element={<FormNiveles />} />
+              <Route path="/recreador/calendar/:id/" element={<CalendarRecreadores />} />
+              <Route path="/recreador/:id/" element={<Recreador />} />
+              <Route path="/recreadores/" element={<Recreadores />} />
+              <Route path="/register/recreador/" element={<FormRecreadores />} />
+              <Route path="/edit/recreador/:id/" element={<FormRecreadores />} />
+            </Route>
+
+            <Route element={<ProtectedPrivate permisos={[9]} />}>
+              <Route path="/materiales/" element={<Materiales />} />
+              <Route path="/register/material/" element={<FormMateriales />} />
+              <Route path="/edit/material/:id/" element={<FormMateriales />} />
+              <Route path="/inventario/:id/" element={<Inventario />} />
+            </Route>
+
+            <Route element={<ProtectedPrivate permisos={[8]} />}>
+              <Route path="/clientes/" element={<Clientes />} />
+              <Route path="/clientes/:id/" element={<Cliente />} />
+              <Route path="/edit/cliente/:id/" element={<FormClientes />} />
+            </Route>
+
+            <Route element={<ProtectedPrivate permisos={[14]} />}>
+              <Route path="/tipo_documentos/" element={<TipoDocumento />} />
+              <Route path="/register/tipo_documento/" element={<FormTipoDocumento />} />
+              <Route path="/edit/tipo_documento/:id/" element={<FormTipoDocumento />} />
+              <Route path="/generos/" element={<Generos />} />
+              <Route path="/register/genero/" element={<FormGeneros />} />
+              <Route path="/edit/genero/:id/" element={<FormGeneros />} />
+              <Route path="/metodos_pago/" element={<MetodosPago />} />
+              <Route path="/register/metodos_pago/" element={<FormMetodosPago />} />
+              <Route path="/edit/metodos_pago/:id/" element={<FormMetodosPago />} />
+              <Route path="/dolar/" element={<Dolar />} />
+            </Route>
+
+            <Route element={<ProtectedPrivate permisos={[14,11]} />}>
+              <Route path="/preguntas/" element={<Preguntas />} />
+            </Route>
+
+            <Route element={<ProtectedPrivate permisos={[14, 3, 1, 11, 5, 12]} />}>
+              <Route path="/configuracion/" element={<Configuracion />} />
+            </Route>
+
+            <Route element={<ProtectedPrivate permisos={[13]} />}>
+              <Route path="/estadisticas/" element={<Estadistica />} />
+            </Route>
+
             <Route path="/inicio/" element={<Inicio />} />
-            <Route path="/configuracion/" element={<Configuracion />} />
+
           </Route>
           <Route path="*" element={<Error404 />} />
         </Routes>

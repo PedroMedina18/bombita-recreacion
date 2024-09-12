@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from django.http.response import JsonResponse
 from django.views import View
-from ..funtions.serializador import dictfetchall
+from ..utils.serializador import dictfetchall
 from django.db import IntegrityError, connection
-from ..funtions.token import verify_token
+from ..utils.token import verify_token
 from ..message import MESSAGE
 
 class Personas_Views(View):
@@ -18,6 +18,14 @@ class Personas_Views(View):
                     'data': None
                 }
                 return JsonResponse(datos)
+
+            if(not (bool(verify['info']['administrador']) or 8 in verify['info']['permisos'] or 7 in verify['info']['permisos'] or 2 in verify['info']['permisos'])):
+                    datos = {
+                        'status': False,
+                        'message': MESSAGE['NonePermisos'],
+                    }
+                    return JsonResponse(datos)
+
             if(tipo_documento>0 and documento>0):
                 query = """
                     SELECT 

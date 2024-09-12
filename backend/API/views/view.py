@@ -20,6 +20,8 @@ from .respaldo import Respaldo
 from .dollar import Dollar_View
 from .pagos import Pagos_Views
 from .eventos_recreadores import Eventos_Recreadores_Servicios_View
-from .recreadores_evento import Recraadores_Eventos_Views
+from .recreadores_evento import Recreadores_Eventos_Views
 from .preguntas import Preguntas_Evento_View
 from .evaluacion import Evaluacion_View
+from .registros_material import Registros_Material_View
+from .estadistica import Estadistica_View

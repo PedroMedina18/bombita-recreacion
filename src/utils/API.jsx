@@ -19,6 +19,8 @@ export const verify_token = new Petisions("verify");
 
 export const permisos = new Petisions("permisos");
 
+export const estadisticas = new Petisions("estadisticas");
+
 export const personas = new Petisions("personas");
 
 export const cargos = new Petisions("cargos");
@@ -42,6 +44,8 @@ export const servicios = new Petisions("servicios");
 export const respaldo = new Petisions("respaldo");
 
 export const preguntas = new Petisions("preguntas");
+
+export const inventario = new Petisions("inventario");
 
 export const metodoPago = new Petisions("metodos_pago");
 

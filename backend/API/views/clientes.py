@@ -5,11 +5,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.db import IntegrityError, connection, models
 from ..models import Clientes, Personas, TipoDocumento
-from ..funtions.indice import indiceFinal, indiceInicial
-from ..funtions.serializador import dictfetchall
-from ..funtions.identificador import determinar_valor, edit_str, normalize_id_list
-from ..funtions.token import verify_token
-from ..funtions.filtros import order, filtrosWhere
+from ..utils.indice import indiceFinal, indiceInicial
+from ..utils.serializador import dictfetchall
+from ..utils.identificador import determinar_valor, edit_str, normalize_id_list
+from ..utils.token import verify_token
+from ..utils.filtros import order, filtrosWhere
 from ..message import MESSAGE
 import json
 
@@ -25,6 +25,14 @@ class Clientes_Views(View):
             if not verify["status"]:
                 datos = {"status": False, "message": verify["message"]}
                 return JsonResponse(datos)
+
+            if(not (bool(verify['info']['administrador']) or 8 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
+
             cliente = list(Clientes.objects.filter(id=int(id)).values())
             if len(cliente) > 0:
                 Clientes.objects.filter(id=int(id)).delete()
@@ -36,13 +44,9 @@ class Clientes_Views(View):
                 }
             return JsonResponse(datos)
         except models.ProtectedError as error:
-            print(f"{MESSAGE['errorProteccion']}  - {str(error)}")
             datos = {"status": False, "message": f"{MESSAGE['errorProtect']}"}
             return JsonResponse(datos)
         except Exception as error:
-            print(
-                f"{MESSAGE['errorDelete']} - {error}",
-            )
             datos = {"status": False, "message": f"{MESSAGE['errorEliminar']}: {error}"}
             return JsonResponse(datos)
 
@@ -53,6 +57,13 @@ class Clientes_Views(View):
             req = req["body"]
             if not verify["status"]:
                 datos = {"status": False, "message": verify["message"]}
+                return JsonResponse(datos)
+            
+            if(not (bool(verify['info']['administrador']) or 8 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
                 return JsonResponse(datos)
             cliente = list(Clientes.objects.filter(id=int(id)).values())
             if len(cliente) > 0:
@@ -90,11 +101,12 @@ class Clientes_Views(View):
                 }
             return JsonResponse(datos)
         except IntegrityError as error:
-            print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
                 if 'telefono_principal' in error.args[1]:
                     message = MESSAGE['telefonoPrincipalDuplicate']
-                if 'numero_documento' in error.args[1]:
+                elif'correo' in error.args[1]:
+                    message = MESSAGE['correoDuplicate']
+                elif'numero_documento' in error.args[1]:
                     message = MESSAGE['documentoDuplicate']
                 else:
                     message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
@@ -109,14 +121,10 @@ class Clientes_Views(View):
                 }
             return JsonResponse(datos)
         except models.ProtectedError as error:
-            print(f"{MESSAGE['errorProteccion']}  - {str(error)}")
             datos = {"status": False, "message": f"{MESSAGE['errorProtect']}"}
             return JsonResponse(datos)
         except Exception as error:
-            print(
-                f"{MESSAGE['errorDelete']} - {error}",
-            )
-            datos = {"status": False, "message": f"{MESSAGE['errorEliminar']}: {error}"}
+            datos = {"status": False, "message": f"{MESSAGE['errorEdition']}: {error}"}
             return JsonResponse(datos)
 
     def get(self, request, id=0):
@@ -128,6 +136,7 @@ class Clientes_Views(View):
                 datos = {"status": False, "message": verify["message"], "data": None}
                 return JsonResponse(datos)
 
+            
             if(totalClientes =="true"):
                 query="""
                     SELECT COUNT(*) AS total FROM clientes
@@ -174,6 +183,12 @@ class Clientes_Views(View):
                         "data": None,
                     }
             else:
+                if(not (bool(verify['info']['administrador']) or 8 in verify['info']['permisos'])):
+                    datos = {
+                        'status': False,
+                        'message': MESSAGE['NonePermisos'],
+                    }
+                    return JsonResponse(datos)  
                 page = request.GET.get('page', 1)
                 inicio = indiceInicial(int(page))
                 final = indiceFinal(int(page))
@@ -207,8 +222,7 @@ class Clientes_Views(View):
                         tipo.nombre AS tipo_documento, 
                         pe.numero_documento,
                         CONCAT('0', pe.telefono_principal) AS telefono_principal,
-                        CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
-                        cli.fecha_registro
+                        IF(pe.telefono_secundario IS NOT NULL AND pe.telefono_secundario != '', CONCAT('0', pe.telefono_secundario), pe.telefono_secundario) AS telefono_secundario
                     FROM clientes AS cli
                     LEFT JOIN personas AS pe ON cli.persona_id=pe.id
                     LEFT JOIN tipos_documentos AS tipo ON pe.tipo_documento_id=tipo.id
@@ -216,7 +230,6 @@ class Clientes_Views(View):
                     ORDER BY {} {} 
                     LIMIT %s, %s;
                 """.format(where, typeOrdenBy, orderType)
-                
                 cursor.execute(query, [inicio, final])
                 clientes = dictfetchall(cursor)
 
@@ -239,18 +252,17 @@ class Clientes_Views(View):
                         "status": True,
                         "message": f"{MESSAGE['errorRegistrosNone']}",
                         "data": None,
-                        "pages": None,
+                        "pages": 0,
                         "total": 0,
                     }
 
             return JsonResponse(datos)
         except Exception as error:
-            print(f"{MESSAGE['errorGet']} - {error}")
             datos = {
                 "status": False,
                 "message": f"{MESSAGE['errorConsulta']}: {error}",
                 "data": None,
-                "pages": None,
+                "pages": 0,
                 "total": 0,
             }
             return JsonResponse(datos)

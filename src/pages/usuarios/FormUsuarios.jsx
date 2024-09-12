@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { Toaster } from "sonner";
 import { usuarios } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx"
-import { IconRowLeft } from "../../components/Icon.jsx"
+import { IconRowLeft, IconKey } from "../../components/Icon.jsx"
 import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx"
 import { getPersona, controlResultPost, habilitarEdicion, controlErrors } from "../../utils/actions.jsx"
 import { useAuthContext } from '../../context/AuthContext.jsx';
@@ -17,10 +17,10 @@ import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
 import texts from "../../context/text_es.js";
 import pattern from "../../context/pattern.js";
 
-
 function FormUsuarios() {
-    const { dataOptions } = useAuthContext()
+    const { dataOptions, editUser, getUser, closeSession } = useAuthContext()
     const [loading, setLoading] = useState(true)
+    const [debounceTimeout, setDebounceTimeout] = useState(null);
     const [errorServer, setErrorServer] = useState("")
     const [dataNewUser, setdataNewUser] = useState({ tipo_documento: null, numero_documento: null })
     const [dataPersona, setPersona] = useState({})
@@ -34,8 +34,10 @@ function FormUsuarios() {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             if (Number(params.id)) {
+                document.title = "Registro de Usuarios - Bombita Recreación"
                 get_usuario()
             } else {
+                document.title = "Edición de Usuarios - Bombita Recreación"
                 setLoading(false)
             }
             return
@@ -48,7 +50,8 @@ function FormUsuarios() {
         handleSubmit,
         formState: { errors },
         watch,
-        setValue
+        setValue,
+        clearErrors
     } = useForm();
 
     const get_usuario = async () => {
@@ -63,6 +66,7 @@ function FormUsuarios() {
                 setValue(key, data[`${key}`])
             });
             setValue(`cargo`, data["cargo_id"])
+            setValue(`telefono_secundario`, data["telefono_secundario"]==="0"? "" : data["telefono_secundario"])
             setValue(`tipo_documento`, data["tipo_documento_id"])
             setDisabled(!data["estado"])
 
@@ -81,28 +85,40 @@ function FormUsuarios() {
                 const message = params.id ? texts.confirmMessage.confirmEdit : texts.confirmMessage.confirmRegister
                 const confirmacion = await alertConfim("Confirmar", message)
                 if (confirmacion.isConfirmed) {
-                    const body={}
+                    if (Number(params.id) == 1 && !data.estado) {
+                        toastError(texts.errorMessage.errorUsuarioProtect)
+                        return
+                    }
+                    const body = {}
                     if (data.id_persona) {
                         body.id_persona = data.id_persona,
-                        body.usuario = data.usuario,
-                        body.contraseña = data.contraseña,
-                        body.cargo = Number(data.cargo)
-                        
+                            body.usuario = data.usuario,
+                            body.contraseña = data.contraseña,
+                            body.cargo = Number(data.cargo)
+
                     } else {
                         body.nombres = data.nombres,
-                        body.apellidos = data.apellidos,
-                        body.numero_documento = data.numero_documento,
-                        body.tipo_documento = Number(data.tipo_documento),
-                        body.telefono_principal = Number(data.telefono_principal),
-                        body.telefono_secundario = Number(data.telefono_secundario),
-                        body.correo = data.correo,
-                        body.usuario = data.usuario,
-                        body.contraseña = data.contraseña,
-                        body.cargo = Number(data.cargo)
-                        if(data.estado !== undefined){
+                            body.apellidos = data.apellidos,
+                            body.numero_documento = data.numero_documento,
+                            body.tipo_documento = Number(data.tipo_documento),
+                            body.telefono_principal = Number(data.telefono_principal),
+                            body.telefono_secundario = Number(data.telefono_secundario),
+                            body.correo = data.correo,
+                            body.usuario = data.usuario,
+                            body.contraseña = data.contraseña,
+                            body.cargo = Number(data.cargo)
+                        if (data.estado !== undefined) {
                             body.estado = data.estado
                         }
                     }
+                    const actualUser = () => {
+                        const usuarioActual = getUser().id == params.id
+                        if (params.id && usuarioActual) {
+                            closeSession()
+                            navigate("/")
+                        }
+                    }
+
                     alertLoading("Cargando")
                     const res = params.id ? await usuarios.put(body, { subDominio: [Number(params.id)] }) : await usuarios.post(body)
                     controlResultPost({
@@ -111,7 +127,8 @@ function FormUsuarios() {
                             navigate,
                             direction: "/usuarios/"
                         },
-                        messageExito: params.id ? texts.successMessage.editionUsuario : texts.successMessage.registerUsuario,
+                        callbak: actualUser,
+                        messageExito: params.id ? !(data.estado) ? texts.successMessage.userDisabled : texts.successMessage.editionUsuario : texts.successMessage.registerUsuario,
                     })
                 }
 
@@ -124,7 +141,13 @@ function FormUsuarios() {
 
     return (
         <Navbar name={`${params.id ? texts.pages.editUsuario.name : texts.pages.registerUsuario.name}`} descripcion={`${params.id ? texts.pages.editUsuario.description : texts.pages.registerUsuario.description}`} dollar={false}>
-            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/usuarios/") }}> <IconRowLeft /> Regresar</ButtonSimple>
+            <div className="w-100 d-flex justify-content-between">
+                <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/usuarios/") }}> <IconRowLeft /> Regresar</ButtonSimple>
+                {
+                    params.id &&
+                    <ButtonSimple type="button" className="mb-2" onClick={() => { navigate(`/password/usuario/${params.id}`) }}> <IconKey /></ButtonSimple>
+                }
+            </div>
 
             {
                 loading ?
@@ -174,6 +197,11 @@ function FormUsuarios() {
                                                 id="estado"
                                                 form={{ errors, register }}
                                                 onChange={(e) => {
+                                                    if (params.id == getUser().id && !e.target.checked) {
+                                                        toastError(texts.errorMessage.errorUsuarioActual)
+                                                        setValue("estado", true)
+                                                        return
+                                                    }
                                                     setDisabled(!e.target.checked)
                                                 }}
                                             />
@@ -185,26 +213,29 @@ function FormUsuarios() {
                                             <UnitSelect label={texts.label.tipoDocuemnto} name="tipo_documento" id="tipo_documento" form={{ errors, register }}
                                                 options={dataOptions().tipos_documentos}
                                                 params={{
-                                                    validate: (value) => {
-                                                        if (!value) {
-                                                            return texts.inputsMessage.selectTipoDocumento
-                                                        } else {
-                                                            return true
-                                                        }
+                                                    required: {
+                                                        value: true,
+                                                        message: texts.inputsMessage.selectTipoDocumento,
                                                     },
                                                 }}
                                                 onChange={
                                                     (e) => {
-                                                        setdataNewUser({
+                                                        if (Boolean(e.target.value)) {
+                                                            clearErrors("tipo_documento")
+                                                        }
+                                                        const newUser = {
                                                             ...dataNewUser,
                                                             tipo_documento: e.target.value
-                                                        })
-                                                        getPersona({
-                                                            dataNewUser,
-                                                            setPersona,
-                                                            setValue,
-                                                            setDisabledInputs
-                                                        })
+                                                        }
+                                                        setdataNewUser(newUser)
+                                                        if (!params.id) {
+                                                            getPersona({
+                                                                dataNewUser: newUser,
+                                                                setPersona,
+                                                                setValue,
+                                                                setDisabledInputs
+                                                            })
+                                                        }
                                                     }
                                                 }
                                                 disabled={disabledInputs || disabled}
@@ -219,33 +250,51 @@ function FormUsuarios() {
                                                         message: texts.inputsMessage.requireDocumento,
                                                     },
                                                     maxLength: {
-                                                        value: 10,
-                                                        message: texts.inputsMessage.max10,
+                                                        value: 9,
+                                                        message: texts.inputsMessage.max9,
                                                     },
                                                     minLength: {
                                                         value: 7,
                                                         message: texts.inputsMessage.min7,
                                                     },
                                                     min: {
-                                                        value: 4000,
+                                                        value: 4000000,
                                                         message: texts.inputsMessage.invalidDocument,
                                                     }
+
                                                 }}
                                                 onKeyUp={
                                                     (e) => {
-                                                        setdataNewUser({
+                                                        const newUser = {
                                                             ...dataNewUser,
                                                             numero_documento: e.target.value
-                                                        })
+                                                        }
+                                                        setdataNewUser(newUser)
+                                                        if (debounceTimeout) {
+                                                            clearTimeout(debounceTimeout);
+                                                        }
+                                                        const timeout = setTimeout(() => {
+                                                            if (!params.id) {
+                                                                getPersona({
+                                                                    dataNewUser: newUser,
+                                                                    setPersona,
+                                                                    setValue,
+                                                                    setDisabledInputs
+                                                                })
+                                                            }
+                                                        }, 900);
+                                                        setDebounceTimeout(timeout);
                                                     }
                                                 }
                                                 onBlur={(e) => {
-                                                    getPersona({
-                                                        dataNewUser,
-                                                        setPersona,
-                                                        setValue,
-                                                        setDisabledInputs
-                                                    })
+                                                    if (!params.id) {
+                                                        getPersona({
+                                                            dataNewUser,
+                                                            setPersona,
+                                                            setValue,
+                                                            setDisabledInputs
+                                                        })
+                                                    }
                                                 }}
                                                 disabled={disabledInputs || disabled}
                                                 placeholder={texts.placeholder.numeroDocumento}
@@ -266,8 +315,8 @@ function FormUsuarios() {
                                                         message: texts.inputsMessage.max200,
                                                     },
                                                     minLength: {
-                                                        value: 5,
-                                                        message: texts.inputsMessage.min5,
+                                                        value: 3,
+                                                        message: texts.inputsMessage.min3,
                                                     },
                                                     pattern: {
                                                         value: pattern.textNoneNumber,
@@ -298,8 +347,8 @@ function FormUsuarios() {
                                                         message: texts.inputsMessage.max200,
                                                     },
                                                     minLength: {
-                                                        value: 5,
-                                                        message: texts.inputsMessage.min5,
+                                                        value: 3,
+                                                        message: texts.inputsMessage.min3,
                                                     },
                                                     pattern: {
                                                         value: pattern.textNoneNumber,
@@ -332,14 +381,14 @@ function FormUsuarios() {
                                                         value: 11,
                                                         message: texts.inputsMessage.onlyCharacter11,
                                                     },
-                                                    minLength: {
-                                                        value: 11,
-                                                        message: texts.inputsMessage.onlyCharacter11,
-                                                    },
                                                     min: {
-                                                        value: 200000000,
+                                                        value: 2000000000,
                                                         message: texts.inputsMessage.invalidTel,
-                                                    }
+                                                    },
+                                                    pattern: {
+                                                        value: pattern.tel,
+                                                        message: texts.inputsMessage.invalidTel,
+                                                    },
                                                 }}
                                                 disabled={disabledInputs || disabled}
                                                 isError={!disabledInputs}
@@ -354,14 +403,14 @@ function FormUsuarios() {
                                                         value: 11,
                                                         message: texts.inputsMessage.onlyCharacter11,
                                                     },
-                                                    minLength: {
-                                                        value: 11,
-                                                        message: texts.inputsMessage.onlyCharacter11,
-                                                    },
                                                     min: {
-                                                        value: 200000000,
+                                                        value: 2000000000,
                                                         message: texts.inputsMessage.invalidTel,
-                                                    }
+                                                    },
+                                                    pattern: {
+                                                        value: pattern.tel,
+                                                        message: texts.inputsMessage.invalidTel,
+                                                    },
                                                 }}
                                                 disabled={disabledInputs || disabled}
                                                 isError={!disabledInputs}
@@ -375,8 +424,8 @@ function FormUsuarios() {
                                             <InputsGeneral type={"email"} label={`${texts.label.email}`} name="correo" id="correo" form={{ errors, register }}
                                                 params={{
                                                     minLength: {
-                                                        value: 5,
-                                                        message: texts.inputsMessage.min5
+                                                        value: 10,
+                                                        message: texts.inputsMessage.min10
                                                     },
                                                     maxLength: {
                                                         value: 100,
@@ -411,6 +460,11 @@ function FormUsuarios() {
                                                         }
                                                     }
                                                 }}
+                                                onChange={(e) => {
+                                                    if (Boolean(e.target.value)) {
+                                                        clearErrors("cargo")
+                                                    }
+                                                }}
                                                 disabled={disabled}
                                             />
                                         </div>
@@ -429,8 +483,8 @@ function FormUsuarios() {
                                                         message: texts.inputsMessage.min8
                                                     },
                                                     maxLength: {
-                                                        value: 20,
-                                                        message: texts.inputsMessage.max20
+                                                        value: 16,
+                                                        message: texts.inputsMessage.max15
                                                     },
                                                     pattern: {
                                                         value: pattern.user,
@@ -458,8 +512,8 @@ function FormUsuarios() {
                                                             message: texts.inputsMessage.requirePassword
                                                         },
                                                         minLength: {
-                                                            value: 5,
-                                                            message: texts.inputsMessage.min5
+                                                            value: 8,
+                                                            message: texts.inputsMessage.min8
                                                         },
                                                         maxLength: {
                                                             value: 20,

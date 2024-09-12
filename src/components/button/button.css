@@ -1,15 +1,19 @@
 .button-initial{
     padding: 10px 15px;
-    font-family: 16px;
     border-radius: 5px;
     border: 0px solid;
-    background-color: rgb(var(--secundario));
     color: white;
+    font-size:16px;
     font-weight: 800;
     transition: all ease .3s;
+    background-color: rgb(var(--secundario));
+}
+
+.button-initial[disabled]{
+    background-color: rgb(var(--secundario), 0.5);
 }
 .button-initial svg{
-    width: 25px;
+    width: 2rem;
 }
 .button-initial:hover{
     transform: scale(1.03);

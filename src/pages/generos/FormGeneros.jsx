@@ -29,7 +29,10 @@ function FormGeneros() {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             if (params.id) {
+                document.title="Editar Genero - Bombita Recreación"
                 get_genero()
+            }else{
+                document.title="Registrar Genero - Bombita Recreación"
             }
             setLoading(false)
             return

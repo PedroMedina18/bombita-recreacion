@@ -47,7 +47,7 @@ class TipoDocumento(models.Model):
 class Personas(models.Model):
     nombres = models.CharField(max_length = 200)
     apellidos = models.CharField(max_length = 200)
-    numero_documento = models.BigIntegerField()
+    numero_documento = models.BigIntegerField(unique = True)
     telefono_principal = models.BigIntegerField(unique = True)
     telefono_secundario = models.BigIntegerField(blank=True, null=True, default=None)
     correo = models.EmailField(max_length = 100, null = True, blank = True, unique = True)
@@ -202,13 +202,11 @@ class Eventos(models.Model):
     cliente = models.ForeignKey(Clientes, on_delete = models.PROTECT, related_name = 'eventos', db_column = 'cliente_id')
     estado = models.BooleanField(null=True, default=None)
     evaluado = models.BooleanField(default=False)
-    recreadores_asignados = models.BooleanField(default=False)
     estado_pago = models.IntegerField(default=0)
-    motivo_cancelacion = models.CharField(max_length = 300, null=True, blank=True, default=None)
-    opinion = models.CharField(max_length = 500, blank=True, null=True, default=None)
+    motivo_cancelacion = models.CharField(max_length = 100, null=True, blank=True, default=None)
+    opinion = models.CharField(max_length = 300, blank=True, null=True, default=None)
     fecha_registro = models.DateTimeField(auto_now_add = True)
     fecha_actualizacion = models.DateTimeField(auto_now = True)
-    opinion = models.CharField(max_length = 300, blank=True, null=True, default=None)
 
     class Meta:
         db_table = 'eventos'
@@ -246,7 +244,7 @@ class Pagos(models.Model):
     tipo = models.IntegerField(default=0)
     monto = models.FloatField()
     precioDolar = models.ForeignKey(PrecioDolar, on_delete = models.PROTECT, related_name = 'pago', db_column = 'precio_dolar_id')
-    referencia = models.BigIntegerField(blank=True, null=True, default=None)
+    referencia = models.BigIntegerField(blank=True, null=True, default=None, unique = True)
     capture = models.FileField(upload_to = 'capture_pago', null = True, blank = True)
     fecha_registro = models.DateTimeField(auto_now_add = True)
 
@@ -272,40 +270,18 @@ class PreguntasEvento(models.Model):
 class EventoPreguntasEvento(models.Model):
     evento = models.ForeignKey(Eventos, on_delete = models.PROTECT, related_name = 'pregunta', db_column = 'evento_id')
     pregunta = models.ForeignKey(PreguntasEvento, on_delete = models.PROTECT, related_name = 'recreador', db_column = 'pregunta_id')
-    respuesta = models.IntegerField(blank=True, null=True, default=None)
+    evaluacion = models.IntegerField(blank=True, null=True, default=None)
 
     class Meta:
         db_table = 'eventos_preguntas_evento'
 
-class RegistroMateriales(models.Model):
+class RegistrosMateriales(models.Model):
     material = models.ForeignKey(Materiales, on_delete = models.CASCADE, related_name = 'registro', db_column = 'material_id')
     descripcion = models.CharField(max_length = 300)
     cantidad = models.IntegerField()
     total = models.IntegerField()
-    tipo = models.CharField(max_length = 100)
-    fecha = models.DateTimeField(auto_now_add = True)
+    tipo = models.IntegerField()
+    fecha_registro = models.DateTimeField(auto_now_add = True)
 
-# necesito una consulta sql un poco dificil veras ten go una tabla eventos, una de servicios y otra de 
-# recreadores, y dos intermedias eventosXservicios y eventosXrecreadores, y como ultimo dato la tabla 
-# servicios tiene un campo de personal que es un numero. La consulta consiste en que necesito 
-# verificar : 1 - cuanto personal se necesita por servicio al ser un numero ya se tiene medido pero 
-# pueden haber mas de un servicio por evento por lo que hay que sumarlos 2 - ahora lo que necesito 
-# consultar es si en la tabla eventosXrecreadores ya se asignaron el numero de personal que se necesita
-
-
-
-
-# SELECT 
-#   e.id_evento,
-#   SUM(s.personal) AS total_personal_necesario,
-#   COUNT(r.id_recreador) AS total_personal_asignado
-# FROM 
-#   eventos e
-#   INNER JOIN eventosXservicios es ON e.id_evento = es.id_evento
-#   INNER JOIN servicios s ON es.id_servicio = s.id_servicio
-#   LEFT JOIN eventosXrecreadores er ON e.id_evento = er.id_evento
-#   LEFT JOIN recreadores r ON er.id_recreador = r.id_recreador
-# GROUP BY 
-#   e.id_evento
-# HAVING 
-#   SUM(s.personal) > COUNT(r.id_recreador)
+    class Meta:
+        db_table = 'registros_materiales'

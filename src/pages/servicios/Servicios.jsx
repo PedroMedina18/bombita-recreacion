@@ -4,7 +4,7 @@ import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx";
 import { IconTrash, IconEdit, IconDetail } from "../../components/Icon.jsx";
-import {formatoId, normalizeDecimalNumber} from "../../utils/process.jsx";
+import { formatoId, normalizeDecimalNumber } from "../../utils/process.jsx";
 import Table from "../../components/table/Table";
 import Navbar from "../../components/navbar/Navbar";
 import texts from "../../context/text_es.js";
@@ -37,8 +37,8 @@ function Servicios() {
   const columns = [
     {
       name: "Código",
-      row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
-  },
+      row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
+    },
     {
       name: "Nombre",
       row: (row) => { return row.nombre }
@@ -50,41 +50,33 @@ function Servicios() {
     {
       name: "Duración",
       row: (row) => {
-          const horas=row.duracion.horas
-          const minutos=row.duracion.minutos
-          return `${horas<10? `0${horas}` : horas}:${minutos<10?  `0${minutos}` : minutos}`
+        const horas = row.duracion.horas
+        const minutos = row.duracion.minutos
+        return `${horas < 10 ? `0${horas}` : horas}:${minutos < 10 ? `0${minutos}` : minutos} ${horas === 0 ? "min" : "h"}`
 
-       }
-    },
-    {
-      name: "N° de Recreadores",
-      row: (row) => { return `${row.numero_recreadores}` }
-    },
-    {
-      name: "Descripción",
-      row: (row) => { return row.descripcion }
+      }
     },
     {
       name: "Opciones",
       row: (row) => {
-          return <div className='d-flex justify-content-around options-table'>
-              {/* <IconDetail
-                  onClick={() => { navigate(`/recreador/${row.numero_documento}/`) }} className="cursor-pointer"
-              /> */}
-              <IconTrash
-                  onClick={() => {
-                    deleteItem({
-                      row: row,
-                      objet: servicios,
-                      functionGet: getServicios
-                    })
-                  }}
-                  className="cursor-pointer"
-              />
-              <IconEdit onClick={() => { navigate(`/edit/servicio/${row.id}/`) }} className="cursor-pointer" />
-          </div>
+        return <div className='d-flex justify-content-around options-table'>
+          <IconDetail
+            onClick={() => { navigate(`/servicios/${row.id}/`) }} className="cursor-pointer"
+          />
+          <IconEdit onClick={() => { navigate(`/edit/servicio/${row.id}/`) }} className="cursor-pointer" />
+          <IconTrash
+            onClick={() => {
+              deleteItem({
+                row: row,
+                objet: servicios,
+                functionGet: getServicios
+              })
+            }}
+            className="cursor-pointer"
+          />
+        </div>
       }
-  },
+    },
   ]
 
   const options = {
@@ -117,6 +109,11 @@ function Servicios() {
         totalPages={dataServicios.pages}
         options={options}
         loading={tableLoading}
+        order={true}
+                organizar={[
+                    { label: "Codigo", value: "orig" },
+                    { label: "Nombre", value: "alf" },
+                ]}
       />
       <Toaster />
     </Navbar>

@@ -3,14 +3,14 @@ from django.http.response import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
-from ..funtions.encriptado_contraseña import encriptado_constraseña, desencriptado_contraseña
-from ..funtions.indice import indiceFinal, indiceInicial
-from ..funtions.token import verify_token
-from ..funtions.identificador import determinar_valor, edit_str
-from ..funtions.serializador import dictfetchall
+from ..utils.encriptado_contraseña import encriptado_constraseña, desencriptado_contraseña
+from ..utils.indice import indiceFinal, indiceInicial
+from ..utils.token import verify_token
+from ..utils.identificador import determinar_valor, edit_str
+from ..utils.serializador import dictfetchall
 from ..models import Cargos, TipoDocumento, Usuarios, Personas
 from django.db import IntegrityError, connection, models
-from ..funtions.filtros import order, filtrosWhere
+from ..utils.filtros import order, filtrosWhere
 from ..message import MESSAGE
 from decouple import config
 import json
@@ -32,7 +32,19 @@ class Usuarios_Views(View):
                     'message': verify['message'],
                 }
                 return JsonResponse(datos)
-
+            if(not (bool(verify['info']['administrador']) or 2 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
+            usuario = list(Usuarios.objects.filter(usuario=req["usuario"].upper()).values())
+            if len(usuario) > 0:
+                datos = {
+                        'status': False,
+                        'message': MESSAGE["usuarioDuplicate"],
+                    }
+                return JsonResponse(datos)
 
             # Comprobar si se esta registrando un nuevo recreador con los datos de una persona existente
             if('id_persona' in req):
@@ -77,7 +89,7 @@ class Usuarios_Views(View):
                 return JsonResponse(datos)
             Usuarios.objects.create(
                 persona=persona,
-                usuario=req['usuario'],
+                usuario=req['usuario'].upper(),
                 contraseña=contraseña,
                 cargo=cargo
             )
@@ -87,13 +99,14 @@ class Usuarios_Views(View):
             }
             return JsonResponse(datos)
         except IntegrityError as error:
-            print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
                 if 'telefono_principal' in error.args[1]:
                     message = MESSAGE['telefonoPrincipalDuplicate']
-                if 'usuario' in error.args[1]:
-                    message = MESSAGE['UsuarioDuplicate']
-                if 'numero_documento' in error.args[1]:
+                elif'usuario' in error.args[1]:
+                    message = MESSAGE['usuarioDuplicate']
+                elif'correo' in error.args[1]:
+                    message = MESSAGE['correoDuplicate']
+                elif'numero_documento' in error.args[1]:
                     message = MESSAGE['documentoDuplicate']
                 else:
                     message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
@@ -108,7 +121,6 @@ class Usuarios_Views(View):
                 }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"{MESSAGE['errorPost']} - {error}", )
             datos = {
                 'status': False,
                 'message': f"{MESSAGE['errorRegistro']}: {error}"
@@ -124,32 +136,56 @@ class Usuarios_Views(View):
             if not verify["status"]:
                 datos = {"status": False, "message": verify["message"]}
                 return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 2 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
+            
             usuario = list(Usuarios.objects.filter(id=id).values())
-
             if len(usuario) > 0:
+                usuario = Usuarios.objects.get(id=id)
                 if(password=="true"):
                     if(req["contraseña"] == req["contraseña_repetida"]):
                         contraseña=encriptado_constraseña(req['contraseña'])
                         usuario.contraseña=contraseña
+                        usuario.save()
                         datos = {
                             "status": True, 
                             "message": f"{MESSAGE['edition']}"
                         }
+                        return JsonResponse(datos)
                     else:
                         datos = {
                             "status": False,
                             "message": f"{MESSAGE['errorContraseña']}",
                         }
-                    return JsonResponse(datos)
+                        return JsonResponse(datos)
                 
-                usuario = Usuarios.objects.get(id=id)
                 persona = Personas.objects.get(id=usuario.persona.id)
                 usuario.estado=req['estado']
+
+                if(usuario.cargo.administrador and not req['estado']):
+                    datos = {
+                    "status": False, 
+                    "message": f"{MESSAGE['errorDisabledNot']}"
+                    }
+                    return JsonResponse(datos)
+
+
                 if(not req['estado']):
                     usuario.save()
                     datos = {
                     "status": True, 
                     "message": f"{MESSAGE['exitoUserDisabled']}"
+                    }
+                    return JsonResponse(datos)
+
+                if(id==1 and req['cargo']!=1):
+                    datos = {
+                    "status": False, 
+                    "message": f"{MESSAGE['errorAdministradorProtejido']}"
                     }
                     return JsonResponse(datos)
 
@@ -172,7 +208,7 @@ class Usuarios_Views(View):
                     }
                     return JsonResponse(datos)
                 persona.nombres=req['nombres'].title()
-                persona.apellidos=req['apellidos'].title(),
+                persona.apellidos=req['apellidos'].title()
                 persona.numero_documento=req['numero_documento']
                 persona.telefono_principal=req['telefono_principal']
                 persona.telefono_secundario=req['telefono_secundario']
@@ -195,13 +231,14 @@ class Usuarios_Views(View):
 
             return JsonResponse(datos)
         except IntegrityError as error:
-            print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
                 if 'telefono_principal' in error.args[1]:
                     message = MESSAGE['telefonoPrincipalDuplicate']
-                if 'usuario' in error.args[1]:
+                elif'usuario' in error.args[1]:
                     message = MESSAGE['usuarioDuplicate']
-                if 'numero_documento' in error.args[1]:
+                elif'correo' in error.args[1]:
+                    message = MESSAGE['correoDuplicate']
+                elif'numero_documento' in error.args[1]:
                     message = MESSAGE['documentoDuplicate']
                 else:
                     message = f"{MESSAGE['errorDuplicate']}: {error.args[1]} "
@@ -216,11 +253,9 @@ class Usuarios_Views(View):
                 }
             return JsonResponse(datos)
         except models.ProtectedError as error:
-            print(f"{MESSAGE['errorProteccion']}  - {str(error)}")
             datos = {"status": False, "message": f"{MESSAGE['errorProtect']}"}
             return JsonResponse(datos)
         except Exception as error:
-            print(f"{MESSAGE['errorPut']} - {error}")
             datos = {"status": False, "message": f"{MESSAGE['errorEdition']}: {error}"}
             return JsonResponse(datos)
 
@@ -235,6 +270,12 @@ class Usuarios_Views(View):
                     'data': None
                 }
                 return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 2 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
             if id:
                 query = """
                     SELECT 
@@ -247,9 +288,9 @@ class Usuarios_Views(View):
                         tipo.nombre AS tipo_documento, 
                         us.estado,
                         car.id as cargo_id,
-                        car.nombre,
+                        car.nombre as cargo,
                         CONCAT('0', pe.telefono_principal) AS telefono_principal,
-                        CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
+                        IF(pe.telefono_secundario IS NOT NULL AND pe.telefono_secundario != '', CONCAT('0', pe.telefono_secundario), pe.telefono_secundario) AS telefono_secundario,
                         us.fecha_registro,
                         us.fecha_actualizacion
                     FROM usuarios AS us
@@ -291,10 +332,10 @@ class Usuarios_Views(View):
                 search = request.GET.get('search', None)
                 search = determinar_valor(search)
                 if(search['valor'] and search['type']=='int'):
-                    where.append(f"us.id LIKE '{search['valor']}%%'" )
+                    where.append(f"pe.numero_documento LIKE '{search['valor']}%%'" )
                 elif(search['valor'] and search['type']=='str'):
                     str_validate = edit_str(search['valor'])
-                    where.append(f"us.usuarios LIKE '{str_validate}'" )
+                    where.append(f"CONCAT(pe.nombres, ' ', pe.apellidos) LIKE '{str_validate}'" )
 
                 cargo = request.GET.get('cargo', None)
                 estado = request.GET.get('estado', None)
@@ -316,7 +357,7 @@ class Usuarios_Views(View):
                         pe.apellidos, 
                         us.estado,
                         car.id as cargo_id,
-                        car.nombre
+                        car.nombre as cargo
                     FROM usuarios AS us
                     LEFT JOIN personas AS pe ON us.persona_id=pe.id
                     LEFT JOIN cargos AS car ON us.cargo_id=car.id
@@ -347,18 +388,17 @@ class Usuarios_Views(View):
                         "status": True,
                         "message": f"{MESSAGE['errorRegistrosNone']}",
                         "data": None,
-                        "pages": None,
+                        "pages": 0,
                         "total": 0,
                     }
 
             return JsonResponse(datos)
         except Exception as error:
-            print(f"{MESSAGE['errorGet']} - {error}")
             datos = {
                 "status": False,
                 "message": f"{MESSAGE['errorConsulta']}: {error}",
                 "data": None,
-                "pages": None,
+                "pages": 0,
                 "total": 0,
             }
             return JsonResponse(datos)

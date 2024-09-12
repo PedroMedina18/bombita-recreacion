@@ -25,12 +25,17 @@ function FormCargos() {
     const [permisosDefault, setPermisosDefault] = useState([]);
     const [selectPermisos, setSelectPermisos] = useState([]);
     const [checkInput, setCheckInput] = useState(false);
-    const {getOption} = useAuthContext();
+    const {getOption, closeSession, getUser} = useAuthContext();
     const navigate = useNavigate();
     const renderizado = useRef(0);
     const params = useParams();
 
     useEffect(() => {
+        if(params.id){
+            document.title="Edición de Cargo - Bombita Recreación"
+        }else{
+            document.title="Registro de Cargo - Bombita Recreación"
+        }
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             get_Permisos()
@@ -107,19 +112,31 @@ function FormCargos() {
                 const message = params.id ? texts.confirmMessage.confirmEdit : texts.confirmMessage.confirmRegister
                 const confirmacion = await alertConfim("Confirmar", message)
                 if (confirmacion.isConfirmed) {
+                    if(Number(params.id) == 1 && !data.administrador){
+                        toastError(texts.errorMessage.errorCargoProtect)
+                        return
+                    }
                     const Form = new FormData()
                     Form.append('nombre', data.nombre)
                     Form.append('descripcion', data.descripcion)
                     Form.append('administrador', data.administrador)
                     Form.append('permisos', permisos)
                     Form.append('img', $archivo ? $archivo : null)
+                    const actualCargo = () => {
+                        const cargoActual = getUser().cargo_id == params.id
+                        if (params.id  && cargoActual) {
+                            closeSession()
+                            navigate("/")
+                        }
+                    }
+
                     alertLoading("Cargando")
                     const res = params.id ? await cargos.putData(Form, { subDominio: [Number(params.id)] }) : await cargos.postData(Form)
                     controlResultPost({
                         respuesta: res,
                         messageExito: params.id ? texts.successMessage.editionCargo : texts.successMessage.registerCargo,
                         useNavigate: { navigate: navigate, direction: "/cargos/" },
-                        callbak:()=>{getOption("cargo")}
+                        callbak:()=>{ getOption("cargo"); actualCargo()}
                     })
                 }
             } catch (error) {
@@ -164,8 +181,8 @@ function FormCargos() {
                                                 message: texts.inputsMessage.max50,
                                             },
                                             minLength: {
-                                                value: 5,
-                                                message: texts.inputsMessage.min5
+                                                value: 3,
+                                                message: texts.inputsMessage.min3,
                                             },
                                             pattern: {
                                                 value: pattern.textWithNumber,

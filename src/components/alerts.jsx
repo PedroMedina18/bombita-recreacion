@@ -91,7 +91,7 @@ export const alertLoading = async (message) => {
     return Swal.fire({
         title: `${message}`,
         width: "70%",
-        padding: "40px",
+        padding: "60px",
         allowOutsideClick: false,
         confirmButtonText: "Aceptar",
         customClass: {

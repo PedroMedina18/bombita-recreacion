@@ -13,16 +13,17 @@ import Table from "../../components/table/Table";
 import texts from "../../context/text_es.js";
 
 function Recreadores() {
+    const { dataOptions } = useAuthContext()
     const [listRecreadores, setRecreadores] = useState([])
     const [dataRecreadores, setDataRecreadores] = useState({ pages: 0, total: 0 })
     const [tableLoading, setTableLoaing] = useState(true)
-    const { dataOptions } = useAuthContext()
     const [niveles] = useState(dataOptions().niveles)
     const [generos] = useState(dataOptions().generos)
     const renderizado = useRef(0)
     const navigate = useNavigate()
 
     useEffect(() => {
+        document.title="Recreadores - Bombita Recreación"
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             getRecreadores()
@@ -150,7 +151,7 @@ function Recreadores() {
                 filtradores={filtros}
                 order={true}
                 organizar={[
-                    { label: "Origen", value: "orig" },
+                    { label: "Codigo", value: "orig" },
                     { label: "Nombre", value: "alf" },
                 ]}
             />

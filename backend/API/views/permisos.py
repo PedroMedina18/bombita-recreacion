@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from django.http.response import JsonResponse
 from django.views import View
-from ..funtions.token import verify_token
-from ..funtions.serializador import dictfetchall
+from ..utils.token import verify_token
+from ..utils.serializador import dictfetchall
 from django.db import IntegrityError, connection
 from ..message import MESSAGE
 import json
@@ -20,7 +20,7 @@ class Permisos_Views(View):
                     'data': None
                 }
                 return JsonResponse(datos)
-            query = 'SELECT * FROM permisos ORDER BY id ASC;'
+            query = 'SELECT * FROM permisos ORDER BY nombre ASC;'
             cursor.execute(query)
             permisos = dictfetchall(cursor)
             if len(permisos) > 0:

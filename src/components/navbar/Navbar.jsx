@@ -26,19 +26,18 @@ import {
 function Navbar({ children, name = null, descripcion = null, dollar = true }) {
     const { getUser, closeSession, getPermisos } = useAuthContext();
     const [dataUser] = useState(getUser());
-    const [permisos] = useState(getPermisos())
     const navigate = useNavigate();
 
     return (
         <main className='d-flex'>
 
             {/* Ventana lateral izquierda del menu */}
-            <nav className="sidebar" id="sidebar" 
-            onClick={(e)=>{
-                if(e.target === document.querySelector(".sidebar.expand")){
-                    e.target.classList.remove('expand') 
-                }
-            }}>
+            <nav className="sidebar" id="sidebar"
+                onClick={(e) => {
+                    if (e.target === document.querySelector(".sidebar.expand")) {
+                        e.target.classList.remove('expand')
+                    }
+                }}>
 
                 {/* Logo */}
                 <div className="d-flex">
@@ -61,98 +60,120 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
                             <span>Inicio</span>
                         </Link>
                     </li>
+                    {
+                        (getPermisos().permisos.includes(2) || getPermisos().administrador) &&
+                        <li className="sidebar-item">
+                            <Link to="/usuarios/" className="sidebar-link">
+                                <IconUsers />
+                                <span>Usuarios</span>
+                            </Link>
+                        </li>
+                    }
 
-                    <li className="sidebar-item">
-                        <Link to="/usuarios/" className="sidebar-link">
-                            <IconUsers />
-                            <span>Usuarios</span>
-                        </Link>
-                    </li>
+                    {
+                        (getPermisos().permisos.includes(12) || getPermisos().administrador) &&
+                        <li className="sidebar-item">
+                            <a href="#" className="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
+                                data-bs-target="#eventos" aria-expanded="false" aria-controls="eventos">
+                                <IconEvent />
+                                <span>Eventos</span>
+                            </a>
+                            <ul id="eventos" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                                <li className="sidebar-item">
+                                    <Link to="/eventos/" className="sidebar-link">Lista de Eventos</Link>
+                                </li>
+                                <li className="sidebar-item">
+                                    <Link to="/register/eventos/" className="sidebar-link">Agregar un Evento</Link>
+                                </li>
+                            </ul>
+                        </li>
+                    }
 
-                    <li className="sidebar-item">
-                        <a href="#" className="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
-                            data-bs-target="#eventos" aria-expanded="false" aria-controls="eventos">
-                            <IconEvent />
-                            <span>Eventos</span>
-                        </a>
-                        <ul id="eventos" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                    {
+                        (getPermisos().permisos.includes(5) || getPermisos().administrador) &&
+                        <li className="sidebar-item">
+                            <a href="#" className="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
+                                data-bs-target="#servicios" aria-expanded="false" aria-controls="servicios">
+                                <IconService />
+                                <span>Servicios</span>
+                            </a>
+                            <ul id="servicios" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li className="sidebar-item">
-                                <Link to="/eventos/" className="sidebar-link">Lista de Eventos</Link>
-                            </li>
-                            <li className="sidebar-item">
-                                <Link to="/register/eventos/" className="sidebar-link">Agregar un Evento</Link>
-                            </li>
-                        </ul>
-                    </li>
+                                    <Link to="/servicios/" className="sidebar-link">Servicios</Link>
+                                </li>
+                                <li className="sidebar-item">
+                                    <Link to="/actividades/" className="sidebar-link">Actividades</Link>
+                                </li>
+                                <li className="sidebar-item">
+                                    <Link to="/sobrecargos/" className="sidebar-link">Sobrecargos</Link>
+                                </li>
+                            </ul>
+                        </li>
+                    }
+                    {
+                        (getPermisos().permisos.includes(5) || getPermisos().administrador) &&
+                        <li className="sidebar-item">
+                            <a href="#" className="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
+                                data-bs-target="#inventario" aria-expanded="false" aria-controls="inventario">
+                                <IconInventario />
+                                <span>Inventario</span>
+                            </a>
+                            <ul id="inventario" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                                <li className="sidebar-item">
+                                    <Link to="/materiales/" className="sidebar-link">Materiales</Link>
+                                </li>
+                            </ul>
+                        </li>
+                    }
 
-                    <li className="sidebar-item">
-                        <a href="#" className="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
-                            data-bs-target="#servicios" aria-expanded="false" aria-controls="servicios">
-                            <IconService />
-                            <span>Servicios</span>
-                        </a>
-                        <ul id="servicios" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
+                    {
+                        (getPermisos().permisos.includes(7) || getPermisos().administrador) &&
+                        <li className="sidebar-item">
+                            <a href="#" className="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
+                                data-bs-target="#recreadores" aria-expanded="false" aria-controls="recreadores">
+                                <IconRecreadores />
+                                <span>Recreadores</span>
+                            </a>
+                            <ul id="recreadores" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
                             <li className="sidebar-item">
-                                <Link to="/actividades/" className="sidebar-link">Actividades</Link>
-                            </li>
-                            <li className="sidebar-item">
-                                <Link to="/servicios/" className="sidebar-link">Servicios</Link>
-                            </li>
-                            <li className="sidebar-item">
-                                <Link to="/sobrecargos/" className="sidebar-link">Sobrecargos</Link>
-                            </li>
-                        </ul>
-                    </li>
+                                    <Link to="/recreadores/" className="sidebar-link">Recreadores</Link>
+                                </li>
+                                <li className="sidebar-item">
+                                    <Link to="/niveles/" className="sidebar-link">Niveles</Link>
+                                </li>
+                            </ul>
+                        </li>
+                    }
 
-                    <li className="sidebar-item">
-                        <a href="#" className="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
-                            data-bs-target="#inventario" aria-expanded="false" aria-controls="inventario">
-                            <IconInventario />
-                            <span>Inventario</span>
-                        </a>
-                        <ul id="inventario" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                            <li className="sidebar-item">
-                                <Link to="/materiales/" className="sidebar-link">Materiales</Link>
-                            </li>
-                        </ul>
-                    </li>
+                    {
+                        (getPermisos().permisos.includes(8) || getPermisos().administrador) &&
+                        <li className="sidebar-item">
+                            <Link to="/clientes/" className="sidebar-link">
+                                <IconClient />
+                                <span>Clientes</span>
+                            </Link>
+                        </li>
+                    }
 
-                    <li className="sidebar-item">
-                        <a href="#" className="sidebar-link collapsed has-dropdown" data-bs-toggle="collapse"
-                            data-bs-target="#recreadores" aria-expanded="false" aria-controls="recreadores">
-                            <IconRecreadores />
-                            <span>Recreadores</span>
-                        </a>
-                        <ul id="recreadores" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                            <li className="sidebar-item">
-                                <Link to="/niveles/" className="sidebar-link">Niveles</Link>
-                            </li>
-                            <li className="sidebar-item">
-                                <Link to="/recreadores/" className="sidebar-link">Recreadores</Link>
-                            </li>
-                        </ul>
-                    </li>
-
-                    <li className="sidebar-item">
-                        <Link to="/clientes/" className="sidebar-link">
-                            <IconClient />
-                            <span>Clientes</span>
-                        </Link>
-                    </li>
-
-                    <li className="sidebar-item">
-                        <a href="#" className="sidebar-link">
+                    {
+                        (getPermisos().permisos.includes(13) || getPermisos().administrador) &&
+                        <li className="sidebar-item">
+                        <Link to="/estadisticas/" className="sidebar-link">
                             <IconEstadistica />
                             <span>Estadisticas</span>
-                        </a>
-                    </li>
-
-                    <li className="sidebar-item">
-                        <Link to="/configuracion/" className="sidebar-link">
-                            <IconConfig />
-                            <span>Configuración</span>
                         </Link>
                     </li>
+                    }
+                    {
+                        (getPermisos().permisos.includes(14) || getPermisos().administrador) &&
+                        <li className="sidebar-item">
+                            <Link to="/configuracion/" className="sidebar-link">
+                                <IconConfig />
+                                <span>Configuración</span>
+                            </Link>
+                        </li>
+                    }
+
 
                     <li className="sidebar-item"
                         onClick={async () => {
@@ -179,12 +200,12 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
                         <img src={bombita} alt="bombita" />
                     </Link>
                     <div className="user ms-2">
-                        <p className="m-0 me-1 text-center inline-block">{dataUser.nombre}</p>
+                        <p className="m-0 me-1 text-center inline-block">{dataUser.usuario}</p>
                         {
-                            permisos.img && permisos.img !=="" ?
-                            <img className="icono-nav" src={permisos.img} alt="logo" />
-                            :
-                            <IconUserCircle />
+                            getPermisos().img && getPermisos().img !== "" ?
+                                <img className="icono-nav" src={getPermisos().img} alt="logo" />
+                                :
+                                <IconUserCircle />
                         }
                     </div>
                 </header>

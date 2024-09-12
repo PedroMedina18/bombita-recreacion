@@ -11,6 +11,7 @@ function Error404() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    document.title = "Página Desconocida - Bombita Recreación"
     if (isAuthenticateds && getCookie("token")) {
       setLogin(true)
     }

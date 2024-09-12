@@ -14,6 +14,7 @@ function Dolar() {
     const renderizado = useRef(0)
 
     useEffect(() => {
+        document.title="Precio Dolar - Bombita Recreación"
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             getDolar()
@@ -70,8 +71,9 @@ function Dolar() {
                 order={true}
                 organizar={[
                     { label: "Fecha", value: "fech" },
-                    { label: "Precio", value: "price" },
+                    { label: "Precio", value: "precio" },
                 ]}
+                fechaOrganizer={true}
             />
             <Toaster />
         </Navbar>

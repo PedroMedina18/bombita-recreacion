@@ -32,9 +32,12 @@ function FormActividades() {
     if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1
       if (params.id) {
+        document.title = "Edición de Actividades - Bombita Recreación"
         get_actividad()
+      }else{
+        document.title = "Registro de Actividades - Bombita Recreación"
+        setLoading(false)
       }
-      return
     }
   }, [])
   const get_actividad = async () => {

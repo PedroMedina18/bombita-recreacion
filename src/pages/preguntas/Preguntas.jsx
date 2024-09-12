@@ -19,6 +19,15 @@ function Preguntas() {
     const renderizado = useRef(0)
     const navigate = useNavigate()
 
+    useEffect(() => {
+        document.title="Preguntas - Bombitas Recreación"
+        if (renderizado.current === 0) {
+            renderizado.current = renderizado.current + 1
+            getPreguntas()
+            return
+        }
+    }, [])
+
     const alertRegisterPregunta = async ({ title, dataEdit = { value: "", id: 0 } }) => {
         return Swal.fire({
             title: `${title}`,
@@ -77,16 +86,11 @@ function Preguntas() {
                     getPreguntas()
                 }
             }
+            if(result.value?.status===false){
+                toastError(result.value? result.value.message : "Error durante el registro")
+            }
         })
     }
-
-    useEffect(() => {
-        if (renderizado.current === 0) {
-            renderizado.current = renderizado.current + 1
-            getPreguntas()
-            return
-        }
-    }, [])
 
     const getPreguntas = () => {
         getListItems({
@@ -185,7 +189,7 @@ function Preguntas() {
     }
 
     return (
-        <Navbar name={texts.pages.getPreguntas.name} descripcion={texts.pages.getPreguntas.description}>
+        <Navbar name={texts.pages.getPreguntas.name} descripcion={texts.pages.getPreguntas.description} dollar={false}>
             <Table
                 columns={columns}
                 rows={listPreguntas}

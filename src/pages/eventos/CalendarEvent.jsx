@@ -7,9 +7,13 @@ import texts from "../../context/text_es.js";
 import {
     IconRowLeft
   } from "../../components/Icon.jsx";
+import { useEffect } from "react";
 
 function CalendarEvent() {
     const navigate = useNavigate()
+    useEffect(()=>{
+        document.title="Calendario de Eventos - Bombita Recreación"
+    },[])
 
     return (
         <Navbar name={texts.pages.calendarEvents.name} descripcion={texts.pages.calendarEvents.description}>

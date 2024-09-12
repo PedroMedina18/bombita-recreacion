@@ -14,7 +14,6 @@ button[disabled]:hover {
   background: #fff;
   border: 2px solid rgb(22, 21, 21);
   border-radius: 5px;
-  height: 35px;
   line-height: 40px;
   padding: 10px 15px;
   transition: 0.3s ease all;
@@ -27,8 +26,9 @@ button[disabled]:hover {
 }
 
 .input-table.page {
-  padding: 10px 0px;
+  padding: 5px 0px;
   text-align: center;
+  width: 50px;
 }
 
 .container-table {
@@ -74,7 +74,7 @@ table.table-data td {
   text-align: center;
   padding: 10px 5px;
   border: 2px solid rgb(92, 92, 92);
-  min-width: max-content;
+  max-width: 250px;
   word-wrap: break-word;
 }
 
@@ -119,16 +119,16 @@ tbody tr td {
   font-weight: normal;
 }
 
-table td:first-child {
+/* table td:first-child {
   font-weight: bold;
-}
+} */
 
 table tbody tr:nth-child(odd) {
   background-color: rgba(var(--secundario), 0.2);
 }
 
 table svg {
-  width: 30px;
+  width: 2rem;
 }
 
 table .svg-check svg {
@@ -159,13 +159,14 @@ table svg.money:hover {
   display: inline-block;
   padding: 5px;
   right: 1.5rem;
-  top: 0.5rem;
+  top: 0.7rem;
   position: absolute;
   transition: all 0.2s ease-out;
 }
 
 .row-collapse[data-bs-toggle="collapse"][aria-expanded="true"]::after {
   transform: rotate(45deg);
+  top: 0.5rem;
 }
 
 .row-collapse[data-bs-toggle="collapse"][aria-expanded="false"]::after {
@@ -187,6 +188,7 @@ table svg.money:hover {
 }
 
 
+
 @media (max-width: 768px) {
   table.table-data {
     min-width: max-content;
@@ -196,15 +198,15 @@ table svg.money:hover {
     padding: 10px 6px;
   }
 }
-
-@media (min-width: 992px) {
+@media (max-width: 576px) {
+  table.table-data th {
+    max-width: 150px;
+  }
+}
+@media (max-width: 992px) {
   table.table-data th {
     max-width: 100px;
   }
 }
 
-@media (min-width: 576px) {
-  table.table-data th {
-    max-width: 150px;
-  }
-}
+

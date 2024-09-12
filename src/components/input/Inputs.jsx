@@ -89,7 +89,8 @@ export function InputTextTarea({ label, id, name, form, placeholder = "", params
           {...register(name, params)}
           {...props}
         />
-
+        <IconCircleCheck className="bi bi-check-circle-fill" />
+        <IconCircleX className="bi bi-x-circle-fill" />
       </div>
       <p className="formulario-message-error">
         {errors[name] ? errors[name].message : "error"}
@@ -297,8 +298,8 @@ export function UnitSelect({ label, id, name, form, params = {}, options, placeh
         >
           {placeholder && <option value="">{placeholder}</option>}
           {options.length
-            ? options.map((element) => (
-              <option key={element.value} value={element.value}>
+            ? options.map((element, index) => (
+              <option key={`element.label-${index}`} value={element.value}>
                 {element.label}
               </option>
             ))
@@ -390,7 +391,7 @@ export function SelectAsync({ id, label = null, optionsDefault, placeholder, loa
   )
 }
 
-export function InputImgPerfil({ label, id, name, form, tamaño = "lg", imgPerfil = null }) {
+export function InputImgPerfil({ label, id, name, form, tamaño = "lg", imgPerfil = null, disabled = false }) {
   const { errors, register } = form;
   const img = imgPerfil ? imgPerfil : perfil
 
@@ -428,10 +429,10 @@ export function InputImgPerfil({ label, id, name, form, tamaño = "lg", imgPerfi
         <IconUserCircleSolid id="svg-perfil" className={`${imgPerfil ? "d-none" : ""}`} />
         <img id="img-perfil-creador" src={img} alt="img_perfil" className={`${tamaño == "sm" ? 'sm' : 'lg'} img-perfil ${imgPerfil ? "" : "d-none"}`} />
       </div>
-      <label className="button-initial cursor-pointer" htmlFor={name}>
+      <label className="button-initial cursor-pointer" htmlFor={name} disabled={disabled}>
         {label}
       </label>
-      <input type="file" className="d-none" id={id} name={name} accept=".jpg, .jpeg, .png" multiple={false}
+      <input type="file" className="d-none" id={id} name={name} accept=".jpg, .jpeg, .png" multiple={false} disabled={disabled}
         {...register(name)}
         onChange={(e) => { cambio_imagen(e) }}
       />
@@ -610,56 +611,77 @@ export function TogleSwiches({ id, name, form, className = "", ...props }) {
   )
 }
 
-export function RadioStart({ save, state, index, id, name, check }) {
+export function RadioStart({ save, state, index, id, name, check, block=false }) {
+  const [value, setValue]=useState(Number(check))
 
   return (
     <div className="rating">
-  <input type="radio" id={`${name}-star-1`} name={name} value={5} checked={check===5}
-  onChange={(e)=>{
-    const list = [...state]
-    list[index]={id:id, value:Number(e.target.value)}
-    save(list)
-  }}/>
-  <label htmlFor={`${name}-star-1`}>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
-  </label>
-  <input type="radio" id={`${name}-star-2`} name={name} value={4} checked={check===4}
-  onChange={(e)=>{
-    const list = [...state]
-    list[index]={id:id, value:Number(e.target.value)}
-    save(list)
-  }}/>
-  <label htmlFor={`${name}-star-2`}>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
-  </label>
-  <input type="radio" id={`${name}-star-3`} name={name} value={3} checked={check===3}
-  onChange={(e)=>{
-    const list = [...state]
-    list[index]={id:id, value:Number(e.target.value)}
-    save(list)
-  }}/>
-  <label htmlFor={`${name}-star-3`}>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
-  </label>
-  <input type="radio" id={`${name}-star-4`} name={name} value={2} checked={check===2}
-  onChange={(e)=>{
-    const list = [...state]
-    list[index]={id:id, value:Number(e.target.value)}
-    save(list)
-  }}/>
-  <label htmlFor={`${name}-star-4`}>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
-  </label>
-  <input type="radio" id={`${name}-star-5`} name={name} value={1} checked={check===1}
-  onChange={(e)=>{
-    const list = [...state]
-    list[index]={id:id, value:Number(e.target.value)}
-    save(list)
-  }}/>
-  <label htmlFor={`${name}-star-5`}>
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
-  </label>
-</div>
+      <input type="radio" id={`${name}-star-1`} name={name} value={5} checked={5 === value}
+        onChange={(e) => {
+          if(block){
+            return
+          }
+          const list = [...state]
+          list[index] = { id: id, value: Number(e.target.value) }
+          save(list)
+          setValue(Number(e.target.value))
+        }} />
+      <label htmlFor={`${name}-star-1`}>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+      </label>
+      <input type="radio" id={`${name}-star-2`} name={name} value={4} checked={4 === value}
+        onChange={(e) => {
+          if(block){
+            return
+          }
+          const list = [...state]
+          list[index] = { id: id, value: Number(e.target.value) }
+          save(list)
+          setValue(Number(e.target.value))
+        }} />
+      <label htmlFor={`${name}-star-2`}>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+      </label>
+      <input type="radio" id={`${name}-star-3`} name={name} value={3} checked={3 === value}
+        onChange={(e) => {
+          if(block){
+            return
+          }
+          const list = [...state]
+          list[index] = { id: id, value: Number(e.target.value) }
+          save(list)
+          setValue(Number(e.target.value))
+        }} />
+      <label htmlFor={`${name}-star-3`}>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+      </label>
+      <input type="radio" id={`${name}-star-4`} name={name} value={2} checked={2 === value}
+        onChange={(e) => {
+          if(block){
+            return
+          }
+          const list = [...state]
+          list[index] = { id: id, value: Number(e.target.value) }
+          save(list)
+          setValue(Number(e.target.value))
+        }} />
+      <label htmlFor={`${name}-star-4`}>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+      </label>
+      <input type="radio" id={`${name}-star-5`} name={name} value={1} checked={1 === value}
+        onChange={(e) => {
+          if(block){
+            return
+          }
+          const list = [...state]
+          list[index] = { id: id, value: Number(e.target.value) }
+          save(list)
+          setValue(Number(e.target.value))
+        }} />
+      <label htmlFor={`${name}-star-5`}>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path pathLength="360" d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z"></path></svg>
+      </label>
+    </div>
 
 
   )

@@ -46,6 +46,7 @@ function FormDataEvent() {
         watch,
         setValue,
         getValues,
+        clearErrors
 
     } = useForm();
 
@@ -180,12 +181,16 @@ function FormDataEvent() {
                             }}
                             onChange={
                                 (e) => {
-                                    setdataNewUser({
+                                    if (Boolean(e.target.value)) {
+                                        clearErrors("tipo_documento")
+                                    }
+                                    const newUser = {
                                         ...dataNewUser,
                                         tipo_documento: e.target.value
-                                    })
+                                    }
+                                    setdataNewUser(newUser)
                                     getPersona({
-                                        dataNewUser,
+                                        dataNewUser: newUser,
                                         setPersona,
                                         setValue,
                                         setDisabledInputs
@@ -207,30 +212,31 @@ function FormDataEvent() {
                                     message: texts.inputsMessage.requireDocumento,
                                 },
                                 maxLength: {
-                                    value: 10,
-                                    message: texts.inputsMessage.max10,
+                                    value: 9,
+                                    message: texts.inputsMessage.max9,
                                 },
                                 minLength: {
                                     value: 7,
                                     message: texts.inputsMessage.min7,
                                 },
-                                min:{
-                                    value:4000,
+                                min: {
+                                    value: 4000000,
                                     message: texts.inputsMessage.invalidDocument,
                                 }
                             }}
                             onKeyUp={
                                 (e) => {
-                                    setdataNewUser({
+                                    const newUser = {
                                         ...dataNewUser,
                                         numero_documento: e.target.value
-                                    })
+                                    }
+                                    setdataNewUser(newUser)
                                     if (debounceTimeoutPersona) {
                                         clearTimeout(debounceTimeoutPersona);
                                     }
                                     const timeout = setTimeout(() => {
                                         getPersona({
-                                            dataNewUser: { tipo_documento: dataNewUser.tipo_documento, numero_documento: e.target.value },
+                                            dataNewUser:newUser,
                                             setPersona,
                                             setValue,
                                             setDisabledInputs
@@ -266,8 +272,8 @@ function FormDataEvent() {
                                     message: texts.inputsMessage.max200,
                                 },
                                 minLength: {
-                                    value: 5,
-                                    message: texts.inputsMessage.min5,
+                                    value: 3,
+                                    message: texts.inputsMessage.min3,
                                 },
                                 pattern: {
                                     value: pattern.textNoneNumber,
@@ -298,8 +304,8 @@ function FormDataEvent() {
                                     message: texts.inputsMessage.max200,
                                 },
                                 minLength: {
-                                    value: 5,
-                                    message: texts.inputsMessage.min5,
+                                    value: 3,
+                                    message: texts.inputsMessage.min3,
                                 },
                                 pattern: {
                                     value: pattern.textNoneNumber,
@@ -332,14 +338,14 @@ function FormDataEvent() {
                                     value: 11,
                                     message: texts.inputsMessage.onlyCharacter11,
                                 },
-                                minLength: {
-                                    value: 11,
-                                    message: texts.inputsMessage.onlyCharacter11,
-                                },
-                                min:{
-                                    value:200000000,
+                                min: {
+                                    value: 2000000000,
                                     message: texts.inputsMessage.invalidTel,
-                                }
+                                },
+                                pattern: {
+                                    value: pattern.tel,
+                                    message: texts.inputsMessage.invalidTel,
+                                },
                             }}
                             disabled={disabledInputs}
                             isError={!disabledInputs}
@@ -354,14 +360,14 @@ function FormDataEvent() {
                                     value: 11,
                                     message: texts.inputsMessage.onlyCharacter11,
                                 },
-                                minLength: {
-                                    value: 11,
-                                    message: texts.inputsMessage.onlyCharacter11,
-                                },
-                                min:{
-                                    value:200000000,
+                                min: {
+                                    value: 2000000000,
                                     message: texts.inputsMessage.invalidTel,
-                                }
+                                },
+                                pattern: {
+                                    value: pattern.tel,
+                                    message: texts.inputsMessage.invalidTel,
+                                },
                             }}
                             disabled={disabledInputs}
                             isError={!disabledInputs}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { InputsGeneral} from "../../components/input/Inputs.jsx"
+import { InputsGeneral } from "../../components/input/Inputs.jsx"
 import { ButtonSimple } from "../../components/button/Button"
 import { LoaderCircle } from "../../components/loader/Loader";
 import { useNavigate, useParams } from 'react-router-dom'
@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { Toaster } from "sonner";
 import { usuarios } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx"
-import { IconRowLeft } from "../../components/Icon.jsx"
+import { IconRowLeft, IconCircleX, IconCircleCheck } from "../../components/Icon.jsx"
 import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx"
 import { getPersona, controlResultPost, habilitarEdicion, controlErrors } from "../../utils/actions.jsx"
 import { useAuthContext } from '../../context/AuthContext.jsx';
@@ -21,11 +21,12 @@ function Password() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true)
     const [errorServer, setErrorServer] = useState("")
-    const [usuario, setUsuario] = useState(null)
+    const [condicionesPassword, setCondicionesPassword] = useState({ min8: false, max16: false, repeat: false, mayuscula: false, numero: false })
     const renderizado = useRef(0)
     const params = useParams();
 
     useEffect(() => {
+        document.title="Cambio de Contraseña - Bombita Recreación"
         if (renderizado.current === 0) {
             get_usuario()
         }
@@ -59,22 +60,26 @@ function Password() {
     const onSubmit = handleSubmit(
         async (data) => {
             try {
-                const message =  texts.confirmMessage.confirmPassword
+                const message = texts.confirmMessage.confirmPassword
                 const confirmacion = await alertConfim("Confirmar", message)
                 if (confirmacion.isConfirmed) {
-                    const body={
-                        contraseña:data.contraseña,
-                        contraseña_repetida:data.contraseñaTwo
+                    const body = {
+                        contraseña: data.contraseña,
+                        contraseña_repetida: data.contraseñaTwo
+                    }
+                    if (Number(params.id) == 1) {
+                        toastError(texts.errorMessage.errorUserPasswor)
+                        return
                     }
                     alertLoading("Cargando")
-                    const res =  await usuarios.put(body, { subDominio: [Number(params.id)], params:{password:true} })
+                    const res = await usuarios.put(body, { subDominio: [Number(params.id)], params: { password: true } })
                     controlResultPost({
                         respuesta: res,
                         useNavigate: {
                             navigate,
                             direction: "/usuarios/"
                         },
-                        messageExito: params.id ? texts.successMessage.editionUsuario : texts.successMessage.registerUsuario,
+                        messageExito: texts.successMessage.editContraseña 
                     })
                 }
 
@@ -107,92 +112,125 @@ function Password() {
                         (
                             //* Sección principal
                             <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
-                                <form className="w-100 d-flex flex-column align-items-center"
+                                <form className="w-100 d-flex flex-column align-items-center justify-content-center"
                                     onSubmit={onSubmit}
                                 >
-                                    <div className="w-50 d-flex flex-column justify-content-between align-item-center">
-                                        <div className="w-100 ps-0">
-                                        <InputsGeneral type={"text"} label={`${texts.label.user}`} name="usuario" id="usuario" form={{ errors, register }}
-                                                params={{
-                                                    required: {
-                                                        value: true,
-                                                        message: texts.inputsMessage.requireUser
-                                                    },
-                                                    minLength: {
-                                                        value: 8,
-                                                        message: texts.inputsMessage.min8
-                                                    },
-                                                    maxLength: {
-                                                        value: 20,
-                                                        message: texts.inputsMessage.max20
-                                                    },
-                                                    pattern: {
-                                                        value: pattern.user,
-                                                        message: texts.inputsMessage.invalidUser
-                                                    },
-                                                    validate: (value) => {
-                                                        if (hasLeadingOrTrailingSpace(value)) {
-                                                            return texts.inputsMessage.noneSpace
-                                                        } else {
-                                                            return true
-                                                        }
-                                                    },
-                                                }}
-                                                disabled={true}
-                                                placeholder={texts.placeholder.usuario}
-                                            />
+                                    <div className="w-100 px-2 d-flex flex-column flex-md-row justify-content-between align-item-center">
+                                        <ul className="list-password">
+                                            <li><span>{(condicionesPassword.min8 && condicionesPassword.max16) ? <IconCircleCheck /> : <IconCircleX />}</span> Mayor a 8 caracteres y menor a 16 caracteres</li>
+                                            <li><span>{condicionesPassword.mayuscula ? <IconCircleCheck /> : <IconCircleX />}</span> Minimo una letra en Mayuscula</li>
+                                            <li><span>{condicionesPassword.numero ? <IconCircleCheck /> : <IconCircleX />}</span> Minimo una Digito Númerico</li>
+                                            <li><span>{condicionesPassword.repeat ? <IconCircleCheck /> : <IconCircleX />}</span> Contraseña Repetida</li>
+                                        </ul>
+                                        <div className="w-100 w-md-50 d-flex flex-column justify-content-between align-item-center">
+                                            <div className="w-100 ps-0">
+                                                <InputsGeneral type={"text"} label={`${texts.label.user}`} name="usuario" id="usuario" form={{ errors, register }}
+                                                    params={{
+                                                        required: {
+                                                            value: true,
+                                                            message: texts.inputsMessage.requireUser
+                                                        },
+                                                        minLength: {
+                                                            value: 8,
+                                                            message: texts.inputsMessage.min8
+                                                        },
+                                                        maxLength: {
+                                                            value: 20,
+                                                            message: texts.inputsMessage.max20
+                                                        },
+                                                        pattern: {
+                                                            value: pattern.user,
+                                                            message: texts.inputsMessage.invalidUser
+                                                        },
+                                                        validate: (value) => {
+                                                            if (hasLeadingOrTrailingSpace(value)) {
+                                                                return texts.inputsMessage.noneSpace
+                                                            } else {
+                                                                return true
+                                                            }
+                                                        },
+                                                    }}
+                                                    disabled={true}
+                                                    placeholder={texts.placeholder.usuario}
+                                                />
+                                            </div>
+                                            <div className="w-100 ps-0">
+                                                <InputsGeneral type={"password"} label={`${texts.label.password}`} name="contraseña" id="contraseña" form={{ errors, register }}
+                                                    params={{
+                                                        required: {
+                                                            value: true,
+                                                            message: texts.inputsMessage.requirePassword
+                                                        },
+                                                        minLength: {
+                                                            value: 8,
+                                                            message: texts.inputsMessage.min8
+                                                        },
+                                                        maxLength: {
+                                                            value: 20,
+                                                            message: texts.inputsMessage.max20
+                                                        },
+                                                        pattern: {
+                                                            value: pattern.password,
+                                                            message: texts.inputsMessage.invalidPassword,
+                                                        },
+                                                        validate: (value) => {
+                                                            if (hasLeadingOrTrailingSpace(value)) {
+                                                                return texts.inputsMessage.noneSpace
+                                                            } else {
+                                                                return true
+                                                            }
+                                                        },
+                                                    }}
+                                                    onChange={(e) => {
+                                                        const password = e.target.value
+                                                        const min8 = password.length >= 8;
+                                                        const max16 = password.length <= 16;
+                                                        const mayuscula = /[A-Z]/.test(password);
+                                                        const numero = /\d/.test(password);
+                                                        setCondicionesPassword({
+                                                            ...condicionesPassword,
+                                                            min8,
+                                                            max16,
+                                                            mayuscula,
+                                                            numero,
+                                                        });
+
+                                                    }}
+                                                    placeholder={texts.placeholder.password}
+                                                />
+                                            </div>
+                                            <div className="w-100 ps-0">
+                                                <InputsGeneral type={"password"} label={texts.label.password2} name="contraseñaTwo" id="contraseñaTwo" form={{ errors, register }}
+                                                    params={{
+                                                        required: {
+                                                            value: true,
+                                                            message: texts.inputsMessage.confirmPassword
+                                                        },
+                                                        validate: (value) => {
+                                                            if (!(value === watch("contraseña"))) {
+                                                                return texts.inputsMessage.errorPassword
+                                                            } else {
+                                                                return true
+                                                            }
+                                                        },
+
+                                                    }}
+                                                    onChange={(e) => {
+                                                        const password = e.target.value
+                                                        const repeat = password === watch("contraseña")
+                                                        setCondicionesPassword({
+                                                            ...condicionesPassword,
+                                                            repeat
+                                                        });
+                                                    }}
+                                                    placeholder={texts.placeholder.repeatPassword}
+                                                />
+                                            </div>
                                         </div>
-                                        <div className="w-100 ps-0">
-                                            <InputsGeneral type={"password"} label={`${texts.label.password}`} name="contraseña" id="contraseña" form={{ errors, register }}
-                                                params={{
-                                                    required: {
-                                                        value: true,
-                                                        message: texts.inputsMessage.requirePassword
-                                                    },
-                                                    minLength: {
-                                                        value: 5,
-                                                        message: texts.inputsMessage.min5
-                                                    },
-                                                    maxLength: {
-                                                        value: 20,
-                                                        message: texts.inputsMessage.max20
-                                                    },
-                                                    pattern: {
-                                                        value: pattern.password,
-                                                        message: texts.inputsMessage.invalidPassword,
-                                                    },
-                                                    validate: (value) => {
-                                                        if (hasLeadingOrTrailingSpace(value)) {
-                                                            return texts.inputsMessage.noneSpace
-                                                        } else {
-                                                            return true
-                                                        }
-                                                    },
-                                                }}
-                                                placeholder={texts.placeholder.password}
-                                            />
-                                        </div>
-                                        <div className="w-100 ps-0">
-                                            <InputsGeneral type={"password"} label={texts.label.password2} name="contraseñaTwo" id="contraseñaTwo" form={{ errors, register }}
-                                                params={{
-                                                    required: {
-                                                        value: true,
-                                                        message: texts.inputsMessage.confirmPassword
-                                                    },
-                                                    validate: (value) => {
-                                                        if (!(value === watch("contraseña"))) {
-                                                            return texts.inputsMessage.errorPassword
-                                                        } else {
-                                                            return true
-                                                        }
-                                                    },
-                                                }}
-                                                placeholder={texts.placeholder.repeatPassword}
-                                            />
-                                        </div>
+
                                     </div>
 
-                                    <ButtonSimple type="submit" className="mx-auto w-50 mt-3">
+                                    <ButtonSimple type="submit" className="mx-auto w-50 mt-3" disabled={!(condicionesPassword.max16 && condicionesPassword.min8 && condicionesPassword.mayuscula && condicionesPassword.repeat && condicionesPassword.numero)}>
                                         Registrar
                                     </ButtonSimple>
                                 </form>

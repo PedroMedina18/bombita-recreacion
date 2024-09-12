@@ -57,13 +57,15 @@ function ComponentCalendarEvents() {
         }
 
     }
+
     return (
         <div className=' px-sm-0 px-md-1 px-4 mt-5 w-100'>
             <h6 className='text-center h3 fw-bold'>Calendario de Eventos</h6>
             <div className='w-100 overflow-auto scroll'>
                 <ComponentCalendar
                     object={eventos}
-                    className='vh-100 w-calendar'
+                    className='w-calendar h-calendar'
+                    filtros={{estado:"not_cancel", estado_pago:"not_page"}}
                     eventData={eventData}
                     components={components}
                     onDoubleClickEvent={

@@ -17,6 +17,7 @@ function Cargos() {
     const navigate = useNavigate()
 
     useEffect(() => {
+        document.title="Cargos - Bombita Recreación"
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             getCargos()

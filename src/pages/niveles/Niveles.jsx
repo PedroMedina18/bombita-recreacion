@@ -18,6 +18,7 @@ function Niveles() {
   const navigate = useNavigate()
 
   useEffect(() => {
+    document.title = "Niveles - Bombita Recreación"
     if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1
       getNiveles()
@@ -36,7 +37,7 @@ function Niveles() {
 
   const columns = [
     {
-      name: "Codigo",
+      name: "Código",
       row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
     },
     {
@@ -59,7 +60,7 @@ function Niveles() {
                   codigo: formatoId(row.id),
                   descripción: row.descripcion,
                   fecha_de_registro: formatDateWithTime12Hour(row.fecha_registro),
-                  fecha_de_actualizacion: formatDateWithTime12Hour(row.fecha_actualizacion),
+                  ultima_modificación: formatDateWithTime12Hour(row.fecha_actualizacion),
                 }
               )
             }} className="cursor-pointer"
@@ -133,7 +134,7 @@ function Niveles() {
         loading={tableLoading}
         order={true}
         organizar={[
-          { label: "Origen", value: "orig" },
+          { label: "Codigo", value: "orig" },
           { label: "Nombre", value: "alf" },
         ]}
       />

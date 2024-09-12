@@ -1,0 +1,58 @@
+{% extends "./main.html" %}
+
+{% block titulo %} Completo {% endblock %}
+
+{% block content %}
+<img class="logo" src="./logo-bombita.png" alt="logo">
+
+<div
+    class="d-flex flex-column w-90 w-md-80 mx-auto bg-white-ligh py-3 px-4 border rounded-1 border-dark border-2 mt-10 mb-5">
+    <img src="./sonrisa.png" alt="estrellas" width="100px" class="mx-auto my-2">
+    <div class="header-email">
+        <h2 class="text-center fw-bold  h1 mb-1 text-capitalize">EVENTO COMPLETADO!</h2>
+        <h3 class="text-center fw-semibold mt-2">Evento Completado
+        </h3>
+    </div>
+    <hr class="hr-email">
+
+    <div class="body-email px-4 ">
+        <p class="text-center text-description my-3">Nos complace informarles que el evento ha sido
+            completado con gran éxito. Queremos agradecerles sinceramente por su participación y apoyo. </p>
+        <p class="text-center text-description my-3">Esperamos que hayan disfrutado de la experiencia. Les
+            deseamos lo mejor en sus proyectos y actividades futuras. <br></p>
+        <p class="text-center text-description my-3">Estamos ansiosos por la oportunidad de trabajar juntos
+            nuevamente en el futuro. ¡Gracias y hasta la próxima!</p>
+    </div>
+    <div class="w-90 w-md-80 mx-auto bg-white-ligh py-2 px-4 border rounded-4 border-dark border-2 my-2">
+        <div class="w-100 px-4">
+            <h3 class="text-center fw-bold">Información del Evento</h3>
+            <div class="d-flex aling-items-center justify-content-between w-100">
+                <div>
+                    <strong class="m-0 fs-6">Código:</strong>
+                    <p class="m-0 fs-6"> {{codigo}}</p>
+                </div>
+                <div>
+                    <strong class="m-0 fs-6">Cliente:</strong>
+                    <p class="m-0 fs-6"> {{nombre}} {{documento}}</p>
+    
+                </div>
+            </div>
+            <div class="w-100">
+                <strong class="m-0 fs-6">Dirección:</strong>
+                <p class="m-0 fs-6"> {{direccion}}</p>
+            </div>
+            <div class="d-flex aling-items-center justify-content-between w-100">
+                <div>
+                    <strong class="m-0 fs-6">Desde:</strong>
+                    <p class="m-0 fs-6">{{fecha_inicio}}</p>
+                </div>
+                <div>
+                    <strong class="m-0 fs-6">Hasta:</strong>
+                    <p class="m-0 fs-6">{{fecha_final}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

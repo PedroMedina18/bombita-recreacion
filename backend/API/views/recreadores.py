@@ -6,11 +6,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.db import IntegrityError, connection, models
 from ..models import Nivel, Recreadores, Personas, TipoDocumento, Generos
-from ..funtions.indice import indiceFinal, indiceInicial
-from ..funtions.serializador import dictfetchall
-from ..funtions.identificador import determinar_valor, edit_str
-from ..funtions.token import verify_token
-from ..funtions.filtros import order, filtrosWhere
+from ..utils.indice import indiceFinal, indiceInicial
+from ..utils.serializador import dictfetchall
+from ..utils.identificador import determinar_valor, edit_str, returnBoolean
+from ..utils.token import verify_token
+from ..utils.filtros import order, filtrosWhere
 from ..message import MESSAGE
 from decouple import config
 import json
@@ -33,6 +33,12 @@ class Recreadores_Views(View):
                     "message": verify["message"],
                 }
                 return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 7 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
 
             if method == "PUT":
 
@@ -43,6 +49,15 @@ class Recreadores_Views(View):
                 if len(recreador) > 0:
                     recreador = Recreadores.objects.get(id=int(id))
                     persona = Personas.objects.get(id=int(recreador.persona.id))
+                    
+                    recreador.estado=returnBoolean(req['estado'])
+                    if(not returnBoolean(req['estado'])):
+                        recreador.save()
+                        datos = {
+                        "status": True, 
+                        "message": f"{MESSAGE['exitoRecreadorDisabled']}"
+                        }
+                        return JsonResponse(datos)
 
                     ### *comprobacion de tipo de documento
                     tipo_documento = list(
@@ -189,15 +204,11 @@ class Recreadores_Views(View):
             return JsonResponse(datos)
         except Exception as error:
             if method == "PUT":
-                print(f"{MESSAGE['errorPut']} - {error}")
                 datos = {
                     "status": False,
                     "message": f"{MESSAGE['errorEdition']}: {error}",
                 }
             else:
-                print(
-                    f"{MESSAGE['errorPost']} - {error}",
-                )
                 datos = {
                     "status": False,
                     "message": f"{MESSAGE['errorRegistro']}: {error}",
@@ -212,6 +223,12 @@ class Recreadores_Views(View):
             verify = verify_token(request.headers)
             if not verify["status"]:
                 datos = {"status": False, "message": verify["message"]}
+                return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 7 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
                 return JsonResponse(datos)
             recreador = list(Recreadores.objects.filter(id=int(id)).values())
             if len(recreador) > 0:
@@ -243,6 +260,12 @@ class Recreadores_Views(View):
             if not verify["status"]:
                 datos = {"status": False, "message": verify["message"], "data": None}
                 return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 7 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
 
             if totalRecreadores == "true":
                 query = """
@@ -273,9 +296,10 @@ class Recreadores_Views(View):
                         tipo.nombre AS tipo_documento, 
                         pe.numero_documento,
                         CONCAT('0', pe.telefono_principal) AS telefono_principal,
-                        CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
+                        IF(pe.telefono_secundario IS NOT NULL AND pe.telefono_secundario != '', CONCAT('0', pe.telefono_secundario), pe.telefono_secundario) AS telefono_secundario,
+                        
                         re.estado,
-                        IF(re.img_perfil IS NOT NULL AND re.img_perfil != '', CONCAT('{}media/', re.img_perfil), img_perfil) AS img_perfil
+                        IF(re.img_perfil IS NOT NULL AND re.img_perfil != '', CONCAT('{}media/', re.img_perfil), re.img_perfil) AS img_perfil
                     FROM recreadores AS re
                     LEFT JOIN niveles AS ni ON re.nivel_id=ni.id
                     LEFT JOIN generos AS ge ON re.genero_id=ge.id
@@ -286,10 +310,27 @@ class Recreadores_Views(View):
                 cursor.execute(query, [int(id)])
                 recreador = dictfetchall(cursor)
                 if len(recreador) > 0:
+                    queryEvaluacion="""
+                    SELECT 
+                        r.id,
+                        COALESCE(AVG(ers.evaluacion_recreador), 0) AS evaluacion
+                    FROM 
+                        recreadores r
+                        LEFT JOIN recreadores_eventos_servicios ers ON r.id = ers.recreador_id
+                    WHERE 
+                        r.id = %s
+                    GROUP BY 
+                        r.id
+                    """
+                    cursor.execute(queryEvaluacion, [int(id)])
+                    evaluacion = dictfetchall(cursor)
                     datos = {
                         "status": True,
                         "message": f"{MESSAGE['exitoGet']}",
-                        "data": recreador[0],
+                        "data": {
+                            **recreador[0],
+                            "evaluacion":evaluacion[0]["evaluacion"]
+                        }
                     }
                 else:
                     datos = {
@@ -347,7 +388,7 @@ class Recreadores_Views(View):
                         tipo.nombre AS tipo_documento, 
                         pe.numero_documento,
                         CONCAT('0', pe.telefono_principal) AS telefono_principal,
-                        CONCAT('0', pe.telefono_secundario) AS telefono_secundario,
+                        IF(pe.telefono_secundario IS NOT NULL AND pe.telefono_secundario != '', CONCAT('0', pe.telefono_secundario), pe.telefono_secundario) AS telefono_secundario,
                         re.estado,
                         IF(re.img_perfil IS NOT NULL AND re.img_perfil != '', CONCAT('{}media/', re.img_perfil), img_perfil) AS img_perfil
                     FROM recreadores AS re
@@ -382,7 +423,7 @@ class Recreadores_Views(View):
                         "status": True,
                         "message": f"{MESSAGE['errorRegistrosNone']}",
                         "data": None,
-                        "pages": None,
+                        "pages": 0,
                         "total": 0,
                     }
             return JsonResponse(datos)
@@ -392,7 +433,7 @@ class Recreadores_Views(View):
                 "status": False,
                 "message": f"{MESSAGE['errorConsulta']}: {error}",
                 "data": None,
-                "pages": None,
+                "pages": 0,
                 "total": 0,
             }
             return JsonResponse(datos)

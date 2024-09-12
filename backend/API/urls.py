@@ -1,5 +1,5 @@
 from django.urls import path
-from .views.view import Metodos_Pagos_Views, Actividades_Views, Cargos_Views, Preguntas_Evento_View, Clientes_Views, Dollar_View, Eventos_Views, Generos_Views, Login, Eventos_Recreadores_Servicios_View, Materiales_Views, Niveles_Views, Permisos_Views, Personas_Views, Recreadores_Views, Respaldo, Servicios_Views, Sobrecargos_Views, Tipos_Documentos_Views, Usuarios_Views, Verify_Token_Views, Pagos_Views, Recraadores_Eventos_Views, Evaluacion_View
+from .views.view import Metodos_Pagos_Views, Actividades_Views, Cargos_Views, Estadistica_View, Preguntas_Evento_View, Clientes_Views, Dollar_View, Eventos_Views, Generos_Views, Login, Registros_Material_View, Eventos_Recreadores_Servicios_View, Materiales_Views, Niveles_Views, Permisos_Views, Personas_Views, Recreadores_Views, Respaldo, Servicios_Views, Sobrecargos_Views, Tipos_Documentos_Views, Usuarios_Views, Verify_Token_Views, Pagos_Views, Recreadores_Eventos_Views, Evaluacion_View
 
 urlpatterns=[
     path('cargos/', Cargos_Views.as_view(), name='cargos'),
@@ -18,6 +18,8 @@ urlpatterns=[
     path('actividades/<int:id>/', Actividades_Views.as_view(), name='actividad'),
     path('materiales/', Materiales_Views.as_view(), name='materiales'),
     path('materiales/<int:id>/', Materiales_Views.as_view(), name='material'),
+    path('inventario/', Registros_Material_View.as_view(), name='inventarios'),
+    path('inventario/<int:id>/', Registros_Material_View.as_view(), name='inventario'),
     path('metodos_pago/', Metodos_Pagos_Views.as_view(), name='metodos_pago'),
     path('metodos_pago/<int:id>/', Metodos_Pagos_Views.as_view(), name='metodo_pago'),
     path('servicios/', Servicios_Views.as_view(), name='servicios'),
@@ -26,7 +28,7 @@ urlpatterns=[
     path('usuarios/', Usuarios_Views.as_view(), name='usuarios'),
     path('usuarios/<int:id>/', Usuarios_Views.as_view(), name='usuario'),
     path('recreadores/', Recreadores_Views.as_view(), name='recreadores'),
-    path('recreadores/eventos/<int:id>/', Recraadores_Eventos_Views.as_view(), name='recreadores_evento'),
+    path('recreadores/eventos/<int:id>/', Recreadores_Eventos_Views.as_view(), name='recreadores_evento'),
     path('recreadores/<int:id>/', Recreadores_Views.as_view(), name='recreadores'),
     path('eventos/', Eventos_Views.as_view(), name='eventos'),
     path('eventos/pagos/', Pagos_Views.as_view(), name='pagos'),
@@ -39,6 +41,8 @@ urlpatterns=[
     path('preguntas/<int:id>/', Preguntas_Evento_View.as_view(), name='pregunta'),
     path('evaluacion/', Evaluacion_View.as_view(), name='evaluaciones'),
     path('evaluacion/<int:id>/', Evaluacion_View.as_view(), name='evaluacion'),
+    path('estadisticas/', Estadistica_View.as_view(), name='estadistica'),
+    path('login/', Login.as_view(), name='login'),
     path('login/', Login.as_view(), name='login'),
     path('verify/', Verify_Token_Views.as_view(), name='verify'),
     path('respaldo/', Respaldo.as_view(), name='respaldo'),

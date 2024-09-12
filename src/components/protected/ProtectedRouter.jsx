@@ -1,13 +1,13 @@
 import { Outlet, Navigate } from 'react-router-dom';
 import { useAuthContext } from "../../context/AuthContext.jsx";
 import { getCookie } from "../../utils/cookie.jsx"
-import useInactivity from "../../context/useInactivity.jsx"
 import { useEffect } from 'react';
 
 
 function ProtectedRouter({children}) {
   const { isAuthenticateds } = useAuthContext();
   const token = getCookie("token")
+  
   if (isAuthenticateds && token) {
     return (children ? children : <Outlet />)
 

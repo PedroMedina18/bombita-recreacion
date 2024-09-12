@@ -4,13 +4,13 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.db import IntegrityError, connection, models
-from ..funtions.indice import indiceFinal, indiceInicial
-from ..funtions.serializador import dictfetchall
+from ..utils.indice import indiceFinal, indiceInicial
+from ..utils.serializador import dictfetchall
 from ..models import Actividades, MaterialesActividad, Materiales
-from ..funtions.token import verify_token
-from ..funtions.editorOpciones import editorOpciones
-from ..funtions.filtros import order, filtrosWhere
-from ..funtions.identificador import determinar_valor
+from ..utils.token import verify_token
+from ..utils.editorOpciones import editorOpciones
+from ..utils.filtros import order, filtrosWhere
+from ..utils.identificador import determinar_valor
 from ..message import MESSAGE
 import json
 from decouple import config
@@ -32,16 +32,24 @@ class Actividades_Views(View):
                     'message': verify['message'],
                 }
                 return JsonResponse(datos)
+
+            if(not (bool(verify['info']['administrador']) or 5 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
+
             actividad = Actividades.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'])
             if(req['materiales']):
                 materiales = req['materiales']
                 for material in materiales:
                         new_material = Materiales.objects.get(id=int(material))
                         MaterialesActividad.objects.create(material=new_material, actividad=actividad)
-                datos = {
-                    'status': True,
-                    'message': f"{MESSAGE['registerActividad']}"
-                }
+            datos = {
+                'status': True,
+                'message': f"{MESSAGE['registerActividad']}"
+            }
             return JsonResponse(datos)
         
         except IntegrityError as error:
@@ -81,6 +89,14 @@ class Actividades_Views(View):
                     'message': verify['message'],
                 }
                 return JsonResponse(datos)
+                
+            if(not (bool(verify['info']['administrador']) or 5 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
+
             actividad = list(Actividades.objects.filter(id=id).values())
             if len(actividad) > 0:
                 actividad = Actividades.objects.get(id=id)
@@ -124,7 +140,6 @@ class Actividades_Views(View):
             return JsonResponse(datos)
             
         except IntegrityError as error:
-            print(f"{MESSAGE['errorIntegrity']} - {error}", )
             if error.args[0]==1062:
                 if 'nombre' in error.args[1]:
                     message = MESSAGE['nombreDuplicate']
@@ -141,7 +156,6 @@ class Actividades_Views(View):
                 }
             return JsonResponse(datos)
         except Exception as error:
-            print(f"{MESSAGE['errorPut']} - {error}")
             datos = {
                 'status': False,
                 'message': f"{MESSAGE['errorEdition']}: {error}",
@@ -160,6 +174,14 @@ class Actividades_Views(View):
                     'message': verify['message']
                 }
                 return JsonResponse(datos)
+
+            if(not (bool(verify['info']['administrador']) or 5 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
+
             actividad = list(Actividades.objects.filter(id=id).values())
             if len(actividad) > 0:
                 Actividades.objects.filter(id=id).delete()
@@ -199,7 +221,14 @@ class Actividades_Views(View):
                     'data': None
                 }
                 return JsonResponse(datos)
+
             if (id > 0):
+                if(not (bool(verify['info']['administrador']) or 5 in verify['info']['permisos'])):
+                    datos = {
+                        'status': False,
+                        'message': MESSAGE['NonePermisos'],
+                    }
+                    return JsonResponse(datos)
                 query = """
                 SELECT * FROM actividades WHERE actividades.id=%s;
                 """

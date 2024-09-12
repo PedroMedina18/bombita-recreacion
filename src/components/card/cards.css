@@ -34,15 +34,14 @@
   justify-content: space-between;
   align-items: center;
   color: var(--color);
-  background-color: rgb(var(--background-color-rgb));
-  width: 35%;
+  background-color: rgba(var(--background-color-rgb));
   /* height: 80px; */
   border-radius: 5px;
   padding: 20px 18px;
   transition: 400ms;
   overflow: hidden;
   border: 1px solid var(--color-border);
-  width: 45%;
+  width: 30%;
   box-shadow: inset 0 -3em 3em rgba(0, 0, 0, 0.1), 0 0 0 2px rgb(207, 207, 207),
     0.3em 0.3em 1em rgba(0, 0, 0, 0.3);
 }
@@ -57,7 +56,7 @@
 }
 
 .card-info svg {
-  width: 50px;
+  width: 35px;
   margin-left: 5px;
 }
 
@@ -65,32 +64,43 @@
   font-weight: bold;
   text-align: justify;
   width: 80%;
-  font-size: 25px;
+  font-size: 20px;
   margin: 0;
   /* color: rgb(15, 133, 0); */
 }
 
 .card-secundario {
-  --background-color-rgb: var(--secundario);
+  --background-color-rgb: var(--secundario), 0.9;
   --color: white;
   --color-border: white;
 }
 
 .card-greed {
-  --background-color-rgb: 15, 133, 0;
+  --background-color-rgb: 15, 133, 0, 0.9;
   --color: white;
   --color-border: white;
 }
 
 .card-blue {
-  --background-color-rgb: var(--principal);
+  --background-color-rgb: var(--principal), 0.9;
   --color: white;
   --color-border: white;
 }
 
 .card-purple {
-  --background-color-rgb: var(--purple);
+  --background-color-rgb: var(--purple), 0.9;
   --color: white;
+  --color-border: rgb(255, 255, 255);
+}
+.card-naranja {
+  --background-color-rgb: 247, 139, 51, 0.9;
+  --color: white;
+  --color-border: white;
+}
+
+.card-azulado {
+  --background-color-rgb: 10, 209, 183, 0.9;
+  --color: rgb(255, 255, 255);
   --color-border: white;
 }
 

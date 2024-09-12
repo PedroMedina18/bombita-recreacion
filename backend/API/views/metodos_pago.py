@@ -4,13 +4,13 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views import View
 from django.db import IntegrityError, connection, models
-from ..funtions.indice import indiceFinal, indiceInicial
-from ..funtions.serializador import dictfetchall
+from ..utils.indice import indiceFinal, indiceInicial
+from ..utils.serializador import dictfetchall
 from ..models import MetodosPago
-from ..funtions.filtros import order, filtrosWhere
-from ..funtions.identificador import determinar_valor
+from ..utils.filtros import order, filtrosWhere
+from ..utils.identificador import determinar_valor, edit_str
 from ..message import MESSAGE
-from ..funtions.token import verify_token
+from ..utils.token import verify_token
 import json
 
 # CRUD COMPLETO DE LA TABLA DE metodos_pago
@@ -28,6 +28,12 @@ class Metodos_Pagos_Views(View):
                 datos = {
                     'status': False,
                     'message': verify['message'],
+                }
+                return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
                 }
                 return JsonResponse(datos)
             referencia = req['referencia'] if 'referencia' in req else False
@@ -73,6 +79,12 @@ class Metodos_Pagos_Views(View):
                 datos = {
                     'status': False,
                     'message': verify['message']
+                }
+                return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
                 }
                 return JsonResponse(datos)
             metodo_pago = list(MetodosPago.objects.filter(id=id).values())
@@ -131,6 +143,12 @@ class Metodos_Pagos_Views(View):
                     'message': verify['message']
                 }
                 return JsonResponse(datos)
+            if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'])):
+                datos = {
+                    'status': False,
+                    'message': MESSAGE['NonePermisos'],
+                }
+                return JsonResponse(datos)
             metodo_pago = list(MetodosPago.objects.filter(id=id).values())
             if len(metodo_pago) > 0:
                 MetodosPago.objects.filter(id=id).delete()
@@ -171,6 +189,12 @@ class Metodos_Pagos_Views(View):
                 }
                 return JsonResponse(datos)
             if (id > 0):
+                if(not (bool(verify['info']['administrador']) or 14 in verify['info']['permisos'])):
+                    datos = {
+                        'status': False,
+                        'message': MESSAGE['NonePermisos'],
+                    }
+                    return JsonResponse(datos)
                 query = """
                 SELECT * FROM metodos_pago WHERE metodos_pago.id=%s;
                 """
@@ -208,6 +232,9 @@ class Metodos_Pagos_Views(View):
                 search = determinar_valor(search)
                 if(search['valor'] and search['type']=="int"):
                     where.append(f"id LIKE '{search['valor']}%%'" )
+                elif(search['valor'] and search['type']=="str"):
+                    str_validate = edit_str(search["valor"])
+                    where.append(f"nombre LIKE '{str_validate}'" )
                 where = filtrosWhere(where)
 
                 if(all == "true"):

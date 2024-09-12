@@ -2,11 +2,12 @@ import "react-loading-skeleton/dist/skeleton.css";
 import "./table.css";
 import { useState, useEffect, useRef } from "react";
 import { ButtonSimple } from "../button/Button.jsx";
-import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import { IconCheck, IconX } from "../Icon";
 import { UnitSelect, InputsGeneral } from "../input/Inputs.jsx";
 import { fechaFormat } from "../../utils/process.jsx";
 import { useForm } from "react-hook-form";
+import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
+import dayjsEs from "../../utils/dayjs.js";
 
 function Table({
   columns,
@@ -19,8 +20,9 @@ function Table({
   order = false,
   organizar = [],
   fechaOrganizer = false,
-  childrenTop = null 
+  childrenTop = null
 }) {
+  const dayjs = dayjsEs({ weekdaysAbre: false });
   const [page, setPages] = useState(1);
   const [debounceTimeout, setDebounceTimeout] = useState(null);
   const [debounceTimeoutPage, setDebounceTimeoutPage] = useState(null);
@@ -59,6 +61,7 @@ function Table({
     const timeout = setTimeout(() => {
       const filtro = { ...filtros };
       filtradores.forEach((e) => {
+
         if (Boolean(watch(`${e.columnName}`))) {
           filtro[`${e.columnName}`] = watch(`${e.columnName}`);
         }
@@ -69,19 +72,27 @@ function Table({
       if (Boolean(organizar.length)) {
         filtro[`organizar`] = watch(`organizar`);
       }
-
-      const desde = e.target.name === "desde" ? e.target.value : watch(`desde`);
-      if (Boolean(desde)) {
-        filtro.desde = desde;
-      } else {
-        delete filtro.desde;
-      }
-
       if (Boolean(e.target.value)) {
         filtro[`${e.target.name}`] = e.target.value;
       } else {
         delete filtro[`${e.target.name}`];
       }
+
+      const desde = e.target.name === "desde" ? e.target.value : watch(`desde`);
+      if (Boolean(desde)) {
+        filtro.desde = dayjs(desde).format("DD-MM-YYYY")
+      } else {
+        delete filtro.desde;
+      }
+
+      const hasta = e.target.name === "hasta" ? e.target.value : watch(`hasta`);
+      if (hasta !== fechaFormat()) {
+        filtro.hasta = dayjs(hasta).format("DD-MM-YYYY")
+      } else {
+        delete filtro.hasta;
+      }
+
+      
       if (options.consult) {
         options.consult(searchTerm, filtro);
       } else {
@@ -106,7 +117,6 @@ function Table({
   // *the useform
   const {
     register,
-    handleSubmit,
     formState: { errors },
     setValue,
     watch,
@@ -126,10 +136,10 @@ function Table({
       {/* info:Primera Seccion con el buscardor y el Boton de direccionamiento */}
       <div className="w-100 d-flex flex-column flex-md-row justify-content-between pb-3">
         {options.register ? (
-          <div className="w-100 w-md-50 pe-2 pe-md-4">
+          <div className="w-100 d-flex w-md-50 pe-2 pe-md-4">
             <ButtonSimple
               type="button"
-              className={"w-100"}
+              className={"w-100 align-self-stretch"}
               onClick={() => {
                 options.register.function();
               }}
@@ -144,6 +154,7 @@ function Table({
         {options.search ? (
           <div className=" d-flex align-items-center w-100 w-md-50 mt-3 mt-md-0">
             <ButtonSimple
+            className={"align-self-stretch"}
               type="button"
               onClick={(e) => {
                 options.search.function(
@@ -187,7 +198,7 @@ function Table({
                 {filtradores.length !== 0 && (
                   <div className="w-100 d-flex flex-column ">
                     <span className="fw-bold text-center">Categorías</span>
-                    <div className="d-flex w-100 flex-column flex-md-row">
+                    <div className="d-flex w-100 flex-column flex-md-row justify-content-center">
                       {filtradores.map((filtro, index) => (
                         <div
                           key={`${filtro.columnName}_${index}`}
@@ -214,11 +225,11 @@ function Table({
                   </div>
                 )}
                 {(order || organizar.length !== 0 || fechaOrganizer) && (
-                  <div className="w-100 d-flex">
+                  <div className="w-100 d-flex justify-content-center">
                     {(order || organizar.length !== 0) && (
-                      <div className="w-50 d-flex flex-column justify-content-center align-items-center">
+                      <div className="w-100 w-md-50 d-flex flex-column justify-content-center align-items-center">
                         <span className="fw-bold text-center">Orden</span>
-                        <div className="w-100 d-flex flex-column flex-md-row">
+                        <div className="w-100 d-flex flex-column flex-md-row justify-content-center">
                           {order && (
                             <div className="w-100 w-md-50 px-2">
                               <UnitSelect
@@ -260,9 +271,9 @@ function Table({
                       </div>
                     )}
                     {fechaOrganizer && (
-                      <div className="w-50 d-flex flex-column justify-content-center align-items-center">
+                      <div className="w-100 w-md-50 d-flex flex-column justify-content-center align-items-center">
                         <span className="fw-bold text-center">Fecha</span>
-                        <div className="w-100 d-flex flex-column flex-md-row">
+                        <div className="w-100 d-flex flex-column flex-md-row justify-content-center">
                           <div className="w-100 w-md-50 px-2">
                             <InputsGeneral
                               type={"date"}
@@ -324,58 +335,36 @@ function Table({
                   <tr>
                     <td className="py-3"></td>
                     {columns.map((column, index) => {
-                      return (
-                        <td
-                          key={`${column.name}-${index}-1`}
-                          className="py-3"
-                        ></td>
-                      );
+                      return (<td key={`${column.name}-${index}-1`} className="py-3"></td>);
                     })}
                   </tr>
                   <tr>
                     <td className="py-3"></td>
                     {columns.map((column, index) => {
-                      return (
-                        <td
-                          key={`${column.name}-${index}-2`}
-                          className="py-3"
-                        ></td>
-                      );
+                      return (<td key={`${column.name}-${index}-2`} className="py-3"></td>);
                     })}
                   </tr>
                   <tr>
                     <td className="py-3"></td>
                     {columns.map((column, index) => {
-                      return (
-                        <td
-                          key={`${column.name}-${index}-3`}
-                          className="py-3"
-                        ></td>
-                      );
+                      return (<td key={`${column.name}-${index}-3`} className="py-3"></td>);
                     })}
                   </tr>
                 </>
               ) : (
                 rows.map((row, index) => (
                   <tr key={`row-${index}`}>
-                    <td key={`N°-${index}`}>{index + 1}</td>
                     {columns.map((column, index) => {
                       if (column.row(row) === true) {
                         return (
-                          <td
-                            key={`${column.row(row)}-${index}`}
-                            className="svg-check"
-                          >
+                          <td key={`${column.row(row)}-${index}`} className="svg-check">
                             <IconCheck />
                           </td>
                         );
                       }
                       if (column.row(row) === false) {
                         return (
-                          <td
-                            key={`${column.row(row)}-${index}`}
-                            className="svg-x"
-                          >
+                          <td key={`${column.row(row)}-${index}`} className="svg-x">
                             <IconX />
                           </td>
                         );
@@ -408,12 +397,15 @@ function Table({
               setValue("page", pagina)
               setPages(pagina);
               paginar(pagina)
-            }}
-          >
+              setTimeout(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }, 100);
+            }}>
             Anterior
           </ButtonSimple>
           <input
             className="mx-2 input-table page"
+            type="number" 
             {...register("page", {
               onChange: (e) => {
                 if (debounceTimeoutPage) {
@@ -434,14 +426,16 @@ function Table({
                     setPages(value);
                     paginar(value)
                   }
+                  setTimeout(() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }, 100);
                 }, 800);
                 setDebounceTimeoutPage(timeout);
               },
               min: { value: 1 },
               max: { value: totalPages }
             })}
-            type="number"
-          />
+          /> 
           <ButtonSimple
             type="button"
             id="siguiente-table"
@@ -451,8 +445,10 @@ function Table({
               setValue("page", pagina)
               setPages(pagina);
               paginar(pagina)
-            }}
-          >
+              setTimeout(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }, 100);
+            }}>
             Siguiente
           </ButtonSimple>
         </div>

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { InputsGeneral, UnitSelect, InputCheckRadio, InputImgPerfil } from "../../components/input/Inputs.jsx"
+import { InputsGeneral, UnitSelect, InputCheckRadio, InputImgPerfil, TogleSwiches } from "../../components/input/Inputs.jsx"
 import { ButtonSimple } from "../../components/button/Button.jsx"
 import { useForm } from "react-hook-form";
 import { useAuthContext } from '../../context/AuthContext.jsx';
@@ -8,7 +8,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Toaster } from "sonner";
 import { recreadores, } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
-import { hasLeadingOrTrailingSpace, calcularEdad , fechaFormat} from "../../utils/process.jsx";
+import { hasLeadingOrTrailingSpace, calcularEdad, fechaFormat } from "../../utils/process.jsx";
 import { habilitarEdicion, controlErrors, getPersona, controlResultPost } from "../../utils/actions.jsx"
 import { IconRowLeft } from "../../components/Icon.jsx"
 import ErrorSystem from "../../components/errores/ErrorSystem.jsx";
@@ -19,13 +19,14 @@ import Swal from 'sweetalert2';
 
 function FormRecreadores() {
     const [img, setImg] = useState(null)
-    const {dataOptions} = useAuthContext()
+    const { dataOptions } = useAuthContext()
     const [loading, setLoading] = useState(true)
     const [debounceTimeout, setDebounceTimeout] = useState(null);
     const [errorServer, setErrorServer] = useState("")
     const [dataNewUser, setdataNewUser] = useState({ tipo_documento: null, numero_documento: null })
     const [dataPersona, setPersona] = useState({})
     const [disabledInputs, setDisabledInputs] = useState(false)
+    const [disabledEstado, setDisabledEstado] = useState(false)
     const navigate = useNavigate();
     const renderizado = useRef(0)
     const params = useParams();
@@ -35,7 +36,7 @@ function FormRecreadores() {
             renderizado.current = renderizado.current + 1
             if (Number(params.id)) {
                 get_recreador()
-            }else{
+            } else {
                 setLoading(false)
             }
             return
@@ -45,8 +46,8 @@ function FormRecreadores() {
     const get_recreador = async () => {
         try {
             const respuesta = await recreadores.get({ subDominio: [Number(params.id)] })
-            const errors = controlErrors({respuesta:respuesta, constrolError:setErrorServer})
-            if(errors) return
+            const errors = controlErrors({ respuesta: respuesta, constrolError: setErrorServer })
+            if (errors) return
             setErrorServer("")
             const data = respuesta.data.data
             setImg(data.img_perfil)
@@ -57,9 +58,9 @@ function FormRecreadores() {
             setValue(`genero`, data["genero_id"])
             setValue(`nivel`, data["nivel_id"])
             setValue(`tipo_documento`, data["tipo_documento_id"])
-
+            setValue(`telefono_secundario`, data["telefono_secundario"]==="0"? "" : data["telefono_secundario"])
+            setDisabledEstado(!data["estado"])
         } catch (error) {
-            console.log(error)
             setErrorServer(texts.errorMessage.errorObjet)
         } finally {
             setLoading(false)
@@ -72,6 +73,7 @@ function FormRecreadores() {
         handleSubmit,
         formState: { errors },
         watch,
+        clearErrors,
         setValue
     } = useForm();
 
@@ -102,19 +104,21 @@ function FormRecreadores() {
                         Form.append('nivel', Number(data.nivel))
                         Form.append('genero', Number(data.genero))
                         Form.append('img_perfil', $archivo ? $archivo : null)
+                        if (data.estado !== undefined) {
+                            Form.append('estado', data.estado)
+                        }
                     }
                     Form.append('img_perfil', $archivo ? $archivo : null)
                     alertLoading("Cargando")
-                    const res = params.id ? await recreadores.putData(Form, { subDominio:[Number(params.id)]}) : await recreadores.postData(Form)
+                    const res = params.id ? await recreadores.putData(Form, { subDominio: [Number(params.id)] }) : await recreadores.postData(Form)
 
                     controlResultPost({
                         respuesta: res,
-                        messageExito: params.id ? texts.successMessage.editionRecreador : texts.successMessage.registerRecreador,
+                        messageExito: params.id ? !(data.estado) ? texts.successMessage.recreadorDisabled : texts.successMessage.editionRecreador : texts.successMessage.registerRecreador,
                         useNavigate: { navigate: navigate, direction: "/recreadores/" }
                     })
                 }
             } catch (error) {
-                console.log(error)
                 Swal.close()
                 toastError(texts.errorMessage.errorConexion)
             }
@@ -163,8 +167,23 @@ function FormRecreadores() {
                                             }
                                         }
                                     />
+                                    {
+                                        params.id &&
+                                        <div className="w-100 d-flex">
+                                            <TogleSwiches
+                                                className="ms-auto mb-2"
+                                                name="estado"
+                                                id="estado"
+                                                form={{ errors, register }}
+                                                onChange={(e) => {
+                                                    setDisabledEstado(!e.target.checked)
+                                                }}
+                                            />
+
+                                        </div>
+                                    }
                                     <div className="w-100">
-                                        <InputImgPerfil name="img_perfil" id="img_perfil" label={`${texts.label.fotoRecreador}`} form={{ errors, register }} imgPerfil={img} />
+                                        <InputImgPerfil name="img_perfil" id="img_perfil" label={`${texts.label.fotoRecreador}`} form={{ errors, register }} imgPerfil={img} disabled={disabledEstado} />
                                     </div>
 
                                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between align-item-center">
@@ -172,26 +191,24 @@ function FormRecreadores() {
                                             <UnitSelect label={texts.label.tipoDocuemnto} name="tipo_documento" id="tipo_documento" form={{ errors, register }}
                                                 options={dataOptions().tipos_documentos}
                                                 params={{
-                                                    validate: (value) => {
-                                                        if ((value === "")) {
-                                                            return texts.inputsMessage.selectTipoDocumento
-                                                        } else {
-                                                            return true
-                                                        }
+                                                    required: {
+                                                        value: true,
+                                                        message: texts.inputsMessage.selectTipoDocumento,
                                                     },
-
                                                 }}
-                                                isError={!watch("tipo_documento")}
                                                 onChange={
                                                     (e) => {
-
-                                                        setdataNewUser({
+                                                        if (Boolean(e.target.value)) {
+                                                            clearErrors("tipo_documento")
+                                                        }
+                                                        const newUser = {
                                                             ...dataNewUser,
                                                             tipo_documento: e.target.value
-                                                        })
+                                                        }
+                                                        setdataNewUser(newUser)
                                                         if (!params.id) {
                                                             getPersona({
-                                                                dataNewUser: { tipo_documento: e.target.value, numero_documento: dataNewUser.numero_documento },
+                                                                dataNewUser: newUser,
                                                                 setPersona,
                                                                 setValue,
                                                                 setDisabledInputs
@@ -199,7 +216,7 @@ function FormRecreadores() {
                                                         }
                                                     }
                                                 }
-                                                disabled={disabledInputs}
+                                                disabled={disabledInputs || disabledEstado}
                                             />
                                         </div>
                                         <div className="w-100 w-md-75 ps-0 ps-md-3 d-flex align-items-center">
@@ -210,31 +227,32 @@ function FormRecreadores() {
                                                         message: texts.inputsMessage.requireDocumento,
                                                     },
                                                     maxLength: {
-                                                        value: 10,
-                                                        message: texts.inputsMessage.max10,
+                                                        value: 9,
+                                                        message: texts.inputsMessage.max9,
                                                     },
                                                     minLength: {
                                                         value: 7,
                                                         message: texts.inputsMessage.min7,
                                                     },
-                                                    min:{
-                                                        value:4000,
+                                                    min: {
+                                                        value: 4000000,
                                                         message: texts.inputsMessage.invalidDocument,
                                                     }
                                                 }}
                                                 onKeyUp={
                                                     (e) => {
-                                                        setdataNewUser({
+                                                        const newUser = {
                                                             ...dataNewUser,
                                                             numero_documento: e.target.value
-                                                        })
+                                                        }
+                                                        setdataNewUser(newUser)
                                                         if (debounceTimeout) {
                                                             clearTimeout(debounceTimeout);
                                                         }
                                                         const timeout = setTimeout(() => {
                                                             if (!params.id) {
                                                                 getPersona({
-                                                                    dataNewUser: { tipo_documento: dataNewUser.tipo_documento, numero_documento: e.target.value },
+                                                                    dataNewUser:newUser,
                                                                     setPersona,
                                                                     setValue,
                                                                     setDisabledInputs
@@ -254,7 +272,7 @@ function FormRecreadores() {
                                                         })
                                                     }
                                                 }}
-                                                disabled={disabledInputs}
+                                                disabled={disabledInputs || disabledEstado}
                                                 placeholder={texts.placeholder.numeroDocumento}
                                             />
                                         </div>
@@ -274,8 +292,8 @@ function FormRecreadores() {
                                                         message: texts.inputsMessage.max200,
                                                     },
                                                     minLength: {
-                                                        value: 5,
-                                                        message: texts.inputsMessage.min5,
+                                                        value: 3,
+                                                        message: texts.inputsMessage.min3,
                                                     },
                                                     pattern: {
                                                         value: pattern.textNoneNumber,
@@ -289,7 +307,7 @@ function FormRecreadores() {
                                                         }
                                                     }
                                                 }}
-                                                disabled={disabledInputs}
+                                                disabled={disabledInputs || disabledEstado}
                                                 isError={!disabledInputs}
                                                 placeholder={texts.placeholder.nombre}
                                             />
@@ -307,8 +325,8 @@ function FormRecreadores() {
                                                         message: texts.inputsMessage.max200,
                                                     },
                                                     minLength: {
-                                                        value: 5,
-                                                        message: texts.inputsMessage.min5,
+                                                        value: 3,
+                                                        message: texts.inputsMessage.min3,
                                                     },
                                                     pattern: {
                                                         value: pattern.textNoneNumber,
@@ -322,7 +340,7 @@ function FormRecreadores() {
                                                         }
                                                     }
                                                 }}
-                                                disabled={disabledInputs}
+                                                disabled={disabledInputs || disabledEstado}
                                                 isError={!disabledInputs}
                                                 placeholder={texts.placeholder.apellidos}
                                             />
@@ -347,6 +365,7 @@ function FormRecreadores() {
                                                         }
                                                     }
                                                 }}
+                                                disabled={disabledEstado}
                                             />
                                         </div>
                                         <div className="w-100 w-md-50 ps-0 ps-md-3">
@@ -361,6 +380,12 @@ function FormRecreadores() {
                                                         }
                                                     }
                                                 }}
+                                                onChange={(e) => {
+                                                    if (Boolean(e.target.value)) {
+                                                        clearErrors("genero")
+                                                    }
+                                                }}
+                                                disabled={disabledEstado}
                                             />
                                         </div>
                                     </div>
@@ -376,16 +401,16 @@ function FormRecreadores() {
                                                         value: 11,
                                                         message: texts.inputsMessage.onlyCharacter11,
                                                     },
-                                                    minLength: {
-                                                        value: 11,
-                                                        message: texts.inputsMessage.onlyCharacter11,
-                                                    },
-                                                    min:{
-                                                        value:200000000,
+                                                    min: {
+                                                        value: 2000000000,
                                                         message: texts.inputsMessage.invalidTel,
-                                                    }
+                                                    },
+                                                    pattern: {
+                                                        value: pattern.tel,
+                                                        message: texts.inputsMessage.invalidTel,
+                                                    },
                                                 }}
-                                                disabled={disabledInputs}
+                                                disabled={disabledInputs || disabledEstado}
                                                 isError={!disabledInputs}
                                                 placeholder={texts.placeholder.telefono}
                                             />
@@ -397,16 +422,16 @@ function FormRecreadores() {
                                                         value: 11,
                                                         message: texts.inputsMessage.onlyCharacter11,
                                                     },
-                                                    minLength: {
-                                                        value: 11,
-                                                        message: texts.inputsMessage.onlyCharacter11,
+                                                    min: {
+                                                        value: 2000000000,
+                                                        message: texts.inputsMessage.invalidTel,
                                                     },
-                                                    min:{
-                                                        value:200000000,
+                                                    pattern: {
+                                                        value: pattern.tel,
                                                         message: texts.inputsMessage.invalidTel,
                                                     }
                                                 }}
-                                                disabled={disabledInputs}
+                                                disabled={disabledInputs || disabledEstado}
                                                 isError={!disabledInputs}
                                                 placeholder={texts.placeholder.telefono}
                                             />
@@ -417,8 +442,8 @@ function FormRecreadores() {
                                             <InputsGeneral type={"email"} label={`${texts.label.email}`} name="correo" id="correo" form={{ errors, register }}
                                                 params={{
                                                     minLength: {
-                                                        value: 5,
-                                                        message: texts.inputsMessage.min5
+                                                        value: 10,
+                                                        message: texts.inputsMessage.min10
                                                     },
                                                     maxLength: {
                                                         value: 100,
@@ -436,7 +461,7 @@ function FormRecreadores() {
                                                         }
                                                     }
                                                 }}
-                                                disabled={disabledInputs}
+                                                disabled={disabledInputs || disabledEstado}
                                                 isError={!disabledInputs}
                                                 placeholder={texts.placeholder.correo}
                                             />
@@ -453,6 +478,12 @@ function FormRecreadores() {
                                                         }
                                                     }
                                                 }}
+                                                onChange={(e) => {
+                                                    if (Boolean(e.target.value)) {
+                                                        clearErrors("nivel")
+                                                    }
+                                                }}
+                                                disabled={disabledEstado}
                                             />
                                         </div>
                                     </div>
