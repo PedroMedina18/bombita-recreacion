@@ -1,5 +1,5 @@
 from django.urls import path
-from .views.view import Metodos_Pagos_Views, Actividades_Views, Cargos_Views, Estadistica_View, Preguntas_Evento_View, Clientes_Views, Dollar_View, Eventos_Views, Generos_Views, Login, Registros_Material_View, Eventos_Recreadores_Servicios_View, Materiales_Views, Niveles_Views, Permisos_Views, Personas_Views, Recreadores_Views, Respaldo, Servicios_Views, Sobrecargos_Views, Tipos_Documentos_Views, Usuarios_Views, Verify_Token_Views, Pagos_Views, Recreadores_Eventos_Views, Evaluacion_View
+from .views.view import Metodos_Pagos_Views, Actividades_Views, Cargos_Views, Estadistica_View, Preguntas_Evento_View, Clientes_Views, Dollar_View, Eventos_Views, Generos_Views, Login, Registros_Material_View, Eventos_Recreadores_Servicios_View, Materiales_Views, Niveles_Views, Permisos_Views, Personas_Views, Recreadores_Views, Respaldo, Servicios_Views, Sobrecostos_Views, Tipos_Documentos_Views, Usuarios_Views, Verify_Token_Views, Pagos_Views, Recreadores_Eventos_Views, Evaluacion_View
 
 urlpatterns=[
     path('cargos/', Cargos_Views.as_view(), name='cargos'),
@@ -12,8 +12,8 @@ urlpatterns=[
     path('niveles/<int:id>/', Niveles_Views.as_view(), name='nivel'),
     path('generos/', Generos_Views.as_view(), name='generos'),
     path('generos/<int:id>/', Generos_Views.as_view(), name='genero'),
-    path('sobrecargos/', Sobrecargos_Views.as_view(), name='sobrecargos'),
-    path('sobrecargos/<int:id>/', Sobrecargos_Views.as_view(), name='sobrecargo'),
+    path('sobrecostos/', Sobrecostos_Views.as_view(), name='sobrecaostos'),
+    path('sobrecostos/<int:id>/', Sobrecostos_Views.as_view(), name='sobrecosto'),
     path('actividades/', Actividades_Views.as_view(), name='actividades'),
     path('actividades/<int:id>/', Actividades_Views.as_view(), name='actividad'),
     path('materiales/', Materiales_Views.as_view(), name='materiales'),

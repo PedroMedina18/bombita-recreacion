@@ -55,7 +55,7 @@ function Evento() {
       const totalServicios = evento.data.data.servicios.reduce((accumulator, current) => {
         return accumulator + current.precio
       }, 0)
-      const totalSobrecargos = evento.data.data.sobrecargos.reduce((accumulator, current) => {
+      const totalSobrecostos = evento.data.data.sobrecostos.reduce((accumulator, current) => {
         return accumulator + current.monto
       }, 0)
       const pagosAnticipo = evento.data.data.pagos.filter(e => e.tipo === 1)
@@ -64,8 +64,8 @@ function Evento() {
       setDataEvento({
         ...evento.data.data,
         totalServicios: totalServicios,
-        totalSobrecargos: totalSobrecargos,
-        totalEvento: totalServicios + totalSobrecargos,
+        totalSobrecostos: totalSobrecostos,
+        totalEvento: totalServicios + totalSobrecostos,
         pagosAnticipo,
         pagosFaltante,
         pagosTotal
@@ -220,22 +220,22 @@ function Evento() {
                     <div className="w-100 d-flex flex-column flex-md-row justify-content-between">
                       <div className="my-1 mx-2 my-md-2 d-flex flex-column">
                         <strong className="fs-6">Estado:</strong>
-                        <spam className="">
+                        <span className="">
 
                           {dataEvento.info.estado === null && <Pildora contenido={"En espera"} color="bg-info"></Pildora>}
                           {Boolean(dataEvento.info.estado) === true && <Pildora contenido={"Completado"} color="bg-succes"></Pildora>}
                           {(Boolean(dataEvento.info.estado) === false && dataEvento.info.estado !== null) && <Pildora contenido={"Cancelado"} color="bg-danger"></Pildora>}
-                        </spam>
+                        </span>
                       </div>
                       <div className="my-1 mx-2 my-md-2 d-flex flex-column">
                         <strong className="fs-6">Estado de Pago:</strong>
-                        <spam className="">
+                        <span className="">
 
                           {dataEvento.info.estado_pago === 0 && <Pildora contenido={`${dataEvento.info.estado_pago_descripcion}`} color="bg-danger"></Pildora>}
                           {dataEvento.info.estado_pago === 1 && <Pildora contenido={`${dataEvento.info.estado_pago_descripcion}`} color="bg-warning"></Pildora>}
                           {dataEvento.info.estado_pago === 2 && <Pildora contenido={`${dataEvento.info.estado_pago_descripcion}`} color="bg-succes"></Pildora>}
                           {dataEvento.info.estado_pago === 3 && <Pildora contenido={`${dataEvento.info.estado_pago_descripcion}`} color="bg-info"></Pildora>}
-                        </spam>
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -326,7 +326,7 @@ function Evento() {
                           </div>
                           {
                             dataEvento.servicios.map((e, index) => (
-                              <div key={`sobrecargo-${index}`} className="w-100 d-flex justify-content-between align-items-center mb-2">
+                              <div key={`sobrecosto-${index}`} className="w-100 d-flex justify-content-between align-items-center mb-2">
                                 <strong className="m-0 text-center w-20">{formatoId(e.id)}</strong>
                                 <p className="m-0 text-center w-60">{e.nombre}</p>
                                 <p className="m-0 text-center w-20">{Number(e.precio).toFixed(2)}</p>
@@ -337,22 +337,22 @@ function Evento() {
                       </div>
                     </div>
                     {
-                      Boolean(dataEvento.sobrecargos.length) &&
+                      Boolean(dataEvento.sobrecostos.length) &&
                       <div className="accordion-item">
                         <h2 className="accordion-header">
                           <button className="accordion-button fw-bold fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                            Sobrecargos    -  Ref {Number(dataEvento.totalSobrecargos).toFixed(2)}
+                            Sobrecostos    -  Ref {Number(dataEvento.totalSobrecostos).toFixed(2)}
                           </button>
                         </h2>
                         <div id="collapseTwo" className="accordion-collapse collapse" data-bs-parent="#accordionExample">
                           <div className="accordion-body d-flex flex-column">
                             <div className="w-100 d-flex justify-content-between align-items-center mb-2">
                               <strong className="m-0 fw-bold w-20 text-center">Codigo</strong>
-                              <p className="m-0 fw-bold w-60 text-center">Sobrecargo</p>
+                              <p className="m-0 fw-bold w-60 text-center">Sobrecosto</p>
                               <p className="m-0 fw-bold w-20 text-center">Precio</p>
                             </div>
                             {
-                              dataEvento.sobrecargos.map((e, index) => (
+                              dataEvento.sobrecostos.map((e, index) => (
                                 <div key={`servicio-${index}`} className="w-100 d-flex justify-content-between align-items-center mb-2">
                                   <strong className="m-0 text-center w-20">{formatoId(e.id)}</strong>
                                   <p className="m-0 w-60 text-center">{e.nombre}</p>

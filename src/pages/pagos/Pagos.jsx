@@ -71,13 +71,13 @@ function Pagos() {
       const totalServicios = evento.data.data.servicios.reduce((accumulator, current) => {
         return accumulator + current.precio
       }, 0)
-      const totalSobrecargos = evento.data.data.sobrecargos.reduce((accumulator, current) => {
+      const totalSobrecostos = evento.data.data.sobrecostos.reduce((accumulator, current) => {
         return accumulator + current.monto
       }, 0)
       const Pagos = evento.data.data.pagos.reduce((accumulator, current) => {
         return accumulator + current.monto
       }, 0)
-      setMontoCancelar((totalServicios + totalSobrecargos) - Pagos)
+      setMontoCancelar((totalServicios + totalSobrecostos) - Pagos)
       console.log(evento.data.data)
       const pagosAnticipo = evento.data.data.pagos.filter(e => e.tipo === 1)
       const pagosFaltante = evento.data.data.pagos.filter(e => e.tipo === 2)
@@ -88,10 +88,10 @@ function Pagos() {
         ...dataEvento,
         ...evento.data.data,
         totalServicios: totalServicios,
-        totalSobrecargos: totalSobrecargos,
-        totalEvento: totalServicios + totalSobrecargos,
+        totalSobrecostos: totalSobrecostos,
+        totalEvento: totalServicios + totalSobrecostos,
         MontoPagado: Pagos,
-        anticipoEvento: (totalServicios + totalSobrecargos) / 2,
+        anticipoEvento: (totalServicios + totalSobrecostos) / 2,
         totalCancelado: 0,
         pagosAnticipo,
         pagosFaltante,
@@ -310,19 +310,19 @@ function Pagos() {
                   <p className='h4 fw-bold'>Descripcion del evento</p>
                   {
                     dataEvento.servicios.map((e, index) => (
-                      <LineDescription nombre={e.nombre} dolar={dolar} precio={e.precio} key={`sobrecargos_${index}`} />
+                      <LineDescription nombre={e.nombre} dolar={dolar} precio={e.precio} key={`sobrecostos_${index}`} />
                     ))
                   }
                   {
-                    dataEvento.sobrecargos.map((e, index) => (
-                      <LineDescription nombre={e.nombre} dolar={dolar} precio={e.monto} key={`sobrecargos_${index}`} />
+                    dataEvento.sobrecostos.map((e, index) => (
+                      <LineDescription nombre={e.nombre} dolar={dolar} precio={e.monto} key={`sobrecostos_${index}`} />
                     ))
                   }
                   <hr />
                   <LineDescription nombre={"Servicios"} dolar={dolar} precio={dataEvento.totalServicios} />
                   {
-                    Boolean(dataEvento.totalSobrecargos) &&
-                    <LineDescription nombre={"Sobrecargos"} dolar={dolar} precio={dataEvento.totalSobrecargos} />
+                    Boolean(dataEvento.totalSobrecostos) &&
+                    <LineDescription nombre={"Sobrecostos"} dolar={dolar} precio={dataEvento.totalSobrecostos} />
                   }
                   <LineDescription nombre={"Total"} dolar={dolar} precio={dataEvento.totalEvento} fs={5} />
                   {

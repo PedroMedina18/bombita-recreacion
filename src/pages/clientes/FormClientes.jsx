@@ -82,7 +82,7 @@ function FormClientes() {
                     body.numero_documento = data.numero_documento
                     body.tipo_documento = Number(data.tipo_documento)
                     body.telefono_principal = Number(data.telefono_principal)
-                    body.telefono_secundario = Number(data.telefono_secundario)
+                    body.telefono_secundario = Number(data.telefono_secundario)? Number(data.telefono_secundario) : null
                     body.correo = data.correo
                     alertLoading("Cargando")
                     const res = await clientes.put(body, { subDominio:[Number(params.id)]}) 

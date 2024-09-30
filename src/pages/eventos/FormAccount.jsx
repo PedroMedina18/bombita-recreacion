@@ -5,7 +5,7 @@ import { toastError, alertConfim, alertLoading } from "../../components/alerts.j
 import { useNavigate } from 'react-router-dom';
 import { formatoId, truncateString } from "../../utils/process.jsx";
 import { useFormEventContext } from "../../context/FormEventContext.jsx";
-import { sobrecargos, servicios, eventos } from "../../utils/API.jsx";
+import { sobrecostos, servicios, eventos } from "../../utils/API.jsx";
 import { IconService, IconBilletera } from "../../components/Icon.jsx";
 import { controlResultPost } from "../../utils/actions.jsx";
 import { useAuthContext } from "../../context/AuthContext.jsx";
@@ -17,8 +17,8 @@ import TableDescriptionFacture from "../../components/table/TableDescriptionFact
 function FormAccount() {
     const { getUser, dataOptions } = useAuthContext();
     const [dolar] = useState(getUser().dollar.price);
-    const { dataServicios, saveDataServicios, valueCliente, saveDataSobrecargos, dataSobrecargos, setSaveDataSobrecargos, setSaveDataServicios, dataEvent } = useFormEventContext()
-    const [estadoSobrecargos, setEstadoSobrecargos] = useState(false);
+    const { dataServicios, saveDataServicios, valueCliente, saveDataSobrecostos, dataSobrecostos, setSaveDataSobrecostos, setSaveDataServicios, dataEvent } = useFormEventContext()
+    const [estadoSobrecostos, setEstadoSobrecostos] = useState(false);
     const [estadoServicios, setEstadoServicios] = useState(false);
     const navigate = useNavigate();
 
@@ -51,16 +51,16 @@ function FormAccount() {
                     }
                     body.nombres = dataEvent.nombres
                     body.apellidos = dataEvent.apellidos
-                    body.numero_documento = dataEvent.numero_documento
-                    body.telefono_principal = dataEvent.telefono_principal
-                    body.telefono_secundario = dataEvent.telefono_secundario
+                    body.numero_documento = Number(dataEvent.numero_documento)
+                    body.telefono_principal = Number(dataEvent.telefono_principal)
+                    body.telefono_secundario = Number(dataEvent.telefono_secundario)? Number(dataEvent.telefono_secundario) : null
                     body.correo = dataEvent.correo
-                    body.tipo_documento = dataEvent.tipo_documento
+                    body.tipo_documento = Number(dataEvent.tipo_documento)
                     body.fecha_evento_inicio = dataEvent.fecha_evento_inicio
-                    body.numero_personas = dataEvent.numero_personas
+                    body.numero_personas = Number(dataEvent.numero_personas)
                     body.direccion = dataEvent.direccion
                     body.servicios = saveDataServicios
-                    body.sobrecargos = saveDataSobrecargos
+                    body.sobrecostos = saveDataSobrecostos
                     alertLoading("Cargando")
                     const respuesta = await eventos.post(body)
                     if (respuesta.status = 200) {
@@ -112,7 +112,7 @@ function FormAccount() {
         }
     ]
 
-    const columnsSobrecargo = [
+    const columnsSobrecosto = [
         {
             name: "Código",
             row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
@@ -143,14 +143,14 @@ function FormAccount() {
     return (
         <>
             <ModalSelect titulo={"Escoja los servicios"} state={[estadoServicios, setEstadoServicios]} object={servicios} columns={columnsServicio} saveSelect={setSaveDataServicios} select={saveDataServicios} />
-            <ModalSelect titulo={"Escoja los sobrecargo"} state={[estadoSobrecargos, setEstadoSobrecargos]} object={sobrecargos} columns={columnsSobrecargo} saveSelect={setSaveDataSobrecargos} select={saveDataSobrecargos} />
+            <ModalSelect titulo={"Escoja los sobrecosto"} state={[estadoSobrecostos, setEstadoSobrecostos]} object={sobrecostos} columns={columnsSobrecosto} saveSelect={setSaveDataSobrecostos} select={saveDataSobrecostos} />
 
             <form className="w-100 d-flex flex-column justify-content-between" onSubmit={onSubmit}>
                 <div className="w-100 d-flex justify-content-end align-item-center">
                     <ButtonSimple type="button" onClick={() => { setEstadoServicios(true) }} className="px-4 mt-3">
                         <IconService/>
                     </ButtonSimple>
-                    <ButtonSimple type="button" onClick={() => { setEstadoSobrecargos(true) }} className="px-4 ms-5 mt-3">
+                    <ButtonSimple type="button" onClick={() => { setEstadoSobrecostos(true) }} className="px-4 ms-5 mt-3">
                         <IconBilletera/>
                     </ButtonSimple>
                 </div>
@@ -160,11 +160,11 @@ function FormAccount() {
                         <h6 className="m-0 mb-2 fw-bold h4">Servicios</h6>
                         <TableDescriptionFacture listaData={dataServicios} listDescripcion={saveDataServicios} saveListDescription={setSaveDataServicios} />
                         {
-                            saveDataSobrecargos.length ?
+                            saveDataSobrecostos.length ?
                                 (
                                     <>
-                                        <h6 className="m-0 my-2 fw-bold h4">Sobrecargos</h6>
-                                        <TableDescriptionFacture listaData={dataSobrecargos} listDescripcion={saveDataSobrecargos} saveListDescription={setSaveDataSobrecargos} />
+                                        <h6 className="m-0 my-2 fw-bold h4">Sobrecostos</h6>
+                                        <TableDescriptionFacture listaData={dataSobrecostos} listDescripcion={saveDataSobrecostos} saveListDescription={setSaveDataSobrecostos} />
                                     </>
                                 )
                                 :
@@ -179,13 +179,13 @@ function FormAccount() {
                             <p className="m-0 fw-semibold h5 w-100 text-center">{`${(sumarPrecios(dataServicios, saveDataServicios) * dolar).toFixed(2)} BS.s`}</p>
                         </div>
                         {
-                            saveDataSobrecargos.length ?
+                            saveDataSobrecostos.length ?
                                 (
                                     <>
                                         <div className="d-flex justify-content-between mb-2">
-                                            <p className="m-0 fw-bold h5 w-100">Sobrecargos</p>
-                                            <p className="m-0 fw-semibold h5 w-100 text-center">{`${sumarPrecios(dataSobrecargos, saveDataSobrecargos)} $`}</p>
-                                            <p className="m-0 fw-semibold h5 w-100 text-center">{`${(sumarPrecios(dataSobrecargos, saveDataSobrecargos) * dolar).toFixed(2)} BS.s`}</p>
+                                            <p className="m-0 fw-bold h5 w-100">Sobrecostos</p>
+                                            <p className="m-0 fw-semibold h5 w-100 text-center">{`${sumarPrecios(dataSobrecostos, saveDataSobrecostos)} $`}</p>
+                                            <p className="m-0 fw-semibold h5 w-100 text-center">{`${(sumarPrecios(dataSobrecostos, saveDataSobrecostos) * dolar).toFixed(2)} BS.s`}</p>
                                         </div>
                                     </>
                                 )
@@ -195,8 +195,8 @@ function FormAccount() {
 
                         <div className="d-flex justify-content-between mb-2">
                             <p className="mb-0 fw-bold h3 w-100">Total</p>
-                            <p className="mb-0 fw-semibold h3 w-100 text-center">{`${sumarPrecios(dataServicios, saveDataServicios) + sumarPrecios(dataSobrecargos, saveDataSobrecargos)} $`}</p>
-                            <p className="mb-0 fw-semibold h3 w-100 text-center">{`${((sumarPrecios(dataServicios, saveDataServicios) + sumarPrecios(dataSobrecargos, saveDataSobrecargos)) * dolar).toFixed(2)} BS.s`}</p>
+                            <p className="mb-0 fw-semibold h3 w-100 text-center">{`${sumarPrecios(dataServicios, saveDataServicios) + sumarPrecios(dataSobrecostos, saveDataSobrecostos)} $`}</p>
+                            <p className="mb-0 fw-semibold h3 w-100 text-center">{`${((sumarPrecios(dataServicios, saveDataServicios) + sumarPrecios(dataSobrecostos, saveDataSobrecostos)) * dolar).toFixed(2)} BS.s`}</p>
                         </div>
                     </div>
                 </div>

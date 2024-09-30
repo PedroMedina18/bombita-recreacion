@@ -42,16 +42,13 @@ function EventosRecreadores() {
     try {
       const evento = await eventos.get({ subDominio: [Number(params.id_evento)] })
       const recreadoresEvento = await eventos.get({ subDominio: ["recreadores", Number(params.id_evento)] })
-      const listRecreadores = await recreadores.get()
+      const listRecreadores = await recreadores.get({params: {estado:1}})
 
       if (evento.status !== 200 || evento.data.status === false) {
         setErrorServer('Error. Conexión Evento')
         return
       }
-      if (evento.data.data.info.estado === false) {
-        navigate("/eventos/")
-      }
-      if (evento.data.data.info.estado_pago === 0) {
+      if (evento.data.data.info.estado === false || evento.data.data.info.estado_pago === 0) {
         navigate("/eventos/")
       }
       if (recreadoresEvento.status !== 200 || recreadoresEvento.data.status === false) {

@@ -183,7 +183,7 @@ class PrecioDolar(models.Model):
         db_table = 'precio_dolar'
 
 # *Tabla del precio del dolar registrado
-class Sobrecargos(models.Model):
+class Sobrecostos(models.Model):
     nombre = models.CharField(max_length = 100, unique = True)
     descripcion = models.CharField(max_length = 300)
     monto = models.FloatField(default = 0)
@@ -191,7 +191,7 @@ class Sobrecargos(models.Model):
     fecha_actualizacion = models.DateTimeField(auto_now = True)
 
     class Meta:
-        db_table = 'sobrecargos'
+        db_table = 'sobrecostos'
 
 # *Tabla de los eventos registrados
 class Eventos(models.Model):
@@ -211,13 +211,13 @@ class Eventos(models.Model):
     class Meta:
         db_table = 'eventos'
 
-# *Tabla intermedia entre los sobrecargo y los eventos
-class EventosSobrecargos(models.Model):
-    evento = models.ForeignKey(Eventos, on_delete = models.CASCADE, related_name = 'sobrecargo', db_column = 'evento_id')
-    sobrecargo = models.ForeignKey(Sobrecargos, on_delete = models.CASCADE, related_name = 'evento', db_column = 'sobrecargo_id')
+# *Tabla intermedia entre los sobrecosto y los eventos
+class EventosSobrecostos(models.Model):
+    evento = models.ForeignKey(Eventos, on_delete = models.CASCADE, related_name = 'sobrecosto', db_column = 'evento_id')
+    sobrecosto = models.ForeignKey(Sobrecostos, on_delete = models.CASCADE, related_name = 'evento', db_column = 'sobrecosto_id')
 
     class Meta:
-        db_table = 'sobrecargos_eventos'
+        db_table = 'sobrecostos_eventos'
 
 class EventosServicios(models.Model):
     evento = models.ForeignKey(Eventos, on_delete = models.CASCADE, related_name = 'servicio', db_column = 'evento_id')

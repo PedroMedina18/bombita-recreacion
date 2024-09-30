@@ -6,7 +6,7 @@ from django.views import View
 from django.db import IntegrityError, connection, models
 from ..utils.indice import indiceFinal, indiceInicial
 from ..utils.serializador import dictfetchall
-from ..models import Sobrecargos
+from ..models import Sobrecostos
 from ..utils.filtros import order, filtrosWhere
 from ..utils.identificador import determinar_valor, edit_str
 from ..utils.token import verify_token
@@ -14,7 +14,7 @@ from ..message import MESSAGE
 import json
 
 # CRUD COMPLETO DE LA TABLA DE nivel
-class Sobrecargos_Views(View):
+class Sobrecostos_Views(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super().dispatch(request, *args, **kwargs)
@@ -36,10 +36,10 @@ class Sobrecargos_Views(View):
                         'message': MESSAGE['NonePermisos'],
                     }
                     return JsonResponse(datos)
-            Sobrecargos.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'], monto=req['monto'])
+            Sobrecostos.objects.create(nombre=req['nombre'].title(), descripcion=req['descripcion'], monto=req['monto'])
             datos = {
                 'status': True,
-                'message': f"{MESSAGE['registerSobrecargo']}"
+                'message': f"{MESSAGE['registerSobrecosto']}"
             }
             return JsonResponse(datos)
         except IntegrityError as error:
@@ -84,13 +84,13 @@ class Sobrecargos_Views(View):
                     'message': MESSAGE['NonePermisos'],
                 }
                 return JsonResponse(datos)
-            sobrecargo = list(Sobrecargos.objects.filter(id = id).values())
-            if len(sobrecargo) > 0:
-                sobrecargo = Sobrecargos.objects.get(id = id)
-                sobrecargo.nombre = req['nombre']
-                sobrecargo.descripcion = req['descripcion']
-                sobrecargo.monto = req['monto']
-                sobrecargo.save()
+            sobrecosto = list(Sobrecostos.objects.filter(id = id).values())
+            if len(sobrecosto) > 0:
+                sobrecosto = Sobrecostos.objects.get(id = id)
+                sobrecosto.nombre = req['nombre']
+                sobrecosto.descripcion = req['descripcion']
+                sobrecosto.monto = req['monto']
+                sobrecosto.save()
                 datos = {
                     'status': True,
                     'message': f"{MESSAGE['edition']}"
@@ -141,9 +141,9 @@ class Sobrecargos_Views(View):
                     'message': MESSAGE['NonePermisos'],
                 }
                 return JsonResponse(datos)
-            sobrecargo = list(Sobrecargos.objects.filter(id = id).values())
-            if len(sobrecargo) > 0:
-                Sobrecargos.objects.filter(id = id).delete()
+            sobrecosto = list(Sobrecostos.objects.filter(id = id).values())
+            if len(sobrecosto) > 0:
+                Sobrecostos.objects.filter(id = id).delete()
                 datos = {
                     'status': True,
                     'message': f"{MESSAGE['delete']}"
@@ -188,15 +188,15 @@ class Sobrecargos_Views(View):
                     }
                     return JsonResponse(datos)
                 query = """
-                SELECT * FROM sobrecargos WHERE sobrecargos.id=%s;
+                SELECT * FROM sobrecostos WHERE sobrecostos.id=%s;
                 """
                 cursor.execute(query, [int(id)])
-                sobrecargo = dictfetchall(cursor)
-                if(len(sobrecargo) > 0):
+                sobrecosto = dictfetchall(cursor)
+                if(len(sobrecosto) > 0):
                     datos = {
                         'status': True,
                         'message': f"{MESSAGE['exitoGet']}",
-                        'data': sobrecargo[0]
+                        'data': sobrecosto[0]
                     }
                 else:
                     datos = {
@@ -230,24 +230,24 @@ class Sobrecargos_Views(View):
                 where = filtrosWhere(where)
 
                 if(all == "true"):
-                    query = "SELECT id, nombre, monto FROM sobrecargos ORDER BY {} {};".format(typeOrdenBy, orderType)
+                    query = "SELECT id, nombre, monto FROM sobrecostos ORDER BY {} {};".format(typeOrdenBy, orderType)
                     cursor.execute(query)
-                    sobrecargos = dictfetchall(cursor)
+                    sobrecostos = dictfetchall(cursor)
                 else:
-                    query = "SELECT * FROM sobrecargos {} ORDER BY {} {} LIMIT %s, %s;".format(where, typeOrdenBy, orderType)
+                    query = "SELECT * FROM sobrecostos {} ORDER BY {} {} LIMIT %s, %s;".format(where, typeOrdenBy, orderType)
                     cursor.execute(query, [inicio, final])
-                    sobrecargos = dictfetchall(cursor)
+                    sobrecostos = dictfetchall(cursor)
 
                 query="""
-                    SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM sobrecargos;
+                    SELECT CEILING(COUNT(id) / 25) AS pages, COUNT(id) AS total FROM sobrecostos;
                 """
                 cursor.execute(query)
                 result = dictfetchall(cursor)
-                if len(sobrecargos)>0:
+                if len(sobrecostos)>0:
                     datos = {
                         'status': True,
                         'message': f"{MESSAGE['exitoGet']}",
-                        'data': sobrecargos,
+                        'data': sobrecostos,
                         'pages': int(result[0]['pages']),
                         'total':result[0]['total'],
                     }

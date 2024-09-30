@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react"
 import { useForm } from "react-hook-form";
-import { sobrecargos } from "../../utils/API.jsx"
+import { sobrecostos } from "../../utils/API.jsx"
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx"
@@ -11,9 +11,9 @@ import Navbar from "../../components/navbar/Navbar"
 import Table from "../../components/table/Table"
 import texts from "../../context/text_es.js";
 
-function Niveles() {
-  const [listSobrecargo, setSobrecargo] = useState([])
-  const [dataSobrecargos, setDataSobrecargos] = useState({ pages: 0, total: 0 })
+function Sobrecostos() {
+  const [listSobrecosto, setSobrecosto] = useState([])
+  const [dataSobrecostos, setDataSobrecostos] = useState({ pages: 0, total: 0 })
   const [tableLoading, setTableLoaing] = useState(true)
   const renderizado = useRef(0)
   const navigate = useNavigate()
@@ -21,16 +21,16 @@ function Niveles() {
   useEffect(() => {
     if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1
-      getSobrecargos()
+      getSobrecostos()
       return
     }
   }, [])
 
-  const getSobrecargos = () => {
+  const getSobrecostos = () => {
     getListItems({
-      object: sobrecargos,
-      setList: setSobrecargo,
-      setData: setDataSobrecargos,
+      object: sobrecostos,
+      setList: setSobrecosto,
+      setData: setDataSobrecostos,
       setLoading: setTableLoaing
     })
   }
@@ -74,13 +74,13 @@ function Niveles() {
             onClick={() => {
               deleteItem({
                 row: row,
-                objet: sobrecargos,
-                functionGet: getSobrecargos
+                objet: sobrecostos,
+                functionGet: getSobrecostos
               })
             }}
             className="cursor-pointer"
           />
-          <IconEdit onClick={() => { navigate(`/edit/sobrecargo/${row.id}/`) }} className="cursor-pointer" />
+          <IconEdit onClick={() => { navigate(`/edit/sobrecosto/${row.id}/`) }} className="cursor-pointer" />
         </div>
       }
     },
@@ -92,28 +92,28 @@ function Niveles() {
       function: (value) => {
         searchCode({
           value: value,
-          object: sobrecargos,
-          setList: setSobrecargo,
-          setData: setDataSobrecargos,
+          object: sobrecostos,
+          setList: setSobrecosto,
+          setData: setDataSobrecostos,
           setLoading: setTableLoaing
         })
       }
     },
     register: {
-      name: texts.registerMessage.buttonRegisterSobrecargo,
+      name: texts.registerMessage.buttonRegisterSobrecosto,
       function: () => {
-        navigate("/register/sobrecargo/")
+        navigate("/register/sobrecosto/")
       }
     }
   }
   return (
-    <Navbar name={`${texts.pages.getSobrecargos.name}`} descripcion={`${texts.pages.getSobrecargos.description}`}>
+    <Navbar name={`${texts.pages.getSobrecostos.name}`} descripcion={`${texts.pages.getSobrecostos.description}`}>
 
       <Table
         columns={columns}
-        rows={listSobrecargo}
-        totalElements={dataSobrecargos.total}
-        totalPages={dataSobrecargos.pages}
+        rows={listSobrecosto}
+        totalElements={dataSobrecostos.total}
+        totalPages={dataSobrecostos.pages}
         options={options}
         loading={tableLoading}
         order={true}
@@ -127,4 +127,4 @@ function Niveles() {
   )
 }
 
-export default Niveles
+export default Sobrecostos

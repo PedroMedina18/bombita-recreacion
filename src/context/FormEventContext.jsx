@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react'
 import Form_Eventos from "../pages/eventos/FormEventos.jsx"
-import { servicios, sobrecargos, clientes } from "../utils/API.jsx";
+import { servicios, sobrecostos, clientes } from "../utils/API.jsx";
 import { toastError } from "../components/alerts.jsx";
 import ErrorSystem from "../components/errores/ErrorSystem.jsx";
 import { controlErrors } from "../utils/actions.jsx"
@@ -12,11 +12,11 @@ export const useFormEventContext=()=>{
 
 export function FormEventContextProvider() {
     const [dataServicios, setServicios] = useState([])
-    const [dataSobrecargos, setSobrecargos] = useState([])
+    const [dataSobrecostos, setSobrecostos] = useState([])
     const [valueCliente, setValueCliente] = useState(null)
     const [dataClientes, setClientes] = useState([])
     const [saveDataServicios, setSaveDataServicios] = useState([])
-    const [saveDataSobrecargos, setSaveDataSobrecargos] = useState([])
+    const [saveDataSobrecostos, setSaveDataSobrecostos] = useState([])
     const [dataNewUser, setdataNewUser] = useState({ tipo_documento: null, numero_documento: null })
     const [dataPersona, setPersona] = useState({})
     const [dataEvent, setDataEvent] = useState({})
@@ -35,14 +35,14 @@ export function FormEventContextProvider() {
   const getData = async () => {
       try {
           const get_servicios = await servicios.get({params:{all:true}})
-          const get_sobrecargos = await sobrecargos.get({params:{all:true}})
+          const get_sobrecostos = await sobrecostos.get({params:{all:true}})
           const get_clientes = await clientes.get()
           controlErrors({ respuesta: get_servicios, constrolError: toastError })
-          controlErrors({ respuesta: get_sobrecargos, constrolError: toastError })
+          controlErrors({ respuesta: get_sobrecostos, constrolError: toastError })
           controlErrors({ respuesta: get_clientes, constrolError: toastError })
           setClientes(get_clientes.data.data)
           setServicios(get_servicios.data.data)
-          setSobrecargos(get_sobrecargos.data.data)
+          setSobrecostos(get_sobrecostos.data.data)
       } catch (error) {
           console.log(error)
           toastError(texts.inputsMessage.errorSystem)
@@ -53,9 +53,9 @@ export function FormEventContextProvider() {
 
     return (
       <FormEventContext.Provider value={{
-        saveDataSobrecargos, 
+        saveDataSobrecostos, 
         saveDataServicios, 
-        dataSobrecargos, 
+        dataSobrecostos, 
         dataServicios, 
         dataNewUser, 
         dataPersona, 
@@ -68,7 +68,7 @@ export function FormEventContextProvider() {
         setPersona,
         setdataNewUser,
         setSaveDataServicios,
-        setSaveDataSobrecargos,
+        setSaveDataSobrecostos,
       }}>
         <Form_Eventos/>
       </FormEventContext.Provider>

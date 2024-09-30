@@ -1,7 +1,7 @@
 
 import './login.css'
 import { useForm } from "react-hook-form";
-import Logo from "../../assets/logo-bombita.png";
+import logo from "../../assets/logo-bombita.png";
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useAuthContext } from '../../context/AuthContext';
@@ -65,7 +65,7 @@ function Login() {
 
   return (
     <main className='w-100 px-2 px-md-0 vh-100 d-flex justify-content-center align-items-center bg-login position-relative'>
-
+      <img src={logo} alt="Logo" width="230px" className='position-absolute top-0 start-50 translate-middle-x' />
       <form className='form w-100 w-sm-50 w-lg-30'
         autoComplete={"off"}
         onSubmit={onSubmit}

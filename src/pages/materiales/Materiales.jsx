@@ -79,16 +79,6 @@ function Materiales() {
                         }}
                         className="cursor-pointer"
                     />
-                    <IconTrash
-                        onClick={() => {
-                            deleteItem({
-                                row: row,
-                                objet: materiales,
-                                functionGet: getMateriales
-                            })
-                        }}
-                        className="cursor-pointer"
-                    />
                     <IconEdit onClick={() => { navigate(`/edit/material/${row.id}/`) }} className="cursor-pointer" />
                 </div>
             }

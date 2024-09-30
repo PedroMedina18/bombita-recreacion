@@ -33,7 +33,7 @@ export const eventos = new Petisions("eventos");
 
 export const clientes = new Petisions("clientes");
 
-export const sobrecargos = new Petisions("sobrecargos");
+export const sobrecostos = new Petisions("sobrecostos");
 
 export const materiales = new Petisions("materiales");
 

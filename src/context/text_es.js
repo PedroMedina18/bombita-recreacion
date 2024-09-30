@@ -85,7 +85,7 @@ const texts={
         registerRecreador:"Recreador Registrado",
         registerServicio:"Servicio Registrado",
         registerGenero:"Género Registrado",
-        registerSobrecargo:"Sobrecargo Registrado",
+        registerSobrecosto:"Sobrecosto Registrado",
         registerEvento:"Evento Registrado",
         registerMetodoPago:"Metodo de Pago Registrado",
         registerEventoRecreadores:"Recreadores Asignados",
@@ -104,7 +104,7 @@ const texts={
         editionServicio:"Servicio Editado",
         editContraseña:"Contraseña Editada",
         editionGenero:"Género Editado",
-        editionSobrecargo:"Sobrecargo Editado",
+        editionSobrecosto:"Sobrecosto Editado",
         editionMetodoPago:"Metodo de Pago Editado",
         editionEventoRecreadores:"Recreadores Actualizados",
         editionPregunta:"Pregunta Actualizados",
@@ -210,7 +210,7 @@ const texts={
         nameMetodoPago:"Nombre del Metodo de Pago",
         nameMaterial:"Nombre del Material",
         nameNivel:"Nombre de la Nivel",
-        nameSobrecargos:"Nombre de la Sobrecargos",
+        nameSobrecostos:"Nombre de la Sobrecostos",
         nameServicio:"Nombre del Servicio",
         nameTipoDocumento:"Nombre del Tipo de Documento",
         usuario:"Nombre de Usuario unico",
@@ -252,9 +252,9 @@ const texts={
             name:"Registrar una Actividad",
             description:"Introduzca los datos para agregar una nueva Actividad"
         },
-        registerSobrecargos:{
-            name:"Registrar un Sobrecargo",
-            description:"Introduzca los datos para agregar un nuevo Sobrecargo"
+        registerSobrecostos:{
+            name:"Registrar un Sobrecosto",
+            description:"Introduzca los datos para agregar un nuevo Sobrecosto"
         },
         registerEventos:{
             name:"Registrar un Evento",
@@ -300,9 +300,9 @@ const texts={
             name:"Editar un  Nivel",
             description:"Introduzca los datos para editar un nivel"
         },
-        editSobrecargo:{
-            name:"Editar un Sobrecargo",
-            description:"Introduzca los datos para editar un sobrecargo"
+        editSobrecosto:{
+            name:"Editar un Sobrecosto",
+            description:"Introduzca los datos para editar un sobrecosto"
         },
         editMaterial:{
             name:"Editar un Material",
@@ -348,9 +348,9 @@ const texts={
             name:"Lista de Niveles",
             description:"Verifique los Niveles de recreador agregados"
         },
-        getSobrecargos:{
-            name:"Lista de Sobrecargos",
-            description:"Verifique los Sobrecargos agregados"
+        getSobrecostos:{
+            name:"Lista de Sobrecostos",
+            description:"Verifique los Sobrecostos agregados"
         },
         getMateriales:{
             name:"Lista de Materiales",
@@ -442,7 +442,7 @@ const texts={
         buttonRegisterCargo:"Agregar un nuevo Cargo",
         buttonRegisterActividad:"Agregar una nueva Actividad",
         buttonRegisterRecreador:"Agregar un nuevo Recreador",
-        buttonRegisterSobrecargo:"Agregar un nuevo Sobrecargo",
+        buttonRegisterSobrecosto:"Agregar un nuevo Sobrecosto",
         buttonRegisterMetodoPago:"Agregar un nuevo Metodo de Pago",
         buttonRegisterServicio:"Agregar un nuevo Servicio",
         buttonRegisterPregunta:"Agregar un nuevo Pregunta",

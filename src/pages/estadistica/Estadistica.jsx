@@ -244,7 +244,7 @@ function Estadistica() {
                             {
                                 grafRecreadores.length > 0 &&
                                 <div className="w-100 d-flex flex-column px-3 py-2 my-4 border boder-info border-2">
-                                    <h2 className="fw-bold text-center">Evaluacion Promedio de los eventos</h2>
+                                    <h2 className="fw-bold text-center">Evaluacion Promedio de los recreadores</h2>
                                     <div className="w-10 px-5">
                                         {
                                             grafRecreadores.map((e, index) => (

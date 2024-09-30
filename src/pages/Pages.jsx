@@ -28,8 +28,8 @@ import Materiales from "./materiales/Materiales.jsx";
 import Inventario from "./materiales/Inventario.jsx";
 import FormMateriales from "./materiales/FormMateriales.jsx";
 import Servicios from "./servicios/Servicios.jsx";
-import Sobrecargos from "./sobrecargos/Sobrecargos.jsx";
-import FormSobrecargos from "./sobrecargos/FormSobrecargos.jsx";
+import Sobrecostos from "./sobrecostos/Sobrecostos.jsx";
+import FormSobrecostos from "./sobrecostos/FormSobrecostos.jsx";
 import FormServicios from "./servicios/FormServicios.jsx";
 import Eventos from "./eventos/Eventos.jsx";
 import CalendarEvent from "./eventos/CalendarEvent.jsx";
@@ -59,8 +59,8 @@ export {
     MetodosPago, FormMetodosPago,
     Niveles, FormNiveles,
     Materiales, FormMateriales,
-    Servicios, Sobrecargos,
-    FormSobrecargos, FormServicios,
+    Servicios, Sobrecostos,
+    FormSobrecostos, FormServicios,
     Eventos, Dolar, Evento,
     FormDataEvent, FormAccount,
     EventosRecreadores, FormUsuarios,

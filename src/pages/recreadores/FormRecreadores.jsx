@@ -98,7 +98,7 @@ function FormRecreadores() {
                         Form.append('numero_documento', data.numero_documento)
                         Form.append('tipo_documento', Number(data.tipo_documento))
                         Form.append('telefono_principal', Number(data.telefono_principal))
-                        Form.append('telefono_secundario', Number(data.telefono_secundario))
+                        Form.append('telefono_secundario', Number(data.telefono_secundario)? Number(data.telefono_secundario) : null)
                         Form.append('correo', data.correo)
                         Form.append('fecha_nacimiento', data.fecha_nacimiento)
                         Form.append('nivel', Number(data.nivel))

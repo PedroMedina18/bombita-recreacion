@@ -62,10 +62,10 @@
             <p class="m-0 fs-6">{{servicio.precio}}$</p>
         </div>
         {% endfor %}
-        {% for sobrecargo in sobrecargos %}
+        {% for sobrecosto in sobrecostos %}
         <div class="d-flex aling-items-center justify-content-between w-100">
-            <strong class="m-0 fs-6">Sobrecargos - {{sobrecargo.nombre}}</strong>
-            <p class="m-0 fs-6">{{sobrecargo.monto}}$</p>
+            <strong class="m-0 fs-6">Sobrecosto - {{sobrecosto.nombre}}</strong>
+            <p class="m-0 fs-6">{{sobrecosto.monto}}$</p>
         </div>
         {% endfor %}
         <div class="d-flex aling-items-center justify-content-between w-100">

@@ -89,16 +89,16 @@ class Pagos_Views(View):
                     "canceladoBolivares":0,
 
                 }
-            querySobrecargos="""
-                SELECT COALESCE(SUM(s.monto), 0) AS total_sobrecargo
-                    FROM sobrecargos_eventos es
-                    JOIN sobrecargos s ON es.sobrecargo_id = s.id
+            querySobrecostos="""
+                SELECT COALESCE(SUM(s.monto), 0) AS total_sobrecosto
+                    FROM sobrecostos_eventos es
+                    JOIN sobrecostos s ON es.sobrecosto_id = s.id
                 WHERE es.evento_id = %s;
             """
-            cursor.execute(querySobrecargos, [int(req['evento'])])
-            totalSobrecargo = dictfetchall(cursor)
-            totalSobrecargo = float(totalSobrecargo[0]["total_sobrecargo"])
-            queryServicios="""
+            cursor.execute(querySobrecostos, [int(req['evento'])])
+            totalSobrecosto = dictfetchall(cursor)
+            totalSobrecosto = float(totalSobrecosto[0]["total_sobrecosto"])
+            queryServicios = """
                 SELECT COALESCE(SUM(s.precio), 0) AS total_servicio
                     FROM servicios_eventos es
                     JOIN servicios s ON es.servicio_id = s.id
@@ -119,7 +119,7 @@ class Pagos_Views(View):
                 objetEventoEmail["montoCancelado"]=True
                 objetEventoEmail["canceladoDolares"]=float(totalPagado)
                 objetEventoEmail["canceladoBolivares"]=float(totalPagado * precio_dolar.precio)
-            totalEvento=totalServicio+totalSobrecargo
+            totalEvento=totalServicio+totalSobrecosto
             objetEventoEmail["totalEventoDolares"]=float(totalEvento)
             objetEventoEmail["totalEventoBolivares"]=float(totalEvento * precio_dolar.precio)
             totalFaltante=totalEvento - totalPagado

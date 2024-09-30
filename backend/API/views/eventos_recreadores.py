@@ -182,7 +182,8 @@ class Eventos_Recreadores_Servicios_View(View):
             for recreador in req["recreadores"]:
                 servicio = Servicios.objects.get(id=recreador["servicio"])
                 if(totalRecreadores[f"{servicio.id}"] < servicio.numero_recreadores):
-                    recreadorGet = Recreadores.objects.get(id=recreador["id"])
+                    recreadorGet = Recreadores.objects.get(id=recreador["id"], estado=True)
+
                     EventosRecreadoresServicios.objects.create(evento = evento, recreador = recreadorGet, servicio = servicio)
             
             evento.recreadores_asignados=True

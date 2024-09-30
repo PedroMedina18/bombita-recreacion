@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 function CardRecreador({ id, nombre = null,  nivel = null, genero = null, edad = null, img = null }) {
     const navigate=useNavigate()
     return (
-        <div className="card-recreador" onDoubleClick={()=>{navigate(`/recreador/${id}/`)}}>
+        <div className="card-recreador" onDoubleClick={()=>{if(id)navigate(`/recreador/${id}/`)}}>
             <div className='card-header'>
                 {
                     img ?

@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { InputsGeneral, InputTextTarea, MoneyInput } from "../../components/input/Inputs.jsx";
 import { ButtonSimple } from "../../components/button/Button.jsx";
 import { useParams, useNavigate } from "react-router-dom";
-import { sobrecargos } from "../../utils/API.jsx";
+import { sobrecostos } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx";
 import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx";
 import { Toaster } from "sonner";
@@ -16,7 +16,7 @@ import texts from "../../context/text_es.js";
 import Swal from 'sweetalert2';
 import pattern from "../../context/pattern.js";
 
-function FormSobrecargos() {
+function FormSobrecostos() {
     const navigate = useNavigate();
     const params = useParams();
     const [loading, setLoading] = useState(true)
@@ -27,16 +27,16 @@ function FormSobrecargos() {
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             if (params.id) {
-                get_sobrecargo()
+                get_sobrecosto()
             }
             setLoading(false)
             return
         }
     }, [])
 
-    const get_sobrecargo = async () => {
+    const get_sobrecosto = async () => {
         try {
-            const respuesta = await sobrecargos.get({subDominio:[Number(params.id)]})
+            const respuesta = await sobrecostos.get({subDominio:[Number(params.id)]})
             if (respuesta.status !== 200) {
                 setErrorServer(`Error. ${respuesta.status} ${respuesta.statusText}`)
                 return
@@ -81,11 +81,11 @@ function FormSobrecargos() {
                         monto: parseFloat(data.monto),
                     }
                     alertLoading("Cargando")
-                    const res = params.id ? await sobrecargos.put(body, { subDominio:[Number(params.id)]}) : await sobrecargos.post(body)
+                    const res = params.id ? await sobrecostos.put(body, { subDominio:[Number(params.id)]}) : await sobrecostos.post(body)
                     controlResultPost({
                         respuesta: res,
-                        messageExito: params.id ? texts.successMessage.editionSobrecargo : texts.successMessage.registerSobrecargo,
-                        useNavigate: { navigate: navigate, direction: "/sobrecargos/" }
+                        messageExito: params.id ? texts.successMessage.editionSobrecosto : texts.successMessage.registerSobrecosto,
+                        useNavigate: { navigate: navigate, direction: "/sobrecostos/" }
                     })
                 }
             } catch (error) {
@@ -96,8 +96,8 @@ function FormSobrecargos() {
         }
     )
     return (
-        <Navbar name={`${params.id ? texts.pages.editSobrecargo.name : texts.pages.registerSobrecargos.name}`} descripcion={`${params.id ? texts.pages.editSobrecargo.description : texts.pages.registerSobrecargos.description}`}>
-            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/sobrecargos/") }}><IconRowLeft /> Regresar</ButtonSimple>
+        <Navbar name={`${params.id ? texts.pages.editSobrecosto.name : texts.pages.registerSobrecostos.name}`} descripcion={`${params.id ? texts.pages.editSobrecosto.description : texts.pages.registerSobrecostos.description}`}>
+            <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/sobrecostos/") }}><IconRowLeft /> Regresar</ButtonSimple>
 
             {
                 loading ?
@@ -145,7 +145,7 @@ function FormSobrecargos() {
                                                 }
                                             }
                                         }}
-                                        placeholder={texts.placeholder.nameSobrecargos}
+                                        placeholder={texts.placeholder.nameSobrecostos}
                                     />
                                     <InputTextTarea label={`${texts.label.descripcion}`} name="descripcion" id="descripcion" form={{ errors, register }}
                                         params={{
@@ -199,4 +199,4 @@ function FormSobrecargos() {
     )
 }
 
-export default FormSobrecargos
+export default FormSobrecostos

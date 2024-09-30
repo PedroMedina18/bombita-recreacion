@@ -7,7 +7,7 @@ MESSAGE={
     'registerMaterial':'Registro de material completado',
     'registerNivel':'Registro de nivel completado',
     'registerTipoDocumento':'Registro de tipo de documento completado',
-    'registerSobrecargo':'Registro de sobrecargo completado',
+    'registerSobrecosto':'Registro de sobrecosto completado',
     'registerServicio':'Registro de servicio completado',
     'registerRecreador':'Registro de recreador completado',
     'registerRecreadores':'Asignación de recreadores completado',

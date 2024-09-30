@@ -215,7 +215,7 @@ label.button-initial[disabled] {
 }
 
 .switch .switch-input:checked + .slider {
-  background: rgba(var(--secundario), 0.9);
+  background: rgba(var(--exito), 0.9);
 }
 
 .switch .switch-input:focus + .slider {

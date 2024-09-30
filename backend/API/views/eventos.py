@@ -11,7 +11,7 @@ from ..utils.time import duration
 from ..utils.identificador import determinar_valor, edit_str, formato_id
 from ..utils.estado_pago import estadoPagoDescription
 from ..utils.filtros import order, filtrosWhere, peridoFecha
-from ..models import Eventos, EventosSobrecargos, EventosServicios, Clientes, Pagos, Personas, Servicios, Sobrecargos, TipoDocumento, EventosRecreadoresServicios, Materiales, RegistrosMateriales
+from ..models import Eventos, EventosSobrecostos, EventosServicios, Clientes, Pagos, Personas, Servicios, Sobrecostos, TipoDocumento, EventosRecreadoresServicios, Materiales, RegistrosMateriales
 from ..utils.token import verify_token
 from ..message import MESSAGE
 import datetime
@@ -61,7 +61,7 @@ class Eventos_Views(View):
                 "fecha_inicio":None,
                 "fecha_final":None,
                 "servicios":[],
-                "sobrecargos":[],
+                "sobrecostos":[],
                 "total":0,
             }
             if ('id_cliente' in req):
@@ -144,12 +144,12 @@ class Eventos_Views(View):
                 objetEventoEmail["total"]=float(objetEventoEmail["total"]) + float(servicio.precio)
                 EventosServicios.objects.create(evento=evento, servicio=servicio)
             
-            sobrecargos = req['sobrecargos']
-            for sobrecargo in sobrecargos:
-                getSobrecargo = Sobrecargos.objects.get(id=int(sobrecargo))
-                objetEventoEmail["sobrecargos"].append({"nombre":getSobrecargo.nombre, "monto":float(getSobrecargo.monto)})
-                objetEventoEmail["total"]=float(objetEventoEmail["total"]) + float(getSobrecargo.monto)
-                EventosSobrecargos.objects.create(evento=evento, sobrecargo=getSobrecargo)
+            sobrecostos = req['sobrecostos']
+            for sobrecosto in sobrecostos:
+                getSobrecosto = sobrecostos.objects.get(id=int(sobrecosto))
+                objetEventoEmail["sobrecostos"].append({"nombre":getSobrecosto.nombre, "monto":float(getSobrecosto.monto)})
+                objetEventoEmail["total"]=float(objetEventoEmail["total"]) + float(getSobrecosto.monto)
+                EventosSobrecostos.objects.create(evento=evento, sobrecosto=getSobrecosto)
             
             if cliente.persona.correo:
                 emailRegistroEvento(cliente.persona.correo, objetEventoEmail)
@@ -271,12 +271,12 @@ class Eventos_Views(View):
                             so.nombre,
                             so.descripcion,
                             so.monto
-                        FROM sobrecargos_eventos AS sove
-                        INNER JOIN sobrecargos AS so ON sove.sobrecargo_id=so.id
+                        FROM sobrecostos_eventos AS sove
+                        INNER JOIN sobrecostos AS so ON sove.sobrecosto_id=so.id
                         WHERE sove.evento_id=%s;
                     """
                     cursor.execute(query, [int(evento['id'])])
-                    sobrecargos = dictfetchall(cursor)
+                    sobrecostos = dictfetchall(cursor)
 
                     query = """
                         SELECT 
@@ -308,7 +308,7 @@ class Eventos_Views(View):
                                 "evaluacion":evaluacion[0]["evaluacion"]
                             },
                             'servicios': servicios,
-                            'sobrecargos': sobrecargos,
+                            'sobrecostos': sobrecostos,
                             'pagos': pagos,
                         }
                     }

@@ -15,8 +15,8 @@ import {
   MetodosPago, FormMetodosPago,
   Niveles, FormNiveles,
   Materiales, FormMateriales,
-  Servicios, Sobrecargos,
-  FormSobrecargos, FormServicios,
+  Servicios, Sobrecostos,
+  FormSobrecostos, FormServicios,
   Eventos, Dolar, Inventario,
   FormDataEvent, FormAccount,
   EventosRecreadores, FormUsuarios,
@@ -106,9 +106,9 @@ function App() {
               <Route path="/servicios/:id/" element={<Servicio />} />
               <Route path="/register/servicio/" element={<FormServicios />} />
               <Route path="/edit/servicio/:id/" element={<FormServicios />} />
-              <Route path="/sobrecargos/" element={<Sobrecargos />} />
-              <Route path="/register/sobrecargo/" element={<FormSobrecargos />} />
-              <Route path="/edit/sobrecargo/:id/" element={<FormSobrecargos />} />
+              <Route path="/sobrecostos/" element={<Sobrecostos />} />
+              <Route path="/register/sobrecosto/" element={<FormSobrecostos />} />
+              <Route path="/edit/sobrecosto/:id/" element={<FormSobrecostos />} />
             </Route>
 
             <Route element={<ProtectedPrivate permisos={[7]} />}>

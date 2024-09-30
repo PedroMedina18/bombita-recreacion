@@ -66,7 +66,7 @@ function FormUsuarios() {
                 setValue(key, data[`${key}`])
             });
             setValue(`cargo`, data["cargo_id"])
-            setValue(`telefono_secundario`, data["telefono_secundario"]==="0"? "" : data["telefono_secundario"])
+            setValue(`telefono_secundario`, data["telefono_secundario"] === "0" ? "" : data["telefono_secundario"])
             setValue(`tipo_documento`, data["tipo_documento_id"])
             setDisabled(!data["estado"])
 
@@ -91,26 +91,27 @@ function FormUsuarios() {
                     }
                     const body = {}
                     if (data.id_persona) {
-                        body.id_persona = data.id_persona,
-                            body.usuario = data.usuario,
-                            body.contraseña = data.contraseña,
-                            body.cargo = Number(data.cargo)
+                        body.id_persona = data.id_persona
+                        body.usuario = data.usuario
+                        body.contraseña = data.contraseña
+                        body.cargo = Number(data.cargo)
 
                     } else {
-                        body.nombres = data.nombres,
-                            body.apellidos = data.apellidos,
-                            body.numero_documento = data.numero_documento,
-                            body.tipo_documento = Number(data.tipo_documento),
-                            body.telefono_principal = Number(data.telefono_principal),
-                            body.telefono_secundario = Number(data.telefono_secundario),
-                            body.correo = data.correo,
-                            body.usuario = data.usuario,
-                            body.contraseña = data.contraseña,
-                            body.cargo = Number(data.cargo)
+                        body.nombres = data.nombres
+                        body.apellidos = data.apellidos
+                        body.numero_documento = data.numero_documento
+                        body.tipo_documento = Number(data.tipo_documento)
+                        body.telefono_principal = Number(data.telefono_principal)
+                        body.telefono_secundario = Number(data.telefono_secundario)? Number(data.telefono_secundario) : null
+                        body.correo = data.correo
+                        body.usuario = data.usuario
+                        body.contraseña = data.contraseña
+                        body.cargo = Number(data.cargo)
                         if (data.estado !== undefined) {
                             body.estado = data.estado
                         }
                     }
+                    console.log(body)
                     const actualUser = () => {
                         const usuarioActual = getUser().id == params.id
                         if (params.id && usuarioActual) {
