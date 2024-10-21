@@ -49,7 +49,6 @@ function FormMateriales() {
             });
 
         } catch (error) {
-            console.log(error)
             setErrorServer(texts.errorMessage.errorObjet)
         } finally {
             setLoading(false)
@@ -89,7 +88,6 @@ function FormMateriales() {
                     })
                 }
             } catch (error) {
-                console.log(error)
                 Swal.close()
                 toastError(texts.errorMessage.errorConexion,)
             }
@@ -115,14 +113,14 @@ function FormMateriales() {
                         )
                         :
                         (
-                            <div className="div-main justify-content-between px-3 px-md-4 px-lg-5 py-3">
+                            <div className="div-main justify-content-between  px-3 px-md-4 px-lg-5 py-3">
                                 <form className="w-100 d-flex flex-column"
                                     onSubmit={onSubmit}>
                                     <InputsGeneral type={"text"} label={texts.label.nombre} name="nombre" id="nombre" form={{ errors, register }}
                                         params={{
                                             required: {
                                                 value: true,
-                                                message: texts.inputsMessage.requireName
+                                                message: texts.inputsMessage.requiredName
                                             },
                                             maxLength: {
                                                 value: 100,

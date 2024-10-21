@@ -20,7 +20,7 @@ function Usuarios() {
     const navigate = useNavigate()
 
     useEffect(() => {
-        document.title="Usuarios - Bombita Recreación"
+        document.title = "Usuarios - Bombita Recreación"
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             getUsuarios()
@@ -64,9 +64,23 @@ function Usuarios() {
             name: "Opciones",
             row: (row) => {
                 return <div className='d-flex justify-content-around options-table'>
-                    
-                    <IconEdit onClick={() => { navigate(`/edit/usuario/${row.id}/`) }} className="cursor-pointer" />
-                    <IconKey onClick={() => { navigate(`/password/usuario/${row.id}/`) }} className="cursor-pointer" />
+
+                    <IconEdit
+                        onClick={() => { navigate(`/edit/usuario/${row.id}/`) }}
+                        className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.editUsuario}
+                        data-bs-trigger="hover"
+                    />
+                    <IconKey
+                        onClick={() => { navigate(`/password/usuario/${row.id}/`) }}
+                        className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.password}
+                        data-bs-trigger="hover"
+                    />
                 </div>
             }
         }
@@ -95,7 +109,7 @@ function Usuarios() {
                     setList: setUsuarios,
                     setData: setDataUsuarios,
                     setLoading: setTableLoaing
-                    
+
                 })
             }
         },

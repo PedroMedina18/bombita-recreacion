@@ -1,60 +1,78 @@
-Sistema de control de eventos recreativos
+# Sistema Automatizado de control administrativo de eventos recreativos
 
 integrantes:
 Pedro Medina C.I. 30.565.353
 Emilys Hoyos C.I. 29.828.557
 
-USUARIOS PARA INGRESAR AL SISTEMA
+# Tecnologias y Herramientas Utilizadas:
 
-*PARA INICIAR EL PROYECTO TENGA EN CUENTA ALGUNAS COSAS:
-*NECESITA TENER DESCARGADO EL XAMPP
-
-*TENER EL LECTOR DE BASE DE DATOS MYSQL
-
-*CONEXION A INTERNET PARA DESCARGASR LOS MODULOS 
-
-*EL PROYECTO FUE CREADO UTILIZANDO DJANGO CON PYTHON  Y REACT CON JS
-
-*-----------------------PASOS DE INICIACION DEL PROYECTO REACT----------------
-
-1-CLONE EL REPOSITORIO O DESCARGUELO Y OBTENDRA UN DOCUMENTO CON LOS ARCHIVOS DEL SISTEMA
-
-2- DIRIGASE A LA CARPETA CARPETA RAIZ
-
-3- DESCARGUE LOS MODULOS DE REACT CON EL COMANDO npm install
-
-4- INICIE EL SISTEMA CON EL COMANDO npm run dev
+* Node
+* React
+* Python 3.8 
+* Django
+* MySql
+* Xampp
 
 
-*-----------------------PASOS DE INICIACION DEL PROYECTO DJANGO----------------
+# Instalacion:
 
-SI YA ESTA CLONADO EL REPOSITORIO INGRESE A LA RUTA DEL BACKEND
+- Descargar el proyecto
 
-E INSTALE LOS MODULOS DE PYTHON SE RECOMIENDA USAR UN ENTORNO VIRTUAL PARA EVITAR LA INSLACCION GLOBAL 
+- Instalar las dependencias tanto las del frontend como las de backend
 
-PARA REALIZAR USE EL COMANDO pip install -r requirements.txt
+*Archivos de dependencias*
+./package.json  | npm install
+./backend/requirements.txt  | pip install -r requirements.txt
 
-E INICIE EL SERVIDOR CON EL COMANDO python manage.py runserver
+- Cargar la base de datos del proyecto
 
-CON AMBOS SERVIDORES INICIADOS PODRA ACCEDER AL PROYECTO POR MEDIO DEL PUERTO POR DEFECTO DE REACT
+- Completar las variables de entorno del backen en un archivo .env
 
-----------------------------------------ADVERTENCIAS----------------------------
+-------------------------------------------------------------------------------------
+* SECRET_KEY = *Clave Secreta de django* [recomendacion: django-insecure-2&h!hmk-3ilmrw8+t!b39ulhawokq55%0t(^gg)*6!!re]
+* KEYZIP= *Clave Secreta para encriptar los respaldos* 
+* NAME_BASE_DATOS= *Nombre de la base de datos*  [recomendacion: bombita_recreacion]
+* USER= *Usuario de la base de datos* 
+* PASSWORD= *Password de la base de datos* 
+* PORT=*Puerto de ejecucion de la base de datos*  [recomendacion: 3306]
+* HOST= *Host de ejecucion de la base de datos*  [recomendacion: 127.0.0.1]
+* TOKEN= *Clave secreta del jwt* 
+* URL= *Url de ejecuion del backend para presentar las imagenes*  [recomendacion: http://127.0.0.1:8000/] 
+* RUTA_RAIZ= *Clave Raiz del sistema*  [recomendacion: C:]
+* CORREO= *Correo electronico para mandar correos*
+* PASSWORDCORREO= *Clave secreta dada por google para aplicaciones externas*
+----------------------------------------------------------------------------------------------
 
-*DEBE DE TENER SU ENTORNO VIRTUAL ACTIVO PARA EVITAR DESCARGAR LOS MODULOS GLOBALMENTE
-*DEBE TENER ACTIVADO EL XAMPP EN EL PUERTO 3306
-*EN CASO DE PROBLEMAS AL DESCARGAR EL MODULO DE mysqlclient EN PYTHON SE AGREGO EL ARCHIVO USADO DESCARGUELO MANUALMENTE
+- Iniciar el proyecto con los comandos
 
-LOS PUERTOS UTILIZADOS SON EL:
-http://127.0.0.1:5173/ PARA EL REACT  Y EL 
-http://127.0.0.1:8000/ PARA DJANGO
+* frontent | npm run dev
 
-SI MODIFICA ESTOS MUERTAS EL SISTEMA GENERAR ERROR POR LO QUE SE RECOMIENDA NO HACER EN CASO DE HACER TENDRA QUE ACCEDER AL ARCHIVO DE settings.py  UBICADO EN LA CARPETA my_api EN EL BACKEND Y MODIFICAR LAS  RUTAS  DEL CORS PARA PERMITIR EL ACCESO A LA API
+* backend | python manage.py runserver
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173']
+# ADVERTENCIAS
 
-Y PARA DJANGO ACCEDA AL ARCHIVO Servidor.js ubicado en la carpeta js en el src del frontend y modificar las siguientes lineas
+- Recuerde crear su entorno virtual para ejecutar el proyecto en python
 
-const API_URL="http://127.0.0.1:8000/api/"
+- En caso de conflictos revisar el settings del backend o las variables de entorno
+
+- Si cambia los puertos de ejecucion por defecto del proyecto corregir la ruta de conexion entre el frontend y el backend el mismo esta en el archivo ./src/utils/API.jsx
+
+# NOTAS
+
+- Rutas por defecto del proyecto
+
+* frontent | http://127.0.0.1:5173/
+
+* backend | http://127.0.0.1:8000/API/v1/[RUTA]
+
+- Puertos de Ejecucion
+
+* frontent | 5173
+
+* backend | 8000
+
+- Usuario y Contraseña de Acceso
+
+Usuario: Administrador1  
+Clave: Password123
 

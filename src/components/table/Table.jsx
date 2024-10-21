@@ -49,7 +49,7 @@ function Table({
       }
       const timeout = setTimeout(() => {
         options.search.function(searchTerm, filtros);
-      }, 900);
+      }, 800);
       setDebounceTimeout(timeout);
     }
   }, [searchTerm]);

@@ -17,7 +17,7 @@ function Clientes() {
     const navigate = useNavigate()
 
     useEffect(() => {
-        document.title="Clientes - Bombita Recreación"
+        document.title = "Clientes - Bombita Recreación"
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             getClientes()
@@ -31,14 +31,14 @@ function Clientes() {
             setList: setClientes,
             setData: setDataClientes,
             setLoading: setTableLoaing,
-            
+
         })
     }
 
     const columns = [
         {
             name: "Código",
-            row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
+            row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
         },
         {
             name: "Documento",
@@ -63,21 +63,35 @@ function Clientes() {
         {
             name: "Opciones",
             row: (row) => {
-              return <div className='d-flex justify-content-around options-table'>
-                <IconDetail onClick={() => { navigate(`/clientes/${row.id}/`) }} className="cursor-pointer" />
-                <IconEdit onClick={() => { navigate(`/edit/cliente/${row.id}/`) }} className="cursor-pointer" />
-              </div>
+                return <div className='d-flex justify-content-around options-table'>
+                    <IconDetail
+                        onClick={() => { navigate(`/clientes/${row.id}/`) }}
+                        className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.cliente}
+                        data-bs-trigger="hover"
+                    />
+                    <IconEdit
+                        onClick={() => { navigate(`/edit/cliente/${row.id}/`) }}
+                        className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.editar}
+                        data-bs-trigger="hover"
+                    />
+                </div>
             }
-          },
+        },
     ]
 
     const options = {
         search: {
             placeholder: texts.registerMessage.searchNameDocument,
-            function: (value, filtros={}) => {
+            function: (value, filtros = {}) => {
                 searchCode({
                     value: value,
-                    filtros:filtros,
+                    filtros: filtros,
                     object: clientes,
                     setList: setClientes,
                     setData: setDataClientes,
@@ -86,7 +100,7 @@ function Clientes() {
             }
         },
     }
-    
+
     return (
         <Navbar name={texts.pages.getClientes.name} descripcion={texts.pages.getClientes.description}>
 
@@ -97,6 +111,11 @@ function Clientes() {
                 totalPages={dataClientes.pages}
                 options={options}
                 loading={tableLoading}
+                order={true}
+                organizar={[
+                    { label: "Codigo", value: "orig" },
+                    { label: "Nombre", value: "alf" },
+                ]}
             />
             <Toaster />
         </Navbar>

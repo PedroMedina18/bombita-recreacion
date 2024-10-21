@@ -52,7 +52,6 @@ function FormTipoDocumento() {
             });
 
         } catch (error) {
-            console.log(error)
             setErrorServer(texts.errorMessage.errorObjet)
         } finally {
             setLoading(false)
@@ -91,7 +90,6 @@ function FormTipoDocumento() {
                 }
 
             } catch (error) {
-                console.log(error)
                 Swal.close()
                 toastError(texts.errorMessage.errorConexion)
             }
@@ -127,7 +125,7 @@ function FormTipoDocumento() {
                                         params={{
                                             required: {
                                                 value: true,
-                                                message: texts.inputsMessage.requireName,
+                                                message: texts.inputsMessage.requiredName,
                                             },
                                             maxLength: {
                                                 value: 100,

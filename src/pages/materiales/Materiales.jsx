@@ -4,7 +4,7 @@ import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx";
 import { formatDateWithTime12Hour } from "../../utils/process.jsx";
-import { IconTrash, IconEdit, IconDetail, IconList,  } from "../../components/Icon.jsx";
+import { IconTrash, IconEdit, IconDetail, IconList, } from "../../components/Icon.jsx";
 import { formatoId } from "../../utils/process.jsx";
 import { alertInfo } from "../../components/alerts.jsx";
 import Navbar from "../../components/navbar/Navbar";
@@ -27,9 +27,10 @@ function Materiales() {
         }
     }, [])
 
-    const getMateriales = () => {
+    const getMateriales = (filtros = {}) => {
         getListItems({
             object: materiales,
+            filtros: { ...filtros },
             setList: setMateriales,
             setData: setDataMateriales,
             setLoading: setTableLoaing,
@@ -63,6 +64,10 @@ function Materiales() {
                             navigate(`/inventario/${row.id}/`)
                         }}
                         className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.detailInventario}
+                        data-bs-trigger="hover"
                     />
                     <IconDetail
                         onClick={() => {
@@ -78,8 +83,17 @@ function Materiales() {
                             )
                         }}
                         className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.material}
+                        data-bs-trigger="hover"
                     />
-                    <IconEdit onClick={() => { navigate(`/edit/material/${row.id}/`) }} className="cursor-pointer" />
+                    <IconEdit onClick={() => { navigate(`/edit/material/${row.id}/`) }} className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.editar}
+                        data-bs-trigger="hover"
+                    />
                 </div>
             }
         },
@@ -88,10 +102,11 @@ function Materiales() {
     const options = {
         search: {
             placeholder: texts.registerMessage.searchItem,
-            function: (value, filtros = null) => {
+            function: (value, filtros = {}) => {
                 searchCode({
                     value: value,
                     object: materiales,
+                    filtros:filtros,
                     setList: setMateriales,
                     setData: setDataMateriales,
                     setLoading: setTableLoaing,

@@ -209,7 +209,7 @@ function FormDataEvent() {
                             params={{
                                 required: {
                                     value: !isClient,
-                                    message: texts.inputsMessage.requireDocumento,
+                                    message: texts.inputsMessage.requiredDocumento,
                                 },
                                 maxLength: {
                                     value: 9,
@@ -265,7 +265,7 @@ function FormDataEvent() {
                             params={{
                                 required: {
                                     value: !isClient,
-                                    message: texts.inputsMessage.requireNames,
+                                    message: texts.inputsMessage.requiredNames,
                                 },
                                 maxLength: {
                                     value: 200,
@@ -297,7 +297,7 @@ function FormDataEvent() {
                             params={{
                                 required: {
                                     value: !isClient,
-                                    message: texts.inputsMessage.requireLastName,
+                                    message: texts.inputsMessage.requiredLastName,
                                 },
                                 maxLength: {
                                     value: 200,
@@ -332,7 +332,7 @@ function FormDataEvent() {
                             params={{
                                 required: {
                                     value: !isClient,
-                                    message: texts.inputsMessage.requireTel,
+                                    message: texts.inputsMessage.requiredTel,
                                 },
                                 maxLength: {
                                     value: 11,
@@ -416,7 +416,7 @@ function FormDataEvent() {
                             params={{
                                 required: {
                                     value: true,
-                                    message: texts.inputsMessage.requireFechaEvent,
+                                    message: texts.inputsMessage.requiredFechaEvent,
                                 },
                                 min:{
                                     value:formatoFechaInput(fechaActual),
@@ -431,7 +431,7 @@ function FormDataEvent() {
                             params={{
                                 required: {
                                     value: true,
-                                    message: texts.inputsMessage.requirePersonas,
+                                    message: texts.inputsMessage.requiredPersonas,
                                 },
                                 min: {
                                     value: 1,

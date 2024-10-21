@@ -17,7 +17,7 @@ function Cargos() {
     const navigate = useNavigate()
 
     useEffect(() => {
-        document.title="Cargos - Bombita Recreación"
+        document.title = "Cargos - Bombita Recreación"
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             getCargos()
@@ -36,7 +36,7 @@ function Cargos() {
     const columns = [
         {
             name: "Código",
-            row: (row) => { const codigo = formatoId(Number(row.id)); return codigo}
+            row: (row) => { const codigo = formatoId(Number(row.id)); return codigo }
         },
         {
             name: "Nombre",
@@ -56,32 +56,47 @@ function Cargos() {
         {
             name: "Opciones",
             row: (row) => {
-              return <div className='d-flex justify-content-around options-table'>
-                <IconDetail
-                  onClick={() => { navigate(`/cargo/${row.id}/`) }} className="cursor-pointer"
-                />
-                <IconTrash
-                  onClick={() => {
-                    deleteItem({
-                        row: row,
-                        objet: cargos,
-                        functionGet: getCargos
-                    })
-                  }}
-                  className="cursor-pointer"
-                />
-                <IconEdit onClick={() => { navigate(`/edit/cargo/${row.id}/`) }} className="cursor-pointer" />
-              </div>
+                return <div className='d-flex justify-content-around options-table'>
+                    <IconDetail
+                        onClick={() => { navigate(`/cargo/${row.id}/`) }} className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.cargo}
+                        data-bs-trigger="hover"
+                    />
+                    <IconTrash
+                        onClick={() => {
+                            deleteItem({
+                                row: row,
+                                objet: cargos,
+                                functionGet: getCargos
+                            })
+                        }}
+                        className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.eliminar}
+                        data-bs-trigger="hover"
+                    />
+                    <IconEdit
+                        onClick={() => { navigate(`/edit/cargo/${row.id}/`) }}
+                        className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.editar}
+                        data-bs-trigger="hover"
+                    />
+                </div>
             }
-          },
+        },
     ]
     const options = {
         search: {
             placeholder: texts.registerMessage.searchItem,
-            function: (value, filtros={}) => {
+            function: (value, filtros = {}) => {
                 searchCode({
                     value: value,
-                    filtros:filtros,
+                    filtros: filtros,
                     object: cargos,
                     setList: setCargos,
                     setData: setDataCargos,
@@ -113,7 +128,7 @@ function Cargos() {
             />
             <Toaster />
         </Navbar>
-    ) 
+    )
 }
 
 export default Cargos

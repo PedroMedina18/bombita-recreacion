@@ -52,7 +52,6 @@ function FormSobrecostos() {
             });
             setValue("monto", `${Number(respuesta.data.data.monto).toFixed(2)}`)
         } catch (error) {
-            console.log(error)
             setErrorServer(texts.errorMessage.errorObjet)
         } finally {
             setLoading(false)
@@ -89,7 +88,6 @@ function FormSobrecostos() {
                     })
                 }
             } catch (error) {
-                console.log(error)
                 Swal.close()
                 toastError(texts.errorMessage.errorConexion)
             }
@@ -123,7 +121,7 @@ function FormSobrecostos() {
                                         params={{
                                             required: {
                                                 value: true,
-                                                message: texts.inputsMessage.requireName,
+                                                message: texts.inputsMessage.requiredName,
                                             },
                                             maxLength: {
                                                 value: 100,
@@ -175,7 +173,7 @@ function FormSobrecostos() {
                                         params={{
                                             required: {
                                                 value: true,
-                                                message: texts.inputsMessage.requireMonto,
+                                                message: texts.inputsMessage.requiredMonto,
                                             },
                                             validate: (e) => {
                                                 if (e <= 0) {

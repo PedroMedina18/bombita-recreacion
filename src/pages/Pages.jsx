@@ -45,6 +45,7 @@ import Preguntas from "./preguntas/Preguntas.jsx"
 import Evaluacion from "./evaluacion/FormEvaluacion.jsx"
 import Servicio from "./servicios/Servicio.jsx"
 import Estadistica from "./estadistica/Estadistica.jsx"
+import Manual from "./manual/Manual.jsx"
 
 export {
     Login, Error404, 
@@ -67,7 +68,7 @@ export {
     Configuracion, Cargo, Inventario,
     CalendarRecreadores, CalendarEvent,
     Preguntas, Evaluacion, Servicio,
-    Estadistica
+    Estadistica, Manual
 }
 
 

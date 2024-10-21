@@ -78,7 +78,6 @@ function Pagos() {
         return accumulator + current.monto
       }, 0)
       setMontoCancelar((totalServicios + totalSobrecostos) - Pagos)
-      console.log(evento.data.data)
       const pagosAnticipo = evento.data.data.pagos.filter(e => e.tipo === 1)
       const pagosFaltante = evento.data.data.pagos.filter(e => e.tipo === 2)
       const pagosTotal = evento.data.data.pagos.filter(e => e.tipo === 3)

@@ -2,7 +2,7 @@ import { personas } from "./API.jsx"
 import { toastError, alertConfim, alertLoading, alertAceptar } from '../components/alerts.jsx'
 import Swal from 'sweetalert2';
 import texts from "../context/text_es.js"
-import {useAuthContext} from "../context/AuthContext.jsx"
+import { activeTooltip } from "./process.jsx"
 
 // *Para permitir editar los datos al registrar un usuario, cliente o recreador
 export const habilitarEdicion = ({ setValue, setdataNewUser, dataPersona }) => {
@@ -15,13 +15,13 @@ export const habilitarEdicion = ({ setValue, setdataNewUser, dataPersona }) => {
     setValue("id_persona", "")
 }
 
-export const controlErrors = ({ respuesta, constrolError, message200=null, messageStatus=null }) => {
+export const controlErrors = ({ respuesta, constrolError, message200 = null, messageStatus = null }) => {
     if (respuesta.status !== 200) {
-        constrolError(`${message200? message200 : `Error. ${respuesta.status} ${respuesta.statusText}`}`)
+        constrolError(`${message200 ? message200 : `Error. ${respuesta.status} ${respuesta.statusText}`}`)
         return true
     }
     if (respuesta.data.status === false) {
-        constrolError(`${messageStatus? messageStatus : respuesta.data.message}`)
+        constrolError(`${messageStatus ? messageStatus : respuesta.data.message}`)
         return true
     }
     return false
@@ -49,7 +49,7 @@ export const verifyOptionsSelect = ({ respuesta, setOptions, label }) => {
 
 export const getDataAll = async ({ api, setData, label = null, message = null }) => {
     try {
-        const data = await api.get({params:{all:true, order:"ASC"}})
+        const data = await api.get({ params: { all: true, order: "ASC" } })
         verifyOptionsSelect({
             respuesta: data,
             setOptions: setData,
@@ -78,7 +78,7 @@ export const getPersona = async ({ dataNewUser, setPersona, setValue, setDisable
             }
         }
     } catch (error) {
-        toastError( "Error Consulta de Persona")
+        toastError("Error Consulta de Persona")
     }
 }
 // *Funcion encargada de buscar los datos del recreador y agregarlos al formulario
@@ -99,7 +99,7 @@ export const getRecreador = async ({ dataNewUser, setPersona, setValue, setDisab
             }
         }
     } catch (error) {
-        toastError( "Error Consulta de Recreador")
+        toastError("Error Consulta de Recreador")
     }
 }
 
@@ -131,10 +131,10 @@ export const deleteItem = async ({ row, objet, functionGet }) => {
 }
 
 // *funcion para realizar una consulta get al pasar un search
-export const searchCode = async ({ value, object, setList, setLoading, setData, filtros={}, subDominio=[] }) => {
+export const searchCode = async ({ value, object, setList, setLoading, setData, filtros = {}, subDominio = [] }) => {
     try {
         setLoading(true)
-        const respuesta = value ? await object.get({ subDominio:subDominio, params:{...filtros, search:value} }) : await object.get({subDominio:subDominio, params:filtros})
+        const respuesta = value ? await object.get({ subDominio: subDominio, params: { ...filtros, search: value } }) : await object.get({ subDominio: subDominio, params: filtros })
         if (respuesta.status !== 200) {
             setList([])
             setData({ pages: 1, total: 0 })
@@ -160,7 +160,9 @@ export const searchCode = async ({ value, object, setList, setLoading, setData, 
             setList(respuesta.data.data)
             setData({ pages: respuesta.data.pages ? respuesta.data.pages : 1, total: respuesta.data.total ? respuesta.data.total : 1 })
         }
-
+        setTimeout(() => {
+            activeTooltip()
+        }, 200);
     } catch (error) {
         setList([])
         setData({ pages: 1, total: 0 })
@@ -173,9 +175,9 @@ export const searchCode = async ({ value, object, setList, setLoading, setData, 
 }
 
 // *funcion para buscar lista de elementos en la API
-export const getListItems = async ({ object, setList, setData, data={}, setLoading, filtros={}, subDominio=[]}) => {
+export const getListItems = async ({ object, setList, setData, data = {}, setLoading, filtros = {}, subDominio = [] }) => {
     try {
-        const respuesta = await object.get({subDominio:subDominio, params:filtros})
+        const respuesta = await object.get({ subDominio: subDominio, params: filtros })
         if (respuesta.status !== 200) {
             toastError(`Error.${respuesta.status} ${respuesta.statusText}`)
             return
@@ -183,12 +185,17 @@ export const getListItems = async ({ object, setList, setData, data={}, setLoadi
         if (respuesta.data.status === false) {
             toastError(`${respuesta.data.message}`)
             return
-        } 
-        if(!respuesta.data.data){
+        }
+        if (!respuesta.data.data) {
             toastError(`Sin resultados`)
         }
-        setList(respuesta.data.data? respuesta.data.data : [])
-        setData({...data, pages: respuesta.data.pages, total: respuesta.data.total })
+        setList(respuesta.data.data ? respuesta.data.data : [])
+        setData({ ...data, pages: respuesta.data.pages, total: respuesta.data.total })
+
+        setTimeout(() => {
+            activeTooltip()
+        }, 200);
+
         return respuesta.data
     } catch (error) {
         setData({ pages: 1, total: 0 })

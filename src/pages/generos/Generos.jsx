@@ -26,10 +26,11 @@ function Generos() {
         }
     }, [])
 
-    const getGenero = () => {
+    const getGenero = (filtros = {}) => {
         getListItems({
             object: generos,
             setList: setGeneros,
+            filtros: { ...filtros },
             setData: setDataGeneros,
             setLoading: setTableLoaing
         })
@@ -63,7 +64,12 @@ function Generos() {
                                     ultima_modificación: formatDateWithTime12Hour(row.fecha_actualizacion),
                                 }
                             )
-                        }} className="cursor-pointer"
+                        }} 
+                        className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.genero}
+                        data-bs-trigger="hover"
                     />
                     <IconTrash
                         onClick={() => {
@@ -74,8 +80,19 @@ function Generos() {
                             })
                         }}
                         className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.eliminar}
+                        data-bs-trigger="hover"
                     />
-                    <IconEdit onClick={() => { navigate(`/edit/genero/${row.id}/`) }} className="cursor-pointer" />
+                    <IconEdit 
+                    onClick={() => { navigate(`/edit/genero/${row.id}/`) }} 
+                    className="cursor-pointer" 
+                    data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.editar}
+                        data-bs-trigger="hover"
+                    />
                 </div>
             }
         },
@@ -84,9 +101,10 @@ function Generos() {
     const options = {
         search: {
             placeholder: texts.registerMessage.searchItem,
-            function: (value) => {
+            function: (value, filtros = {}) => {
                 searchCode({
                     value: value,
+                    filtros:filtros,
                     object: generos,
                     setList: setGeneros,
                     setLoading: setTableLoaing,

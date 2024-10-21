@@ -52,7 +52,6 @@ function FormGeneros() {
             });
 
         } catch (error) {
-            console.log(error)
             setErrorServer(texts.errorMessage.errorObjet)
         } finally {
             setLoading(false)
@@ -80,7 +79,6 @@ function FormGeneros() {
                         descripcion: data.descripcion,
                     }
                     alertLoading("Cargando")
-                    console.log(params.id)
                     const res = params.id ? await generos.put(body, { subDominio:[Number(params.id)]}) : await generos.post(body)
                     controlResultPost({
                         respuesta: res,
@@ -91,7 +89,6 @@ function FormGeneros() {
                 }
 
             } catch (error) {
-                console.log(error)
                 Swal.close()
                 toastError(texts.errorMessage.errorConexion)
             }
@@ -125,7 +122,7 @@ function FormGeneros() {
                                         params={{
                                             required: {
                                                 value: true,
-                                                message: texts.inputsMessage.requireName,
+                                                message: texts.inputsMessage.requiredName,
                                             },
                                             maxLength: {
                                                 value: 100,

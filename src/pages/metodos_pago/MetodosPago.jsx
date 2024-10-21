@@ -64,7 +64,12 @@ function MetodosPago() {
                                   divisa:row.divisa? '<span class="badge p-2 bg-success">Monto en Divisa</span>' : '<span class="badge p-2 bg-danger">Monto en Bs.S</span>',
                                 }
                             )
-                        }} className="cursor-pointer"
+                        }} 
+                        className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.metodo_pago}
+                        data-bs-trigger="hover"
                     />
                     <IconTrash
                         onClick={() => {
@@ -75,8 +80,19 @@ function MetodosPago() {
                             })
                         }}
                         className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.eliminar}
+                        data-bs-trigger="hover"
                     />
-                    <IconEdit onClick={() => { navigate(`/edit/metodos_pago/${row.id}/`) }} className="cursor-pointer" />
+                    <IconEdit 
+                    onClick={() => { navigate(`/edit/metodos_pago/${row.id}/`) }} 
+                    className="cursor-pointer" 
+                    data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.editar}
+                        data-bs-trigger="hover"
+                    />
                 </div>
             }
         },

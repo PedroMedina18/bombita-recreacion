@@ -56,7 +56,7 @@ function Preguntas() {
                         pregunta: value
                     }
                     if (!value) {
-                        return Swal.showValidationMessage(texts.inputsMessage.requirePregunta);
+                        return Swal.showValidationMessage(texts.inputsMessage.requiredPregunta);
                     }
                     if (value.length > 100) {
                         return Swal.showValidationMessage(texts.inputsMessage.max100);
@@ -138,6 +138,10 @@ function Preguntas() {
                             getPreguntas()
                         }}
                         className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.disable}
+                        data-bs-trigger="hover"
                     />
                     <IconTrash
                         onClick={() => {
@@ -148,6 +152,11 @@ function Preguntas() {
                             });
                         }}
                         className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.eliminar}
+                        data-bs-trigger="hover"
+                        
                     />
                     <IconEdit
                         onClick={() => {
@@ -159,7 +168,12 @@ function Preguntas() {
                                 }
                             })
                         }}
-                        className="cursor-pointer" />
+                        className="cursor-pointer" 
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.editar}
+                        data-bs-trigger="hover"
+                        />
                 </div>
             }
         },

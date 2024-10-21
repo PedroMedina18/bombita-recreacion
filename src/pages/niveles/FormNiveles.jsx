@@ -52,7 +52,6 @@ function FormNiveles() {
             });
 
         } catch (error) {
-            console.log(error)
             setErrorServer(texts.errorMessage.errorObjet)
         } finally {
             setLoading(false)
@@ -89,7 +88,6 @@ function FormNiveles() {
                     })
                 }
             } catch (error) {
-                console.log(error)
                 Swal.close()
                 toastError(texts.errorMessage.errorConexion)
             }
@@ -123,7 +121,7 @@ function FormNiveles() {
                                         params={{
                                             required: {
                                                 value: true,
-                                                message: texts.inputsMessage.requireName,
+                                                message: texts.inputsMessage.requiredName,
                                             },
                                             maxLength: {
                                                 value: 100,

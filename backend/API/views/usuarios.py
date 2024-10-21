@@ -185,7 +185,7 @@ class Usuarios_Views(View):
                 if(id==1 and req['cargo']!=1):
                     datos = {
                     "status": False, 
-                    "message": f"{MESSAGE['errorAdministradorProtejido']}"
+                    "message": f"{MESSAGE['errorAdministradorProtegido']}"
                     }
                     return JsonResponse(datos)
 

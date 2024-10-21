@@ -158,7 +158,7 @@ function FormClientes() {
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: texts.inputsMessage.requireDocumento,
+                                                        message: texts.inputsMessage.requiredDocumento,
                                                     },
                                                     maxLength: {
                                                         value: 9,
@@ -186,7 +186,7 @@ function FormClientes() {
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: texts.inputsMessage.requireNames,
+                                                        message: texts.inputsMessage.requiredNames,
                                                     },
                                                     maxLength: {
                                                         value: 200,
@@ -219,7 +219,7 @@ function FormClientes() {
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: texts.inputsMessage.requireLastName,
+                                                        message: texts.inputsMessage.requiredLastName,
                                                     },
                                                     maxLength: {
                                                         value: 200,
@@ -253,7 +253,7 @@ function FormClientes() {
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: texts.inputsMessage.requireTel,
+                                                        message: texts.inputsMessage.requiredTel,
                                                     },
                                                     maxLength: {
                                                         value: 11,

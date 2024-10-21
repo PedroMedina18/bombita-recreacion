@@ -65,7 +65,6 @@ function FormEvaluacion() {
         useNavigate: { navigate: navigate, direction: `/eventos/${params.id}` },
       });
     } catch (error) {
-      console.log(error);
       Swal.close();
       toastError(texts.errorMessage.errorConexion);
     }

@@ -174,7 +174,7 @@ export const alertMotivo = async (title, id, callback) => {
             motivo_cancelacion: value
           }
           if (!value) {
-            return Swal.showValidationMessage(texts.inputsMessage.requirePregunta);
+            return Swal.showValidationMessage(texts.inputsMessage.requiredPregunta);
           }
           if (value.length > 300) {
             return Swal.showValidationMessage(texts.inputsMessage.max100);

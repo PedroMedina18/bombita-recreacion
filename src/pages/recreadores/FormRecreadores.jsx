@@ -178,6 +178,7 @@ function FormRecreadores() {
                                                 onChange={(e) => {
                                                     setDisabledEstado(!e.target.checked)
                                                 }}
+                                                title={watch("estado")?  texts.tootlip.enable : texts.tootlip.disable }
                                             />
 
                                         </div>
@@ -224,7 +225,7 @@ function FormRecreadores() {
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: texts.inputsMessage.requireDocumento,
+                                                        message: texts.inputsMessage.requiredDocumento,
                                                     },
                                                     maxLength: {
                                                         value: 9,
@@ -285,7 +286,7 @@ function FormRecreadores() {
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: texts.inputsMessage.requireNames,
+                                                        message: texts.inputsMessage.requiredNames,
                                                     },
                                                     maxLength: {
                                                         value: 200,
@@ -318,7 +319,7 @@ function FormRecreadores() {
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: texts.inputsMessage.requireLastName,
+                                                        message: texts.inputsMessage.requiredLastName,
                                                     },
                                                     maxLength: {
                                                         value: 200,
@@ -354,7 +355,7 @@ function FormRecreadores() {
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: texts.inputsMessage.requireDate,
+                                                        message: texts.inputsMessage.requiredDate,
                                                     },
                                                     validate: (e) => {
                                                         const edad = calcularEdad(e, new Date())
@@ -395,7 +396,7 @@ function FormRecreadores() {
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: texts.inputsMessage.requireTel,
+                                                        message: texts.inputsMessage.requiredTel,
                                                     },
                                                     maxLength: {
                                                         value: 11,

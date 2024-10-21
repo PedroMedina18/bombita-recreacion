@@ -268,7 +268,7 @@ function ModalPagos({ titulo, state, saveDataState, dataEvento }) {
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: texts.inputsMessage.requireMonto,
+                                                        message: texts.inputsMessage.requiredMonto,
                                                     },
                                                     validate: (e) => {
                                                         if (Number(e) == 0.0) {

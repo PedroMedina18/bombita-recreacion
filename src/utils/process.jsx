@@ -1,6 +1,7 @@
 import Swal from 'sweetalert2';
 import { personas } from "./API.jsx"
 import texts from '../context/text_es.js';
+import { Tooltip } from "bootstrap";
 
 // *Para verificar que no queden espacios en los inputs ni al inicio ni al final
 export function hasLeadingOrTrailingSpace(name) {
@@ -170,4 +171,9 @@ export function FalseTrue(param){
     return true
   }
   return param
+}
+
+export function activeTooltip(){
+  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new Tooltip(tooltipTriggerEl))
 }

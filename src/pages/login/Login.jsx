@@ -65,13 +65,12 @@ function Login() {
 
   return (
     <main className='w-100 px-2 px-md-0 vh-100 d-flex justify-content-center align-items-center bg-login position-relative'>
-      <img src={logo} alt="Logo" width="230px" className='position-absolute top-0 start-50 translate-middle-x' />
       <form className='form w-100 w-sm-50 w-lg-30'
         autoComplete={"off"}
         onSubmit={onSubmit}
       >
         <div className="icon-user" >
-          <IconUserCircleSolid />
+        <img src={logo} alt="Logo" width="220px" />
         </div>
 
         <h1 className='h3 fw-bold mb-4 mt-5 text-white text-center'>Inicio de Sesión</h1>
@@ -90,7 +89,7 @@ function Login() {
               ...register("usuario", {
                 required: {
                   value: true,
-                  message: texts.inputsMessage.requireUser,
+                  message: texts.inputsMessage.requiredUser,
                 }
               })
               }
@@ -104,7 +103,7 @@ function Login() {
                 }
               }
             />
-            <label htmlFor="user" className='lb-name  cursor-pointer'>
+            <label htmlFor="user" className='lb-name cursor-pointer'>
               <span className='text-name'>{texts.label.user}</span>
             </label>
           </div>
@@ -124,7 +123,7 @@ function Login() {
               ...register("contraseña", {
                 required: {
                   value: true,
-                  message: texts.inputsMessage.requirePassword,
+                  message: texts.inputsMessage.requiredPassword,
                 }
               })
               }

@@ -1,10 +1,12 @@
 import "./input.css";
 import "../button/button.css"
 import Select from "react-select";
-import { useState } from "react";
 import AsyncSelect from 'react-select/async';
 import perfil from "../../assets/perfil.png"
+import { activeTooltip } from "../../utils/process.jsx"
 import MakeAnimated from "react-select/animated";
+import { Tooltip } from "bootstrap"
+import { useEffect, useState } from "react";
 import { IconCircleCheck, IconCircleX, IconUserCircleSolid } from "../Icon";
 
 
@@ -598,15 +600,29 @@ export function MoneyInput({ label, id, name, form, params = {}, flexRow = false
   }
 }
 
-export function TogleSwiches({ id, name, form, className = "", ...props }) {
+export function TogleSwiches({ id, name, form, className = "", title=null, ...props }) {
   const { errors, register } = form;
+
+  useEffect(() => {
+    const tooltipElements = document.querySelectorAll('div.tooltip.custom-tooltip.bs-tooltip-auto.fade.show');
+    tooltipElements.forEach((element) => {
+      element.remove()
+    });
+    activeTooltip()
+  }, [title])
+  
   return (
     <label className={`switch ${className}`}>
       <input className="switch-input" type="checkbox" id={id}
         {...register(name)}
         {...props}
       />
-      <span className="slider"></span>
+      <span className="slider"
+      data-bs-toggle={"tooltip"} data-bs-placement="top"
+      data-bs-custom-class="custom-tooltip"
+      data-bs-trigger="hover"
+      data-bs-title={title}
+      ></span>
     </label>
   )
 }

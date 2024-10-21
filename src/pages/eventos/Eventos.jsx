@@ -134,14 +134,24 @@ export function TableEventos({ filtrosTable = {}, calendar = true, recreadoresIc
             <IconDetail
               onClick={() => {
                 navigate(`/eventos/${row.id}/`);
-              }} className="cursor-pointer"
+              }}
+              className="cursor-pointer"
+              data-bs-toggle="tooltip" data-bs-placement="top"
+              data-bs-custom-class="custom-tooltip"
+              data-bs-title={texts.tootlip.evento}
+              data-bs-trigger="hover"
             />
             {
               recreadoresIcon &&
               <IconRecreadores
                 onClick={() => {
                   navigate(`/eventos/recreadores/${row.id}/`);
-                }} className="cursor-pointer"
+                }}
+                className="cursor-pointer"
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                data-bs-custom-class="custom-tooltip"
+                data-bs-title={texts.tootlip.addRecreador}
+                data-bs-trigger="hover"
               />
             }
             {
@@ -151,23 +161,31 @@ export function TableEventos({ filtrosTable = {}, calendar = true, recreadoresIc
                   navigate(`/eventos/pagos/${row.id}/`);
                 }}
                 className="cursor-pointer"
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                data-bs-custom-class="custom-tooltip"
+                data-bs-title={texts.tootlip.addpagos}
+                data-bs-trigger="hover"
               />
             }
             {
               desabilititIcon &&
               <IconDesabilit
                 onClick={() => {
-                  const day = dayjs()
-                  const end = dayjs(row.fecha_evento_final)
-                  if (day.isAfter(end)) {
-                    return
-                  }
+                  // const day = dayjs()
+                  // const end = dayjs(row.fecha_evento_final)
+                  // if (day.isAfter(end)) {
+                  //   return
+                  // }
                   if (row.estado == 1 || row.estado === 0) {
                     return
                   }
                   cancelarEvento(row.id, filtros)
                 }}
                 className="cursor-pointer"
+                data-bs-toggle="tooltip" data-bs-placement="top"
+                data-bs-custom-class="custom-tooltip"
+                data-bs-title={texts.tootlip.cancelEvent}
+                data-bs-trigger="hover"
               />
             }
 
@@ -218,7 +236,7 @@ export function TableEventos({ filtrosTable = {}, calendar = true, recreadoresIc
     try {
       const confirmacion = await alertConfim("Confirmar", texts.confirmMessage.confirmCancelarEvento)
       if (confirmacion.isConfirmed) {
-        alertMotivo("Motivo por el que se Cancela el evento", id, () => { getEventos(filtros) })
+        alertMotivo(texts.pages.alertCancel.name, id, () => { getEventos(filtros) })
       }
     } catch (error) {
       toastError(texts.errorMessage.errorSystem)

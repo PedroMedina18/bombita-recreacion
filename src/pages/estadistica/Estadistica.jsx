@@ -76,7 +76,6 @@ function Estadistica() {
             }
 
         } catch (error) {
-            console.log(error)
             setErrorServer("Error en el grafico de Torta")
         }
 
@@ -119,7 +118,6 @@ function Estadistica() {
             }
 
         } catch (error) {
-            console.log(error)
             setErrorServer("Error en el grafico de Torta")
         }
     }

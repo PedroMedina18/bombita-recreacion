@@ -41,7 +41,6 @@ function Password() {
             const data = respuesta.data.data
             setValue(`usuario`, data["usuario"])
         } catch (error) {
-            console.log(error)
             setErrorServer(texts.errorMessage.errorObjet)
         } finally {
             setLoading(false)
@@ -66,10 +65,6 @@ function Password() {
                     const body = {
                         contraseña: data.contraseña,
                         contraseña_repetida: data.contraseñaTwo
-                    }
-                    if (Number(params.id) == 1) {
-                        toastError(texts.errorMessage.errorUserPasswor)
-                        return
                     }
                     alertLoading("Cargando")
                     const res = await usuarios.put(body, { subDominio: [Number(params.id)], params: { password: true } })
@@ -120,7 +115,7 @@ function Password() {
                                             <li><span>{(condicionesPassword.min8 && condicionesPassword.max16) ? <IconCircleCheck /> : <IconCircleX />}</span> Mayor a 8 caracteres y menor a 16 caracteres</li>
                                             <li><span>{condicionesPassword.mayuscula ? <IconCircleCheck /> : <IconCircleX />}</span> Minimo una letra en Mayuscula</li>
                                             <li><span>{condicionesPassword.numero ? <IconCircleCheck /> : <IconCircleX />}</span> Minimo una Digito Númerico</li>
-                                            <li><span>{condicionesPassword.repeat ? <IconCircleCheck /> : <IconCircleX />}</span> Contraseña Repetida</li>
+                                            <li><span>{condicionesPassword.repeat ? <IconCircleCheck /> : <IconCircleX />}</span> Contraseña Confirmada</li>
                                         </ul>
                                         <div className="w-100 w-md-50 d-flex flex-column justify-content-between align-item-center">
                                             <div className="w-100 ps-0">
@@ -128,7 +123,7 @@ function Password() {
                                                     params={{
                                                         required: {
                                                             value: true,
-                                                            message: texts.inputsMessage.requireUser
+                                                            message: texts.inputsMessage.requiredUser
                                                         },
                                                         minLength: {
                                                             value: 8,
@@ -159,7 +154,7 @@ function Password() {
                                                     params={{
                                                         required: {
                                                             value: true,
-                                                            message: texts.inputsMessage.requirePassword
+                                                            message: texts.inputsMessage.requiredPassword
                                                         },
                                                         minLength: {
                                                             value: 8,

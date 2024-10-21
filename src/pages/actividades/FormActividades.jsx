@@ -52,7 +52,6 @@ function FormActividades() {
       setOptionsDefault(coincidences(materiales, data.materiales))
       setSelectOptions(coincidences(materiales, data.materiales))
     } catch (error) {
-      console.log(error)
       setErrorServer(texts.errorMessage.errorObjet)
     } finally {
       setLoading(false)
@@ -93,7 +92,6 @@ function FormActividades() {
         }
 
       } catch (error) {
-        console.log(error)
         Swal.close()
         toastError(texts.errorMessage.errorConexion)
       }
@@ -126,7 +124,7 @@ function FormActividades() {
                     params={{
                       required: {
                         value: true,
-                        message: texts.inputsMessage.requireName,
+                        message: texts.inputsMessage.requiredName,
                       },
                       maxLength: {
                         value: 50,

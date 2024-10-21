@@ -63,7 +63,6 @@ function FormServicios() {
         setValue(`${element.nombre}`, element.cantidad)
       });
     } catch (error) {
-      console.log(error)
       setErrorServer(texts.errorMessage.errorObjet)
     } finally {
       setLoading(false)
@@ -118,7 +117,6 @@ function FormServicios() {
         useNavigate: { navigate: navigate, direction: "/servicios/" },
       });
     } catch {
-      console.log(error);
       Swal.close();
       toastError(texts.errorMessage.errorConexion);
     }
@@ -160,7 +158,7 @@ function FormServicios() {
                   params={{
                     required: {
                       value: true,
-                      message: texts.inputsMessage.requireName,
+                      message: texts.inputsMessage.requiredName,
                     },
                     maxLength: {
                       value: 100,
@@ -208,7 +206,7 @@ function FormServicios() {
                       params={{
                         required: {
                           value: true,
-                          message: texts.inputsMessage.requireRecreadores,
+                          message: texts.inputsMessage.requiredRecreadores,
                         },
                         min: {
                           value: 1,
@@ -228,7 +226,7 @@ function FormServicios() {
                       params={{
                         required: {
                           value: true,
-                          message: texts.inputsMessage.requirePrecio,
+                          message: texts.inputsMessage.requiredPrecio,
                         },
                         validate: (e) => {
                           if (e <= "0,00") {
@@ -278,7 +276,7 @@ function FormServicios() {
                       <InputsGeneral type={"number"} key={`${element.label}-${index}`} name={element.label} label={element.label} id={`${element.value}-material`} form={{ errors, register }} flexRow={true} params={{
                         required: {
                           value: true,
-                          message: texts.inputsMessage.requireCantidadMaterial,
+                          message: texts.inputsMessage.requiredCantidadMaterial,
                         },
                         min: {
                           value: 0,

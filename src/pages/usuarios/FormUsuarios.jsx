@@ -8,7 +8,7 @@ import { Toaster } from "sonner";
 import { usuarios } from "../../utils/API.jsx";
 import { alertConfim, toastError, alertLoading } from "../../components/alerts.jsx"
 import { IconRowLeft, IconKey } from "../../components/Icon.jsx"
-import { hasLeadingOrTrailingSpace } from "../../utils/process.jsx"
+import { hasLeadingOrTrailingSpace, activeTooltip } from "../../utils/process.jsx"
 import { getPersona, controlResultPost, habilitarEdicion, controlErrors } from "../../utils/actions.jsx"
 import { useAuthContext } from '../../context/AuthContext.jsx';
 import Navbar from "../../components/navbar/Navbar.jsx"
@@ -71,10 +71,13 @@ function FormUsuarios() {
             setDisabled(!data["estado"])
 
         } catch (error) {
-            console.log(error)
             setErrorServer(texts.errorMessage.errorObjet)
         } finally {
             setLoading(false)
+            setTimeout(() => {
+                activeTooltip()
+                
+            }, 800);
         }
     }
 
@@ -111,7 +114,6 @@ function FormUsuarios() {
                             body.estado = data.estado
                         }
                     }
-                    console.log(body)
                     const actualUser = () => {
                         const usuarioActual = getUser().id == params.id
                         if (params.id && usuarioActual) {
@@ -146,7 +148,16 @@ function FormUsuarios() {
                 <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/usuarios/") }}> <IconRowLeft /> Regresar</ButtonSimple>
                 {
                     params.id &&
-                    <ButtonSimple type="button" className="mb-2" onClick={() => { navigate(`/password/usuario/${params.id}`) }}> <IconKey /></ButtonSimple>
+                    <ButtonSimple 
+                    type="button" 
+                    className="mb-2" 
+                    onClick={() => { navigate(`/password/usuario/${params.id}`) }}
+                    data-bs-toggle="tooltip" data-bs-placement="top"
+                    data-bs-custom-class="custom-tooltip"
+                    data-bs-title={texts.tootlip.password}
+                    > 
+                    <IconKey />
+                    </ButtonSimple>
                 }
             </div>
 
@@ -205,6 +216,7 @@ function FormUsuarios() {
                                                     }
                                                     setDisabled(!e.target.checked)
                                                 }}
+                                                title={watch("estado")?  texts.tootlip.enable : texts.tootlip.disable }
                                             />
 
                                         </div>
@@ -248,7 +260,7 @@ function FormUsuarios() {
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: texts.inputsMessage.requireDocumento,
+                                                        message: texts.inputsMessage.requiredDocumento,
                                                     },
                                                     maxLength: {
                                                         value: 9,
@@ -309,7 +321,7 @@ function FormUsuarios() {
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: texts.inputsMessage.requireNames,
+                                                        message: texts.inputsMessage.requiredNames,
                                                     },
                                                     maxLength: {
                                                         value: 200,
@@ -341,7 +353,7 @@ function FormUsuarios() {
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: texts.inputsMessage.requireLastName,
+                                                        message: texts.inputsMessage.requiredLastName,
                                                     },
                                                     maxLength: {
                                                         value: 200,
@@ -376,7 +388,7 @@ function FormUsuarios() {
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: texts.inputsMessage.requireTel,
+                                                        message: texts.inputsMessage.requiredTel,
                                                     },
                                                     maxLength: {
                                                         value: 11,
@@ -477,7 +489,7 @@ function FormUsuarios() {
                                                 params={{
                                                     required: {
                                                         value: true,
-                                                        message: texts.inputsMessage.requireUser
+                                                        message: texts.inputsMessage.requiredUser
                                                     },
                                                     minLength: {
                                                         value: 8,
@@ -485,7 +497,7 @@ function FormUsuarios() {
                                                     },
                                                     maxLength: {
                                                         value: 16,
-                                                        message: texts.inputsMessage.max15
+                                                        message: texts.inputsMessage.max16
                                                     },
                                                     pattern: {
                                                         value: pattern.user,
@@ -510,7 +522,7 @@ function FormUsuarios() {
                                                     params={{
                                                         required: {
                                                             value: true,
-                                                            message: texts.inputsMessage.requirePassword
+                                                            message: texts.inputsMessage.requiredPassword
                                                         },
                                                         minLength: {
                                                             value: 8,

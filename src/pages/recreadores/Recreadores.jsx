@@ -23,7 +23,7 @@ function Recreadores() {
     const navigate = useNavigate()
 
     useEffect(() => {
-        document.title="Recreadores - Bombita Recreación"
+        document.title = "Recreadores - Bombita Recreación"
         if (renderizado.current === 0) {
             renderizado.current = renderizado.current + 1
             getRecreadores()
@@ -31,17 +31,16 @@ function Recreadores() {
         }
     }, [])
 
-    const getRecreadores = async (filtros={}) => {
+    const getRecreadores = async (filtros = {}) => {
         try {
             getListItems({
                 object: recreadores,
-                filtros:filtros,
+                filtros: filtros,
                 setList: setRecreadores,
                 setData: setDataRecreadores,
                 setLoading: setTableLoaing
             })
         } catch (error) {
-            console.log(error)
             setErrorServer(texts.errorMessage.errorSystem)
         }
     }
@@ -73,7 +72,7 @@ function Recreadores() {
         {
             name: "Estado",
             row: (row) => {
-                return row.estado ? <Pildora contenido="Activo" color="bg-succes"/> : <Pildora contenido="Inhabilitado" color="bg-danger"/>
+                return row.estado ? <Pildora contenido="Activo" color="bg-succes" /> : <Pildora contenido="Inhabilitado" color="bg-danger" />
             }
         },
         {
@@ -81,19 +80,35 @@ function Recreadores() {
             row: (row, filtros) => {
                 return <div className='d-flex justify-content-around options-table'>
                     <IconDetail
-                        onClick={() => { navigate(`/recreador/${row.id}/`) }} className="cursor-pointer"
+                        onClick={() => { navigate(`/recreador/${row.id}/`) }}
+                        className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.recreador}
+                        data-bs-trigger="hover"
                     />
                     <IconTrash
                         onClick={() => {
                             deleteItem({
                                 row: row,
                                 objet: recreadores,
-                                functionGet: ()=>{getRecreadores(filtros)}
+                                functionGet: () => { getRecreadores(filtros) }
                             })
                         }}
                         className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.eliminar}
+                        data-bs-trigger="hover"
                     />
-                    <IconEdit onClick={() => { navigate(`/edit/recreador/${row.id}/`) }} className="cursor-pointer" />
+                    <IconEdit
+                        onClick={() => { navigate(`/edit/recreador/${row.id}/`) }}
+                        className="cursor-pointer"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.editar}
+                        data-bs-trigger="hover"
+                    />
                 </div>
             }
         },

@@ -55,7 +55,6 @@ function FormMetodoPago() {
             });
 
         } catch (error) {
-            console.log(error)
             setErrorServer(texts.errorMessage.errorObjet)
         } finally {
             setLoading(false)
@@ -96,7 +95,6 @@ function FormMetodoPago() {
                 }
 
             } catch (error) {
-                console.log(error)
                 Swal.close()
                 toastError(texts.errorMessage.errorConexion)
             }
@@ -130,7 +128,7 @@ function FormMetodoPago() {
                                         params={{
                                             required: {
                                                 value: true,
-                                                message: texts.inputsMessage.requireName,
+                                                message: texts.inputsMessage.requiredName,
                                             },
                                             maxLength: {
                                                 value: 100,

@@ -3,7 +3,7 @@ import { actividades } from "../../utils/API.jsx";
 import { Toaster } from "sonner";
 import { useNavigate } from 'react-router-dom';
 import { deleteItem, searchCode, getListItems } from "../../utils/actions.jsx";
-import { formatoId, formatDateWithTime12Hour } from "../../utils/process.jsx";
+import { formatoId, formatDateWithTime12Hour, activeTooltip } from "../../utils/process.jsx";
 import { IconTrash, IconEdit, IconDetail } from "../../components/Icon.jsx";
 import { alertInfo } from "../../components/alerts.jsx";
 import Navbar from "../../components/navbar/Navbar";
@@ -26,12 +26,13 @@ function Actividades() {
     }
   }, [])
 
-  const getActividades = () => {
+  const getActividades = (filtros = {}) => {
     getListItems({
       object: actividades,
+      filtros: { ...filtros },
       setList: setActividades,
       setData: setDataActividades,
-      setLoading: setTableLoaing
+      setLoading: setTableLoaing,
     })
   }
 
@@ -61,8 +62,19 @@ function Actividades() {
               })
             }}
             className="cursor-pointer"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-custom-class="custom-tooltip"
+            data-bs-title={texts.tootlip.eliminar}
+            data-bs-trigger="hover"
           />
-          <IconEdit onClick={() => { navigate(`/edit/actividad/${row.id}/`) }} className="cursor-pointer" />
+          <IconEdit
+            onClick={() => { navigate(`/edit/actividad/${row.id}/`) }}
+            className="cursor-pointer"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-custom-class="custom-tooltip"
+            data-bs-title={texts.tootlip.editar}
+            data-bs-trigger="hover"
+          />
         </div>
       }
     },
@@ -71,10 +83,11 @@ function Actividades() {
   const options = {
     search: {
       placeholder: texts.registerMessage.searchItem,
-      function: (value) => {
+      function: (value, filtros = {}) => {
         searchCode({
           value: value,
           object: actividades,
+          filtros: filtros,
           setList: setActividades,
           setData: setDataActividades,
           setLoading: setTableLoaing,
@@ -99,6 +112,11 @@ function Actividades() {
         totalPages={dataActividades.pages}
         options={options}
         loading={tableLoading}
+        order={true}
+        organizar={[
+          { label: "Codigo", value: "orig" },
+          { label: "Nombre", value: "alf" },
+        ]}
       />
       <Toaster />
     </Navbar>

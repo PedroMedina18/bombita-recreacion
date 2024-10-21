@@ -21,7 +21,7 @@ function TipoDocumento() {
 
   const navigate = useNavigate();
   useEffect(() => {
-    document.title="Tipos de Documentos - Bombita Recreación"
+    document.title = "Tipos de Documentos - Bombita Recreación"
     if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1;
       getTipo_Documentos();
@@ -77,6 +77,10 @@ function TipoDocumento() {
                 });
               }}
               className="cursor-pointer"
+              data-bs-toggle="tooltip" data-bs-placement="top"
+              data-bs-custom-class="custom-tooltip"
+              data-bs-title={texts.tootlip.tipo_documento}
+              data-bs-trigger="hover"
             />
             <IconTrash
               onClick={() => {
@@ -87,12 +91,20 @@ function TipoDocumento() {
                 });
               }}
               className="cursor-pointer"
+              data-bs-toggle="tooltip" data-bs-placement="top"
+              data-bs-custom-class="custom-tooltip"
+              data-bs-title={texts.tootlip.eliminar}
+              data-bs-trigger="hover"
             />
             <IconEdit
               onClick={() => {
                 navigate(`/edit/tipo_documento/${row.id}/`);
               }}
               className="cursor-pointer"
+              data-bs-toggle="tooltip" data-bs-placement="top"
+              data-bs-custom-class="custom-tooltip"
+              data-bs-title={texts.tootlip.editar}
+              data-bs-trigger="hover"
             />
           </div>
         );

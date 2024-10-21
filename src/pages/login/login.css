@@ -25,16 +25,9 @@ main{
 
 .icon-user {
   position: absolute;
-  color: rgb(255, 255, 255);
-  width: 100px;
   top: 0;
-  background-color: rgba(70, 70, 70, 0.918);
   border-radius: 50%;
   transform: translateY(-50%);
-}
-
-.login-logo{
-  width: 250px;
 }
 
 .bg-login {
@@ -75,7 +68,7 @@ label.icon-input {
 }
 .lb-name {
   position: absolute;
-  bottom: 0;
+  bottom: 0px;
   margin-left: 5px;
   left: 0;
   width: 100%;
@@ -86,11 +79,11 @@ label.icon-input {
 
 .text-name {
   position: absolute;
-  bottom: 0px;
+  bottom: 2px;
   left: 8px;
   transition: all 0.3s ease;
   font-weight: bold;
-  font-size: 15px;
+  font-size: 18px;
   color: rgb(14, 14, 14);
 }
 

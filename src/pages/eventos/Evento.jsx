@@ -36,8 +36,6 @@ function Evento() {
 
   useEffect(() => {
     document.title = "Evento - Bombita Recreación"
-    // const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    // const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new Tooltip(tooltipTriggerEl))
     if (renderizado.current === 0) {
       renderizado.current = renderizado.current + 1
       get_data()
@@ -104,7 +102,6 @@ function Evento() {
         alertMotivo("Motivo por el que se Cancela el evento", params.id, () => { navigate("/eventos/") })
       }
     } catch (error) {
-      console.log(error)
       toastError(texts.errorMessage.errorSystem)
     }
   }
@@ -134,23 +131,33 @@ function Evento() {
       <div className="w-100 d-flex flex-wrap justify-content-between">
         <ButtonSimple type="button" className="mb-2" onClick={() => { navigate("/eventos/") }}> <IconRowLeft /> Regresar  </ButtonSimple>
         <div className="d-flex flex-column flex-md-row">
-          <ButtonSimple disabled={dataEvento?.info.estado !== null || dataEvento?.info.estado === 1}
-            data-bs-toggle="tooltip" data-bs-placement="top"
-            data-bs-custom-class="custom-tooltip"
-            data-bs-title="This top tooltip is themed via CSS variables."
-            type="button"
-            className="mb-2"
-            onClick={() => {
-              cancelarEvento()
-            }}
-          >Cancelar <IconX /> </ButtonSimple>
-          <ButtonSimple disabled={ !(dataEvento?.info.estado_pago === 2 && dataEvento?.info.recreadores === 1 &&  dataEvento?.info.estado===null && (getPermisos().administrador || getPermisos().permisos.includes(12)) ) }
-            type="button"
-            className="mb-2 ms-2"
-            onClick={() => {
-              completarEvento()
-            }}
-          >Completado <IconCheck /> </ButtonSimple>
+          {
+            !(dataEvento?.info.estado !== null || dataEvento?.info.estado === 1) &&
+            <ButtonSimple
+              data-bs-toggle="tooltip" data-bs-placement="top"
+              data-bs-custom-class="custom-tooltip"
+              data-bs-title="This top tooltip is themed via CSS variables."
+              type="button"
+              className="mb-2"
+              onClick={() => {
+                cancelarEvento()
+              }}
+            >
+              Cancelar <IconX />
+            </ButtonSimple>
+          }
+          {
+            !(!(dataEvento?.info.estado_pago === 2 && dataEvento?.info.recreadores === 1 && dataEvento?.info.estado === null && (getPermisos().administrador || getPermisos().permisos.includes(12)))) &&
+            <ButtonSimple
+              type="button"
+              className="mb-2 ms-2"
+              onClick={() => {
+                completarEvento()
+              }}
+            >Completado <IconCheck />
+            </ButtonSimple>
+          }
+
 
           <ButtonSimple disabled={!dataEvento?.info.estado === true}
             type="button"
@@ -246,7 +253,7 @@ function Evento() {
                         <strong className="fs-3">Opinión</strong>
                         <p className="m-0 fs-6 mb-1">{`${dataEvento.info.opinion}`}</p>
                       </div>
-                      <RadioStart save={()=>{}} state={[]} index={1} id={"evaluacion-evento"} name={"evaluacion-evento"} check={Number(dataEvento.info.evaluacion).toFixed(0)} block={true} />
+                      <RadioStart save={() => { }} state={[]} index={1} id={"evaluacion-evento"} name={"evaluacion-evento"} check={Number(dataEvento.info.evaluacion).toFixed(0)} block={true} />
                     </div>
                   }
 

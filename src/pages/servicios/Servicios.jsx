@@ -61,9 +61,21 @@ function Servicios() {
       row: (row) => {
         return <div className='d-flex justify-content-around options-table'>
           <IconDetail
-            onClick={() => { navigate(`/servicios/${row.id}/`) }} className="cursor-pointer"
+            onClick={() => { navigate(`/servicios/${row.id}/`) }}
+            className="cursor-pointer"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-custom-class="custom-tooltip"
+            data-bs-title={texts.tootlip.servicio}
+            data-bs-trigger="hover"
           />
-          <IconEdit onClick={() => { navigate(`/edit/servicio/${row.id}/`) }} className="cursor-pointer" />
+          <IconEdit
+            onClick={() => { navigate(`/edit/servicio/${row.id}/`) }}
+            className="cursor-pointer"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-custom-class="custom-tooltip"
+            data-bs-title={texts.tootlip.editar}
+            data-bs-trigger="hover"
+          />
           <IconTrash
             onClick={() => {
               deleteItem({
@@ -73,6 +85,10 @@ function Servicios() {
               })
             }}
             className="cursor-pointer"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-custom-class="custom-tooltip"
+            data-bs-title={texts.tootlip.eliminar}
+            data-bs-trigger="hover"
           />
         </div>
       }
@@ -110,10 +126,10 @@ function Servicios() {
         options={options}
         loading={tableLoading}
         order={true}
-                organizar={[
-                    { label: "Codigo", value: "orig" },
-                    { label: "Nombre", value: "alf" },
-                ]}
+        organizar={[
+          { label: "Codigo", value: "orig" },
+          { label: "Nombre", value: "alf" },
+        ]}
       />
       <Toaster />
     </Navbar>

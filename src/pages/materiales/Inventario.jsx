@@ -96,10 +96,10 @@ function Inventario() {
                         material:Number(id)
                     }
                     if(!body.cantidad){
-                        return Swal.showValidationMessage(texts.inputsMessage.requireCantidadMaterial);
+                        return Swal.showValidationMessage(texts.inputsMessage.requiredCantidadMaterial);
                     }
                     if(!body.descripcion){
-                        return Swal.showValidationMessage(texts.inputsMessage.requireDescripcion);
+                        return Swal.showValidationMessage(texts.inputsMessage.requiredDescripcion);
                     }
                     if(!body.tipo){
                         return Swal.showValidationMessage(texts.inputsMessage.selectRegistro);
@@ -131,7 +131,6 @@ function Inventario() {
             },
             allowOutsideClick: () => !Swal.isLoading()
         }).then(async (result) => {
-            console.log(result)
             if (result.value?.status) {
                 const aceptar = await alertAceptar("Exito!", texts.successMessage.registerRegistroMaterial)
                 if (aceptar.isConfirmed) {

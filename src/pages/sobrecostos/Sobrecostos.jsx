@@ -69,6 +69,10 @@ function Sobrecostos() {
                 }
               )
             }} className="cursor-pointer"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-custom-class="custom-tooltip"
+            data-bs-title={texts.tootlip.sobrecosto}
+            data-bs-trigger="hover"
           />
           <IconTrash
             onClick={() => {
@@ -79,8 +83,19 @@ function Sobrecostos() {
               })
             }}
             className="cursor-pointer"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-custom-class="custom-tooltip"
+            data-bs-title={texts.tootlip.eliminar}
+            data-bs-trigger="hover"
           />
-          <IconEdit onClick={() => { navigate(`/edit/sobrecosto/${row.id}/`) }} className="cursor-pointer" />
+          <IconEdit
+            onClick={() => { navigate(`/edit/sobrecosto/${row.id}/`) }}
+            className="cursor-pointer"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-custom-class="custom-tooltip"
+            data-bs-title={texts.tootlip.editar}
+            data-bs-trigger="hover"
+          />
         </div>
       }
     },

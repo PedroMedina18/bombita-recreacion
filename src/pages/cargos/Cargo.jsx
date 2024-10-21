@@ -41,7 +41,6 @@ function Cargo() {
       setData(cargo.data.data)
       setUsuarios(usuarioRes.data.data ? usuarioRes.data.data : [])
     } catch (error) {
-      console.log(error)
       setErrorServer(texts.errorMessage.errorSystem)
       setData(null)
     } finally {
@@ -71,7 +70,7 @@ function Cargo() {
                 <h3 className="h2 fw-bold">{`${data.nombre}`}</h3>
                 <div className="w-100 d-flex flex-column">
                   <div className="d-flex flex-column flex-md-row  justify-content-between mt-3">
-                    <div className={`lg section-perfil d-flex align-items-center justify-content-center mt-2 mx-auto ${data.img ? "section-perfil-img" : ""}`}>
+                    <div className={`lg section-perfil d-flex align-items-center justify-content-center mt-2 mx-auto align-self-start ${data.img ? "section-perfil-img" : ""}`}>
                       {
                         data.img ?
                           <img src={data.img} alt="img_perfil" className={`lg img-perfil ${data.img ? "" : "d-none"}`} />

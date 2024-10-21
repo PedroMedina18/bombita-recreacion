@@ -63,7 +63,12 @@ function Niveles() {
                   ultima_modificación: formatDateWithTime12Hour(row.fecha_actualizacion),
                 }
               )
-            }} className="cursor-pointer"
+            }}
+            className="cursor-pointer"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-custom-class="custom-tooltip"
+            data-bs-title={texts.tootlip.nivel}
+            data-bs-trigger="hover"
           />
           <IconTrash
             onClick={() => {
@@ -74,8 +79,19 @@ function Niveles() {
               })
             }}
             className="cursor-pointer"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-custom-class="custom-tooltip"
+            data-bs-title={texts.tootlip.eliminar}
+            data-bs-trigger="hover"
           />
-          <IconEdit onClick={() => { navigate(`/edit/nivel/${row.id}/`) }} className="cursor-pointer" />
+          <IconEdit
+            onClick={() => { navigate(`/edit/nivel/${row.id}/`) }}
+            className="cursor-pointer"
+            data-bs-toggle="tooltip" data-bs-placement="top"
+            data-bs-custom-class="custom-tooltip"
+            data-bs-title={texts.tootlip.editar}
+            data-bs-trigger="hover"
+          />
         </div>
       }
     },
@@ -104,10 +120,10 @@ function Niveles() {
     },
     search: {
       placeholder: texts.registerMessage.searchItem,
-      function: (value, filtros={}) => {
+      function: (value, filtros = {}) => {
         searchCode({
           value: value,
-          filtros:filtros,
+          filtros: filtros,
           object: niveles,
           setList: setNiveles,
           setData: setDataNiveles,

@@ -61,7 +61,6 @@ function FormCargos() {
                 label:(e)=>{return e.nombre}
             })
         } catch (error) {
-            console.log(error)
             setErrorServer(texts.errorMessage.errorSystem)
         } finally {
             if (!params.id) {
@@ -87,7 +86,6 @@ function FormCargos() {
             setCheckInput(data.administrador ? true : false)
             setImgLogo(data.img ? data.img : null)
         } catch (error) {
-            console.log(error)
             setErrorServer(texts.errorMessage.errorObjet)
         } finally {
             setLoading(false)
@@ -140,7 +138,6 @@ function FormCargos() {
                     })
                 }
             } catch (error) {
-                console.log(error)
                 Swal.close()
                 toastError(texts.errorMessage.errorConexion)
             }
@@ -174,7 +171,7 @@ function FormCargos() {
                                         params={{
                                             required: {
                                                 value: true,
-                                                message: texts.inputsMessage.requireName,
+                                                message: texts.inputsMessage.requiredName,
                                             },
                                             maxLength: {
                                                 value: 50,

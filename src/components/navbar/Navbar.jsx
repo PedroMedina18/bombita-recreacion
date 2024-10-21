@@ -19,7 +19,8 @@ import {
     IconService,
     IconUsers,
     IconUserCircle,
-    IconExit
+    IconExit,
+    IconManual
 
 } from "../../components/Icon.jsx"
 
@@ -98,14 +99,14 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
                                 <span>Servicios</span>
                             </a>
                             <ul id="servicios" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                            <li className="sidebar-item">
+                                <li className="sidebar-item">
                                     <Link to="/servicios/" className="sidebar-link">Servicios</Link>
                                 </li>
                                 <li className="sidebar-item">
                                     <Link to="/actividades/" className="sidebar-link">Actividades</Link>
                                 </li>
                                 <li className="sidebar-item">
-                                    <Link to="/sobrecargos/" className="sidebar-link">Sobrecargos</Link>
+                                    <Link to="/sobrecostos/" className="sidebar-link">Sobrecostos</Link>
                                 </li>
                             </ul>
                         </li>
@@ -135,7 +136,7 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
                                 <span>Recreadores</span>
                             </a>
                             <ul id="recreadores" className="sidebar-dropdown list-unstyled collapse" data-bs-parent="#sidebar">
-                            <li className="sidebar-item">
+                                <li className="sidebar-item">
                                     <Link to="/recreadores/" className="sidebar-link">Recreadores</Link>
                                 </li>
                                 <li className="sidebar-item">
@@ -158,11 +159,11 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
                     {
                         (getPermisos().permisos.includes(13) || getPermisos().administrador) &&
                         <li className="sidebar-item">
-                        <Link to="/estadisticas/" className="sidebar-link">
-                            <IconEstadistica />
-                            <span>Estadisticas</span>
-                        </Link>
-                    </li>
+                            <Link to="/estadisticas/" className="sidebar-link">
+                                <IconEstadistica />
+                                <span>Estadisticas</span>
+                            </Link>
+                        </li>
                     }
                     {
                         (getPermisos().permisos.includes(14) || getPermisos().administrador) &&
@@ -173,6 +174,12 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
                             </Link>
                         </li>
                     }
+                    <li className="sidebar-item">
+                        <Link to="/manual/" className="sidebar-link">
+                            <IconManual />
+                            <span>Guía</span>
+                        </Link>
+                    </li>
 
 
                     <li className="sidebar-item"
@@ -226,7 +233,7 @@ function Navbar({ children, name = null, descripcion = null, dollar = true }) {
                         {
                             dollar &&
                             <div className="d-flex flex-column">
-                                <h1 className="fs-5 fw-bold m-0 pb-1">Precio del Dolar $</h1>
+                                <h1 className="fs-5 fw-bold m-0 pb-1">Precio del Dólar $</h1>
                                 <p className="m-0 fs-6 ">{`${dataUser.dollar.price} Bs.S`}</p>
                             </div>
                         }

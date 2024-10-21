@@ -1,13 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ButtonSimple } from "../../components/button/Button";
 import { useForm } from "react-hook-form";
 import { toastError, alertConfim, alertLoading } from "../../components/alerts.jsx";
 import { useNavigate } from 'react-router-dom';
-import { formatoId, truncateString } from "../../utils/process.jsx";
+import { formatoId, truncateString, activeTooltip } from "../../utils/process.jsx";
 import { useFormEventContext } from "../../context/FormEventContext.jsx";
 import { sobrecostos, servicios, eventos } from "../../utils/API.jsx";
 import { IconService, IconBilletera } from "../../components/Icon.jsx";
-import { controlResultPost } from "../../utils/actions.jsx";
 import { useAuthContext } from "../../context/AuthContext.jsx";
 import ModalSelect from "../../components/modal/ModalSelect.jsx";
 import Swal from 'sweetalert2';
@@ -16,11 +15,15 @@ import TableDescriptionFacture from "../../components/table/TableDescriptionFact
 
 function FormAccount() {
     const { getUser, dataOptions } = useAuthContext();
-    const [dolar] = useState(getUser().dollar.price);
     const { dataServicios, saveDataServicios, valueCliente, saveDataSobrecostos, dataSobrecostos, setSaveDataSobrecostos, setSaveDataServicios, dataEvent } = useFormEventContext()
+    const [dolar] = useState(getUser().dollar.price);
     const [estadoSobrecostos, setEstadoSobrecostos] = useState(false);
     const [estadoServicios, setEstadoServicios] = useState(false);
     const navigate = useNavigate();
+
+    useEffect(() => {
+        activeTooltip()
+    }, [])
 
     // *the useform
     const {
@@ -53,7 +56,7 @@ function FormAccount() {
                     body.apellidos = dataEvent.apellidos
                     body.numero_documento = Number(dataEvent.numero_documento)
                     body.telefono_principal = Number(dataEvent.telefono_principal)
-                    body.telefono_secundario = Number(dataEvent.telefono_secundario)? Number(dataEvent.telefono_secundario) : null
+                    body.telefono_secundario = Number(dataEvent.telefono_secundario) ? Number(dataEvent.telefono_secundario) : null
                     body.correo = dataEvent.correo
                     body.tipo_documento = Number(dataEvent.tipo_documento)
                     body.fecha_evento_inicio = dataEvent.fecha_evento_inicio
@@ -77,7 +80,6 @@ function FormAccount() {
                     }
                 }
             } catch (error) {
-                console.log(error)
                 Swal.close()
                 toastError(texts.errorMessage.errorConexion)
             }
@@ -139,7 +141,7 @@ function FormAccount() {
         });
         return suma;
     }
-    
+
     return (
         <>
             <ModalSelect titulo={"Escoja los servicios"} state={[estadoServicios, setEstadoServicios]} object={servicios} columns={columnsServicio} saveSelect={setSaveDataServicios} select={saveDataServicios} />
@@ -147,11 +149,21 @@ function FormAccount() {
 
             <form className="w-100 d-flex flex-column justify-content-between" onSubmit={onSubmit}>
                 <div className="w-100 d-flex justify-content-end align-item-center">
-                    <ButtonSimple type="button" onClick={() => { setEstadoServicios(true) }} className="px-4 mt-3">
-                        <IconService/>
+                    <ButtonSimple type="button" onClick={() => { setEstadoServicios(true) }} className="px-4 mt-3"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.addServicios}
+                        data-bs-trigger="hover"
+                    >
+                        <IconService />
                     </ButtonSimple>
-                    <ButtonSimple type="button" onClick={() => { setEstadoSobrecostos(true) }} className="px-4 ms-5 mt-3">
-                        <IconBilletera/>
+                    <ButtonSimple type="button" onClick={() => { setEstadoSobrecostos(true) }} className="px-4 ms-5 mt-3"
+                        data-bs-toggle="tooltip" data-bs-placement="top"
+                        data-bs-custom-class="custom-tooltip"
+                        data-bs-title={texts.tootlip.addSobrecostos}
+                        data-bs-trigger="hover"
+                    >
+                        <IconBilletera />
                     </ButtonSimple>
                 </div>
                 <div className="w-100 d-flex flex-column justify-content-between align-item-center">

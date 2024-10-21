@@ -35,7 +35,7 @@ function Configuracion() {
                     {
                         (getPermisos().administrador || [5, 12, 14, 6,].some(id => getPermisos().permisos.includes(id))) &&
                         <li className='list-group-item p-0 d-flex border-top'>
-                            <Link to="/dolar/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig className="me-2" /></span>Dolar</Link>
+                            <Link to="/dolar/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig className="me-2" /></span>Dólar</Link>
                         </li>
                     }
                     {
@@ -49,10 +49,10 @@ function Configuracion() {
                         <Link to="/tipo_documentos/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig className="me-2" /></span>Tipo Documento</Link>
                     </li>
                     <li className='list-group-item p-0 d-flex'>
-                        <Link to="/generos/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig className="me-2" /></span>Generos</Link>
+                        <Link to="/generos/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig className="me-2" /></span>Géneros</Link>
                     </li>
                     <li className='list-group-item p-0 d-flex border-bottom'>
-                        <Link to="/metodos_pago/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig className="me-2" /></span>Metodos de Pago</Link>
+                        <Link to="/metodos_pago/" className="text-decoration-none text-dark w-100 py-2 px-4  link-action-secundary"><span><IconConfig className="me-2" /></span>Métodos de Pago</Link>
                     </li>
                     {
                         (getPermisos().administrador || [11, 14].some(id => getPermisos().permisos.includes(id))) &&

@@ -62,11 +62,9 @@
 
 .card-info .title-info {
   font-weight: bold;
-  text-align: justify;
   width: 80%;
   font-size: 20px;
   margin: 0;
-  /* color: rgb(15, 133, 0); */
 }
 
 .card-secundario {

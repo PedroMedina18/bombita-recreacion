@@ -135,23 +135,10 @@ function EventosRecreadores() {
         controlResultPost({
           respuesta: respuesta,
           messageExito: isRecreadores ? texts.successMessage.editionEventoRecreadores : texts.successMessage.registerEventoRecreadores,
-          useNavigate: { navigate: navigate, direction: `/evento/${Number(params.id_evento)}/` }
+          useNavigate: { navigate: navigate, direction: `/eventos/${Number(params.id_evento)}/` }
         })
-        // if (respuesta.status = 200) {
-        //   if (respuesta.data.status) {
-        //     Swal.close(`/eventos/pagos/${respuesta.data.id}/`)
-        //     navigate()
-        //   } else {
-        //     Swal.close()
-        //     toastError(`${respuesta.data.message}`)
-        //   }
-        // } else {
-        //   Swal.close()
-        //   toastError(`Error.${respuesta.status} ${respuesta.statusText}`)
-        // }
       }
     } catch (error) {
-      console.log(error)
       Swal.close()
       toastError(texts.errorMessage.errorConexion)
     }
